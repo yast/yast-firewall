@@ -206,8 +206,44 @@
 	return ret_message;
     }
 
+    string SummaryUnassignedInterfaces () {
+	string ret_message = "\n" + (simple_text ?
+	    // TRANSLATORS: Summary text item
+	    String::UnderlinedHeader(_("Unassigned Interfaces"),0)
+	    :
+	    // TRANSLATORS: Summary text item
+	    ("<h2>" + _("Unassigned Interfaces") + "</h2>")
+	) + "\n";
+
+	list <string> special_strings = [];
+	foreach (string zone, SuSEFirewall::GetKnownFirewallZones(), {
+	    special_strings = (list<string>)
+		union(special_strings, SuSEFirewall::GetSpecialInterfacesInZone(zone));
+	});
+
+	if (contains(special_strings, "any") || contains(special_strings, "auto")) {
+	    y2milestone("Special strings 'any' or 'auto' presented, skipping...");
+	    return "";
+	}
+
+	ret_message = ret_message + ul_start;
+	foreach (map <string, string> interface, SuSEFirewall::GetAllKnownInterfaces(), {
+	    if (interface["zone"]:nil==nil) {
+		ret_message = ret_message + li_start + ErrMark + " " + sformat(
+		    // TRANSLATORS: Summary
+		    _("Warning: Network interface '%1' / '%2' in not mentioned in any firewall zone. All network traffic on this interface will be blocked!"), interface["name"]:"", interface["id"]:"")
+		+ li_end + "\n";
+	    }
+	});
+	ret_message = ret_message + ul_end + "\n";
+
+	return ret_message;
+    }
+
     string InitBoxSummary (list <string> for_zones) {
 	string summary = SummaryFirewallStart();
+	
+	summary = summary + SummaryUnassignedInterfaces();
 
 	if (size(for_zones)==0) for_zones = SuSEFirewall::GetKnownFirewallZones();
 
