@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Sat Sep 13 18:46:58 CEST 2003 - nashif@suse.de
+
+- #30291: return list of needed packages for autoinstall
+
+-------------------------------------------------------------------
 Fri Aug 29 16:27:18 CEST 2003 - visnov@suse.de
 
 - fix #29659 (syntax errors) 

@@ -53,6 +53,10 @@ else if (func == "Reset") {
     SuSEFirewall::Import($[]);
     ret = $[];
 }
+/* Return required packages for module to operate */
+else if (func == "Packages") {
+    ret = $[];
+}
 /* Change configuration (run AutoSequence) */
 else if (func == "Change") {
     ret = FirewallAutoSequence();
