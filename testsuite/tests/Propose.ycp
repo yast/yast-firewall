@@ -130,7 +130,7 @@
 
     READ[ "sysconfig", "SuSEfirewall2" ] = SuSEFirewall::settings;
 
-    Mode::test = true;
+    Mode::test () = true;
     Progress::off ();
 
     SuSEFirewall::enable_firewall = true;
@@ -142,10 +142,10 @@
     NetworkDevices::Read ();
     TEST (``(SuSEFirewall::Propose ()), [READ, WRITE, EXEC], 0);
     TEST (``(SuSEFirewall::GetPreformattedProposal ()), [READ, WRITE, EXEC], 0);
-    Mode::usessh = true;
+    Linuxrc::usessh () = true;
     TEST (``(SuSEFirewall::Propose ()), [READ, WRITE, EXEC], 0);
     TEST (``(SuSEFirewall::GetPreformattedProposal ()), [READ, WRITE, EXEC], 0);
-    Mode::vnc = true;
+    Linuxrc::vnc () = true;
     TEST (``(SuSEFirewall::Propose ()), [READ, WRITE, EXEC], 0);
     TEST (``(SuSEFirewall::GetPreformattedProposal ()), [READ, WRITE, EXEC], 0);    
     DUMP ("=======================");

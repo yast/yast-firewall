@@ -111,7 +111,7 @@
 
     READ[ "sysconfig", "SuSEfirewall2" ] = SuSEFirewall::settings;
 
-    Mode::test = true;
+    Mode::test () = true;
     Progress::off ();
 
     DUMP ("=======================");

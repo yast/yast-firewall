@@ -102,13 +102,13 @@ void SetFirewallLabel (symbol status) {
  * Initialize the list of all known interfaces
  */
 void InitAllInterfacesList () {
-    if (! Mode::config)
+    if (! Mode::config ())
 	NetworkDevices::Read ();
     all_interfaces = NetworkDevices::List ("");
     all_interfaces = filter (string i, all_interfaces, {
 	return i != "lo";
     });
-    if (! Mode::config)
+    if (! Mode::config ())
     {
 	interface_items = maplist (string i, all_interfaces, {
 	    NetworkDevices::Select (i);

@@ -401,11 +401,11 @@ define boolean GetSupportStatusNISServer (string interface) {
  */
 global define void SuSEFirewall () {
 
-    if (Mode::test) {
+    if (Mode::test ()) {
 	return;
     }
 
-    if (!Mode::config) {
+    if (!Mode::config ()) {
 
 	string REJECT_ALL_INCOMING_CONNECTIONS = (string) SCR::Read(.sysconfig.personal-firewall.REJECT_ALL_INCOMING_CONNECTIONS);
 	if( REJECT_ALL_INCOMING_CONNECTIONS == nil ) REJECT_ALL_INCOMING_CONNECTIONS = "";
@@ -697,11 +697,11 @@ global define void Propose () ``{
     // list of Open TCP ports
     list<string> allowed_tcp_ports = [];
     // SSH installation opens SSH in firewall by default, only if user didn't disable it
-    if ((Mode::usessh==true) && (open_ssh_port!=false)) {
+    if ((Linuxrc::usessh ()==true) && (open_ssh_port!=false)) {
 	allowed_tcp_ports = add(allowed_tcp_ports, "ssh");
     }
     // VNC installation or Alowed Remote administration opens VNC in firewall by default
-    if ((Mode::vnc==true) || (Remote::allow_administration==true)) {
+    if ((Linuxrc::vnc ()==true) || (Remote::allow_administration==true)) {
 	allowed_tcp_ports = add(allowed_tcp_ports, "5801 5901");
     }
 
@@ -756,10 +756,10 @@ global define void Propose () ``{
  * Reset Firewall settings
  */
 global define void Reset () ``{
-    if (Mode::autoinst)
+    if (Mode::autoinst ())
 	return;
 
-    if (! Mode::config)
+    if (! Mode::config ())
 	Propose();
     else
 	Read();
@@ -911,19 +911,19 @@ global define boolean ActivateConfiguration () {
 global define boolean Write() {
     // indicates that the firewall settings weren't modified
     // usable for external use in other modules
-    if (GetModified()==false && !Mode::autoinst) {
+    if (GetModified()==false && !Mode::autoinst ()) {
 	y2milestone("Firewall wasn't modified");
 	return true;
     }
 
 //    Disabled firewall have to be also written, bug #46043
 //    // only activated firewall's setting is writen in installation (proposal) mode
-//    if ((Mode::installation == true) && (SuSEFirewall::enable_firewall == false)) {
+//    if ((Mode::installation () == true) && (SuSEFirewall::enable_firewall == false)) {
 //	y2milestone("Firewall disabled in proposal");
 //	return true;
 //    }
 
-    if (Mode::config==true || Mode::autoinst==true) {
+    if (Mode::config ()==true || Mode::autoinst ()==true) {
 	if (!start && !write_only ) {
 	    y2milestone("Firewall should not start and should not be written");
 	    return false;
@@ -1756,12 +1756,12 @@ global define map<string, map<string, boolean> > GetServicesInGroups (list<strin
  * @return list<string>	list of devices
  */
 global list<string> GetFirewallDevices () {
-    if (Mode::normal==true) {
+    if (Mode::normal ()==true) {
 	NetworkDevices::Read();
     }
 
     list<string> netdevices = NetworkDevices::List("");
-    if (Mode::installation==true) {
+    if (Mode::installation ()==true) {
 	netdevices = (list<string>) toset(union(netdevices, ISDN::NetDeviceList()));
     }
     netdevices = filter(string dev, netdevices, ``{

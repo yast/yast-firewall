@@ -174,11 +174,11 @@ entering their names separated by spaces, for example: <i>modem0 dsl1</i>.</p>")
 //interface in this case.</li></ul></p>");
 
     // fetch list of network devices in normal configuration
-    if (Mode::config==false && Mode::normal==true) {
+    if (Mode::config ()==false && Mode::normal ()==true) {
 	NetworkDevices::Read();
     }
     list<string> netdevices = NetworkDevices::List("");
-    if (Mode::installation==true) {
+    if (Mode::installation ()==true) {
 	netdevices = (list<string>) toset(union(netdevices, ISDN::NetDeviceList()));
     }
     netdevices = filter(string dev, netdevices, ``{
@@ -238,7 +238,7 @@ have an internal network.
 
 
     Wizard::SetContentsButtons(caption,contents,help,Label::BackButton(),Label::NextButton());
-    if (!Mode::installation) Wizard::DisableBackButton();
+    if (!Mode::installation ()) Wizard::DisableBackButton();
 
     if( FW_DEV_EXT != "" )
     {
