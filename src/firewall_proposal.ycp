@@ -1,0 +1,82 @@
+/**
+ * File:	clients/firewall_proposal.ycp
+ * Package:	Firewall configuration
+ * Summary:	Firewall configuration proposal
+ * Authors:	Lukas Ocilka <locilka@suse.cz>
+ *
+ * $Id$
+ */
+
+{
+
+textdomain "firewall";
+
+/* The main () */
+y2milestone("----------------------------------------");
+y2milestone("Firewall proposal started");
+y2milestone("Arguments: %1", WFM::Args());
+
+import "SuSEFirewall";
+import "Popup";
+import "Progress";
+
+string func = (string) WFM::Args(0);
+map param = (map) WFM::Args(1);
+map ret = $[];
+
+/* create a textual proposal */
+if(func == "MakeProposal") {
+    boolean force_reset = param["force_reset"]:false;
+
+    if(force_reset || !SuSEFirewall::proposal_changed_by_user) {
+	Progress::off();
+	SuSEFirewall::Reset();
+    }
+
+    string warning = nil;
+    symbol warning_level = nil;
+    string proposal = (string) SuSEFirewall::GetPreformattedProposal ();
+    Progress::on();
+
+    ret = $[
+	"preformatted_proposal" : proposal,
+	"warning_level" : warning_level,
+	"warning" : warning,
+    ];
+}
+/* run the module */
+else if(func == "AskUser") {
+    map stored = SuSEFirewall::Export();
+    symbol result = (symbol) WFM::CallFunction("firewall", [.propose]);
+    if(result != `next) SuSEFirewall::Import(stored);
+    y2debug("stored=%1", stored);
+    y2debug("result=%1", result);
+    ret = $[ "workflow_sequence" : result ];
+}
+/* create titles */
+else if(func == "Description") {
+    ret = $[
+	/* RichText label */
+	"rich_text_title" : _("Firewall"),
+	/* Menu label */
+	"menu_title" : _("&Firewall"),
+	"id" : "firewall",
+    ];
+}
+/* write the proposal */
+else if(func == "Write") {
+    SuSEFirewall::Write();
+}
+/* unknown function */
+else {
+    y2error("unknown function: %1", func);
+}
+
+/* Finish */
+y2debug("ret=%1",ret);
+y2milestone("Firewall proposal finished");
+y2milestone("----------------------------------------");
+return ret;
+
+/* EOF */
+}

@@ -1027,6 +1027,7 @@ If you want to to use SuSEfirewall2 to protect your system, select
 	    SuSEFirewall::enable_firewall = true;
 	    break;
 	} else if (ret == `finish) {
+	    SuSEFirewall::proposal_changed_by_user = true;
 	    SuSEFirewall::enable_firewall = false;
 	    break;
 	} else if (ret == `abort) {
