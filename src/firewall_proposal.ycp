@@ -100,7 +100,7 @@ else if(func == "AskUser") {
     } else {
 	// user wants to change the firewall settings
 	map <string, any> stored = (map <string, any>) SuSEFirewall::Export();
-	symbol result = (symbol) WFM::CallFunction("firewall", [.propose]);
+	symbol result = (symbol) WFM::CallFunction("firewall");
 
 	if (result != `next) SuSEFirewall::Import(stored);
 	else SuSEFirewallProposal::SetChangedByUser(true);
