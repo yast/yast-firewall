@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Aug 30 14:38:35 CEST 2004 - locilka@suse.cz
+
+- added NFS-Server, NFS-Client, NIS-Server support
+- added functions for searching FW_SERVICES_XXX_RPC for serv. supp.
+
+-------------------------------------------------------------------
 Mon Aug 30 13:33:00 CEST 2004 - jsrain@suse.cz
 
 - added CWMFirewallInterfaces::Modified () function (#44106)
