@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Jul 15 15:10:57 CEST 2003 - msvec@suse.de
+
+- fix the help text (#27857)
+- updated testsuite
+- 2.8.2
+
+-------------------------------------------------------------------
 Fri Jun 27 00:11:24 CEST 2003 - msvec@suse.cz
 
 - updated to the current yast2 interface

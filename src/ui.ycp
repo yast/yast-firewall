@@ -585,7 +585,7 @@ global define symbol FeatureDialog() ``{
     /* Features dialog help 1/4 */
     string help = _("<p><b>Allow Traceroute</b> means that ICMP
 time-to-live-exceeded messages are allowed to be sent from your firewall.
-This is used for traceroutes <u>to</u> your firewall
+This is used for traceroutes <i>to</i> your firewall
 (or traceroute like tools).</p>") +
 
     /* Features dialog help 2/4 */
@@ -600,12 +600,12 @@ to services, TCP, and UDP on this machine will be prevented except for those
 to which you explicitly allowed access in the previous dialog.</p>") +
 
     /* Features dialog help 4/4 */
-    _("<p><b>Protect from Internal Network</b> means that <u>internal</u>
+    _("<p><b>Protect from Internal Network</b> means that <i>internal</i>
 machines may only access explicitly allowed services on the machine.
 They will also be affected by the FW_AUTOPROTECT_SERVICES option. However,
 specifying services that should be available from the internal network is
 beyond the scope of this workflow. For your machine to be accessible from
-the internal network, <u>unset</u> this option.</p>");
+the internal network, <i>unset</i> this option.</p>");
 
     map firewall_settings = SuSEFirewall::settings;
 
