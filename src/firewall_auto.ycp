@@ -54,7 +54,7 @@ define  switch2Lower(map s) ``{
  * @param map with low case
  * @return map with upper case
  */
-define  switch2Upper(map s) ``{
+define switch2Upper(map s) ``{
 	map new_s = mapmap(`k,`v, s, ``{
 			return([toupper(k),v]);
 			});

@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Mar  7 02:29:16 CET 2003 - nashif@suse.de
+
+- dont clone unconfigured firewall ( #24792 )
+- 2.7.7
+
+-------------------------------------------------------------------
 Tue Mar  4 14:23:58 CET 2003 - mvidner@suse.de
 
 - Texts from final proofreading.

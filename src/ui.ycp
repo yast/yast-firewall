@@ -271,6 +271,7 @@ global define PreWriteDialog() ``{
 
     if( continuecancel == true )
     {
+	SuSEFirewall::start = true;
 	ret = `next;
     }
     else
@@ -806,18 +807,20 @@ option is dangerous as your log file will grow very quicky if you activate this.
     );
 
     if (Mode::config)
-	 Wizard::SetContentsButtons(caption,contents,help,BackButtonLabel(),FinishButtonLabel());
+	Wizard::SetContentsButtons(caption,contents,help,BackButtonLabel(),FinishButtonLabel());
     else
 	Wizard::SetContentsButtons(caption,contents,help,BackButtonLabel(),NextButtonLabel());
 
     any ret = nil;
     while(true) {
 	ret = UI::UserInput();
-	if(ret == `abort) {
+	if(ret == `abort)
+	{
 	    if(UI::ReallyAbortPopup(true)) break;
 	    else continue;
 	}
-	else {
+	else
+	{
 	    FW_LOG_DROP_CRIT = bool2string(UI::QueryWidget(`id("drop_crit"),`Value));
 	    FW_LOG_DROP_ALL = bool2string(UI::QueryWidget(`id("drop_all"),`Value));
 	    FW_LOG_ACCEPT_CRIT = bool2string(UI::QueryWidget(`id("accept_crit"),`Value));
@@ -828,6 +831,7 @@ option is dangerous as your log file will grow very quicky if you activate this.
 	    change(firewall_settings,"FW_LOG_ACCEPT_CRIT",FW_LOG_ACCEPT_CRIT);
 	    change(firewall_settings,"FW_LOG_ACCEPT_ALL",FW_LOG_ACCEPT_ALL);
 	    SuSEFirewall::settings = firewall_settings;
+	    SuSEFirewall::start = true;
 	    break;
 	}
     };
@@ -968,9 +972,13 @@ when you boot your system.</p>
 
     boolean firewallstopped = true;
     any ret = nil;
-    while(true) {
+    while(true)
+    {
+	
 	ret = UI::UserInput();
-	if(ret == `abort) {
+	
+	if(ret == `abort)
+	{
 	    if(UI::ReallyAbortPopup(true)) break;
 	    else continue;
 	}
@@ -1013,6 +1021,7 @@ when you boot your system.</p>
 	    if( linksremoved && firewallstopped )
 	    {
 		UI::MessagePopup(_("The firewall is now turned off"));
+		SuSEFirewall::start = false;
 	    }
 	    else if( linksremoved == false )
 	    {
