@@ -28,7 +28,6 @@ y2milestone("firewall auto started");
 
 import "SuSEFirewall";
 import "Mode";
-Mode::config = true;
 
 include "firewall/ui.ycp";
 
