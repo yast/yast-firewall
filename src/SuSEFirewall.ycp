@@ -446,23 +446,46 @@ global define map Export() {
 global define list Summary() {
 
     string summary = "";
-    summary = Summary::AddHeader(summary, _("External Device"));
-    summary = Summary::AddLine(summary, (settings["FW_DEV_EXT"]:"" != "") ?
+
+    if (start) {
+	// autoyast summary header
+	summary = Summary::AddHeader(summary, _("External Device"));
+	summary = Summary::AddLine(summary, (settings["FW_DEV_EXT"]:"" != "") ?
 			       settings["FW_DEV_EXT"]:"" : Summary::NotConfigured());
 
-    summary = Summary::AddHeader(summary, _("Internal Device"));
-    summary = Summary::AddLine(summary, (settings["FW_DEV_INT"]:"" != "") ?
+	// autoyast summary header
+	summary = Summary::AddHeader(summary, _("Internal Device"));
+	summary = Summary::AddLine(summary, (settings["FW_DEV_INT"]:"" != "") ?
 			       settings["FW_DEV_INT"]:"" : Summary::NotConfigured());
 
-    summary = Summary::AddHeader(summary, _("Protect from Internal"));
-    summary = Summary::AddLine(summary, (settings["FW_PROTECT_FROM_INTERNAL"]:"" != "") ?
+	// autoyast summary header
+	summary = Summary::AddHeader(summary, _("Protect from Internal"));
+	summary = Summary::AddLine(summary, (settings["FW_PROTECT_FROM_INTERNAL"]:"" != "") ?
 			       settings["FW_PROTECT_FROM_INTERNAL"]:"" : Summary::NotConfigured());
 
-    summary = Summary::AddHeader(summary, _("External TCP Services"));
-    summary = Summary::AddLine(summary, (settings["FW_SERVICES_EXT_TCP"]:"" != "") ?
-			       settings["FW_SERVICES_EXT_TCP"]:"" : Summary::NotConfigured());
+	// autoyast summary header
+	summary = Summary::AddHeader(summary, _("External Services"));
 
-    summary = Summary::AddLine(summary, _("(Start the configuration to view more options)"));
+	// Protocol name or type (doesn't need translation), summary line information
+	summary = Summary::AddLine(summary, (_("TCP: ") + ((settings["FW_SERVICES_EXT_TCP"]:"" != "") ?
+			    settings["FW_SERVICES_EXT_TCP"]:"" : Summary::NotConfigured())));
+
+	// Protocol name or type (doesn't need translation), summary line information
+	summary = Summary::AddLine(summary, (_("UDP: ") + ((settings["FW_SERVICES_EXT_UDP"]:"" != "") ?
+			    settings["FW_SERVICES_EXT_UDP"]:"" : Summary::NotConfigured())));
+
+	// Protocol name or type (doesn't need translation), summary line information
+	summary = Summary::AddLine(summary, (_("RPC: ") + ((settings["FW_SERVICES_EXT_RPC"]:"" != "") ?
+			    settings["FW_SERVICES_EXT_RPC"]:"" : Summary::NotConfigured())));
+
+	// autoyast summary header
+	summary = Summary::AddLine(summary, _("(Start the configuration to view more options)"));
+    } else {
+	// autoyast summary header
+	summary = Summary::AddHeader(summary, _("Firewall is"));
+	// autoyast summary line information
+	summary = Summary::AddLine(summary, _("disabled"));
+    }
 
     return [ summary, [] ];
 }
@@ -1564,7 +1587,7 @@ global define boolean IsServiceSupportedInGroup (string service, string group) {
  * Function return map of support status for services in all device groups
  *
  * @param list<string>	list of services [ "dhcp-server" | "ssh" | "vnc" ... ]
- * @return map<string, map<string, boolean> >	map<service, map<device_group, status> >
+ * @return map<string, map<string, boolean> >	$[service : $[ device_group : status ]]
  */
 global define map<string, map<string, boolean> > GetServicesInGroups (list<string> services) {
     map<string, map<string, boolean> > ret = $[ ];
@@ -1604,7 +1627,7 @@ global list<string> GetFirewallDevices () {
  * used by firewall
  *
  * @param list<string>	list of services [ "dhcp-server" | "ssh" | "vnc" ... ]
- * @return map<string, map<string, boolean> >	map<service, map<network_device, status> >
+ * @return map<string, map<string, boolean> >	$[ service : $[ network_device : status ]]
  */
 global define map<string, map<string, boolean> > GetServices (list<string> services) {
     map<string, map<string, boolean> > ret = $[ ];
@@ -1632,6 +1655,7 @@ global define map<string, map<string, boolean> > GetServices (list<string> servi
  * Usable for instance for adding just created netdevices.
  */
 global define void UpdateProposal () ``{
+    list<string> known_devices_before_update = known_devices;
     SetKnownDevices();
     y2milestone("Updating proposal");
 
@@ -1647,6 +1671,8 @@ global define void UpdateProposal () ``{
     netdevices = filter(string dev, netdevices, ``{
 	return dev != "" && !issubstring(dev, "lo") && !issubstring(dev, "sit");
     });
+y2milestone("NETDEVICES: %1", netdevices);
+y2milestone("KNWDEVICES: %1", known_devices_before_update);
 
     // listing all now known devices
     foreach (string netdevice, netdevices, {
@@ -1656,7 +1682,7 @@ global define void UpdateProposal () ``{
 	if (IsDmzInterface(netdevice)) return;
 
 	// if this device was known and was removed
-	if (contains(all_devices_in_configuration, netdevice)) return;
+	if (contains(known_devices_before_update, netdevice)) return;
 
 	y2milestone("New device found '%1', adding into FW_DEV_EXT devices", netdevice);
 	proposal_warnings = add(proposal_warnings, sformat(
@@ -1667,9 +1693,9 @@ global define void UpdateProposal () ``{
 	proposal_updated = true;
     });
 
-    // listing all devices known in the previous turn
+    // listing all devices mentioned in the previous propose/update run
     foreach (string netdevice, all_devices_in_configuration, {
-	// device is known now
+	// device is known yet
 	if (contains(known_devices, netdevice)) return;
 
 	// else was removed

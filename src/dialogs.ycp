@@ -171,8 +171,10 @@ entering their names separated by spaces, for example: <i>eth0 eth1</i>.</p>");
 as the external interface. Your ethernet interface is not the external
 interface in this case.</li></ul></p>");
 
-    // fetch list of network devices
-    NetworkDevices::Read();
+    // fetch list of network devices in normal configuration
+    if (Mode::config==false && Mode::normal==true) {
+	NetworkDevices::Read();
+    }
     list<string> netdevices = NetworkDevices::List("");
     netdevices = filter(string dev, netdevices, ``{
 	return dev != "" && !issubstring(dev, "lo") && !issubstring(dev, "sit");

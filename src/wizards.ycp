@@ -169,6 +169,7 @@ define any Firewall() ``{
  */
 define any FirewallAutoSequence() ``{
     map aliases = $[
+	"figurefw"	: ``(FigureFirewallDialog()),
 	"devices"	: ``(DevicesDialog()),
 	"services"	: ``(ServicesDialog()),
 	"features"	: ``(FeatureDialog()),
@@ -176,7 +177,12 @@ define any FirewallAutoSequence() ``{
     ];
 
     map sequence = $[
-        "ws_start" : "devices",
+        "ws_start" : "figurefw",
+	"figurefw" : $[
+	    `abort: `abort,
+	    `next: "devices",
+	    `finish: `next
+	],
         "devices" : $[
 	    `abort: `abort,
             `next: "services"

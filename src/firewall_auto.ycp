@@ -31,7 +31,6 @@ import "SuSEFirewall";
 
 include "firewall/wizards.ycp";
 
-
 any ret = nil;
 string func = "";
 map param = $[];
@@ -53,6 +52,7 @@ if(func == "Summary") {
 else if (func == "Reset") {
     SuSEFirewall::Import($[]);
     ret = $[];
+    SuSEFirewall::enable_firewall = SuSEFirewall::start;
 }
 /* Return required packages for module to operate */
 else if (func == "Packages") {
@@ -61,14 +61,17 @@ else if (func == "Packages") {
 /* Change configuration (run AutoSequence) */
 else if (func == "Change") {
     ret = FirewallAutoSequence();
+    SuSEFirewall::start = SuSEFirewall::enable_firewall;
 }
 /* Import configuration */
 else if (func == "Import") {
     ret = SuSEFirewall::Import(Map::KeysToUpper((map<string,any>)param));
+    SuSEFirewall::enable_firewall = SuSEFirewall::start;
 }
 /* Read firewall data */
 else if (func == "Read") {
     ret = SuSEFirewall::Read();
+    SuSEFirewall::enable_firewall = SuSEFirewall::start;
 }
 /* Return actual state */
 else if (func == "Export") {

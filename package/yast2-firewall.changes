@@ -1,4 +1,16 @@
 -------------------------------------------------------------------
+Thu Sep  2 09:06:36 CEST 2004 - locilka@suse.cz
+
+- fixed #44566 Wrong handling with newly added interfaces into the
+  user-changed firewall proposal in the installation
+- fixed #44463 Firewall can be disabled in autoyast, added dialog
+  taken from the installation proposal
+- fixed #44568 Firewall didn't inform about UDP and RPC services
+  in the autoyast summary
+- fixed #44569 Firewall in autoyast was getting interfaces from
+  the running system instead of the autoyast settings
+
+-------------------------------------------------------------------
 Mon Aug 30 16:33:00 CEST 2004 - locilka@suse.cz
 
 - 2.10.6
