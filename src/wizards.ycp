@@ -86,6 +86,7 @@ define any FirewallSequence() ``{
     ];
 
     Wizard::CreateDialog();
+    Wizard::SetDesktopIcon("firewall");
 
     any ret = Sequencer::Run(aliases, sequence);
 
@@ -155,6 +156,7 @@ define any Firewall() ``{
     term contents = `Label(_("Initializing ..."));
 
     Wizard::CreateDialog();
+    Wizard::SetDesktopIcon("firewall");
     Wizard::SetContentsButtons(caption,contents,help,Label::BackButton(),Label::NextButton());
 
     any ret = Sequencer::Run(aliases, sequence);
@@ -202,6 +204,7 @@ define any FirewallAutoSequence() ``{
     term contents = `Label(_("Initializing ..."));
 
     Wizard::CreateDialog();
+    Wizard::SetDesktopIcon("firewall");
     Wizard::SetContentsButtons(caption, contents, help,
 	    Label::BackButton(), Label::NextButton());
 
