@@ -17,6 +17,10 @@
     import "SuSEFirewall";
     import "SuSEFirewallServices";
     import "Mode";
+    import "String";
+
+    // use simple textual summary for commandline
+    boolean simple_text = false;
 
     map protocol_type_names = $[
 	// TRANSLATORS: Summary item label
@@ -29,12 +33,33 @@
 	"IP"  : _("IP Protocols"),
     ];
 
-    string SummaryZoneHeader (string zone_id) {
-	return "\n<h2>" + SuSEFirewall::GetZoneFullName(zone_id) + "</h2>\n";
+    string OKMark = "<font color='#339900'>"  + UI::Glyph(`CheckMark)        + "</font>";
+    string ErrMark = "<font color='#993300'>" + UI::Glyph(`BulletArrowRight) + "</font>";
+
+    string li_start = "<li>";
+    string li_end   = "</li>";
+    
+    string ul_start = "<ul>";
+    string ul_end   = "</ul>";
+
+    // Function initializes spacial behaviour for commandline
+    void SummaryInitCommandLine () {
+	// TRANSLATORS: 2-chars string, for commandline summary "[ OK ]"
+	OKMark   = "[ " + _("OK") + " ]";
+	ErrMark  = "[ !! ]";
+	li_start = "        * ";
+	li_end   = "";
+	ul_start = "";
+	ul_end   = "";
     }
 
-    string OKMark = "<font color='#339900'>"  + UI::Glyph(`CheckMark)        + "</font>";
-    string ErrMark = "<font color='#993300'>" + UI::Glyph(`BulletArrowRight) + "</font>"; 
+    string SummaryZoneHeader (string zone_id) {
+	if (simple_text) {
+	    return String::UnderlinedHeader(SuSEFirewall::GetZoneFullName(zone_id),0);
+	} else {
+	    return "\n<h2>" + SuSEFirewall::GetZoneFullName(zone_id) + "</h2>\n";
+	}
+    }
 
     string SummaryCheckSpecInterface (string spec_interface, string zone) {
 	string ret_val = "";
@@ -72,27 +97,32 @@
 
 	if (size(interfaces_in_zone)>0 || size(special_interfaces)>0) {
 	    ret_summary = ret_summary +
-		// TRANSLATORS: Summary item label
-		"<h3>" + _("Interfaces") + "</h3>\n";
+		(simple_text ?
+		    // TRANSLATORS: Summary item label
+		    String::UnderlinedHeader(_("Interfaces"),4)
+		    :
+		    // TRANSLATORS: Summary item label
+		    ("<h3>" + _("Interfaces") + "</h3>")
+		) + "\n";
 
-	    ret_summary = ret_summary + "<ul>\n";
+	    ret_summary = ret_summary + ul_start;
 	    foreach (string interface_id, interfaces_in_zone, {
 		ret_summary = ret_summary +
-		    "<li>" + OKMark + " " +
+		    li_start + OKMark + " " +
 		    (interface_id_to_name[interface_id]:"" != "" ?
 			interface_id_to_name[interface_id]:"" + " / "
 			:
 			""
-		    ) + interface_id + "</li>\n";
+		    ) + interface_id + li_end + "\n";
 	    });
 	    foreach (string spec_interface, special_interfaces, {
 		ret_summary = ret_summary +
-		    "<li>" + SummaryCheckSpecInterface(spec_interface,zone_id) + "</li>\n";
+		    li_start + SummaryCheckSpecInterface(spec_interface,zone_id) + li_end + "\n";
 	    });
-	    ret_summary = ret_summary + "</ul>\n";
+	    ret_summary = ret_summary + ul_end;
 	} else {
 	    // TRANSLATORS: informative text
-	    ret_summary = "<li>" + _("No interfaces assigned to this zone.") + "</li>\n";
+	    ret_summary = li_start + _("No interfaces assigned to this zone.") + li_end + "\n";
 	}
 
 	return ret_summary;
@@ -107,11 +137,15 @@
 	// any interface must be assigned
 	if (size(interfaces_in_zone)>0 || size(special_interfaces)>0) {
 	    // TRANSLATORS: summary item label
-	    ret_val = "<h3>" + _("Open Services, Ports and Protocols") + "</h3>\n";
+	    ret_val = (simple_text ?
+		String::UnderlinedHeader(_("Open Services, Ports and Protocols"),4)
+		:
+		("<h3>" + _("Open Services, Ports and Protocols") + "</h3>")
+	    ) + "\n";
 	    // internal zone and unprotected
 	    if (zone_id == "INT" && SuSEFirewall::GetProtectFromInternalZone()) {
 		// TRANSLATORS: informative text
-		ret_val = _("Internal zone is unprotected, all ports are open.");
+		ret_val = ret_val + ul_start + li_start + _("Internal zone is unprotected, all ports are open.") + li_end + ul_end + "\n";
 	    } else {
 		string open_services = "";
 
@@ -122,7 +156,7 @@
 		// Allowed known services
 		foreach (string service_name, string service_id, translations_to_service_ids, {
 		    if (SuSEFirewall::IsServiceSupportedInZone(service_id, zone_id)) {
-			open_services = open_services + "<li>" + service_name + "</li>\n";
+			open_services = open_services + li_start + service_name + li_end + "\n";
 		    }
 		});
 		// Additional (unknown) ports, services, protocols...
@@ -130,15 +164,15 @@
 		    string additional_services = mergestring(SuSEFirewall::GetAdditionalServices(protocol, zone_id), ", ");
 		    if (additional_services == "") return;
 		    open_services = open_services +
-			"<li>" + protocol_type_names[protocol]:"" + ": " + additional_services + "</li>\n";
+			li_start + protocol_type_names[protocol]:"" + ": " + additional_services + li_end + "\n";
 		});
 
-		ret_val = ret_val + "<ul>\n" + (open_services != "" ?
+		ret_val = ret_val + ul_start + (open_services != "" ?
 		    open_services
 		    :
 		    // TRANSLATORS: informative text
-		    _("Zone has no open ports.")
-		) + "</ul>\n";
+		    (li_start + _("Zone has no open ports.") + li_end)
+		) + ul_end + "\n";
 	    }
 	}
 
@@ -147,22 +181,26 @@
 
     string SummaryZoneBody (string zone_id) {
 	return
-	    "<ul>\n" +
+	    ul_start + "\n" +
 	    SummaryInterfacesInZone(zone_id) +
 	    SummaryOpenServicesInZone(zone_id) +
-	    "</ul>\n";
+	    ul_end + "\n";
     }
 
     string SummaryFirewallStart () {
 	// TRANSLATORS: Summary header item
-	string ret_message = "\n<h2>" + _("Firewall Starting") + "</h2>\n";
+	string ret_message = "\n" + (simple_text ?
+	    String::UnderlinedHeader(_("Firewall Starting"),0)
+	    :
+	    ("<h2>" + _("Firewall Starting") + "</h2>")
+	) + "\n";
 
 	if (SuSEFirewall::GetEnableService()) {
 	    // TRANSLATORS: Summary text item
-	    ret_message = ret_message + "<ul>\n<li>" + _("Start firewall when booting") + "</li>\n</ul>\n";
+	    ret_message = ret_message + ul_start + li_start + _("Start firewall when booting") + li_end + ul_end + "\n\n";
 	} else {
 	    // TRANSLATORS: Summary text item
-	    ret_message = ret_message + "<ul>\n<li>" + _("Start firewall manually") + "</li>\n</ul>\n";
+	    ret_message = ret_message + ul_start + li_start + _("Start firewall manually") + li_end + ul_end + "\n\n";
 	}
 
 	return ret_message;

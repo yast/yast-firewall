@@ -16,12 +16,14 @@
     import "SuSEFirewall";
     import "SuSEFirewallServices";
     import "Mode";
-    import "RichText";
     import "Report";
     import "String";
 
     include "firewall/summary.ycp";
     include "firewall/generalfunctions.ycp";
+    
+    // simple_text variable from summary.ycp
+    simple_text = true;
 
     list <string> CommaSeparatedList(any comma_separated_string) {
 	return splitstring((string) comma_separated_string, ",");
@@ -109,8 +111,7 @@
 	// TRANSLATORS: CommandLine header
 	CommandLine::Print(String::UnderlinedHeader(_("Summary"), 0));
 	CommandLine::Print("");
-	CommandLine::Print(RichText::Rich2Plain(InitBoxSummary(for_zones)));
-	CommandLine::Print("");
+	CommandLine::Print(InitBoxSummary(for_zones));
 
 	// Do not call Write()
 	return false;
@@ -1128,6 +1129,7 @@
 
     y2milestone("----------------------------------------");
     y2milestone(sformat("Starting CommandLine with parameters %1", WFM::Args()));
+    SummaryInitCommandLine();
     CommandLine::Run(cmdline);
     y2milestone("----------------------------------------");
 
