@@ -437,9 +437,9 @@ This is used for traceroutes <i>to</i> your firewall
 ") +
 
     /* Features dialog help 2/4 */
-    _("<p><b>Forward Traffic and Do Masquerading</b> means that all your
-internal machines that use services on the Internet seem to come from your
-firewall. It is more secure to communicate via proxies to the Internet than
+    _("<p><b>Forward Traffic and Do Masquerading</b> means that external machines
+see all usage of services on the Internet coming from the firewall rather than
+internal machines. It is more secure to communicate via proxies to the Internet than
 to use masquerading.</p>") +
 
     /* Features dialog help 3/4 */

@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Aug 25 15:35:42 CEST 2003 - visnov@suse.de
+
+- clarify a help text
+- 2.8.10 
+
+-------------------------------------------------------------------
 Wed Aug 20 15:56:03 CEST 2003 - jsuchome@suse.de
 
 - removed redundant "initialization dialog" (#28779)
