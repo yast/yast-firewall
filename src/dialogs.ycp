@@ -371,7 +371,7 @@ to 23, write \"21:23\"</p>
 
     activate_checkboxes_for_services();
 
-    UI::ChangeWidget(`id(`status), `Value, mergestring(additional_services," "));
+    UI::ChangeWidget(`id(`status), `Value, mergestring((list<string>)additional_services," "));
 
     any ret = nil;
     while(true) {
@@ -383,7 +383,7 @@ to 23, write \"21:23\"</p>
 	else if ( ret == `edit )
 	{
 	    string serv = TextEntryPopup( _("Edit additional services"), advanced_helptext, _("&Additional Services"),
-		mergestring(additional_services," "));
+		mergestring((list<string>)additional_services," "));
 
 	    if ( serv != nil )
 	    {
@@ -391,7 +391,7 @@ to 23, write \"21:23\"</p>
 		services_list = sort(union(filter(`s,additional_services,``(s!="" && contains(selectable_services,s))), services_list));
 		additional_services =filter(`s,additional_services,``(s!="" && !contains(selectable_services,s)));
 	        activate_checkboxes_for_services();
-		UI::ChangeWidget(`id(`status), `Value, mergestring(additional_services," "));
+		UI::ChangeWidget(`id(`status), `Value, mergestring((list<string>)additional_services," "));
 	    }
 	}
 	else if(contains(selectable_services, ret))
