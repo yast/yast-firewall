@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Feb  4 09:44:28 CET 2005 - locilka@suse.cz
+
+- added missing comments for translators
+- fixed bug installation proposal, tuning the configuration started
+  the command line interface unstead of UI
+
+-------------------------------------------------------------------
 Mon Jan 31 14:17:01 CET 2005 - locilka@suse.cz
 
 - added feature for better checking of the configuration, user is
