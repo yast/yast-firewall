@@ -3,6 +3,8 @@ Mon Sep 13 09:08:37 CEST 2004 - locilka@suse.cz
 
 - fixed SuSEfirewall2 defaults to be the same as in the SFW2
   package (FW_PROTECT_FROM_INTERNAL=no FW_AUTOPROTECT_SERVICES=no).
+- added ISDN::NetDeviceList() into the firewall proposal to catch
+  just configured devices.
 - 2.10.10
 
 -------------------------------------------------------------------

@@ -26,6 +26,7 @@ import "Summary";
 import "NetworkDevices";
 import "String";
 import "Message";
+import "ISDN";
 
 /* global settings map */
 global map<string,any> settings = $[];
@@ -623,7 +624,8 @@ global define boolean Read() {
  * known_devices list.
  */
 define void SetKnownDevices () ``{
-    known_devices = (list<string>) NetworkDevices::List("");
+    // FIXME: ISDN::NetDeviceList() is there because NetworkDevices doesn't know Just configured ISDN
+    known_devices = (list<string>) toset(union(NetworkDevices::List(""), ISDN::NetDeviceList()));
     known_devices = filter(string dev, known_devices, ``{
 	return dev != "" && !issubstring(dev, "lo") && !issubstring(dev, "sit");
     });
@@ -654,12 +656,12 @@ global define void Propose () ``{
     
     // All "dialup" network devices
     // Bugzilla #44656 - only network devices are protected by default
-    list<string> netdevices = NetworkDevices::List("dialup");
+    list<string> netdevices = (list<string>) toset(union(NetworkDevices::List("dialup"), ISDN::NetDeviceList()));
     netdevices = filter(string dev, netdevices, ``{
 	return dev != "" && !issubstring(dev, "lo") && !issubstring(dev, "sit");
     });
 
-    list<string> non_dialup_netdevices = NetworkDevices::List("");
+    list<string> non_dialup_netdevices = (list<string>) toset(union(NetworkDevices::List(""), ISDN::NetDeviceList()));
     non_dialup_netdevices = filter(string dev, non_dialup_netdevices, ``{
 	return dev != "" && !issubstring(dev, "lo") && !issubstring(dev, "sit") && !contains(netdevices, dev);
     });
@@ -1719,6 +1721,9 @@ global list<string> GetFirewallDevices () {
     }
 
     list<string> netdevices = NetworkDevices::List("");
+    if (Mode::installation==true) {
+	netdevices = (list<string>) toset(union(netdevices, ISDN::NetDeviceList()));
+    }
     netdevices = filter(string dev, netdevices, ``{
 	return dev != "" && !issubstring(dev, "lo") && !issubstring(dev, "sit") && GetGroupOfInterface(dev)!=nil;
     });
@@ -1771,13 +1776,13 @@ global define void UpdateProposal () ``{
     list<string> all_devices_in_configuration = toset(flatten([ devices_ext, devices_int, devices_dmz ]));
 
     // All dialup network devices
-    list<string> netdevices = (list<string>) NetworkDevices::List("dialup");
+    list<string> netdevices = (list<string>) toset(union(NetworkDevices::List("dialup"), ISDN::NetDeviceList()));
     netdevices = filter(string dev, netdevices, ``{
 	return dev != "" && !issubstring(dev, "lo") && !issubstring(dev, "sit");
     });
 
     // All network devices known now
-    list<string> all_devices = NetworkDevices::List("");
+    list<string> all_devices = (list<string>) toset(union(NetworkDevices::List(""), ISDN::NetDeviceList()));
     all_devices = filter(string dev, all_devices, ``{
 	return dev != "" && !issubstring(dev, "lo") && !issubstring(dev, "sit");
     });
