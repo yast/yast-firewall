@@ -15,8 +15,9 @@ textdomain "firewall";
 
 import "CWM";
 import "Label";
+import "Mode";
+import "NetworkDevices";
 import "Popup";
-import "Service";
 import "SuSEFirewall";
 
 
@@ -57,6 +58,8 @@ void EnableOrDisableFirewallDetails () {
 	UI::QueryWidget (`id ("_cwm_open_firewall"), `Value);
     if (enabled == nil)
 	enabled = false;
+    if (size (all_interfaces) == 0)
+	enabled = false;
     UI::ChangeWidget (`id ("_cwm_firewall_details"), `Enabled, enabled);
 }
 
@@ -68,35 +71,49 @@ void SetFirewallLabel (symbol status) {
     string label = "";
     if (status == `off)
     {
+	// label
 	label = _("Firewall is disabled");
     }
     else if (status == `closed)
     {
+	// label
 	label = _("Firewall port is closed");
     }
     else if (status == `open_all)
     {
+	// label
 	label = _("Firewall port is open on all interfaces");
     }
     else if (status == `custom)
     {
+	// label
 	label = _("Firewall port is open on selected interfaces");
+    }
+    else if (status == `no_ifaces)
+    {
+	// label
+	label = _("No network interfaces are configured");
     }
     UI::ReplaceWidget (`id (`_cwm_firewall_status_rp),
 	`Label (label));
 }
 
+/**
+ * Initialize the list of all known interfaces
+ */
 void InitAllInterfacesList () {
-	// FIXME use NetworkDevices instead of SCR!!!
-	all_interfaces = (list<string>)SCR::Dir (.network.section);
-	all_interfaces = filter (string i, all_interfaces, {
-	    return i != "lo";
-	});
+    if (! Mode::config)
+	NetworkDevices::Read ();
+    all_interfaces = NetworkDevices::List ("");
+    all_interfaces = filter (string i, all_interfaces, {
+	return i != "lo";
+    });
+    if (! Mode::config)
+    {
 	interface_items = maplist (string i, all_interfaces, {
-	    string label = (string)
-		SCR::Read (add (add (.network.value, i), "BOOTPROTO"));
-	    string ipaddr = (string)
-		    SCR::Read (add (add (.network.value, i), "IPADDR"));
+	    NetworkDevices::Select (i);
+	    string label = NetworkDevices::Current["BOOTPROTO"]:"";
+	    string ipaddr = NetworkDevices::Current["IPADDR"]:"";
 	    if (tolower (label) == "static" || label == "" || label == nil)
 	    {
 		label = ipaddr;
@@ -117,6 +134,13 @@ void InitAllInterfacesList () {
 	    }
 	    return `item (`id (i), label);
 	});
+    }
+    else
+    {
+	interface_items = maplist (string i, all_interfaces, {
+	    return `item (`id (i), i);
+	});
+    }
 }
 
 /**
@@ -126,8 +150,10 @@ void UpdateFirewallStatus () {
     if (all_interfaces == nil)
 	InitAllInterfacesList ();
     symbol status = `custom;
-    if (! Service::Enabled("SuSEfirewall2_init"))
+    if (! SuSEFirewall::start)
 	status = `off;
+    else if (size (all_interfaces) == 0)
+	status = `no_ifaces;
     else if (size (all_interfaces) == size (allowed_interfaces))
 	status = `open_all;
     else if (size (allowed_interfaces) == 0)
@@ -490,9 +516,11 @@ global void OpenFirewallInit (map<string,any> widget, string key) {
 	return;
     }
     list<string> services = widget["services"]:[];
+    InitAllInterfacesList ();
     InitAllowedInterfaces (services);
     boolean open_firewall = size (allowed_interfaces) > 0;
-    boolean firewall_enabled = Service::Enabled("SuSEfirewall2_init");
+    boolean firewall_enabled = SuSEFirewall::start
+	&& size (all_interfaces) > 0;
     if (! firewall_enabled)
     {
 	open_firewall = false;
