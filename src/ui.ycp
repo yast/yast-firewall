@@ -24,11 +24,11 @@ textdomain "firewall";
 include "ui/common_popups.ycp";
 include "ui/common_messages.ycp";
 
-include "firewall/io.ycp";
+
 
 import "Progress";
 import "Wizard";
-
+import "Mode";
 import "Runlevel";
 
 include "wizard/sequencer.ycp";
@@ -101,6 +101,53 @@ global define Firewall() ``{
     UI::CloseDialog();
     return ret;
 }
+
+
+
+/**
+ * Main interface function
+ */
+global define FirewallAutoSequence() ``{
+    map aliases = $[   
+        "stop"		: ``(StopDialog()),     
+        "step1"		: ``(DevDialog()),
+        "step2"		: ``(ServicesDialog()),
+        "step3"		: ``(FeatureDialog()),
+        "step4"		: ``(LoggingDialog()),
+    ];
+
+    map sequence = $[
+        "ws_start" : "step1",
+        "step1" : $[
+	    `abort: `abort,
+            `next: "step2"
+        ],
+        "step2" : $[
+	    `abort: `abort,
+            `next: "step3"
+        ],
+        "step3" : $[
+	    `abort: `abort,
+            `next: "step4"
+        ],
+        "step4" : $[
+	    `abort: `abort,
+            `next: `next
+        ]
+    ];
+
+    string help = "";
+    string caption = _("Firewall configuration");
+    term contents = `Label(_("Initializing ..."));
+
+    Wizard::CreateDialog();
+    Wizard::SetContentsButtons(caption,contents,help,BackButtonLabel(),NextButtonLabel());
+
+    any ret = WizardSequencer(aliases, sequence);
+    UI::CloseDialog();
+    return ret;
+}
+
 
 UI (``{
     global define TextEntryPopup( string headline, string richtext, string textentrylabel, string text) ``{
@@ -190,9 +237,9 @@ global define ReadDialog() ``{
     UI::SetFocus(`id(`abort));
 
     /* possible more reads, progress bar and UI::UserInput `abort handling */
-    firewall_settings = FirewallRead();
+    map firewall_settings = SuSEFirewall::settings;
 
-    if (lookup(firewall_settings,"personal_firewall_is_active",false)==true)
+    if (SuSEFirewall::personal_firewall_is_active )
     {
 	if(UI::ContinueCancelHeadlinePopup(_("Personal Firewall is active"),
 	    _("The Personal Firewall is activated.
@@ -236,7 +283,7 @@ global define PreWriteDialog() ``{
 global define WriteDialog() ``{
     string help = "";
     boolean retry = true;
-    string whatfailedmsg = "";
+    string whatfailedmsg = _("Stopping the firewall failed");
 
     Wizard::SetContents("",`Empty(),"",false,true);
     UI::ChangeWidget(`id(`abort),`Enabled, false);
@@ -254,7 +301,7 @@ global define WriteDialog() ``{
 
     Progress::NextStage();
 
-    whatfailedmsg = _("Stopping the firewall failed");
+
 
     retry=true;
     while(retry)
@@ -285,10 +332,17 @@ global define WriteDialog() ``{
     Progress::NextStage();
 
     sleep(1000);
-    ret = FirewallWrite(firewall_settings);
+    ret = SuSEFirewall::Write();
+        
+    if (ret == false)
+    {
+	UI::Messagepopup(_("Writing settings failed"));
+    }
+    
     Progress::NextStage();
-
-    if (lookup(firewall_settings,"personal_firewall_is_active",false)==true)
+    map firewall_settings = SuSEFirewall::settings;
+    
+    if (SuSEFirewall::personal_firewall_is_active)
     {
 	SCR::Execute (.target.bash,"/sbin/SuSEpersonal-firewall",$[]);
     }
@@ -356,7 +410,8 @@ global define WriteDialog() ``{
 /**
  */
 global define DevDialog() ``{
-
+    
+    map firewall_settings = SuSEFirewall::settings;
     string help = _("<br><p><b>General:</b><br>This tools aims to be an easy to use configuration front-end for the Linux
 packet filter engine. The configuration items in the following menus are
 a collection of the most important functionalities of the SuSEfirewall2
@@ -457,11 +512,11 @@ have an internal network.
 	    FW_DEV_INT = UI::QueryWidget(`id("intinterface"),`Value);
 	    if( FW_DEV_INT != none )
 	    {
-		change(firewall_settings,"FW_DEV_INT",FW_DEV_INT);
+		SuSEFirewall::settings["FW_DEV_INT"] = FW_DEV_INT;
 	    }
 	    else
 	    {
-		change(firewall_settings,"FW_DEV_INT","");
+		SuSEFirewall::settings["FW_DEV_INT"] = "";
 	    }
 	    break;
 	}
@@ -476,6 +531,10 @@ have an internal network.
  * uses and changes FW_SERVICES_EXT_TCP inside firewall_settings, abuses checkbox widget id as service name
  */
 global define ServicesDialog() ``{
+
+
+    map firewall_settings = SuSEFirewall::settings;
+    
     string help = _("<p>Choose the <b>services</b> that should be available from the Internet.
 </p><p><b>If you are not running a server of some kind, you should not need any of the services.</b></p>
 <br>
@@ -629,8 +688,9 @@ provide server services. You also have to start the appropriate daemons.</p>
 //	    services_string = mergestring(services_list," ");
 //	    UI::ChangeWidget(`id(`status), `Value, services_string);
 	}
-	else {
-	    change(firewall_settings,"FW_SERVICES_EXT_TCP",mergestring(sort(union(services_list,additional_services))," "));
+	else
+	{
+	    SuSEFirewall::settings["FW_SERVICES_EXT_TCP"] = mergestring(sort(union(services_list,additional_services))," ");
 	    break;
 	}
     };
@@ -660,6 +720,8 @@ workflow. For your machine to be accessible from the internal
 network, <u>unset</u> this option.</p>
 ");
 
+    map firewall_settings = SuSEFirewall::settings;
+    
     string caption = _("Firewall Configuration (Step 3 of 4): Features");
     term contents = `VBox (
 			   `HBox (
@@ -784,15 +846,15 @@ Proceed with this setup?
 
 	    }
 
-	    change(firewall_settings,"FW_ALLOW_FW_TRACEROUTE",FW_ALLOW_FW_TRACEROUTE);
-	    change(firewall_settings,"FW_MASQUERADE",FW_MASQUERADE);
-	    change(firewall_settings,"FW_ROUTE",FW_ROUTE);
-	    change(firewall_settings,"FW_MASQ_NETS",FW_MASQ_NETS);
-	    change(firewall_settings,"FW_AUTOPROTECT_SERVICES",FW_AUTOPROTECT_SERVICES);
-	    change(firewall_settings,"FW_PROTECT_FROM_INTERNAL",FW_PROTECT_FROM_INTERNAL);
+	    firewall_settings["FW_ALLOW_FW_TRACEROUTE"] = FW_ALLOW_FW_TRACEROUTE;
+	    firewall_settings["FW_MASQUERADE"] = FW_MASQUERADE;
+	    firewall_settings["FW_ROUTE"] = FW_ROUTE;
+	    firewall_settings["FW_MASQ_NETS"] = FW_MASQ_NETS;
+	    firewall_settings["FW_AUTOPROTECT_SERVICES"] = FW_AUTOPROTECT_SERVICES;
+	    firewall_settings["FW_PROTECT_FROM_INTERNAL"] = FW_PROTECT_FROM_INTERNAL;
 
 	    y2debug("settings %1", firewall_settings);
-
+	    SuSEFirewall::settings = firewall_settings;
 	    break;
 	}
     };
@@ -816,6 +878,8 @@ option is dangerous as your log file will grow very quicky if you activate this.
 ");
     string caption = _("Firewall configuration (step 4 of 4): Logging options");
 
+
+    map firewall_settings = SuSEFirewall::settings;
     string FW_LOG_DROP_CRIT = lookup(firewall_settings,"FW_LOG_DROP_CRIT","yes");
     string FW_LOG_DROP_ALL = lookup(firewall_settings,"FW_LOG_DROP_ALL","no");
     string FW_LOG_ACCEPT_CRIT = lookup(firewall_settings,"FW_LOG_ACCEPT_CRIT","yes");
@@ -855,7 +919,10 @@ option is dangerous as your log file will grow very quicky if you activate this.
 	`HVStretch()
     );
 
-    Wizard::SetContentsButtons(caption,contents,help,BackButtonLabel(),NextButtonLabel());
+    if (Mode::config)
+	 Wizard::SetContentsButtons(caption,contents,help,BackButtonLabel(),FinishButtonLabel());
+    else
+	Wizard::SetContentsButtons(caption,contents,help,BackButtonLabel(),NextButtonLabel());
 
     any ret = nil;
     while(true) {
@@ -874,7 +941,7 @@ option is dangerous as your log file will grow very quicky if you activate this.
 	    change(firewall_settings,"FW_LOG_DROP_ALL",FW_LOG_DROP_ALL);
 	    change(firewall_settings,"FW_LOG_ACCEPT_CRIT",FW_LOG_ACCEPT_CRIT);
 	    change(firewall_settings,"FW_LOG_ACCEPT_ALL",FW_LOG_ACCEPT_ALL);
-
+	    SuSEFirewall::settings = firewall_settings;
 	    break;
 	}
     };

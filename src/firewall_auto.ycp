@@ -1,0 +1,121 @@
+/**
+ * File:	clients/firewall_auto.ycp
+ * Package:	Configuration of firewall
+ * Summary:	Client for autoinstallation
+ * Authors:	Anas Nashif <nashif@suse.de>
+ *
+ * $Id$
+ *
+ * This is a client for autoinstallation. It takes its arguments,
+ * goes through the configuration and return the setting.
+ * Does not do any changes to the configuration.
+ */
+
+/**
+ * @param function to execute
+ * @param map/list of firewall settings
+ * @return map edited settings, Summary or boolean on success depending on called function
+ * @example map mm = $[ "FAIL_DELAY" : "77" ];
+ * @example map ret = WFM::CallFunction ("firewall_auto", [ "Summary", mm ]);
+ */
+
+{
+
+textdomain "firewall";
+
+y2milestone("----------------------------------------");
+y2milestone("firewall auto started");
+
+import "SuSEFirewall";
+import "Mode";
+Mode::config = true;
+
+include "firewall/ui.ycp";
+
+any ret = nil;
+string func = "";
+map param = $[];
+
+
+
+/**
+ * Switch map keys to lower case
+ * @param map with upper case
+ * @return map with lower case
+ */
+define  switch2Lower(map s) ``{
+	map new_s = mapmap(`k,`v, s, ``{
+			return([tolower(k),v]);
+			});
+	return new_s;
+}
+
+/**
+ * Switch map keys to upper case
+ * @param map with low case
+ * @return map with upper case
+ */
+define  switch2Upper(map s) ``{
+	map new_s = mapmap(`k,`v, s, ``{
+			return([toupper(k),v]);
+			});
+	return new_s;
+}
+
+
+/* Check arguments */
+if(size(Args()) > 0 && is(Args(0), string)) {
+    func = WFM::Args(0);
+    if(size(Args()) > 1 && is(Args(1), map))
+	param = WFM::Args(1);
+}
+y2debug("func=%1", func);
+y2debug("param=%1", param);
+
+/* Create a summary*/
+if(func == "Summary") {
+    ret = select(SuSEFirewall::Summary(), 0, "");
+}
+/* Reset configuration */
+else if (func == "Reset") {
+    SuSEFirewall::Import($[]);
+    ret = $[];
+}
+/* Change configuration (run AutoSequence) */
+else if (func == "Change") {
+    ret = FirewallAutoSequence();
+}
+/* Import configuration */
+else if (func == "Import") {
+    ret = SuSEFirewall::Import(switch2Upper(param));
+}
+/* Read firewall data */
+else if (func == "Read") {
+    ret = SuSEFirewall::Read();
+}
+/* Return actual state */
+else if (func == "Result") {
+    ret = switch2Lower(SuSEFirewall::Export());
+}
+/* Write givven settings */
+else if (func == "Write") {
+    import "Progress";
+    Progress::off();
+    SuSEFirewall::write_only = true;
+    ret = SuSEFirewall::Write();
+    Progress::on();
+}
+/* Unknown function */
+else {
+    y2error("Unknown function: %1", func);
+    ret = false;
+}
+
+y2debug("ret=%1", ret);
+y2milestone("firewall auto finished");
+y2milestone("----------------------------------------");
+
+return ret;
+
+/* EOF */
+}

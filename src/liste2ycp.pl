@@ -44,7 +44,7 @@ while(<>)
 			$default = pop @mydefaults;
 			print "    string $service = SCR::Read(.sysconfig.SuSEfirewall2.$service);\n";
 			print "    if( $service == nil ) $service = $default;\n";
-			print "    change(settings,\"$service\",$service);\n";
+			print "    settings[\"$service\"] = $service;\n";
 			print "\n";
 		}
 	}
@@ -57,7 +57,7 @@ while(<>)
 		{
 			$service = pop @myservices;
 			$default = pop @mydefaults;
-			print "    string $service = lookup(settings,\"$service\",$default);\n";
+			print "    string $service = settings[\"$service\"]:$default;\n";
 			print "    ret = SCR::Write(.sysconfig.SuSEfirewall2.$service, $service);\n";
 			print "\n"
 		}

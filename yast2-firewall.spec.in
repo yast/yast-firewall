@@ -29,6 +29,7 @@ Summary:	Configuration of firewall
 %dir @yncludedir@/firewall
 @yncludedir@/firewall/*
 @clientdir@/firewall*
+@moduledir@/SuSEFirewall.ycp
 @configdir@/firewall.y2cc
 @scrconfdir@/*.scr
 %doc @docdir@

@@ -24,14 +24,14 @@
 
 textdomain "firewall";
 
+import "SuSEFirewall";
 include "firewall/ui.ycp";
 
 /* The main() */
 y2milestone("Firewall module started");
 y2milestone("----------------------------------------");
 
-/* global settings map */
-map firewall_settings = $[];
+
 
 /* main ui function */
 any ret = Firewall();
