@@ -1,5 +1,5 @@
 /**
- * File:        firewall/dialogs.ycp
+ * File:        firewall/uifunctions.ycp
  * Package:     Configuration YaST2 Firewall
  * Summary:     Configuration dialogs handling functions
  * Authors:     Lukas Ocilka <locilka@suse.cz>
@@ -18,6 +18,8 @@
     import "PortAliases";
     import "Popup";
     import "Address";
+
+    include "firewall/generalfunctions.ycp";
 
     // GLOBAL UI CONFIGURATION
     term all_popup_definition = `opt(`decorated,`centered);
@@ -50,9 +52,28 @@
 	Wizard::CreateDialog ();
 	Wizard::RestoreHelp (HelpForDialog("saving_configuration"));
 	boolean success = SuSEFirewall::SaveAndRestartService ();
+	if (success) SuSEFirewall::SetStartService(true);
 	sleep(1000);
 	UI::CloseDialog ();
 	return success;
+    }
+
+    /**
+     * Function starts Firewall services and sets firewall
+     * to be started after exiting YaST
+     */
+    boolean StartNow() {
+	SuSEFirewall::SetStartService(true);
+	return SuSEFirewall::StartServices();
+    }
+    
+    /**
+     * Function stops Firewall services and sets firewall
+     * to be stopped after exiting YaST
+     */
+    boolean StopNow() {
+	SuSEFirewall::SetStartService(false);
+	return SuSEFirewall::StopServices();
     }
 
     /**
@@ -268,7 +289,7 @@ Do you really want to use this port?"),
 	return checked;
     }
 
-    void HandlePopupAdditionalServices (string zone) {
+    boolean HandlePopupAdditionalServices (string zone) {
 	string zone_name = SuSEFirewall::GetZoneFullName(zone);
 
 	UI::OpenDialog(all_popup_definition, AdditionalServices(zone_name));
@@ -286,6 +307,7 @@ Do you really want to use this port?"),
 	UI::ChangeWidget(`id("additional_ip"),  `Value, mergestring(additional_ip,  " "));
 
 	any ret = nil;
+	boolean ret_value = false;
 	while (true) {
 	    ret = UI::UserInput();
 
@@ -308,13 +330,16 @@ Do you really want to use this port?"),
 		SuSEFirewall::SetAdditionalServices("RPC", zone, new_additional_rpc);
 		SuSEFirewall::SetAdditionalServices("IP",  zone, new_additional_ip );
 		
+		ret_value = true;
 		break;
 	    } else if (ret == "cancel") {
+		ret_value = false;
 		break;
 	    }
 	}
 
 	UI::CloseDialog();
+	return ret_value;
     }
 
     void RedrawAllowedServicesDialog (string current_zone) {
@@ -411,7 +436,8 @@ Do you really want to use this port?"),
 	    SuSEFirewall::SetServicesForZones([remove_service], [current_zone], false);
 	    RedrawAllowedServices (current_zone);
 	} else if (ret == "advanced_allowed_service") {
-	    if (HandlePopupAdditionalServices(current_zone) == "ok") {
+	    // redraw when "OK" button pressed
+	    if (HandlePopupAdditionalServices(current_zone)) {
 		RedrawAllowedServices (current_zone);
 	    }
 	}
@@ -531,6 +557,28 @@ Do you really want to use this port?"),
 	return true;
     }
 
+    /**
+     * Function checks port number got as parameter.
+     * If check fails SetFocus is called and an empty string is returned.
+     */
+    string CheckPortNumber (string port_to_be_checked, string widget_id) {
+	string port_number = GetPortNumber(port_to_be_checked);
+	// if port name wasn't found
+	if (port_number=="") {
+	    Popup::Error(
+		// TRANSLATORS: popup error message
+		_("Wrong port definition.
+Cannot find port number for this port name.
+Please, use port number instead of using port name.")
+	    );
+
+	    // setfocus for GUI
+	    if (widget_id!="" && widget_id!=nil) UI::SetFocus(`id(widget_id));
+	}
+
+	return port_number;
+    }
+
     boolean CheckIP(string ui_id) {
 	string ip = (string) UI::QueryWidget(`id(ui_id), `Value);
 	if (!Address::Check4(ip)) {
@@ -551,7 +599,20 @@ Do you really want to use this port?"),
 
 	integer row_id = 0;
 	foreach (map <string, string> rule, SuSEFirewall::GetListOfForwardsIntoMasquerade(), {
-	    // FIXME: requested IP is missing in table
+	    // redirect_to_port is the same as requested_port if not defined
+	    if (rule["to_port"]:""=="") {
+		rule["to_port"] = rule["req_port"]:"";
+	    }
+
+	    // printing port names rather then port numbers
+	    foreach (string key, [ "req_port", "to_port" ], {
+		string port_name = GetPortName(rule[key]:"");
+		// port name must be known and not the same as defined yet
+		if (port_name!=nil && port_name!=rule[key]:"") {
+		    rule[key] = sformat("%1 (%2)", port_name, rule[key]:"");
+		}
+	    });
+
 	    items = add (items,
 		`item(`id(row_id),
 		    rule["source_net"]:"",
@@ -568,6 +629,7 @@ Do you really want to use this port?"),
 
 	UI::ChangeWidget(`id("table_redirect_masq"), `Items, items);
     }
+
 
     void HandlePopupAddRedirectToMasqueradedIPRule () {
 	UI::OpenDialog(all_popup_definition, AddRedirectToMasqueradedIPRule());
@@ -598,6 +660,16 @@ Do you really want to use this port?"),
 		string add_requested_port  = (string) UI::QueryWidget(`id("add_requested_port"),  `Value);
 		string add_redirectto_ip   = (string) UI::QueryWidget(`id("add_redirectto_ip"),   `Value);
 		string add_redirectto_port = (string) UI::QueryWidget(`id("add_redirectto_port"), `Value);
+		
+		// Ports must be port numbers, getting port numbers from port names
+		if (add_requested_port!="" && add_requested_port!=nil) {
+		    add_requested_port  = CheckPortNumber (add_requested_port,  "add_requested_port");
+		    if (add_requested_port==nil)  continue;
+		}
+		if (add_redirectto_port!="" && add_redirectto_port!=nil) {
+		    add_redirectto_port = CheckPortNumber (add_redirectto_port, "add_redirectto_port");
+		    if (add_redirectto_port==nil) continue;
+		}
 
 		SuSEFirewall::AddForwardIntoMasqueradeRule (add_source_network, add_redirectto_ip, add_protocol,
 		    add_requested_port, add_redirectto_port, add_requested_ip);
@@ -615,8 +687,6 @@ Do you really want to use this port?"),
     symbol HandleMasquerading (string key, map event) {
 	any ret = event["ID"]:nil;
 
-	y2milestone("RET: %1", ret);
-
 	if (ret == "masquerade_networks") {
 	    boolean masquerade = (boolean) UI::QueryWidget(`id("masquerade_networks"), `Value);
 	    SuSEFirewall::SetMasquerade(masquerade);
@@ -632,8 +702,6 @@ Do you really want to use this port?"),
     symbol HandleRedirectToMasqueradedIP (string key, map event) {
 	any ret = event["ID"]:nil;
 	
-	y2milestone("RET: %1", ret);
-
 	if (ret == "add_redirect_to_masquerade") {
 	    HandlePopupAddRedirectToMasqueradedIPRule();
 	} else if (ret == "remove_redirect_to_masquerade") {

@@ -1,4 +1,15 @@
 -------------------------------------------------------------------
+Mon Jan 17 13:24:35 CET 2005 - locilka@suse.cz
+
+- Added comments for translators (CommandLine)
+- Added CommandLine and UI handling in RedirectToMasquerade
+  functionality to follow iptables/SuSEfirewall2 syntax
+- Fixed redrawing of allowed services after AdditionalServices
+  added
+- Fixed StartNow(), StopNow() and SaveAndRestart() functionality to
+  change the final service status after Write() operations
+
+-------------------------------------------------------------------
 Tue Jan 11 16:13:20 CET 2005 - locilka@suse.cz
 
 - Added CommandLine support
