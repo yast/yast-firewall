@@ -44,5 +44,5 @@ make check
 @YAST2DIR@/include/firewall/*
 @YAST2DIR@/clients/firewall.ycp
 @YAST2DIR@/clients/firewall_*.ycp
-@YAST2DIR@/menuentries/menuentry_firewall.y2cc
+@YAST2DIR@/menuentries/menuentry_firewall2.y2cc
 %doc @DOCDIR@

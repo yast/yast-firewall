@@ -16,6 +16,6 @@ include_DATA =		\
 	io.ycp		\
 	ui.ycp
 
-menu_DATA = menuentry_firewall.y2cc
+menu_DATA = menuentry_firewall2.y2cc
 
 EXTRA_DIST = $(clients_DATA) $(include_DATA) $(menu_DATA)

@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Feb 12 12:03:26 MET 2002 - tom@suse.de
+
+- Renamed menuentry_firewall.y2cc ---> menuentry_firewall2.y2cc (conflict)
+
+-------------------------------------------------------------------
 Fri Feb  8 20:40:48 MET 2002 - tom@suse.de
 
 - Now checked into STABLE
