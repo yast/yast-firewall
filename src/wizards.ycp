@@ -213,5 +213,60 @@ define any FirewallAutoSequence() ``{
     return ret;
 }
 
+/**
+ * Main interface function
+ */
+define any FirewallProposalSequence() ``{
+    map aliases = $[
+	"figurefw"	: ``(FigureFirewallDialog()),
+	"devices"	: ``(DevicesDialog()),
+	"services"	: ``(ServicesDialog()),
+	"features"	: ``(FeatureDialog()),
+	"logging"	: ``(LoggingDialog())
+    ];
+
+    map sequence = $[
+        "ws_start" : "figurefw",
+	"figurefw" : $[
+	    `abort: `abort,
+	    `next: "devices",
+	    `finish: `next
+	],
+        "devices" : $[
+	    `abort: `abort,
+            `next: "services"
+        ],
+        "services" : $[
+	    `abort: `abort,
+            `next: "features"
+        ],
+        "features" : $[
+	    `abort: `abort,
+            `next: "logging"
+        ],
+        "logging" : $[
+	    `abort: `abort,
+            `next: `next
+        ]
+    ];
+
+    string help = "";
+
+    /* Read dialog caption */
+    string caption = _("Firewall configuration");
+
+    /* Read dialog contents */
+    term contents = `Label(_("Initializing ..."));
+
+    Wizard::CreateDialog();
+    Wizard::SetDesktopIcon("firewall");
+    Wizard::SetContentsButtons(caption, contents, help,
+	    Label::BackButton(), Label::NextButton());
+
+    any ret = Sequencer::Run(aliases, sequence);
+    UI::CloseDialog();
+    return ret;
+}
+
 /* EOF */
 }

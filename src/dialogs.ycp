@@ -123,8 +123,10 @@ define any DevicesDialog() ``{
 
     map firewall_settings = SuSEFirewall::settings;
 
+y2milestone("SETTINGS: %1", firewall_settings);
+
     /* Devices dialog caption */
-    string caption = _("Firewall Configuration (Step 1 of 4): Basic Settings");
+    string caption = _("Firewall Configuration: Basic Settings");
 
     /* Devices dialog help 1/4 */
     string help = _("<p>This tool aims to be an easy-to-use configuration
@@ -266,7 +268,7 @@ define any ServicesDialog() ``{
     map firewall_settings = SuSEFirewall::settings;
 
     /* Services dialog caption */
-    string caption = _("Firewall Configuration (Step 2 of 4): Services");
+    string caption = _("Firewall Configuration: Services");
 
     /* Services dialog help 1/10 */
     string help = _("<p>Choose the <b>services</b> that should be available from
@@ -441,7 +443,7 @@ services. Also start the appropriate daemons.</p>");
 define symbol FeatureDialog() ``{
 
     /* Features dialog caption */
-    string caption = _("Firewall Configuration (Step 3 of 4): Features");
+    string caption = _("Firewall Configuration: Features");
 
     string help =
 
@@ -655,7 +657,7 @@ Proceed with this setup?
 define symbol LoggingDialog() ``{
 
     /* Loggin dialog caption */
-    string caption = _("Firewall Configuration (Step 4 of 4): Logging Options");
+    string caption = _("Firewall Configuration: Logging Options");
 
     /* Loggin dialog help 1/4 */
     string help = _("<p>Choose which packets should be logged.</p>") +
@@ -843,7 +845,7 @@ when you boot your system.</p>");
 define symbol StopDialog() ``{
 
     /* Stop dialog caption */
-    string caption = _("Firewall configuration - deactivate firewall");
+    string caption = _("Firewall configuration: Deactivate firewall");
 
     /* Stop dialog help 1/2 */
     string help = _("<p><b>Attention:</b><br>
@@ -957,6 +959,87 @@ editor to manually remove them");
 	}
     };
 
+    return (symbol) ret;
+}
+
+/**
+ * Helper function to set Next button as "Next" or "Finish"
+ * @param string firewall status ("firewall_status_disable" or any other)
+ */
+define void SetNextButtonByStatus(string status) ``{
+    if (status == "firewall_status_disable") {
+	Wizard::SetNextButton(`finish, Label::FinishButton());
+    } else {
+	Wizard::SetNextButton(`next, Label::NextButton());
+    }
+}
+
+/**
+ * Use or do not use firewall
+ * @return dialog result
+ */
+define symbol FigureFirewallDialog() ``{
+    // TRANSLATORS: help text for enabling/disabling firewall in network proposal
+    string help = _("<p><b>Firewall Service</b><br>
+If you want to to use SuSEfirewall2 to protect your system, select
+<b>Enable firewall</b> and click <b>Next</b> to configure it.</p>
+<p>If you don't want use it, select <b>Disable firewall</b> and click <b>Finish</b>.
+</p>");
+
+    // TRANSLATORS: dialog caption, main dialog for enabling/disablig firewall
+    string caption = _("Firewall Service");
+
+    term contents = `HBox(
+	`HStretch(),
+	`HSquash(
+	    `Frame(_("Service"),
+		`RadioButtonGroup(`id("firewall_status"),
+		    `VBox(
+			// TRANSLATORS: radio button
+			`Left(`RadioButton(`id("firewall_status_enable"), `opt(`notify), _("&Enable firewall"))),
+			// TRANSLATORS: radio button
+			`Left(`RadioButton(`id("firewall_status_disable"), `opt(`notify), _("&Disable firewall")))
+		    )
+		)
+	    )
+	),
+	`HStretch()
+    );
+
+    Wizard::SetContentsButtons(caption, contents, help,
+	    Label::BackButton(), Label::NextButton());
+    Wizard::DisableBackButton();
+
+    any ret = nil;
+
+    if (SuSEFirewall::enable_firewall==true) {
+	UI::ChangeWidget (`id ("firewall_status"), `CurrentButton, "firewall_status_enable");
+    } else {
+	UI::ChangeWidget (`id ("firewall_status"), `CurrentButton, "firewall_status_disable");
+    }
+    SetNextButtonByStatus((string)UI::QueryWidget(`id("firewall_status"),`CurrentButton));
+
+    while(true) {
+
+	ret = UI::UserInput();
+
+	if (ret == `next) {
+	    SuSEFirewall::enable_firewall = true;
+	    break;
+	} else if (ret == `finish) {
+	    SuSEFirewall::enable_firewall = false;
+	    break;
+	} else if (ret == `abort) {
+	    if(Popup::ReallyAbort(true)) break;
+	    else continue;
+	} else if (ret == "firewall_status_enable" || ret == "firewall_status_disable") {
+	    SetNextButtonByStatus((string) ret);
+	} else {
+	    y2error("unknown retcode: %1", ret);
+	    continue;
+	}
+
+    }
     return (symbol) ret;
 }
 

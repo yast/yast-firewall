@@ -6,7 +6,8 @@ module_DATA = SuSEFirewall.ycp
 
 client_DATA =		\
 	firewall.ycp	\
-	firewall_auto.ycp
+	firewall_auto.ycp	\
+	firewall_proposal.ycp
 
 ynclude_DATA =		\
 	complex.ycp	\

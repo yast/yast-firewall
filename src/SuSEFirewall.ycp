@@ -15,17 +15,25 @@ module "SuSEFirewall";
 textdomain "firewall";
 
 import "Label";
+import "Remote";
 import "Mode";
 import "Popup";
 import "Progress";
 import "Report";
 import "Service";
 import "Summary";
+import "NetworkDevices";
 
 /* global settings map */
 global map<string,any> settings = $[];
 
 global boolean personal_firewall_is_active = false;
+
+/* something in proposal already changed by user */
+global boolean proposal_changed_by_user = false;
+
+/* default value for firewall enabled/disabled */
+global boolean enable_firewall = false;
 
 /**
  * Write only, used during autoinstallation.
@@ -217,6 +225,120 @@ global define boolean Read() {
     return true;
 }
 
+/*
+ * Propose Firewall settings
+ */
+global define void Propose () ``{
+    y2milestone("Initializing proposal");
+    
+    // All network devices
+    list<string> netdevices = NetworkDevices::List("");
+    netdevices = filter(string dev, netdevices, ``{
+	return dev != "" && !issubstring(dev, "lo") && !issubstring(dev, "sit");
+    });
+
+    // Firewall is disabled if there is no network
+    if (size(netdevices)==0) {
+	SuSEFirewall::enable_firewall = false;
+	return;
+    }
+    SuSEFirewall::enable_firewall = true;
+
+    settings["FW_DEV_EXT"] = mergestring(sort(netdevices), " ");
+    settings["FW_DEV_INT"] = "";
+    settings["FW_DEV_DMZ"] = "";
+
+    list<string> allowed_tcp_services = [];
+    // SSH installation opens SSH in firewall by default
+    if (Mode::usessh==true) {
+	allowed_tcp_services = add(allowed_tcp_services, "ssh");
+    }
+    // VNC installation or Alowed Remote administration opens VNC in firewall by default
+    if ((Mode::vnc==true) || (Remote::allow_administration==true)) {
+	allowed_tcp_services = add(allowed_tcp_services, "5801 5901");
+    }
+
+    // No services are allowed by default, excepting allowed_tcp_services for EXT_TCP
+    settings["FW_SERVICES_EXT_IP"] = "";
+    settings["FW_SERVICES_EXT_TCP"] = mergestring(allowed_tcp_services, " ");
+    settings["FW_SERVICES_EXT_UDP"] = "";
+
+    settings["FW_SERVICES_INT_IP"] = "";
+    settings["FW_SERVICES_INT_TCP"] = "";
+    settings["FW_SERVICES_INT_UDP"] = "";
+    
+    settings["FW_SERVICES_DMZ_IP"] = "";
+    settings["FW_SERVICES_DMZ_TCP"] = "";
+    settings["FW_SERVICES_DMZ_UDP"] = "";
+
+    // We don't do any masquerade or route by default
+    settings["FW_MASQUERADE"] = "no";
+    settings["FW_MASQ_NETS"] = "";
+    settings["FW_ROUTE"] = "no";
+
+    // ICMP is allowed
+    settings["FW_ALLOW_FW_TRACEROUTE"] = "yes";
+
+    // We don't trust any IPsec
+    settings["FW_IPSEC_TRUST"] = "no";
+    settings["FW_PROTECT_FROM_INTERNAL"] = "yes";
+
+    // All services are auto-protected by default
+    settings["FW_AUTOPROTECT_SERVICES"] = "yes";
+
+    // All critical packets are logged
+    settings["FW_LOG_ACCEPT_ALL"] = "no";
+    settings["FW_LOG_ACCEPT_CRIT"] = "yes";
+    settings["FW_LOG_DROP_ALL"] = "no";
+    settings["FW_LOG_DROP_CRIT"] = "yes";
+}
+
+/**
+ * Reset Firewall settings
+ */
+global define void Reset () ``{
+    if (Mode::autoinst)
+	return;
+
+    if (! Mode::config)
+	Propose();
+    else
+	Read();
+}
+
+/**
+ * Returns Preformatted text for proposal
+ */
+global define string GetPreformattedProposal () {
+    string ret = "<ul>";
+
+    // TRANSLATORS: Proposal rich text item, %1 is the firewall status - enabled or disabled
+    ret = ret + sformat(_("<li>Firewall is %1</li>"),
+	(SuSEFirewall::enable_firewall ?
+	    // TRANSLATORS: Proposal rich text item value - Firewall is enabled
+	    _("enabled")
+	    :
+	    // TRANSLATORS: Proposal rich text item value - Firewall is disabled
+	    _("disabled")
+	)
+    );
+
+    if (SuSEFirewall::enable_firewall == true) {
+	// TRANSLATORS: Proposal rich text item, %1 is list of open ports
+	ret = ret + sformat(_("<li>Open ports: %1 </li>"),
+	    (settings["FW_SERVICES_EXT_TCP"]:"" != "" ?
+		settings["FW_SERVICES_EXT_TCP"]:""
+		:
+		// TRANSLATORS: Proposal rich text - Opened ports: none
+		_("none")
+	    )
+	);
+
+	ret = ret + "</ul>";
+    }
+
+    return ret;
+}
 
 /**
  * Update the SCR from the map of all firewall settings
@@ -224,6 +346,10 @@ global define boolean Read() {
  * @return true on success
  */
 global define boolean Write() {
+
+    // only activated firewall's setting is writen in installation (proposal) mode
+    if ((Mode::config == false) && (enable_firewall == false))
+	return true;
 
     if(!start && !write_only)
 	return false;
