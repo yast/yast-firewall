@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Sep  6 13:35:07 CEST 2004 - locilka@suse.cz
+
+- added SetModified() function to autoyast
+- 2.10.8
+
+-------------------------------------------------------------------
 Mon Sep  6 09:01:35 CEST 2004 - locilka@suse.cz
 
 - fixed #44650 Function ActivateConfiguration now tests if you

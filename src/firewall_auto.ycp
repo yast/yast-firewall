@@ -81,6 +81,10 @@ else if (func == "Export") {
 else if (func == "GetModified") {
     ret = SuSEFirewall::GetModified();
 }
+else if (func == "SetModified") {
+    ret = SuSEFirewall::SetModified();
+    ret = true;
+}
 /* Write givven settings */
 else if (func == "Write") {
     import "Progress";
