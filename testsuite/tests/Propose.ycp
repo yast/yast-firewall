@@ -130,7 +130,6 @@
 
     READ[ "sysconfig", "SuSEfirewall2" ] = SuSEFirewall::settings;
 
-    Mode::test () = true;
     Progress::off ();
 
     SuSEFirewall::enable_firewall = true;
@@ -142,11 +141,32 @@
     NetworkDevices::Read ();
     TEST (``(SuSEFirewall::Propose ()), [READ, WRITE, EXEC], 0);
     TEST (``(SuSEFirewall::GetPreformattedProposal ()), [READ, WRITE, EXEC], 0);
-    Linuxrc::usessh () = true;
-    TEST (``(SuSEFirewall::Propose ()), [READ, WRITE, EXEC], 0);
-    TEST (``(SuSEFirewall::GetPreformattedProposal ()), [READ, WRITE, EXEC], 0);
-    Linuxrc::vnc () = true;
-    TEST (``(SuSEFirewall::Propose ()), [READ, WRITE, EXEC], 0);
-    TEST (``(SuSEFirewall::GetPreformattedProposal ()), [READ, WRITE, EXEC], 0);    
+    map R_SSH = $[
+	"etc" : $[
+	    "install_inf" : $[
+		"UseSSH" : "1",
+		],
+	    ],
+	];
+    R_SSH = union (READ, R_SSH);
+
+    TEST (``(SuSEFirewall::Propose ()), [R_SSH, WRITE, EXEC], 0);
+    TEST (``(SuSEFirewall::GetPreformattedProposal ()), [R_SSH, WRITE, EXEC], 0);
+
+    map R_VNC = $[
+	"etc" : $[
+	    "install_inf" : $[
+		"VNC" : "1",
+		],
+	    ],
+	];
+    R_VNC = union (R_SSH, R_VNC);
+    // Nasty trick, we may do this because of Y2ALLGLOBAL
+    // Reset the variable so that SCR is consulted again
+    import "Linuxrc";
+    Linuxrc::install_inf = nil;
+
+    TEST (``(SuSEFirewall::Propose ()), [R_VNC, WRITE, EXEC], 0);
+    TEST (``(SuSEFirewall::GetPreformattedProposal ()), [R_VNC, WRITE, EXEC], 0);    
     DUMP ("=======================");
 }

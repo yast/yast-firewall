@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Oct 27 16:58:50 CEST 2004 - mvidner@suse.cz
+
+- Adjusted for changes in Mode.
+- 2.11.2
+
+-------------------------------------------------------------------
 Tue Oct 19 13:00:10 CEST 2004 - locilka@suse.cz
 
 - Fixed debug and error messages in log

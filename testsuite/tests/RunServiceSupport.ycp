@@ -132,7 +132,6 @@
 
     READ[ "sysconfig", "SuSEfirewall2" ] = SuSEFirewall::settings;
 
-    Mode::test () = true;
     Progress::off ();
     NetworkDevices::Read ();
 

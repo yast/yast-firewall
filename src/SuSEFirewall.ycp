@@ -18,6 +18,7 @@ textdomain "firewall";
 import "Label";
 import "Remote";
 import "Mode";
+import "Linuxrc";
 import "Popup";
 import "Progress";
 import "Report";
