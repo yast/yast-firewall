@@ -6,7 +6,7 @@ X-KDE-ModuleType=Library
 X-KDE-RootOnly=true
 X-KDE-HasReadOnlyMode=true
 X-KDE-Library=yast2
-X-KDE-FactoryName=firewall
+X-SuSE-YaST-Call=firewall
 
 X-SuSE-YaST-Group=Security
 X-SuSE-YaST-Argument=
