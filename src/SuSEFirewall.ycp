@@ -138,6 +138,10 @@ global define boolean Read() ``{
     if( FW_PROTECT_FROM_INTERNAL == nil ) FW_PROTECT_FROM_INTERNAL = "yes";
     settings["FW_PROTECT_FROM_INTERNAL"] = FW_PROTECT_FROM_INTERNAL;
 
+    string FW_DEV_DMZ = SCR::Read(.sysconfig.SuSEfirewall2.FW_DEV_DMZ);
+    if( FW_DEV_DMZ == nil ) FW_DEV_DMZ = "";
+    settings["FW_DEV_DMZ"] = FW_DEV_DMZ;
+
     string FW_DEV_INT = SCR::Read(.sysconfig.SuSEfirewall2.FW_DEV_INT);
     if( FW_DEV_INT == nil ) FW_DEV_INT = "";
     settings["FW_DEV_INT"] = FW_DEV_INT;
@@ -145,6 +149,26 @@ global define boolean Read() ``{
     string FW_DEV_EXT = SCR::Read(.sysconfig.SuSEfirewall2.FW_DEV_EXT);
     if( FW_DEV_EXT == nil ) FW_DEV_EXT = "";
     settings["FW_DEV_EXT"] = FW_DEV_EXT;
+
+    string FW_SERVICES_DMZ_UDP = SCR::Read(.sysconfig.SuSEfirewall2.FW_SERVICES_DMZ_UDP);
+    if( FW_SERVICES_DMZ_UDP == nil ) FW_SERVICES_DMZ_UDP = "";
+    settings["FW_SERVICES_DMZ_UDP"] = FW_SERVICES_DMZ_UDP;
+
+    string FW_SERVICES_INT_UDP = SCR::Read(.sysconfig.SuSEfirewall2.FW_SERVICES_INT_UDP);
+    if( FW_SERVICES_INT_UDP == nil ) FW_SERVICES_INT_UDP = "";
+    settings["FW_SERVICES_INT_UDP"] = FW_SERVICES_INT_UDP;
+
+    string FW_SERVICES_EXT_UDP = SCR::Read(.sysconfig.SuSEfirewall2.FW_SERVICES_EXT_UDP);
+    if( FW_SERVICES_EXT_UDP == nil ) FW_SERVICES_EXT_UDP = "";
+    settings["FW_SERVICES_EXT_UDP"] = FW_SERVICES_EXT_UDP;
+
+    string FW_SERVICES_DMZ_TCP = SCR::Read(.sysconfig.SuSEfirewall2.FW_SERVICES_DMZ_TCP);
+    if( FW_SERVICES_DMZ_TCP == nil ) FW_SERVICES_DMZ_TCP = "";
+    settings["FW_SERVICES_DMZ_TCP"] = FW_SERVICES_DMZ_TCP;
+
+    string FW_SERVICES_INT_TCP = SCR::Read(.sysconfig.SuSEfirewall2.FW_SERVICES_INT_TCP);
+    if( FW_SERVICES_INT_TCP == nil ) FW_SERVICES_INT_TCP = "";
+    settings["FW_SERVICES_INT_TCP"] = FW_SERVICES_INT_TCP;
 
     string FW_SERVICES_EXT_TCP = SCR::Read(.sysconfig.SuSEfirewall2.FW_SERVICES_EXT_TCP);
     if( FW_SERVICES_EXT_TCP == nil ) FW_SERVICES_EXT_TCP = "";
@@ -259,43 +283,61 @@ global define boolean Write() ``{
 
 //  <AUTOCODE WRITE>
     string FW_LOG_ACCEPT_ALL = settings["FW_LOG_ACCEPT_ALL"]:"no";
-    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_LOG_ACCEPT_ALL, FW_LOG_ACCEPT_ALL);
+    ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_LOG_ACCEPT_ALL, FW_LOG_ACCEPT_ALL);
 
     string FW_LOG_ACCEPT_CRIT = settings["FW_LOG_ACCEPT_CRIT"]:"yes";
-    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_LOG_ACCEPT_CRIT, FW_LOG_ACCEPT_CRIT);
+    ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_LOG_ACCEPT_CRIT, FW_LOG_ACCEPT_CRIT);
 
     string FW_LOG_DROP_ALL = settings["FW_LOG_DROP_ALL"]:"no";
-    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_LOG_DROP_ALL, FW_LOG_DROP_ALL);
+    ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_LOG_DROP_ALL, FW_LOG_DROP_ALL);
 
     string FW_LOG_DROP_CRIT = settings["FW_LOG_DROP_CRIT"]:"yes";
-    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_LOG_DROP_CRIT, FW_LOG_DROP_CRIT);
+    ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_LOG_DROP_CRIT, FW_LOG_DROP_CRIT);
 
     string FW_PROTECT_FROM_INTERNAL = settings["FW_PROTECT_FROM_INTERNAL"]:"yes";
-    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_PROTECT_FROM_INTERNAL, FW_PROTECT_FROM_INTERNAL);
+    ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_PROTECT_FROM_INTERNAL, FW_PROTECT_FROM_INTERNAL);
+
+    string FW_DEV_DMZ = settings["FW_DEV_DMZ"]:"";
+    ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_DEV_DMZ, FW_DEV_DMZ);
 
     string FW_DEV_INT = settings["FW_DEV_INT"]:"";
-    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_DEV_INT, FW_DEV_INT);
+    ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_DEV_INT, FW_DEV_INT);
 
     string FW_DEV_EXT = settings["FW_DEV_EXT"]:"";
-    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_DEV_EXT, FW_DEV_EXT);
+    ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_DEV_EXT, FW_DEV_EXT);
+
+    string FW_SERVICES_DMZ_UDP = settings["FW_SERVICES_DMZ_UDP"]:"";
+    ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_DMZ_UDP, FW_SERVICES_DMZ_UDP);
+
+    string FW_SERVICES_INT_UDP = settings["FW_SERVICES_INT_UDP"]:"";
+    ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_INT_UDP, FW_SERVICES_INT_UDP);
+
+    string FW_SERVICES_EXT_UDP = settings["FW_SERVICES_EXT_UDP"]:"";
+    ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_EXT_UDP, FW_SERVICES_EXT_UDP);
+
+    string FW_SERVICES_DMZ_TCP = settings["FW_SERVICES_DMZ_TCP"]:"";
+    ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_DMZ_TCP, FW_SERVICES_DMZ_TCP);
+
+    string FW_SERVICES_INT_TCP = settings["FW_SERVICES_INT_TCP"]:"";
+    ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_INT_TCP, FW_SERVICES_INT_TCP);
 
     string FW_SERVICES_EXT_TCP = settings["FW_SERVICES_EXT_TCP"]:"";
-    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_EXT_TCP, FW_SERVICES_EXT_TCP);
+    ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_EXT_TCP, FW_SERVICES_EXT_TCP);
 
     string FW_AUTOPROTECT_SERVICES = settings["FW_AUTOPROTECT_SERVICES"]:"yes";
-    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_AUTOPROTECT_SERVICES, FW_AUTOPROTECT_SERVICES);
+    ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_AUTOPROTECT_SERVICES, FW_AUTOPROTECT_SERVICES);
 
     string FW_MASQ_NETS = settings["FW_MASQ_NETS"]:"";
-    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_MASQ_NETS, FW_MASQ_NETS);
+    ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_MASQ_NETS, FW_MASQ_NETS);
 
     string FW_ROUTE = settings["FW_ROUTE"]:"no";
-    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_ROUTE, FW_ROUTE);
+    ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_ROUTE, FW_ROUTE);
 
     string FW_MASQUERADE = settings["FW_MASQUERADE"]:"no";
-    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_MASQUERADE, FW_MASQUERADE);
+    ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_MASQUERADE, FW_MASQUERADE);
 
     string FW_ALLOW_FW_TRACEROUTE = settings["FW_ALLOW_FW_TRACEROUTE"]:"yes";
-    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_ALLOW_FW_TRACEROUTE, FW_ALLOW_FW_TRACEROUTE);
+    ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_ALLOW_FW_TRACEROUTE, FW_ALLOW_FW_TRACEROUTE);
 
 //  </AUTOCODE>
 

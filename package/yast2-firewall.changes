@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Aug  5 08:03:04 CEST 2003 - visnov@suse.de
+
+- read and write also DMZ/INT/EXT services and all interfaces 
+
+-------------------------------------------------------------------
 Mon Aug  4 22:33:38 CEST 2003 - nashif@suse.de
 
 - Fixed sequence for autoyast
