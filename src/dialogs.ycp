@@ -121,12 +121,12 @@ of the SuSEfirewall2 package. Take a few moments to go through all menus
 and select the options carefully.</p>") +
 
     /* Devices dialog help 2/3 */
-    _("<p><b>External interface:</b><br>
+    _("<p><b>External Interface:</b><br>
 Choose the interface connected to the Internet for which to configure
 the firewall.</p>") +
 
     /* Devices dialog help 3/3 */
-    _("<p><b>Internal interface:</b><br>
+    _("<p><b>Internal Interface:</b><br>
 Choose your internal network interface.</p>");
 
     /* Warning RichText 1/2 */
@@ -137,13 +137,14 @@ Choose your internal network interface.</p>");
 as the external interface. Your ethernet interface is not the external
 interface in this case.</li></ul></p>");
 
+    /* ComboBox item (No network device selected) */
     string none = _("(none)");
     list default_devices = ["eth0","ppp0","ippp0"];
-    list intdevices = sort(union(lookup(firewall_settings,"network_devices",[]),[none]));
+    list intdevices = sort(union(firewall_settings["network_devices"]:[],[none]));
     list devices = sort(union(intdevices,default_devices));
 
-    string FW_DEV_EXT = lookup(firewall_settings,"FW_DEV_EXT","");
-    string FW_DEV_INT = lookup(firewall_settings,"FW_DEV_INT","");
+    string FW_DEV_EXT = firewall_settings["FW_DEV_EXT"]:"";
+    string FW_DEV_INT = firewall_settings["FW_DEV_INT"]:"";
 
     term contents = `VBox(
        `VSpacing(1.5),
@@ -154,7 +155,7 @@ interface in this case.</li></ul></p>");
 			    `VBox (`VWeight (80,
 					     `VBox (
 						    `VSpacing (2),
-						    `HBox ( `HWeight(20,`Top(`ComboBox (`id ("interface"),`opt(`hstretch, `editable), _("&External Interface: "), devices ))),
+						    `HBox ( `HWeight(20,`Top(`ComboBox (`id ("interface"),`opt(`hstretch, `editable), _("&External Interface:"), devices ))),
 							   `HSpacing(3),
 							   `HWeight(40,`Top( `Left( `Label (
  // to translater: please keep width and newlines. Use more lines if neccessary
@@ -165,7 +166,7 @@ connections
 ")))))
 							   ),
 						    `VSpacing (0),
-						    `HBox ( `HWeight(20,`Top(`ComboBox (`id ("intinterface"),`opt(`hstretch, `editable), _("&Internal Interface: "), intdevices ))),
+						    `HBox ( `HWeight(20,`Top(`ComboBox (`id ("intinterface"),`opt(`hstretch, `editable), _("&Internal Interface:"), intdevices ))),
 							   `HSpacing(3),
 							   `HWeight(40,`Top( `Left( `Label (
    // to translater: please keep width and newlines. Use more lines if neccessary
@@ -335,13 +336,14 @@ to 23 write \"21:23\"</p>");
 	)
     ));
 
-    list selectable_services = ["telnet","ssh","http","https","smtp","pop3", "pop3s", "imap", "imaps", "rsync" ];
+    list selectable_services = [ "telnet", "ssh", "http", "https", "smtp",
+	    "pop3", "pop3s", "imap", "imaps", "rsync" ];
 
-    string services_string = lookup(firewall_settings,"FW_SERVICES_EXT_TCP","");
+    string services_string = firewall_settings["FW_SERVICES_EXT_TCP"]:"";
     list additional_services = [];
-    list services_list = sort(splitstring(services_string," "));
-    additional_services =filter(`s,services_list,``(s!="" && !contains(selectable_services,s)));
-    services_list = filter(`s,services_list,``(s!="" && contains(selectable_services,s)));
+    list services_list = sort(splitstring(services_string, " "));
+    additional_services = filter(`s, services_list,``(s!="" && !contains(selectable_services, s)));
+    services_list = filter(`s, services_list,``(s!="" && contains(selectable_services, s)));
 
     Wizard::SetContentsButtons(caption, contents, help,
 	    Label::BackButton(), Label::NextButton());
@@ -351,7 +353,7 @@ to 23 write \"21:23\"</p>");
     define activate_checkboxes_for_services() ``{
 	// activate all selected services
 	foreach(`service, selectable_services, ``{
-	    if(contains(services_list,service))
+	    if(contains(services_list, service))
 		UI::ChangeWidget(`id(service), `Value, true);
 	    else
 		UI::ChangeWidget(`id(service), `Value, false);
@@ -383,7 +385,7 @@ to 23 write \"21:23\"</p>");
 		UI::ChangeWidget(`id(`status), `Value, mergestring(additional_services," "));
 	    }
 	}
-	else if(contains(selectable_services,ret))
+	else if(contains(selectable_services, ret))
 	{
 	    boolean state = UI::QueryWidget(`id(ret),`Value);
 	    if(state == true)
@@ -403,10 +405,11 @@ to 23 write \"21:23\"</p>");
 	}
 	else
 	{
-	    SuSEFirewall::settings["FW_SERVICES_EXT_TCP"] = mergestring(sort(union(services_list,additional_services))," ");
+	    SuSEFirewall::settings["FW_SERVICES_EXT_TCP"] = mergestring(sort(union(services_list, additional_services))," ");
 	    break;
 	}
-    };
+    }
+    y2milestone("settings=%1", SuSEFirewall::settings);
 
     return ret;
 }
@@ -453,7 +456,8 @@ the internal network, <i>unset</i> this option.</p>");
 	`HSpacing(8),
 	`VBox(
 	    `VSpacing(3),
-	    `Left(`Label(_("Firewall Features:"))),
+	    /* Frame label */
+	    `Frame(_("Firewall Features:"), `VBox(
 	    `VSpacing(1),
 	    `HBox(
 		`HSpacing(1),
@@ -472,20 +476,23 @@ the internal network, <i>unset</i> this option.</p>");
 		),
 		`HSpacing(0)
 	    ),
-	    `VSpacing(1),
+	    `VSpacing(1)
+	    )),
+	    `VSpacing(2),
 	    `VStretch()
 	),
 	`HSpacing(5)
     ));
 
-    string FW_ALLOW_FW_TRACEROUTE	= lookup(firewall_settings,"FW_ALLOW_FW_TRACEROUTE",  "no");
-    string FW_MASQUERADE		= lookup(firewall_settings,"FW_MASQUERADE",           "no");
-    string FW_ROUTE			= lookup(firewall_settings,"FW_ROUTE",                "no");
-    string FW_MASQ_NETS			= lookup(firewall_settings,"FW_MASQ_NETS",            "");
-    string FW_AUTOPROTECT_SERVICES	= lookup(firewall_settings,"FW_AUTOPROTECT_SERVICES", "no");
-    string FW_PROTECT_FROM_INTERNAL	= lookup(firewall_settings,"FW_PROTECT_FROM_INTERNAL","yes");
+    string FW_ALLOW_FW_TRACEROUTE	= firewall_settings["FW_ALLOW_FW_TRACEROUTE"]:"no";
+    string FW_MASQUERADE		= firewall_settings["FW_MASQUERADE"]:"no";
+    string FW_ROUTE			= firewall_settings["FW_ROUTE"]:"no";
+    string FW_MASQ_NETS			= firewall_settings["FW_MASQ_NETS"]:"";
+    string FW_AUTOPROTECT_SERVICES	= firewall_settings["FW_AUTOPROTECT_SERVICES"]:"no";
+    string FW_PROTECT_FROM_INTERNAL	= firewall_settings["FW_PROTECT_FROM_INTERNAL"]:"yes";
 
-    Wizard::SetContentsButtons(caption,contents,help,Label::BackButton(),Label::NextButton());
+    Wizard::SetContentsButtons(caption, contents, help,
+	    Label::BackButton(), Label::NextButton());
 
     if( FW_ALLOW_FW_TRACEROUTE == "yes" )
     {
@@ -561,8 +568,8 @@ the internal network, <i>unset</i> this option.</p>");
 	    {
 		boolean choice = Popup::ContinueCancel(
 		    _("It usually does not make sense to activate both
-\"Forward traffic and do masquerading\" and
-\"Protect from internal network\"
+\"Forward Traffic and Do Masquerading\" and
+\"Protect from Internal Network\"
 as your computer would not accept any packets
 from the internal network.
 
@@ -617,10 +624,10 @@ Attention: This option is dangerous as your log file will grow very quicky
 if you activate this.</p>");
 
     map firewall_settings = SuSEFirewall::settings;
-    string FW_LOG_DROP_CRIT = lookup(firewall_settings,"FW_LOG_DROP_CRIT","yes");
-    string FW_LOG_DROP_ALL = lookup(firewall_settings,"FW_LOG_DROP_ALL","no");
-    string FW_LOG_ACCEPT_CRIT = lookup(firewall_settings,"FW_LOG_ACCEPT_CRIT","yes");
-    string FW_LOG_ACCEPT_ALL = lookup(firewall_settings,"FW_LOG_ACCEPT_ALL","no");
+    string FW_LOG_DROP_CRIT = firewall_settings["FW_LOG_DROP_CRIT"]:"yes";
+    string FW_LOG_DROP_ALL = firewall_settings["FW_LOG_DROP_ALL"]:"no";
+    string FW_LOG_ACCEPT_CRIT = firewall_settings["FW_LOG_ACCEPT_CRIT"]:"yes";
+    string FW_LOG_ACCEPT_ALL = firewall_settings["FW_LOG_ACCEPT_ALL"]:"no";
 
     /* Loggin dialog contents */
     term contents = `VBox(
@@ -723,11 +730,11 @@ when you boot your system.</p>");
 			    //Lable for Checkbox
 //			    `Left(`Label(_("It seems that SuSEfirewall2 is already activate"))),
 			    // Checkbox option
-			    `Left(`RadioButton (`id ("reconfig"), _("Reconfigure firewall settings"),true)),
+			    `Left(`RadioButton (`id ("reconfig"), _("Reconfigure Firewall Settings"),true)),
 			    `VSpacing(0.5),
 
 			    // Checkbox option
-			    `Left(`RadioButton (`id ("stopit"), _("Stop firewall and remove it from boot process"))),
+			    `Left(`RadioButton (`id ("stopit"), _("Stop Firewall and Remove It From Boot Process"))),
 			    `VSpacing(2)
 			),
 			`HSpacing (2)
@@ -854,11 +861,11 @@ when you boot your system.</p>");
 		retry = false;
 		map firewall_stop_map = SCR::Execute (.target.bash_output, "/etc/init.d/SuSEfirewall2_setup stop",$["TERM":"raw"]);
 
-		if(firewall_stop_map == nil || lookup(firewall_stop_map,"exit",0)>0)
+		if(firewall_stop_map == nil || firewall_stop_map["exit"]:0>0)
 		{
 		    if( firewall_stop_map != nil )
 		    {
-			UI::StdOutStdErrLog( whatfailedmsg,lookup(firewall_stop_map,"stdout",""), lookup(firewall_stop_map,"stderr",""));
+			UI::StdOutStdErrLog( whatfailedmsg,firewall_stop_map["stdout"]:"", firewall_stop_map["stderr"]:"");
 			firewallstopped = false;
 		    }
 

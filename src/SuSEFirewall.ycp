@@ -33,7 +33,6 @@ global boolean personal_firewall_is_active = false;
  */
 global boolean write_only = false;
 
-
 global boolean start = false;
 
 /**
@@ -41,8 +40,8 @@ global boolean start = false;
  */
 global define void SuSEFirewall () ``{
 
-    if (!Mode::config)
-    {
+    if (!Mode::config) {
+
 	string REJECT_ALL_INCOMING_CONNECTIONS = SCR::Read(.sysconfig.personal-firewall.REJECT_ALL_INCOMING_CONNECTIONS);
 	if( REJECT_ALL_INCOMING_CONNECTIONS == nil ) REJECT_ALL_INCOMING_CONNECTIONS = "";
 	if( REJECT_ALL_INCOMING_CONNECTIONS != "" &&  REJECT_ALL_INCOMING_CONNECTIONS != "no")
@@ -54,7 +53,6 @@ global define void SuSEFirewall () ``{
 	    personal_firewall_is_active = false;
 	}
     }
-    return;
 }
 
 /**
@@ -109,261 +107,256 @@ global define list Summary() ``{
     return [ summary, [] ];
 }
 
-    /**
-     * Fill the map of all firewall settings from the SCR
-     * @return true on success
-     */
-    global define boolean Read() ``{
+/**
+ * Fill the map of all firewall settings from the SCR
+ * @return true on success
+ */
+global define boolean Read() ``{
 
-	// Check if firewall running
-	start = Runlevel::ServiceEnabled("SuSEfirewall2_init");
+    // Check if firewall running
+    start = Runlevel::ServiceEnabled("SuSEfirewall2_init");
 
 
 //  <AUTOCODE READ>
-	string FW_LOG_ACCEPT_ALL = SCR::Read(.sysconfig.SuSEfirewall2.FW_LOG_ACCEPT_ALL);
-	if( FW_LOG_ACCEPT_ALL == nil ) FW_LOG_ACCEPT_ALL = "no";
-	settings["FW_LOG_ACCEPT_ALL"] = FW_LOG_ACCEPT_ALL;
+    string FW_LOG_ACCEPT_ALL = SCR::Read(.sysconfig.SuSEfirewall2.FW_LOG_ACCEPT_ALL);
+    if( FW_LOG_ACCEPT_ALL == nil ) FW_LOG_ACCEPT_ALL = "no";
+    settings["FW_LOG_ACCEPT_ALL"] = FW_LOG_ACCEPT_ALL;
 
-	string FW_LOG_ACCEPT_CRIT = SCR::Read(.sysconfig.SuSEfirewall2.FW_LOG_ACCEPT_CRIT);
-	if( FW_LOG_ACCEPT_CRIT == nil ) FW_LOG_ACCEPT_CRIT = "yes";
-	settings["FW_LOG_ACCEPT_CRIT"] = FW_LOG_ACCEPT_CRIT;
+    string FW_LOG_ACCEPT_CRIT = SCR::Read(.sysconfig.SuSEfirewall2.FW_LOG_ACCEPT_CRIT);
+    if( FW_LOG_ACCEPT_CRIT == nil ) FW_LOG_ACCEPT_CRIT = "yes";
+    settings["FW_LOG_ACCEPT_CRIT"] = FW_LOG_ACCEPT_CRIT;
 
-	string FW_LOG_DROP_ALL = SCR::Read(.sysconfig.SuSEfirewall2.FW_LOG_DROP_ALL);
-	if( FW_LOG_DROP_ALL == nil ) FW_LOG_DROP_ALL = "no";
-	settings["FW_LOG_DROP_ALL"] = FW_LOG_DROP_ALL;
+    string FW_LOG_DROP_ALL = SCR::Read(.sysconfig.SuSEfirewall2.FW_LOG_DROP_ALL);
+    if( FW_LOG_DROP_ALL == nil ) FW_LOG_DROP_ALL = "no";
+    settings["FW_LOG_DROP_ALL"] = FW_LOG_DROP_ALL;
 
-	string FW_LOG_DROP_CRIT = SCR::Read(.sysconfig.SuSEfirewall2.FW_LOG_DROP_CRIT);
-	if( FW_LOG_DROP_CRIT == nil ) FW_LOG_DROP_CRIT = "yes";
-	settings["FW_LOG_DROP_CRIT"] = FW_LOG_DROP_CRIT;
+    string FW_LOG_DROP_CRIT = SCR::Read(.sysconfig.SuSEfirewall2.FW_LOG_DROP_CRIT);
+    if( FW_LOG_DROP_CRIT == nil ) FW_LOG_DROP_CRIT = "yes";
+    settings["FW_LOG_DROP_CRIT"] = FW_LOG_DROP_CRIT;
 
-	string FW_PROTECT_FROM_INTERNAL = SCR::Read(.sysconfig.SuSEfirewall2.FW_PROTECT_FROM_INTERNAL);
-	if( FW_PROTECT_FROM_INTERNAL == nil ) FW_PROTECT_FROM_INTERNAL = "yes";
-	settings["FW_PROTECT_FROM_INTERNAL"] = FW_PROTECT_FROM_INTERNAL;
+    string FW_PROTECT_FROM_INTERNAL = SCR::Read(.sysconfig.SuSEfirewall2.FW_PROTECT_FROM_INTERNAL);
+    if( FW_PROTECT_FROM_INTERNAL == nil ) FW_PROTECT_FROM_INTERNAL = "yes";
+    settings["FW_PROTECT_FROM_INTERNAL"] = FW_PROTECT_FROM_INTERNAL;
 
-	string FW_DEV_INT = SCR::Read(.sysconfig.SuSEfirewall2.FW_DEV_INT);
-	if( FW_DEV_INT == nil ) FW_DEV_INT = "";
-	settings["FW_DEV_INT"] = FW_DEV_INT;
+    string FW_DEV_INT = SCR::Read(.sysconfig.SuSEfirewall2.FW_DEV_INT);
+    if( FW_DEV_INT == nil ) FW_DEV_INT = "";
+    settings["FW_DEV_INT"] = FW_DEV_INT;
 
-	string FW_DEV_EXT = SCR::Read(.sysconfig.SuSEfirewall2.FW_DEV_EXT);
-	if( FW_DEV_EXT == nil ) FW_DEV_EXT = "";
-	settings["FW_DEV_EXT"] = FW_DEV_EXT;
+    string FW_DEV_EXT = SCR::Read(.sysconfig.SuSEfirewall2.FW_DEV_EXT);
+    if( FW_DEV_EXT == nil ) FW_DEV_EXT = "";
+    settings["FW_DEV_EXT"] = FW_DEV_EXT;
 
-	string FW_SERVICES_EXT_TCP = SCR::Read(.sysconfig.SuSEfirewall2.FW_SERVICES_EXT_TCP);
-	if( FW_SERVICES_EXT_TCP == nil ) FW_SERVICES_EXT_TCP = "";
-	settings["FW_SERVICES_EXT_TCP"] = FW_SERVICES_EXT_TCP;
+    string FW_SERVICES_EXT_TCP = SCR::Read(.sysconfig.SuSEfirewall2.FW_SERVICES_EXT_TCP);
+    if( FW_SERVICES_EXT_TCP == nil ) FW_SERVICES_EXT_TCP = "";
+    settings["FW_SERVICES_EXT_TCP"] = FW_SERVICES_EXT_TCP;
 
-	string FW_AUTOPROTECT_SERVICES = SCR::Read(.sysconfig.SuSEfirewall2.FW_AUTOPROTECT_SERVICES);
-	if( FW_AUTOPROTECT_SERVICES == nil ) FW_AUTOPROTECT_SERVICES = "yes";
-	settings["FW_AUTOPROTECT_SERVICES"] = FW_AUTOPROTECT_SERVICES;
+    string FW_AUTOPROTECT_SERVICES = SCR::Read(.sysconfig.SuSEfirewall2.FW_AUTOPROTECT_SERVICES);
+    if( FW_AUTOPROTECT_SERVICES == nil ) FW_AUTOPROTECT_SERVICES = "yes";
+    settings["FW_AUTOPROTECT_SERVICES"] = FW_AUTOPROTECT_SERVICES;
 
-	string FW_MASQ_NETS = SCR::Read(.sysconfig.SuSEfirewall2.FW_MASQ_NETS);
-	if( FW_MASQ_NETS == nil ) FW_MASQ_NETS = "";
-	settings["FW_MASQ_NETS"] = FW_MASQ_NETS;
+    string FW_MASQ_NETS = SCR::Read(.sysconfig.SuSEfirewall2.FW_MASQ_NETS);
+    if( FW_MASQ_NETS == nil ) FW_MASQ_NETS = "";
+    settings["FW_MASQ_NETS"] = FW_MASQ_NETS;
 
-	string FW_ROUTE = SCR::Read(.sysconfig.SuSEfirewall2.FW_ROUTE);
-	if( FW_ROUTE == nil ) FW_ROUTE = "no";
-	settings["FW_ROUTE"] = FW_ROUTE;
+    string FW_ROUTE = SCR::Read(.sysconfig.SuSEfirewall2.FW_ROUTE);
+    if( FW_ROUTE == nil ) FW_ROUTE = "no";
+    settings["FW_ROUTE"] = FW_ROUTE;
 
-	string FW_MASQUERADE = SCR::Read(.sysconfig.SuSEfirewall2.FW_MASQUERADE);
-	if( FW_MASQUERADE == nil ) FW_MASQUERADE = "no";
-	settings["FW_MASQUERADE"] = FW_MASQUERADE;
+    string FW_MASQUERADE = SCR::Read(.sysconfig.SuSEfirewall2.FW_MASQUERADE);
+    if( FW_MASQUERADE == nil ) FW_MASQUERADE = "no";
+    settings["FW_MASQUERADE"] = FW_MASQUERADE;
 
-	string FW_ALLOW_FW_TRACEROUTE = SCR::Read(.sysconfig.SuSEfirewall2.FW_ALLOW_FW_TRACEROUTE);
-	if( FW_ALLOW_FW_TRACEROUTE == nil ) FW_ALLOW_FW_TRACEROUTE = "yes";
-	settings["FW_ALLOW_FW_TRACEROUTE"] = FW_ALLOW_FW_TRACEROUTE;
+    string FW_ALLOW_FW_TRACEROUTE = SCR::Read(.sysconfig.SuSEfirewall2.FW_ALLOW_FW_TRACEROUTE);
+    if( FW_ALLOW_FW_TRACEROUTE == nil ) FW_ALLOW_FW_TRACEROUTE = "yes";
+    settings["FW_ALLOW_FW_TRACEROUTE"] = FW_ALLOW_FW_TRACEROUTE;
 
 //  </AUTOCODE>
 
+    // fetch list of network devices
+    list devicelist = SCR::Read(.probe.netif);
+    if (devicelist == nil) devicelist = [];
+    list devices = [];
 
-
-	// fetch list of network devices
-	list devicelist_scr = SCR::Read(.probe.netif);
-	if (devicelist == nil)
+    // filter the device names
+    foreach(map device, devicelist, ``{
+	string device = device["dev_name"]:"";
+	if( device != ""
+	    && !issubstring(device,"lo")
+	    && !issubstring(device,"sit"))
 	{
-	    devicelist = [];
+	    change(devices,device);
 	}
-	list devices = [];
+    });
 
-	// filter the device names
-	foreach(`device,devicelist_scr,``{
-	    string device = lookup(device,"dev_name","");
-	    if( device != ""
-		&& !issubstring(device,"lo")
-		&& !issubstring(device,"sit"))
+    settings["network_devices"] = devices;
+
+    return true;
+}
+
+
+/**
+ * Update the SCR from the map of all firewall settings
+ * @param m a map of all firewall settings
+ * @return true on success
+ */
+global define boolean Write() ``{
+
+    if(!start)
+	return false;
+
+    Progress::New(
+	/* Progress caption */
+	_("Firewall configuration -- saving settings"),
+	/* Progress contents */
+	_("Preparing ..."),
+	3,
+	[
+	    /* Progress stage 1/3 */
+	    _("Stop firewall"),
+	    /* Progress stage 2/3 */
+	    _("Save settings"),
+	    /* Progress stage 3/3 */
+	    _("Start firewall")
+	],
+	[
+	    /* Progress step 1/3 */
+	    _("Stopping firewall..."),
+	    /* Progress step 2/3 */
+	    _("Saving settings..."),
+	    /* Progress step 3/3 */
+	    _("Starting firewall...")
+	],
+	""
+    );
+
+    Progress::NextStage();
+
+    boolean retry = true;
+    while(retry) {
+
+	retry = false;
+	if(Runlevel::RunInitScript("SuSEfirewall2_setup", "stop") != 0) {
+
+	    /* Popup text */
+	    string whatfailedmsg = _("Stopping the firewall failed");
+	    symbol ret = Popup::AnyQuestion3(whatfailedmsg,
+		    "", Label::ContinueButton(), Label::AbortButton(),
+		    Label::RetryButton(), `focus_yes );
+
+	    if( ret == `retry)
 	    {
-		change(devices,device);
+		retry=true;
 	    }
-	});
-
-	settings["network_devices"] = devices;
-
-	return true;
+	    else if(ret==`no)
+	    {
+		return `next;
+	    }
+	}
     }
 
-
-    /**
-     * Update the SCR from the map of all firewall settings
-     * @param m a map of all firewall settings
-     * @return true on success
-     */
-    global define boolean Write() ``{
-
-	if (!start)
-	    return false;
-
-	string help = "";
-	string whatfailedmsg = _("Stopping the firewall failed");
-	boolean retry = true;
-	boolean rlret = false;
-
-
-	// Wizard::SetContents("",`Empty(),"",false,true);
-	// UI::ChangeWidget(`id(`abort),`Enabled, false);
-	// UI::ChangeWidget(`id(`next),`Label, Label::FinishButton());
-
-	Progress::New (
-		       _("Firewall configuration -- saving settings"),
-		       _("Preparing ..."),
-		       3,
-		       [
-			_("Stop firewall"),
-			_("Save settings"),
-			_("Start firewall")
-			],
-		       [
-			_("Stopping firewall..."),
-			_("Saving settings..."),
-			_("Starting firewall...")
-			],
-		       help
-		       );
-
-	Progress::NextStage();
-
-
-	retry=true;
-	while(retry)
-	{
-	    retry = false;
-	    if(Runlevel::RunInitScript("SuSEfirewall2_setup", "stop") != 0)
-	    {
-		symbol ret = Popup::AnyQuestion3( whatfailedmsg,
-						    "",
-						    Label::ContinueButton(),
-						    Label::AbortButton(),
-						    Label::RetryButton(),
-						    `focus_yes );
-		if( ret == `retry)
-		{
-		    retry=true;
-		}
-		else if(ret==`no)
-		{
-		    return `next;
-		}
-	    }
-	}
-	Progress::NextStage();
-	sleep(1000);
-	boolean write_ret = false;
-
+    Progress::NextStage();
+    boolean write_ret = false;
 
 //  <AUTOCODE WRITE>
-	string FW_LOG_ACCEPT_ALL = settings["FW_LOG_ACCEPT_ALL"]:"no";
-	write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_LOG_ACCEPT_ALL, FW_LOG_ACCEPT_ALL);
+    string FW_LOG_ACCEPT_ALL = settings["FW_LOG_ACCEPT_ALL"]:"no";
+    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_LOG_ACCEPT_ALL, FW_LOG_ACCEPT_ALL);
 
-	string FW_LOG_ACCEPT_CRIT = settings["FW_LOG_ACCEPT_CRIT"]:"yes";
-	write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_LOG_ACCEPT_CRIT, FW_LOG_ACCEPT_CRIT);
+    string FW_LOG_ACCEPT_CRIT = settings["FW_LOG_ACCEPT_CRIT"]:"yes";
+    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_LOG_ACCEPT_CRIT, FW_LOG_ACCEPT_CRIT);
 
-	string FW_LOG_DROP_ALL = settings["FW_LOG_DROP_ALL"]:"no";
-	write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_LOG_DROP_ALL, FW_LOG_DROP_ALL);
+    string FW_LOG_DROP_ALL = settings["FW_LOG_DROP_ALL"]:"no";
+    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_LOG_DROP_ALL, FW_LOG_DROP_ALL);
 
-	string FW_LOG_DROP_CRIT = settings["FW_LOG_DROP_CRIT"]:"yes";
-	write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_LOG_DROP_CRIT, FW_LOG_DROP_CRIT);
+    string FW_LOG_DROP_CRIT = settings["FW_LOG_DROP_CRIT"]:"yes";
+    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_LOG_DROP_CRIT, FW_LOG_DROP_CRIT);
 
-	string FW_PROTECT_FROM_INTERNAL = settings["FW_PROTECT_FROM_INTERNAL"]:"yes";
-	write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_PROTECT_FROM_INTERNAL, FW_PROTECT_FROM_INTERNAL);
+    string FW_PROTECT_FROM_INTERNAL = settings["FW_PROTECT_FROM_INTERNAL"]:"yes";
+    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_PROTECT_FROM_INTERNAL, FW_PROTECT_FROM_INTERNAL);
 
-	string FW_DEV_INT = settings["FW_DEV_INT"]:"";
-	write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_DEV_INT, FW_DEV_INT);
+    string FW_DEV_INT = settings["FW_DEV_INT"]:"";
+    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_DEV_INT, FW_DEV_INT);
 
-	string FW_DEV_EXT = settings["FW_DEV_EXT"]:"";	
-	write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_DEV_EXT, FW_DEV_EXT);
+    string FW_DEV_EXT = settings["FW_DEV_EXT"]:"";
+    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_DEV_EXT, FW_DEV_EXT);
 
-	string FW_SERVICES_EXT_TCP = settings["FW_SERVICES_EXT_TCP"]:"";
-	write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_EXT_TCP, FW_SERVICES_EXT_TCP);
+    string FW_SERVICES_EXT_TCP = settings["FW_SERVICES_EXT_TCP"]:"";
+    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_EXT_TCP, FW_SERVICES_EXT_TCP);
 
-	string FW_AUTOPROTECT_SERVICES = settings["FW_AUTOPROTECT_SERVICES"]:"yes";
-	write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_AUTOPROTECT_SERVICES, FW_AUTOPROTECT_SERVICES);
+    string FW_AUTOPROTECT_SERVICES = settings["FW_AUTOPROTECT_SERVICES"]:"yes";
+    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_AUTOPROTECT_SERVICES, FW_AUTOPROTECT_SERVICES);
 
-	string FW_MASQ_NETS = settings["FW_MASQ_NETS"]:"";
-	write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_MASQ_NETS, FW_MASQ_NETS);
+    string FW_MASQ_NETS = settings["FW_MASQ_NETS"]:"";
+    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_MASQ_NETS, FW_MASQ_NETS);
 
-	string FW_ROUTE = settings["FW_ROUTE"]:"no";
-	write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_ROUTE, FW_ROUTE);
+    string FW_ROUTE = settings["FW_ROUTE"]:"no";
+    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_ROUTE, FW_ROUTE);
 
-	string FW_MASQUERADE = settings["FW_MASQUERADE"]:"no";
-	write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_MASQUERADE, FW_MASQUERADE);
+    string FW_MASQUERADE = settings["FW_MASQUERADE"]:"no";
+    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_MASQUERADE, FW_MASQUERADE);
 
-	string FW_ALLOW_FW_TRACEROUTE = settings["FW_ALLOW_FW_TRACEROUTE"]:"yes";
-	write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_ALLOW_FW_TRACEROUTE, FW_ALLOW_FW_TRACEROUTE);
+    string FW_ALLOW_FW_TRACEROUTE = settings["FW_ALLOW_FW_TRACEROUTE"]:"yes";
+    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_ALLOW_FW_TRACEROUTE, FW_ALLOW_FW_TRACEROUTE);
 
 //  </AUTOCODE>
 
-	if (personal_firewall_is_active)
-	{
-	    write_ret = SCR::Write(.sysconfig.personal-firewall.REJECT_ALL_INCOMING_CONNECTIONS,"no");
-	    write_ret = SCR::Write(.sysconfig.personal-firewall,nil);
-	}
-
-	// sync settings to file !!!
-	write_ret = SCR::Write(.sysconfig.SuSEfirewall2, nil);
-	if (!write_ret)
-	{
-	    Report::Error(_("Writing settings failed"));
-	}
-	Progress::NextStage();
-
-	y2milestone("writing firewall settings finished, return code %1", write_ret);
-
-
-	// Why is this needed?
-	if (personal_firewall_is_active)
-	{
-	    SCR::Execute (.target.bash,"/sbin/SuSEpersonal-firewall",$[]);
-	}
-
-	list services =  [		
-			  "SuSEfirewall2_init",
-			  "SuSEfirewall2_setup",
-			  "SuSEfirewall2_final",
-			  ];	
-	whatfailedmsg = _("Starting the firewall failed");
-	
-	foreach(string service, services,
-		``{
-	    boolean retry = true;	 
-	    y2milestone("Enabling service %1", service);
-		
-	    rlret = Runlevel::ServiceAdjust(service , "enable");
-		
-	    if(!rlret)
-	    {		 
-		Report::Error( whatfailedmsg );		    
-	    }
-	    
-	});
-
-	Progress::NextStage();
-
-	if (!write_only)
-	    Runlevel::RunInitScript("SuSEfirewall2_final", "start");
-
-	Progress::Finish();
-		
-	return true;
+    if(personal_firewall_is_active) {
+	write_ret = SCR::Write(.sysconfig.personal-firewall.REJECT_ALL_INCOMING_CONNECTIONS,"no");
+	write_ret = SCR::Write(.sysconfig.personal-firewall,nil);
     }
 
+    // sync settings to file !!!
+    write_ret = SCR::Write(.sysconfig.SuSEfirewall2, nil);
+    if (!write_ret)
+	/* Popup text */
+	Report::Error(_("Writing settings failed"));
+
+    Progress::NextStage();
+
+    y2milestone("Writing firewall settings finished, return code %1", write_ret);
+
+    // Why is this needed?
+    if (personal_firewall_is_active)
+	SCR::Execute (.target.bash,"/sbin/SuSEpersonal-firewall",$[]);
+
+    list services = [
+	"SuSEfirewall2_init",
+	"SuSEfirewall2_setup",
+	"SuSEfirewall2_final",
+    ];
+
+    foreach(string service, services, ``{
+
+	y2milestone("Enabling service %1", service);
+	if(!Runlevel::ServiceAdjust(service , "enable"))
+	    /* Popup text */
+	    Report::Error(_("Starting of the firewall failed"));
+
+    });
+
+    Progress::NextStage();
+
+    if(!write_only)
+	Runlevel::RunInitScript("SuSEfirewall2_final", "start");
+
+    Progress::Finish();
+
+    return true;
+}
+
+/**
+ */
+global define boolean AddService(string service) ``{
+
+    list servs = splitstring(settings["FW_SERVICES_EXT_TCP"]:"", " ");
+    if(servs == nil) servs = [];
+
+    servs = add(servs, service);
+    string sers = mergestring(servs, " ");
+    if(servs == nil) return false;
+    settings["FW_SERVICES_EXT_TCP"] = sers;
+
+    return true;
+}
 
 /* EOF */
 }
