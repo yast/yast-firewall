@@ -527,7 +527,7 @@ global define boolean Read() {
     settings["FW_LOG_DROP_CRIT"] = FW_LOG_DROP_CRIT;
 
     string FW_PROTECT_FROM_INTERNAL = (string) SCR::Read(.sysconfig.SuSEfirewall2.FW_PROTECT_FROM_INTERNAL);
-    if( FW_PROTECT_FROM_INTERNAL == nil ) FW_PROTECT_FROM_INTERNAL = "yes";
+    if( FW_PROTECT_FROM_INTERNAL == nil ) FW_PROTECT_FROM_INTERNAL = "no";
     settings["FW_PROTECT_FROM_INTERNAL"] = FW_PROTECT_FROM_INTERNAL;
 
     string FW_DEV_DMZ = (string) SCR::Read(.sysconfig.SuSEfirewall2.FW_DEV_DMZ);
@@ -579,7 +579,7 @@ global define boolean Read() {
     settings["FW_SERVICES_EXT_TCP"] = FW_SERVICES_EXT_TCP;
 
     string FW_AUTOPROTECT_SERVICES = (string) SCR::Read(.sysconfig.SuSEfirewall2.FW_AUTOPROTECT_SERVICES);
-    if( FW_AUTOPROTECT_SERVICES == nil ) FW_AUTOPROTECT_SERVICES = "yes";
+    if( FW_AUTOPROTECT_SERVICES == nil ) FW_AUTOPROTECT_SERVICES = "no";
     settings["FW_AUTOPROTECT_SERVICES"] = FW_AUTOPROTECT_SERVICES;
 
     string FW_MASQ_NETS = (string) SCR::Read(.sysconfig.SuSEfirewall2.FW_MASQ_NETS);
@@ -735,7 +735,7 @@ global define void Propose () ``{
     settings["FW_PROTECT_FROM_INTERNAL"] = "no";
 
     // All services are auto-protected by default
-    settings["FW_AUTOPROTECT_SERVICES"] = "yes";
+    settings["FW_AUTOPROTECT_SERVICES"] = "no";
 
     // All critical packets are logged
     settings["FW_LOG_ACCEPT_ALL"] = "no";
@@ -985,7 +985,7 @@ global define boolean Write() {
     string FW_LOG_DROP_CRIT = settings["FW_LOG_DROP_CRIT"]:"yes";
     write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_LOG_DROP_CRIT, FW_LOG_DROP_CRIT);
 
-    string FW_PROTECT_FROM_INTERNAL = settings["FW_PROTECT_FROM_INTERNAL"]:"yes";
+    string FW_PROTECT_FROM_INTERNAL = settings["FW_PROTECT_FROM_INTERNAL"]:"no";
     write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_PROTECT_FROM_INTERNAL, FW_PROTECT_FROM_INTERNAL);
 
     string FW_DEV_DMZ = settings["FW_DEV_DMZ"]:"";
@@ -1024,7 +1024,7 @@ global define boolean Write() {
     string FW_SERVICES_EXT_TCP = settings["FW_SERVICES_EXT_TCP"]:"";
     write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_EXT_TCP, FW_SERVICES_EXT_TCP);
 
-    string FW_AUTOPROTECT_SERVICES = settings["FW_AUTOPROTECT_SERVICES"]:"yes";
+    string FW_AUTOPROTECT_SERVICES = settings["FW_AUTOPROTECT_SERVICES"]:"no";
     write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_AUTOPROTECT_SERVICES, FW_AUTOPROTECT_SERVICES);
 
     string FW_MASQ_NETS = settings["FW_MASQ_NETS"]:"";
