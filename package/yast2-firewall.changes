@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Aug  6 13:45:35 CEST 2004 - jsrain@suse.cz
+
+- disable firewall enabling checkbox after all interfaces were
+  deselected in interface selection popup
+
+-------------------------------------------------------------------
 Thu Aug  5 10:17:17 CEST 2004 - locilka@suse.cz
 
 - added support for ipp, LDAP and LDAPS

@@ -133,6 +133,8 @@ void UpdateFirewallStatus () {
     else if (size (allowed_interfaces) == 0)
 	status = `closed;
     SetFirewallLabel (status);
+    boolean open = status == `open_all || status == `custom;
+    UI::ChangeWidget (`id ("_cwm_open_firewall"), `Value, open);
 }
 
 /**
@@ -542,6 +544,7 @@ global symbol OpenFirewallHandle (map<string,any> widget, string key, map event)
 	    DisplayDetailsPopup (w);
 	}
 	UpdateFirewallStatus ();
+	EnableOrDisableFirewallDetails ();
 	return ret;
     }
     if (event_id == "_cwm_open_firewall")
@@ -553,8 +556,8 @@ global symbol OpenFirewallHandle (map<string,any> widget, string key, map event)
 	    allowed_interfaces = all_interfaces;
 	else
 	    allowed_interfaces = [];
-	EnableOrDisableFirewallDetails ();
 	UpdateFirewallStatus ();
+	EnableOrDisableFirewallDetails ();
 	configuration_changed = true;
     }
     return nil;
