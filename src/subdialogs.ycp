@@ -209,7 +209,7 @@
 			`VSpacing(1),
 			`Left( `CheckBox(`id("protect_from_internal"), `opt(`notify),
 			    // TRANSLATORS: check box
-			    _("Protect from Internal Zone"))
+			    _("Protect Firewall from Internal Zone"))
 			)
 		    )
 		),

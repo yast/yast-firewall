@@ -48,8 +48,8 @@ Networks are divided into firewall zones.</p>
 select the <b>Allowed Service<b> in the table below and press the <b>Remove</b>
 button.</p>
 
-<p>Unselecting the <b>Protect from Internal Zone</b> check box you can remove the protection
-for whole zone, all services and ports in this zone would be unprotected.</p>"),
+<p>Unselecting the <b>Protect Firewall from Internal Zone</b> check box you can remove the
+protection for whole zone, all services and ports in this zone would be unprotected.</p>"),
 
 	// TRANSLATORS: Base masquerade dialog help
 	"base-masquerading" : _("<p><b><big>Masquerading</big></b>
