@@ -236,6 +236,7 @@ global define ReadDialog() ``{
     UI::ChangeWidget(`id(`next),`Enabled, false);
     UI::SetFocus(`id(`abort));
 
+    SuSEFirewall::Read();
     /* possible more reads, progress bar and UI::UserInput `abort handling */
     map firewall_settings = SuSEFirewall::settings;
 
