@@ -432,7 +432,7 @@ define boolean RemoveServiceFromConfig( string set, string service ) ``{
  *  Add service for a given interface and protocol into a firewall. Will not
  *  modify the list of configured interfaces in the firewall.
  *
- *  @param service	the name of the service
+ *  @param service	the name of the service, or INT, EXT or DMZ
  *  @param proto	UDP or TCP
  *  @param interface	the name of the interface, for example eth0, "all" for all interfaces
  *  @return boolean	true on success
@@ -452,13 +452,13 @@ global define boolean AddService(string service, string proto, string interface)
 	y2debug( "FW_SERVICES_EXT: ", settings["FW_SERVICES_EXT_TCP"]:nil );
     } else {
 	// find out where is the interface
-	if( IsExtInterface( interface ) ) {
+	if(interface == "EXT" || IsExtInterface( interface )) {
 	    AddServiceToConfig ( "FW_SERVICES_EXT_"+proto, service );
 	}
-	else if( IsIntInterface( interface ) ) {
+	else if( interface == "INT" || IsIntInterface( interface )) {
 	    AddServiceToConfig ( "FW_SERVICES_INT_"+proto, service );
 	}
-	else if( IsDmzInterface( interface ) ) {
+	else if( interface == "DMZ" || IsDmzInterface( interface )) {
 	    AddServiceToConfig ( "FW_SERVICES_DMZ_"+proto, service );
 	}
 	else
@@ -475,7 +475,7 @@ global define boolean AddService(string service, string proto, string interface)
  *  Remove service for a given interface and protocol from a firewall. Will not
  *  modify the list of configured interfaces in the firewall.
  *
- *  @param service	the name of the service
+ *  @param service	the name of the service, or INT, EXT or DMZ
  *  @param proto	UDP or TCP
  *  @param interface	the name of the interface, for example eth0, "all" for all interfaces
  *  @return boolean	true on success
@@ -495,13 +495,13 @@ global define boolean RemoveService(string service, string proto, string interfa
 	y2debug( "FW_SERVICES_EXT: ", settings["FW_SERVICES_EXT_TCP"]:nil );
     } else {
 	// find out where is the interface
-	if( IsExtInterface( interface ) ) {
+	if( interface == "EXT" || IsExtInterface( interface ) ) {
 	    RemoveServiceFromConfig ( "FW_SERVICES_EXT_"+proto, service );
 	}
-	else if( IsIntInterface( interface ) ) {
+	else if( interface == "INT" || IsIntInterface( interface ) ) {
 	    RemoveServiceFromConfig ( "FW_SERVICES_INT_"+proto, service );
 	}
-	else if( IsDmzInterface( interface ) ) {
+	else if( interface == "DMZ" || IsDmzInterface( interface ) ) {
 	    RemoveServiceFromConfig ( "FW_SERVICES_DMZ_"+proto, service );
 	}
 	else
@@ -549,6 +549,25 @@ global define boolean IsDmzInterface( string interface ) ``{
     if(servs == nil) servs = [];
     return contains( servs, interface );
 }
+
+/**
+  * Get the interface with the smallest security
+  * @param interfaces list of interfaces
+  * @return string in SuSEfirewall syntax - no, yes, dmz, ext
+  */
+global define string MostInsecureInterface (list interfaces) ``{
+    string result = "no";
+    foreach (string iface, interfaces, ``{
+        if (IsExtInterface (iface))
+            result = "ext";
+        else if (IsDmzInterface (iface) && result != "ext")
+            result = "dmz";
+        else if (IsIntInterface (iface) && result != "ext" && result != "dmz")
+            result = "yes";
+    });
+    return result;
+}
+
 
 /* EOF */
 }
