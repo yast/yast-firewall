@@ -179,7 +179,7 @@ global define bool2string(boolean tf)
  * Read settings dialog
  */
 global define ReadDialog() ``{
-    string help = ("<p>Please be patient</p>");
+    string help = _("<p>Please be patient</p>");
     string caption = _("Firewall configuration");
     term contents = `Label(_("Reading settings ..."));
     /* use ProgressBar if possible */
