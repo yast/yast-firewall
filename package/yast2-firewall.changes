@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Feb 17 16:39:05 CET 2003 - nashif@suse.de
+
+- Read configuration if firewall is activated
+- 2.7.2
+
+-------------------------------------------------------------------
 Wed Feb  5 17:31:33 CET 2003 - lnussel@suse.de
 
 - apply proof read texts
