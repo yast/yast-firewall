@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Sun Sep 14 16:31:34 CEST 2003 - adrian@suse.de
+
+- let it work in kcontrol again
+- 2.8.13
+
+-------------------------------------------------------------------
 Sat Sep 13 18:46:58 CEST 2003 - nashif@suse.de
 
 - #30291: return list of needed packages for autoinstall
