@@ -150,7 +150,7 @@ void UpdateFirewallStatus () {
     if (all_interfaces == nil)
 	InitAllInterfacesList ();
     symbol status = `custom;
-    if (! SuSEFirewall::start)
+    if (! SuSEFirewall::IsStarted())
 	status = `off;
     else if (size (all_interfaces) == 0)
 	status = `no_ifaces;
@@ -170,14 +170,14 @@ void UpdateFirewallStatus () {
  */
 list<string> Selected2Opened (list<string> ifaces) {
     list<string> groups = maplist (string i, ifaces, {
-	return SuSEFirewall::GetInterfaceGroup (i);
+	return SuSEFirewall::GetZoneOfInterface (i);
     });
     groups = toset (groups);
     groups = filter (string g, groups, {
 	return g != nil;
     });
     list<list<string> > iface_groups = maplist (string g, groups, {
-	return SuSEFirewall::GetInterfacesInGroup (g);
+	return SuSEFirewall::GetInterfacesInZone (g);
     });
     list<string> new_ifaces = toset (flatten (iface_groups));
     new_ifaces = filter (string i, new_ifaces, {
@@ -519,7 +519,7 @@ global void OpenFirewallInit (map<string,any> widget, string key) {
     InitAllInterfacesList ();
     InitAllowedInterfaces (services);
     boolean open_firewall = size (allowed_interfaces) > 0;
-    boolean firewall_enabled = SuSEFirewall::start
+    boolean firewall_enabled = SuSEFirewall::IsStarted()
 	&& size (all_interfaces) > 0;
     if (! firewall_enabled)
     {
