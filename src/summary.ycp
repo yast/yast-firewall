@@ -231,7 +231,7 @@
 	    if (interface["zone"]:nil==nil) {
 		ret_message = ret_message + li_start + ErrMark + " " + sformat(
 		    // TRANSLATORS: Summary
-		    _("Warning: Network interface '%1' / '%2' in not mentioned in any firewall zone. All network traffic on this interface will be blocked!"), interface["name"]:"", interface["id"]:"")
+		    _("Warning: Network interface '%1' / '%2' is not mentioned in any firewall zone. All network traffic on this interface will be blocked!"), interface["name"]:"", interface["id"]:"")
 		+ li_end + "\n";
 	    }
 	});
