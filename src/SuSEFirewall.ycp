@@ -57,7 +57,7 @@ define boolean HandlePortmapSupport (boolean enable) {
 	// NFS support
 	"nlockmgr", "status", "nfs", "nfs_acl", "mountd",
 	// NIS support
-	"ypserv", "fypxfrd", "ypbind", "ypasswdd",
+	"ypserv", "fypxfrd", "ypbind", "yppasswdd",
     ];
     if (enable == true) {
 	// adding needed rpc services
