@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Aug 24 15:13:23 CEST 2004 - locilka@suse.cz
+
+- removed "SSH open by default" from the Instalation Proposal
+
+-------------------------------------------------------------------
 Mon Aug 23 17:03:47 CEST 2004 - locilka@suse.cz
 
 - added functionality for adding/removing devices into/from

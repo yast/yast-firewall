@@ -458,8 +458,10 @@ global define void Propose () ``{
     if ((Mode::vnc==true) || (Remote::allow_administration==true)) {
 	allowed_tcp_ports = add(allowed_tcp_ports, "5801 5901");
     }
-    // SSH should be open by default [after meeting 2004-07-29]
-    allowed_tcp_ports = add(allowed_tcp_ports, "ssh");
+
+    // SSH should be open by default [after meeting with aj, kkaempf 2004-07-29]
+    // disabled 2004-08-24 according to Bugzilla #44125
+    // allowed_tcp_ports = add(allowed_tcp_ports, "ssh");
 
     // list of Open UDP ports
     list<string> allowed_udp_ports = [];

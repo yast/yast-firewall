@@ -597,16 +597,12 @@ services. Also start the appropriate daemons.</p>");
 		    return (one_additional_udp != remove_this_udp);
 		});
 	    });
-	    y2milestone("SEL TCP: %1", selected_services_list_tcp);
-	    y2milestone("SEL UDP: %1", selected_services_list_udp);
 
 	    // returns additional services or nil if cancelled
 	    map<string,string> additional_services = ExpertServicePopup($[
 		"tcp" : mergestring((list<string>)additional_services_tcp, " "),
 		"udp" : mergestring((list<string>)additional_services_udp, " "),
 	    ]);
-	    y2milestone("ADD TCP: %1", additional_services["tcp"]:"");
-	    y2milestone("ADD TCP: %1", additional_services["udp"]:"");
 
 	    // unioning additional services with currently selected services
 	    if (additional_services != nil) {
