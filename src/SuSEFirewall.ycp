@@ -1249,7 +1249,7 @@ global define list<string> GetInterfacesInGroup ( string interface_group ) {
 	ret = (list<string>) splitstring(settings[ "FW_DEV_EXT" ]:"", " ");
     } else {
 	ret = nil;
-	y2error("Unknow interface group '%1', known are only 'INT', 'DMZ', 'EXT'");
+	y2error("Unknow interface group '%1', known are only 'INT', 'DMZ', 'EXT'", interface_group);
     }
     return ret;
 }
@@ -1364,7 +1364,7 @@ global define boolean AddService(string service, string proto, string interface)
 	AddServiceToConfig ( "FW_SERVICES_EXT_"+proto, service );
 	AddServiceToConfig ( "FW_SERVICES_INT_"+proto, service );
 	AddServiceToConfig ( "FW_SERVICES_DMZ_"+proto, service );
-	y2debug( "FW_SERVICES_EXT: ", settings["FW_SERVICES_EXT_TCP"]:nil );
+	y2debug( "FW_SERVICES_EXT: %1", settings["FW_SERVICES_EXT_TCP"]:nil );
     } else {
 	// find out where is the interface
 	if(interface == "EXT" || IsExtInterface( interface )) {
@@ -1409,7 +1409,7 @@ global define boolean RemoveService(string service, string proto, string interfa
 	RemoveServiceFromConfig ( "FW_SERVICES_EXT_"+proto, service );
 	RemoveServiceFromConfig ( "FW_SERVICES_INT_"+proto, service );
 	RemoveServiceFromConfig ( "FW_SERVICES_DMZ_"+proto, service );
-	y2debug( "FW_SERVICES_EXT: ", settings["FW_SERVICES_EXT_TCP"]:nil );
+	y2debug( "FW_SERVICES_EXT: %1", settings["FW_SERVICES_EXT_TCP"]:nil );
     } else {
 	// find out where is the interface
 	if( interface == "EXT" || IsExtInterface( interface ) ) {

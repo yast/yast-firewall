@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Oct 19 13:00:10 CEST 2004 - locilka@suse.cz
+
+- Fixed debug and error messages in log
+
+-------------------------------------------------------------------
 Sun Oct  3 01:53:28 CEST 2004 - nashif@suse.de
 
 - #46262: Firewall is always enabled
