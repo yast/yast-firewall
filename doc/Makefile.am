@@ -4,6 +4,7 @@
 # $Id$
 #
 
+SUBDIRS = autodocs
 
 docdir = @DOCDIR@
 htmldir = $(docdir)
