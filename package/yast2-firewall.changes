@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Feb  3 10:27:44 CET 2004 - visnov@suse.cz
+
+- use Sequencer module instead of WizardSequencer 
+
+-------------------------------------------------------------------
 Mon Jan 26 15:31:04 CET 2004 - msvec@suse.cz
 
 - updated for the new interpreter

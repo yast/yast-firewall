@@ -13,14 +13,14 @@ textdomain "firewall";
 
 import "Label";
 import "Wizard";
+import "Sequencer";
 
-include "wizard/sequencer.ycp";
 include "firewall/complex.ycp";
 include "firewall/dialogs.ycp";
 
 /**
  * Main workflow of the firewall configuration
- * @return any Returned value from WizardSequencer() call
+ * @return any Returned value from Sequencer::Run() call
  */
 global define any MainSequence() ``{
 
@@ -52,14 +52,14 @@ global define any MainSequence() ``{
         ]
     ];
 
-    any ret = WizardSequencer(aliases, sequence);
+    any ret = Sequencer::Run(aliases, sequence);
 
     return ret;
 }
 
 /**
  * Whole configuration of firewall
- * @return any Returned value from WizardSequencer() call
+ * @return any Returned value from Sequencer::Run() call
  */
 global define any FirewallSequence() ``{
 
@@ -87,7 +87,7 @@ global define any FirewallSequence() ``{
 
     Wizard::CreateDialog();
 
-    any ret = WizardSequencer(aliases, sequence);
+    any ret = Sequencer::Run(aliases, sequence);
 
     UI::CloseDialog();
     return ret;
@@ -157,7 +157,7 @@ global define any Firewall() ``{
     Wizard::CreateDialog();
     Wizard::SetContentsButtons(caption,contents,help,Label::BackButton(),Label::NextButton());
 
-    any ret = WizardSequencer(aliases, sequence);
+    any ret = Sequencer::Run(aliases, sequence);
     UI::CloseDialog();
     return ret;
 }
@@ -205,7 +205,7 @@ global define any FirewallAutoSequence() ``{
     Wizard::SetContentsButtons(caption, contents, help,
 	    Label::BackButton(), Label::NextButton());
 
-    any ret = WizardSequencer(aliases, sequence);
+    any ret = Sequencer::Run(aliases, sequence);
     UI::CloseDialog();
     return ret;
 }
