@@ -124,8 +124,12 @@ define boolean HandlePortmapSupport (boolean enable) {
 	    "udp_ports" : [ ],
 	],
 	"dhcp-server" : $[
-	    "tcp_ports" : [ "bootpc" ],
-	    "udp_ports" : [ ],
+	    "tcp_ports" : [ ],
+	    "udp_ports" : [ "bootps" ],
+	],
+	"dhcp-client" : $[
+	    "tcp_ports" : [ ],
+	    "udp_ports" : [ "bootpc" ],
 	],
 	"dns-server" : $[
 	    "tcp_ports" : [ "domain" ],
@@ -177,6 +181,10 @@ define boolean HandlePortmapSupport (boolean enable) {
  * Constructor
  */
 global define void SuSEFirewall () {
+
+    if (Mode::test) {
+	return;
+    }
 
     if (!Mode::config) {
 
