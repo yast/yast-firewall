@@ -22,7 +22,7 @@ include "firewall/dialogs.ycp";
  * Main workflow of the firewall configuration
  * @return any Returned value from Sequencer::Run() call
  */
-global define any MainSequence() ``{
+define any MainSequence() ``{
 
     map aliases = $[
         "stop"		: ``(StopDialog()),
@@ -61,7 +61,7 @@ global define any MainSequence() ``{
  * Whole configuration of firewall
  * @return any Returned value from Sequencer::Run() call
  */
-global define any FirewallSequence() ``{
+define any FirewallSequence() ``{
 
     map aliases = $[
 	"read"	: [ ``( ReadDialog() ), true ],
@@ -96,7 +96,7 @@ global define any FirewallSequence() ``{
 /**
  * Main interface function
  */
-global define any Firewall() ``{
+define any Firewall() ``{
     map aliases = $[
 	"config_or_stop": [ ``(AskStopDialog()), true ],
 	"stop"		: ``(StopDialog()),
@@ -165,7 +165,7 @@ global define any Firewall() ``{
 /**
  * Main interface function
  */
-global define any FirewallAutoSequence() ``{
+define any FirewallAutoSequence() ``{
     map aliases = $[
 	"devices"	: ``(DevicesDialog()),
 	"services"	: ``(ServicesDialog()),

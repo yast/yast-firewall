@@ -19,7 +19,21 @@ import "Runlevel";
 import "SuSEFirewall";
 import "Wizard";
 
-global define string TextEntryPopup( string headline, string richtext, string textentrylabel, string text) ``{
+define string ExpertServicePopup( string text ) ``{
+
+    /* Services dialog advanced help 1/2 */
+    string advanced_helptext = _("<p>Enter any number of ports, known port names
+(from /etc/services), and port ranges, separated by spaces.</p>
+") +
+
+    /* Services dialog advanced help 2/2 */
+    _("<p>Port ranges are separated by a colon. For example, to allow port 21
+to 23, write \"21:23\"</p>
+");
+
+    string headline = _("Edit additional services");
+    string tcpstext =  _("&Additional TCP Services");
+
     UI::OpenDialog(`opt(`decorated), `VBox(
 	`VSpacing(0.5),
 	`Heading(headline),
@@ -27,11 +41,11 @@ global define string TextEntryPopup( string headline, string richtext, string te
 	`HBox(
 	    `VSpacing(9),
 	    `HSpacing(1),
-	    `HWeight(50, `RichText(richtext)),
+	    `HWeight(50, `RichText(advanced_helptext)),
 	    `HSpacing(1),
 	    `HWeight(50, `VBox (
 		`VSpacing(1),
-		`TextEntry(`id(`textwidget), textentrylabel, text),
+		`TextEntry(`id(`textwidget), tcpstext, text),
 		`VStretch()
 	    )),
 	    `HSpacing(1)
@@ -54,7 +68,7 @@ global define string TextEntryPopup( string headline, string richtext, string te
     return text;
 }
 
-global define void StdOutStdErrLog( string whatfailedmsg, string stdout, string stderr) ``{
+define void StdOutStdErrLog( string whatfailedmsg, string stdout, string stderr) ``{
     UI::OpenDialog(`opt(`decorated), `HBox(
 	`VSpacing(10),
 	`VBox(
@@ -73,7 +87,7 @@ global define void StdOutStdErrLog( string whatfailedmsg, string stdout, string 
     UI::CloseDialog();
 }
 
-global define string bool2string(boolean tf) ``{
+define string bool2string(boolean tf) ``{
     if(tf==true)
 	return "yes";
     else if(tf==false)
@@ -84,7 +98,7 @@ global define string bool2string(boolean tf) ``{
 /**
  * Write settings dialog
  */
-global define symbol PreWriteDialog() ``{
+define symbol PreWriteDialog() ``{
     // Translator: please keep layout
     string text = _("- configure the firewall boot scripts
 - stop the firewall, if its currently running
@@ -106,7 +120,7 @@ global define symbol PreWriteDialog() ``{
 /**
  * Device Dialog
  */
-global define any DevicesDialog() ``{
+define any DevicesDialog() ``{
 
     map firewall_settings = SuSEFirewall::settings;
 
@@ -243,7 +257,7 @@ have an internal network.
 /**
  * uses and changes FW_SERVICES_EXT_TCP inside firewall_settings, abuses checkbox widget id as service name
  */
-global define any ServicesDialog() ``{
+define any ServicesDialog() ``{
 
     map firewall_settings = SuSEFirewall::settings;
 
@@ -287,16 +301,6 @@ transfers via FTP. It is optimized for slow links and quite easy to configure.</
     /* Services dialog help 10/10 */
     _("<p>Just enabling a service here is most likely not enough to provide
 services. Also start the appropriate daemons.</p>
-");
-
-    /* Services dialog advanced help 1/2 */
-    string advanced_helptext = _("<p>Enter any number of ports, known port names
-(from /etc/services), and port ranges, separated by spaces.</p>
-") +
-
-    /* Services dialog advanced help 2/2 */
-    _("<p>Port ranges are separated by a colon. For example, to allow port 21
-to 23, write \"21:23\"</p>
 ");
 
     term contents = `Top( `VBox(
@@ -351,8 +355,8 @@ to 23, write \"21:23\"</p>
     string services_string = firewall_settings["FW_SERVICES_EXT_TCP"]:"";
     list additional_services = [];
     list services_list = sort(splitstring(services_string, " "));
-    additional_services = filter(`s, services_list,``(s!="" && !contains(selectable_services, s)));
-    services_list = filter(`s, services_list,``(s!="" && contains(selectable_services, s)));
+    additional_services = filter(string s, services_list,``(s!="" && !contains(selectable_services, s)));
+    services_list = filter(string s, services_list,``(s!="" && contains(selectable_services, s)));
 
     Wizard::SetContentsButtons(caption, contents, help,
 	    Label::BackButton(), Label::NextButton());
@@ -361,7 +365,7 @@ to 23, write \"21:23\"</p>
 
     define void activate_checkboxes_for_services() ``{
 	// activate all selected services
-	foreach(`service, selectable_services, ``{
+	foreach(string service, selectable_services, ``{
 	    if(contains(services_list, service))
 		UI::ChangeWidget(`id(service), `Value, true);
 	    else
@@ -382,14 +386,13 @@ to 23, write \"21:23\"</p>
 	}
 	else if ( ret == `edit )
 	{
-	    string serv = TextEntryPopup( _("Edit additional services"), advanced_helptext, _("&Additional Services"),
-		mergestring((list<string>)additional_services," "));
+	    string serv = ExpertServicePopup(mergestring((list<string>)additional_services," "));
 
 	    if ( serv != nil )
 	    {
 		additional_services = sort(splitstring(serv," "));
-		services_list = sort(union(filter(`s,additional_services,``(s!="" && contains(selectable_services,s))), services_list));
-		additional_services =filter(`s,additional_services,``(s!="" && !contains(selectable_services,s)));
+		services_list = sort(union(filter(string s,additional_services,``(s!="" && contains(selectable_services,s))), services_list));
+		additional_services =filter(string s,additional_services,``(s!="" && !contains(selectable_services,s)));
 	        activate_checkboxes_for_services();
 		UI::ChangeWidget(`id(`status), `Value, mergestring((list<string>)additional_services," "));
 	    }
@@ -406,7 +409,7 @@ to 23, write \"21:23\"</p>
 	    }
 	    if(state == false)
 	    {
-		services_list=filter(`v,services_list,``(v!=ret));
+		services_list=filter(string v,services_list,``(v!=ret));
 	    }
 	    services_list=sort(services_list);
 //	    services_string = mergestring(services_list," ");
@@ -428,36 +431,38 @@ to 23, write \"21:23\"</p>
  * Features dialog
  * @return dialog result
  */
-global define symbol FeatureDialog() ``{
+define symbol FeatureDialog() ``{
 
     /* Features dialog caption */
     string caption = _("Firewall Configuration (Step 3 of 4): Features");
 
-    /* Features dialog help 1/4 */
-    string help = _("<p><b>Allow Traceroute</b> means that ICMP
-time-to-live-exceeded messages are allowed to be sent from your firewall.
-This is used for traceroutes <i>to</i> your firewall
-(or traceroute-like tools).</p>
-") +
+    string help =
 
-    /* Features dialog help 2/4 */
+    /* Features dialog help 1/4 */
     _("<p><b>Forward Traffic and Do Masquerading</b> means that external machines
 see all usage of services on the Internet coming from the firewall rather than
-internal machines. It is more secure to communicate via proxies to the Internet than
-to use masquerading.</p>") +
+internal machines. Set this option if you have only one IP address but want to
+grant Internet access to multiple machines. It is more secure to communicate
+via proxies to the Internet than to use masquerading.</p>") +
 
-    /* Features dialog help 3/4 */
-    _("<p><b>Protect All Running Services</b> means that all network access
-to services, TCP, and UDP on this machine will be prevented except for those
-to which you explicitly allowed access in the previous dialog.</p>") +
-
-    /* Features dialog help 4/4 */
+    /* Features dialog help 2/4 */
     _("<p><b>Protect from Internal Network</b> means that <i>internal</i>
 machines may only access explicitly allowed services on the machine.
 They will also be affected by the FW_AUTOPROTECT_SERVICES option. However,
 specifying services that should be available from the internal network is
 beyond the scope of this workflow. For your machine to be accessible from
-the internal network, <i>unset</i> this option.</p>");
+the internal network, <i>unset</i> this option.</p>") +
+
+
+    /* Features dialog help 3/4 */
+    _("<p><b>Allow Traceroute</b> means that ICMP time-to-live-exceeded
+messages are allowed to be sent from your firewall. This is used for
+traceroutes <i>to</i> your firewall (or traceroute-like tools).</p> ") +
+
+    /* Features dialog help 4/4 */
+    _("<p><b>Protect All Running Services</b> means that all network access
+to services, TCP, and UDP on this machine will be prevented except for those
+to which you explicitly allowed access in the previous dialog.</p>");
 
     map firewall_settings = SuSEFirewall::settings;
 
@@ -473,16 +478,16 @@ the internal network, <i>unset</i> this option.</p>");
 		`HSpacing(1),
 		`VBox(
 		    /* CheckBox label */
-		    `Left(`CheckBox(`id("traceroute"), _("Allow &Traceroute"), false)),
+		    `Left(`CheckBox(`id("masquerade"), _("&Forward Traffic and Do Masquerading"), false)),
 		    `VSpacing(1),
 		    /* CheckBox label */
-		    `Left(`CheckBox(`id("masquerade"), _("&Forward Traffic and Do Masquerading"), false)),
+		    `Left(`CheckBox(`id("protect_int"), _("Protect from &Internal Network"), false)),
 		    `VSpacing(1),
 		    /* CheckBox label */
 		    `Left(`CheckBox(`id("protect"), _("&Protect All Running Services"), false)),
 		    `VSpacing(1),
 		    /* CheckBox label */
-		    `Left(`CheckBox(`id("protect_int"), _("Protect from &Internal Network"), false))
+		    `Left(`CheckBox(`id("traceroute"), _("Allow &Traceroute"), false))
 		),
 		`HSpacing(0)
 	    ),
@@ -515,7 +520,7 @@ the internal network, <i>unset</i> this option.</p>");
     }
     else if( FW_MASQUERADE == "no" && FW_ROUTE == "no" )
     {
-//	UI::ChangeWidget(`id("masquerade"), `Value, false);
+	UI::ChangeWidget(`id("masquerade"), `Value, false);
     }
     else
     {
@@ -612,7 +617,7 @@ Proceed with this setup?
  * Logging Dialog
  * @return dialog result
  */
-global define symbol LoggingDialog() ``{
+define symbol LoggingDialog() ``{
 
     /* Loggin dialog caption */
     string caption = _("Firewall Configuration (Step 4 of 4): Logging Options");
@@ -708,7 +713,7 @@ very quicky.</p>
 /**
  * Ask user if he want to reconfigure the firewall or remove the runlevel links
  */
-global define any AskStopDialog() ``{
+define any AskStopDialog() ``{
 
     /* Ask dialog caption */
     string caption = _("SuSE Firewall2 configuration");
@@ -802,7 +807,7 @@ when you boot your system.</p>
 /**
  * Summary what will be done for stopping the firewall
  */
-global define symbol StopDialog() ``{
+define symbol StopDialog() ``{
 
     /* Stop dialog caption */
     string caption = _("Firewall configuration - deactivate firewall");

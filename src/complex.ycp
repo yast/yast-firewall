@@ -20,7 +20,7 @@ import "Wizard";
  * Read settings dialog
  * @return `next if success, else `abort
  */
-global define symbol ReadDialog() ``{
+define symbol ReadDialog() ``{
 
     /* Read dialog help */
     Wizard::RestoreHelp(_("<p><b><big>Reading Firewall Configuration</big></b>
@@ -53,7 +53,7 @@ If you continue, it will be turned off and replaced by SuSEfirewall2.
  * Write settings dialog
  * @return `next if success, else `abort
  */
-global define symbol WriteDialog() ``{
+define symbol WriteDialog() ``{
 
     /* Write dialog help */
     Wizard::RestoreHelp(_("<p><b><big>Saving Firewall Configuration</big></b>
