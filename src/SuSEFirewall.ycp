@@ -97,7 +97,8 @@ global map<string, list<string> > global_portmap_services = $[
     "nfs-client"   : [ "status", "nlockmgr" ],
     "nfs-server"   : [ "status", "nlockmgr", "mountd", "nfs", "nfs_acl" ],
     "nis-server"   : [ "ypserv", "fypxfrd", "ypbind", "yppasswdd" ],
-    "nis-server"   : [ "ypbind" ],
+    // usable for client answering as server
+    "nis-client-ypbind" : [ "ypbind" ],
     "all-services" : [ "status", "nlockmgr", "mountd", "nfs", "nfs_acl", "ypserv", "fypxfrd", "ypbind", "yppasswdd" ],
 ];
 
