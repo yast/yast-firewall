@@ -33,9 +33,6 @@
 	"IP"  : _("IP Protocols"),
     ];
 
-    string OKMark = "<font color='#339900'>"  + UI::Glyph(`CheckMark)        + "</font>";
-    string ErrMark = "<font color='#993300'>" + UI::Glyph(`BulletArrowRight) + "</font>";
-
     string li_start = "<li>";
     string li_end   = "</li>";
     
@@ -45,8 +42,6 @@
     // Function initializes spacial behaviour for commandline
     void SummaryInitCommandLine () {
 	// TRANSLATORS: 2-chars string, for commandline summary "[ OK ]"
-	OKMark   = "[ " + _("OK") + " ]";
-	ErrMark  = "[ !! ]";
 	li_start = "        * ";
 	li_end   = "";
 	ul_start = "";
@@ -66,18 +61,18 @@
 
 	if (spec_interface == "any") {
 	    if (zone == "EXT") {
-		ret_val = OKMark + " '" + spec_interface + "' "
+		ret_val = " '" + spec_interface + "' "
 		// TRANSLATORS: an informative text
 		+ _("Any unassigned interface will be assigned to this zone.");
 	    } else {
 		// FIXME: really?
-		ret_val = ErrMark + " '" + spec_interface + "' "
+		ret_val = " '" + spec_interface + "' "
 		    // TRANSLATORS: informative text
 		    + _("Currently supported only in External Zone.");
 	    }
 	} else {
 	    // TRANSLATORS: informative text
-	    ret_val = ErrMark + " '" + spec_interface + "' " + _("Unknown network interface.");
+	    ret_val = " '" + spec_interface + "' " + _("Unknown network interface.");
 	}
 
 	return ret_val;
@@ -108,7 +103,7 @@
 	    ret_summary = ret_summary + ul_start;
 	    foreach (string interface_id, interfaces_in_zone, {
 		ret_summary = ret_summary +
-		    li_start + OKMark + " " +
+		    li_start + " " +
 		    (interface_id_to_name[interface_id]:"" != "" ?
 			interface_id_to_name[interface_id]:"" + " / "
 			:
@@ -232,7 +227,7 @@
 	ret_message = ret_message + ul_start;
 	foreach (map <string, string> interface, SuSEFirewall::GetAllKnownInterfaces(), {
 	    if (interface["zone"]:nil==nil) {
-		ret_message = ret_message + li_start + ErrMark + " " + sformat(
+		ret_message = ret_message + li_start + " " + sformat(
 		    // TRANSLATORS: Summary, %1 is the network interface name, %2 is the device name, 
 		    _("Warning: Network interface '%1' / '%2' is not mentioned in any firewall zone. All network traffic on this interface will be blocked!"), interface["name"]:"", interface["id"]:"")
 		+ li_end + "\n";

@@ -84,7 +84,8 @@
 
 	// firstly listing all known interfaces
 	foreach (map <string, string> interface, SuSEFirewall::GetAllKnownInterfaces(), {
-	    string zone_name = "";
+	    // TRANSLATORAS: table item, connected with firewall zone of interface
+	    string zone_name = _("No Zone Assigned");
 	    if (interface["zone"]:nil != nil)
 		zone_name = SuSEFirewall::GetZoneFullName(interface["zone"]:nil);
 
@@ -136,7 +137,8 @@
      */
     void HandlePopupSetFirewallInterfaceIntoZone (string interface) {
 	// interface could be unassigned
-	list <term> zones = [ `item(`id(""), "") ];
+	// TRANSLATORAS: selection box item, connected with firewall zone of interface
+	list <term> zones = [ `item(`id(""), _("No Zone Assigned")) ];
 	// current zone of interface
 	string current_zone = SuSEFirewall::GetZoneOfInterface (interface);
 	foreach (string zone_shortname, SuSEFirewall::GetKnownFirewallZones(), {
