@@ -426,7 +426,7 @@ define boolean AddServiceToConfig( string set, string service ) ``{
 
     y2debug( "Before adding services: %1" , settings[set]:"");
 
-    list servs = splitstring(settings[set]:"", " ");
+    list<string> servs = splitstring(settings[set]:"", " ");
     if(servs == nil) servs = [];
 
     servs = add(servs, service);
@@ -447,7 +447,7 @@ define boolean AddServiceToConfig( string set, string service ) ``{
  *  @return boolean	true on success
  */
 define boolean RemoveServiceFromConfig( string set, string service ) ``{
-    list servs = splitstring(settings[set]:"", " ");
+    list<string> servs = splitstring(settings[set]:"", " ");
     if(servs == nil) servs = [];
 
     servs = filter(string s, servs, ``(service != s) );
