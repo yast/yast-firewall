@@ -204,7 +204,7 @@ global define boolean Read() ``{
     foreach(map device, devicelist, ``{
 	string dev = device["dev_name"]:"";
 	if(dev != "" && !issubstring(dev, "lo") && !issubstring(dev, "sit")) {
-	    change(devices, dev);
+            devices[size(devices)] = dev;
 	}
     });
 

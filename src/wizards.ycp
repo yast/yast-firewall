@@ -19,65 +19,6 @@ include "firewall/complex.ycp";
 include "firewall/dialogs.ycp";
 
 /**
- * Whole configuration of firewall
- * @return any Returned value from WizardSequencer() call
- */
-global define any FirewallSequence() ``{
-
-    map aliases = $[
-	"read"	: [ ``( ReadDialog() ), true ],
-	"main"	:   ``( MainSequence() ),
-	"write"	: [ ``( WriteDialog() ), true ]
-    ];
-
-    map sequence = $[
-	"ws_start" : "read",
-	"read" : $[
-	    `abort	: `abort,
-	    `next	: "main"
-	],
-	"main" : $[
-	    `abort	: `abort,
-	    `next	: "write"
-	],
-	"write" : $[
-	    `abort	: `abort,
-	    `next	: `next
-	]
-    ];
-
-    Wizard::CreateDialog();
-
-    any ret = WizardSequencer(aliases, sequence);
-
-    UI::CloseDialog();
-    return ret;
-}
-
-/**
- * Whole configuration of firewall but without reading and writing.
- * For use with autoinstallation.
- * @return any Returned value from WizardSequencer() call
- */
-global define any FirewallAutoSequence() ``{
-
-    /* Dialog caption */
-    string caption = _("Firewall configuration");
-    /* Label */
-    term contents = `Label(_("Initializing ..."));
-
-    Wizard::CreateDialog();
-    Wizard::SetContentsButtons(caption, contents, "",
-	    Label::BackButton(), Label::NextButton());
-
-    /* Run the main configuration workflow */
-    any ret = MainSequence();
-
-    UI::CloseDialog();
-    return ret;
-}
-
-/**
  * Main workflow of the firewall configuration
  * @return any Returned value from WizardSequencer() call
  */
@@ -113,6 +54,42 @@ global define any MainSequence() ``{
 
     any ret = WizardSequencer(aliases, sequence);
 
+    return ret;
+}
+
+/**
+ * Whole configuration of firewall
+ * @return any Returned value from WizardSequencer() call
+ */
+global define any FirewallSequence() ``{
+
+    map aliases = $[
+	"read"	: [ ``( ReadDialog() ), true ],
+	"main"	:   ``( MainSequence() ),
+	"write"	: [ ``( WriteDialog() ), true ]
+    ];
+
+    map sequence = $[
+	"ws_start" : "read",
+	"read" : $[
+	    `abort	: `abort,
+	    `next	: "main"
+	],
+	"main" : $[
+	    `abort	: `abort,
+	    `next	: "write"
+	],
+	"write" : $[
+	    `abort	: `abort,
+	    `next	: `next
+	]
+    ];
+
+    Wizard::CreateDialog();
+
+    any ret = WizardSequencer(aliases, sequence);
+
+    UI::CloseDialog();
     return ret;
 }
 

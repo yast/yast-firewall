@@ -106,7 +106,7 @@ global define symbol PreWriteDialog() ``{
 /**
  * Device Dialog
  */
-global define DevicesDialog() ``{
+global define any DevicesDialog() ``{
 
     map firewall_settings = SuSEFirewall::settings;
 
@@ -210,7 +210,7 @@ have an internal network.
 	    else continue;
 	}
 	else {
-	    FW_DEV_EXT = UI::QueryWidget(`id("interface"),`Value);
+	    FW_DEV_EXT = (string) UI::QueryWidget(`id("interface"),`Value);
 	    if( ret == `next && FW_DEV_EXT == none )
 	    {
 		Popup::Message(_("Select an external interface."));
@@ -218,7 +218,7 @@ have an internal network.
 		continue;
 	    }
 	    SuSEFirewall::settings["FW_DEV_EXT"] = FW_DEV_EXT;
-	    FW_DEV_INT = UI::QueryWidget(`id("intinterface"),`Value);
+	    FW_DEV_INT = (string) UI::QueryWidget(`id("intinterface"),`Value);
 	    if( FW_DEV_INT != none )
 	    {
 		SuSEFirewall::settings["FW_DEV_INT"] = FW_DEV_INT;
@@ -239,7 +239,7 @@ have an internal network.
 /**
  * uses and changes FW_SERVICES_EXT_TCP inside firewall_settings, abuses checkbox widget id as service name
  */
-global define ServicesDialog() ``{
+global define any ServicesDialog() ``{
 
     map firewall_settings = SuSEFirewall::settings;
 
@@ -355,7 +355,7 @@ to 23, write \"21:23\"</p>
 
 //    services_string = mergestring(services_list," ");
 
-    define activate_checkboxes_for_services() ``{
+    define void activate_checkboxes_for_services() ``{
 	// activate all selected services
 	foreach(`service, selectable_services, ``{
 	    if(contains(services_list, service))
@@ -392,7 +392,7 @@ to 23, write \"21:23\"</p>
 	}
 	else if(contains(selectable_services, ret))
 	{
-	    boolean state = UI::QueryWidget(`id(ret),`Value);
+	    boolean state = (boolean) UI::QueryWidget(`id(ret),`Value);
 	    if(state == true)
 	    {
 		if(!contains(services_list,ret))
@@ -410,7 +410,7 @@ to 23, write \"21:23\"</p>
 	}
 	else
 	{
-	    SuSEFirewall::settings["FW_SERVICES_EXT_TCP"] = mergestring(sort(union(services_list, additional_services))," ");
+	    SuSEFirewall::settings["FW_SERVICES_EXT_TCP"] = mergestring((list<string>) sort(union(services_list, additional_services))," ");
 	    break;
 	}
     }
@@ -568,7 +568,7 @@ the internal network, <i>unset</i> this option.</p>");
 		FW_AUTOPROTECT_SERVICES = "no";
 	    }
 
-	    FW_PROTECT_FROM_INTERNAL = bool2string(UI::QueryWidget(`id("protect_int"),`Value));
+	    FW_PROTECT_FROM_INTERNAL = bool2string((boolean) UI::QueryWidget(`id("protect_int"),`Value));
 
 	    if( FW_PROTECT_FROM_INTERNAL == "yes" && FW_ROUTE == "yes" )
 	    {
@@ -601,7 +601,7 @@ Proceed with this setup?
 	}
     }
 
-    return ret;
+    return (symbol) ret;
 }
 
 /**
@@ -684,27 +684,27 @@ very quicky.</p>
 	}
 	else
 	{
-	    FW_LOG_DROP_CRIT = bool2string(UI::QueryWidget(`id("drop_crit"),`Value));
-	    FW_LOG_DROP_ALL = bool2string(UI::QueryWidget(`id("drop_all"),`Value));
-	    FW_LOG_ACCEPT_CRIT = bool2string(UI::QueryWidget(`id("accept_crit"),`Value));
-	    FW_LOG_ACCEPT_ALL = bool2string(UI::QueryWidget(`id("accept_all"),`Value));
+	    FW_LOG_DROP_CRIT = bool2string((boolean) UI::QueryWidget(`id("drop_crit"),`Value));
+	    FW_LOG_DROP_ALL = bool2string((boolean) UI::QueryWidget(`id("drop_all"),`Value));
+	    FW_LOG_ACCEPT_CRIT = bool2string((boolean) UI::QueryWidget(`id("accept_crit"),`Value));
+	    FW_LOG_ACCEPT_ALL = bool2string((boolean) UI::QueryWidget(`id("accept_all"),`Value));
 
-	    change(firewall_settings,"FW_LOG_DROP_CRIT",FW_LOG_DROP_CRIT);
-	    change(firewall_settings,"FW_LOG_DROP_ALL",FW_LOG_DROP_ALL);
-	    change(firewall_settings,"FW_LOG_ACCEPT_CRIT",FW_LOG_ACCEPT_CRIT);
-	    change(firewall_settings,"FW_LOG_ACCEPT_ALL",FW_LOG_ACCEPT_ALL);
+	    firewall_settings["FW_LOG_DROP_CRIT"] = FW_LOG_DROP_CRIT;
+	    firewall_settings["FW_LOG_DROP_ALL"] = FW_LOG_DROP_ALL;
+	    firewall_settings["FW_LOG_ACCEPT_CRIT"] = FW_LOG_ACCEPT_CRIT;
+	    firewall_settings["FW_LOG_ACCEPT_ALL"] = FW_LOG_ACCEPT_ALL;
 	    SuSEFirewall::settings = firewall_settings;
 	    SuSEFirewall::start = true;
 	    break;
 	}
     };
 
-    return ret;
+    return (symbol) ret;
 }
 /**
  * Ask user if he want to reconfigure the firewall or remove the runlevel links
  */
-global define AskStopDialog() ``{
+global define any AskStopDialog() ``{
 
     /* Ask dialog caption */
     string caption = _("SuSE Firewall2 configuration");
@@ -775,7 +775,7 @@ when you boot your system.</p>
 	}
 	else if( ret==`next)
 	{
-	    string current = UI::QueryWidget(`id("radios"), `CurrentButton);
+	    string current = (string) UI::QueryWidget(`id("radios"), `CurrentButton);
 	    if(current == "stopit")
 	    {
 		ret=`stop;
@@ -867,13 +867,13 @@ when you boot your system.</p>");
 	    while(retry)
 	    {
 		retry = false;
-		map firewall_stop_map = SCR::Execute (.target.bash_output, "/etc/init.d/SuSEfirewall2_setup stop",$["TERM":"raw"]);
+		map firewall_stop_map = (map) SCR::Execute (.target.bash_output, "/etc/init.d/SuSEfirewall2_setup stop",$["TERM":"raw"]);
 
 		if(firewall_stop_map == nil || firewall_stop_map["exit"]:0>0)
 		{
 		    if( firewall_stop_map != nil )
 		    {
-			UI::StdOutStdErrLog( whatfailedmsg,firewall_stop_map["stdout"]:"", firewall_stop_map["stderr"]:"");
+			StdOutStdErrLog( whatfailedmsg,firewall_stop_map["stdout"]:"", firewall_stop_map["stderr"]:"");
 			firewallstopped = false;
 		    }
 
@@ -915,7 +915,7 @@ editor to manually remove them");
 	}
     };
 
-    return ret;
+    return (symbol) ret;
 }
 
 /* EOF */
