@@ -15,7 +15,7 @@ import "Label";
 import "Mode";
 import "Popup";
 import "Progress";
-import "Runlevel";
+import "Service";
 import "SuSEFirewall";
 import "Wizard";
 
@@ -765,9 +765,9 @@ when you boot your system.</p>
 
     boolean firewallpresent = false;
     // this is possible because only one is enough
-    firewallpresent = Runlevel::ServiceEnabled ("SuSEfirewall2_init")
-			|| Runlevel::ServiceEnabled ("SuSEfirewall2_setup")
-			|| Runlevel::ServiceEnabled ("SuSEfirewall2_final");
+    firewallpresent = Service::Enabled ("SuSEfirewall2_init")
+			|| Service::Enabled ("SuSEfirewall2_setup")
+			|| Service::Enabled ("SuSEfirewall2_final");
     if(firewallpresent == false )
     {
 	return `config;
@@ -901,9 +901,9 @@ when you boot your system.</p>");
 
 	    boolean linksremoved = true;
 	    // can't write this in one line, because every command needs to be executed
-	    linksremoved = Runlevel::ServiceAdjust ("SuSEfirewall2_final", "disable") && linksremoved;
-	    linksremoved = Runlevel::ServiceAdjust ("SuSEfirewall2_setup", "disable") && linksremoved;
-	    linksremoved = Runlevel::ServiceAdjust ("SuSEfirewall2_init", "disable") && linksremoved;
+	    linksremoved = Service::Disable ("SuSEfirewall2_final") && linksremoved;
+	    linksremoved = Service::Disable ("SuSEfirewall2_setup") && linksremoved;
+	    linksremoved = Service::Disable ("SuSEfirewall2_init") && linksremoved;
 	    if( linksremoved && firewallstopped )
 	    {
 		Popup::Message(_("The firewall is now turned off"));
@@ -915,7 +915,7 @@ when you boot your system.</p>");
 		string errmsg = _("There has been some error while removing the
 firewall bootscripts, please use the runlevel
 editor to manually remove them");
-		Popup::Message(errmsg + "\n" + Runlevel::error_msg);
+		Popup::Message(errmsg + "\n" + Service::error_msg);
 	    }
 	    break;
 	}
