@@ -255,6 +255,8 @@ global define boolean Read() {
     // Check if firewall running
     start = Service::Enabled("SuSEfirewall2_init");
 
+    NetworkDevices::Read ();
+
     string FW_IPSEC_TRUST = (string) SCR::Read(.sysconfig.SuSEfirewall2.FW_IPSEC_TRUST);
     if( FW_IPSEC_TRUST == nil ) FW_IPSEC_TRUST = "no";
     settings["FW_IPSEC_TRUST"] = FW_IPSEC_TRUST;
