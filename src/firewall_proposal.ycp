@@ -52,13 +52,40 @@ if(func == "MakeProposal") {
 }
 /* run the module */
 else if(func == "AskUser") {
-    map stored = SuSEFirewall::Export();
-    symbol result = (symbol) WFM::CallFunction("firewall", [.propose]);
-    if(result != `next)	SuSEFirewall::Import(stored);
-    else SuSEFirewall::proposal_changed_by_user = true;
-    y2debug("stored=%1", stored);
-    y2debug("result=%1", result);
-    ret = $[ "workflow_sequence" : result ];
+    any chosen_id = param["chosen_id"]:nil;
+    y2milestone("Firewall Proposal wanted to change with id %1", chosen_id);
+
+    // user clicked on any clickable <a href> in proposal
+    if (chosen_id == "firewall--enable_firewall_in_proposal") {
+	y2milestone("Firewall enabled by single-click");
+	SuSEFirewall::enable_firewall = true;
+	ret = $[ "workflow_sequence" : `next ];
+    }
+    else if (chosen_id == "firewall--disable_firewall_in_proposal") {
+	y2milestone("Firewall disabled by single-click");
+	SuSEFirewall::enable_firewall = false;
+	ret = $[ "workflow_sequence" : `next ];
+    }
+    else if (chosen_id == "firewall--enable_ssh_in_proposal") {
+	y2milestone("SSH enabled by single-click");
+	SuSEFirewall::open_ssh_port = true;
+	ret = $[ "workflow_sequence" : `next ];
+    }
+    else if (chosen_id == "firewall--disable_ssh_in_proposal") {
+	y2milestone("SSH disabled by single-click");
+	SuSEFirewall::open_ssh_port = false;
+	ret = $[ "workflow_sequence" : `next ];
+    }
+    else {
+	// user wants to change the firewall settings
+	map stored = SuSEFirewall::Export();
+	symbol result = (symbol) WFM::CallFunction("firewall", [.propose]);
+	if(result != `next)	SuSEFirewall::Import(stored);
+	else SuSEFirewall::proposal_changed_by_user = true;
+	y2debug("stored=%1", stored);
+	y2debug("result=%1", result);
+	ret = $[ "workflow_sequence" : result ];
+    }
 }
 /* create titles */
 else if(func == "Description") {
@@ -68,6 +95,10 @@ else if(func == "Description") {
 	/* Menu label */
 	"menu_title" : _("&Firewall"),
 	"id" : "firewall",
+	"links" : [
+	    "firewall--enable_firewall_in_proposal", "firewall--disable_firewall_in_proposal",
+	    "firewall--enable_ssh_in_proposal", "firewall--disable_ssh_in_proposal",
+	],
     ];
 }
 /* write the proposal */

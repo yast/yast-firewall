@@ -592,6 +592,12 @@ services. Also start the appropriate daemons.</p>");
 //	    }
 //	    // --> Exceptions
 
+	    if (contains(services_list_tcp, "ssh") || contains(services_list_tcp, "22")) {
+		SuSEFirewall::open_ssh_port = true;
+	    } else {
+		SuSEFirewall::open_ssh_port = false;
+	    }
+
 	    SuSEFirewall::settings["FW_SERVICES_EXT_TCP"] = mergestring(services_list_tcp, " ");
 	    SuSEFirewall::settings["FW_SERVICES_EXT_UDP"] = mergestring(services_list_udp, " ");
 	    break;
