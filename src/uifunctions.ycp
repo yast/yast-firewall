@@ -46,6 +46,14 @@
     // UI Functions
 
     /**
+     * Function disables the back button.
+     * Fake function for CWM Tree Widget.
+     */
+    void DisableBackButton (string key) {
+	UI::ChangeWidget(`id(`back), `Enabled, false);
+    }
+
+    /**
      * Function saves configuration and restarts firewall
      */
     boolean SaveAndRestart () {

@@ -24,7 +24,6 @@
     include "firewall/summary.ycp";
 
     map<string,map<string,any> > widgets_handling = $[
-	// FIXME: test after jsrain's fix
 	"auto_start_up" : CWMServiceStart::CreateAutoStartWidget ($[
 	    "get_service_auto_start"	: SuSEFirewall::GetEnableService,
 	    "set_service_auto_start"	: SuSEFirewall::SetEnableService,
@@ -39,7 +38,6 @@
 		_("Start Firewall Manually")
 	    )
 	]),
-	// FIXME: test after jsrain's enhancement
 	"start_stop" : CWMServiceStart::CreateStartStopWidget ($[
 	    "service_id"		: "SuSEfirewall2_setup",
 					  // TRANSLATORS: Informating label
@@ -64,6 +62,13 @@
 		_("Save Settings and Restart Firewall Now")
 	    )
 	]),
+	// hack function for disabling BackButon
+	"DisableBackButton" : $[
+	    "widget"		: `custom,
+	    "custom_widget"	: `Empty(),
+	    "init"		: DisableBackButton,
+	    "help"		: " ",
+	],
 	"FirewallInterfaces" : $[
 	    "widget"		: `custom,
 	    "custom_widget"	: `VBox(),
@@ -132,13 +137,14 @@
 		`VSpacing (1),
 		// disabling start/stop buttons when it doesn't make sense
 		(Mode::normal() ? "start_stop" : `Empty()),
+		"hide_back_button",
 		`VStretch ()
 	    ),
 	    // TRANSLATORS: part of dialog caption
 	    "caption"		: firewall_caption + " - " + _("Start-Up"),
 	    // TRANSLATORS: tree menu item
 	    "tree_item_label"	: _("Start-Up"),
-	    "widget_names"	: [ "auto_start_up", "start_stop" ]
+	    "widget_names"	: [ "auto_start_up", "start_stop", "DisableBackButton" ]
 	],
 	"interfaces"		: $[
 	    "contents"		: `VBox (
@@ -223,7 +229,7 @@
 	    "initial_screen"	: "start_up",
 	    "screens"		: tabs,
 	    "widget_descr"	: widgets_handling,
-	    "back_button"	: "",
+	    "back_button"	: Label::BackButton(),
 	    "abort_button"	: Label::AbortButton(),
 	    // if 'normal' or 'installation', [Next] button, else [Accept]
 	    "next_button"	: (Mode::normal() ?
@@ -241,6 +247,7 @@
 	    HelpForDialog("box-summary"),
 	    Label::BackButton (), Label::AcceptButton ()
 	);
+	UI::ChangeWidget(`id(`back), `Enabled, true);
 
 	InitBoxSummary([]);
 

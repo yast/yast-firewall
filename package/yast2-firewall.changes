@@ -6,6 +6,7 @@ Fri Feb  4 09:44:28 CET 2005 - locilka@suse.cz
   the command line interface unstead of UI
 - added descriptive label for no-zone-selected instead of blank ""
 - removed colorful Glyphs from the summary
+- added disabled Back button into the TreeWidget
 
 -------------------------------------------------------------------
 Mon Jan 31 14:17:01 CET 2005 - locilka@suse.cz
