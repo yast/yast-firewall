@@ -1,0 +1,45 @@
+/**
+ * File:
+ *   io.ycp
+ *
+ * Module:
+ *   Configuration of firewall
+ *
+ * Summary:
+ *   Input and output functions.
+ *
+ * Authors:
+ *   Michael Hager <mike@suse.de>
+ *
+ * $Id$
+ *
+ * Input and output routines.
+ *
+ */
+
+{
+
+textdomain "firewall";
+
+/**
+ * Fill the map of all firewall settings from the SCR
+ * @return map all firewall settings
+ */
+global define FirewallRead() ``{
+    /* TODO: your code here ... */
+    sleep(1000);
+    return $[];
+}
+
+/**
+ * Update the SCR from the map of all firewall settings
+ * @param m a map of all firewall settings
+ * @return boolean success of operation
+ */
+global define FirewallWrite(map settings) ``{
+    /* TODO your code here ... */
+    sleep(1000);
+    return true;
+}
+
+}

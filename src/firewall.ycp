@@ -1,0 +1,43 @@
+/**
+ * File:
+ *   firewall.ycp
+ *
+ * Module:
+ *   Configuration of firewall
+ *
+ * Summary:
+ *   Main file
+ *
+ * Authors:
+ *   Michael Hager <mike@suse.de>
+ *
+ * $Id$
+ *
+ * Main file for firewall configuration. Uses all other files.
+ *
+ */
+
+{
+/***
+ * <h3>Configuration of the firewall</h3>
+ */
+
+textdomain "firewall";
+
+include "firewall/ui.ycp";
+
+/* The main() */
+y2milestone("Firewall module started");
+y2milestone("----------------------------------------");
+
+/* global settings map */
+map firewall_settings = $[];
+
+/* main ui function */
+any ret = Firewall();
+y2debug("ret=%1",ret);
+
+/* Finish */
+y2milestone("Firewall module finished");
+return ret;
+}

@@ -1,0 +1,311 @@
+/**
+ * File:
+ *   ui.ycp
+ *
+ * Module:
+ *   Configuration of firewall
+ *
+ * Summary:
+ *   User interface functions.
+ *
+ * Authors:
+ *   Michael Hager <mike@suse.de>
+ *
+ * $Id$
+ *
+ * All user interface functions.
+ *
+ */
+
+{
+
+textdomain "firewall";
+
+include "ui/common_popups.ycp";
+include "ui/common_messages.ycp";
+include "ui/wizard_dialog.ycp";
+include "wizard/sequencer.ycp";
+
+include "firewall/io.ycp";
+
+/**
+ * Main interface function
+ */
+global define Firewall() ``{
+    map aliases = $[
+        "read"		: [ ``(ReadDialog()), true ],
+        "step1"		: ``(DevDialog()),
+        "step2"		: ``(ServicesDialog()),
+        "step3"		: ``(FeatureDialog()),
+        "step4"		: ``(DevDialog()),
+        "write"		: [ ``(WriteDialog()), true ]
+    ];
+
+    map sequence = $[
+        "ws_start" : "read",
+        "read" : $[
+	    `abort: `abort,
+            `next: "step1"
+        ],
+        "step1" : $[
+	    `abort: `abort,
+            `next: "step2"
+        ],
+        "step2" : $[
+	    `abort: `abort,
+            `next: "step3"
+        ],
+        "step3" : $[
+	    `abort: `abort,
+            `next: "write"
+        ],
+        "step4" : $[
+	    `abort: `abort,
+            `next: "write"
+        ],
+        "config" : $[
+	    `abort: `abort,
+            `next: "write"
+        ],
+        "write" : $[
+	    `abort: `abort,
+            `next: `next
+        ]
+    ];
+
+    string help = "";
+    string caption = _("Firewall configuration");
+    term contents = `Label(_("Initializing ..."));
+
+    UI::CreateWizardDialog();
+    UI::SetWizardContentsButtons(caption,contents,help,BackButtonLabel(),NextButtonLabel());
+
+    any ret = WizardSequencer(aliases, sequence);
+    UI::CloseDialog();
+    return ret;
+}
+
+/**
+ * Read settings dialog
+ */
+global define ReadDialog() ``{
+    string help = _("Read help...");
+    string caption = _("Firewall configuration");
+    term contents = `Label(_("Reading settings ..."));
+    /* use ProgressBar if possible */
+
+    UI::SetWizardContentsButtons(caption,contents,help,BackButtonLabel(),NextButtonLabel());
+    UI::ChangeWidget(`id(`back),`Enabled, false);
+    UI::ChangeWidget(`id(`next),`Enabled, false);
+    UI::SetFocus(`id(`abort));
+
+    /* possible more reads, progress bar and UI::UserInput `abort handling */
+    firewall_settings = FirewallRead();
+
+    /* handle possible read errors */
+    return `next;
+}
+
+/**
+ * Write settings dialog
+ */
+global define WriteDialog() ``{
+    string help = _("Write help...");
+    string caption = _("Firewall configuration");
+    term contents = `Label(_("Writing settings ..."));
+    /* use ProgressBar if possible */
+
+    UI::SetWizardContentsButtons(caption,contents,help,BackButtonLabel(),NextButtonLabel());
+    UI::ChangeWidget(`id(`back),`Enabled, false);
+    UI::ChangeWidget(`id(`next),`Enabled, false);
+    UI::SetFocus(`id(`abort));
+
+    /* possible more writes, progress bar and UI::UserInput `abort handling */
+    any ret = FirewallWrite(firewall_settings);
+
+    /* handle possible write errors */
+    return `next;
+}
+
+
+/**
+ */
+global define DevDialog() ``{
+    string help = _("<p>Betaversion does not work until now!!!</p>");
+    
+    string caption = _("Firewall configuration                      Step 1 of 4");
+    term contents =
+`VBox (
+       `HBox (`HSpacing (5),
+	      `VBox (`VWeight (80,
+			       `VBox (
+				      `VSpacing (2),
+				      `Left (`Label ("Configure the external interface, that needs protection")),
+				      `VSpacing (2),
+				      `HBox (`Top (`ComboBox (`id ("interface"), "Interface: ", [
+                                 "/dev/eth0",
+                                 "/dev/ppp0",
+                                 "/dev/ippp0"
+                                ] ))))),
+		     `VBox (`RichText ("Attention: If you use DSL with ppp over ethernet, the interface is not eth0, it is ppp0 (or ppp1 ..)")),
+		     `VSpacing (4)),
+	      `HSpacing (5)));
+
+
+    UI::SetWizardContentsButtons(caption,contents,help,BackButtonLabel(),NextButtonLabel());
+
+    any ret = nil;
+    while(true) {
+	ret = UI::UserInput();
+	if(ret == `abort) {
+	    if(UI::ReallyAbortPopup(true)) break;
+	    else continue;
+	}
+	else {
+	    /* your code ... */
+	    break;
+	}
+    };
+
+    return ret;
+}
+
+
+/**
+ */
+global define ServicesDialog() ``{
+    string help = _("<p>Configure the <b>services</b> that should be available from the internet");
+    
+    string caption = _("Firewall configuration                      Step 2 of 4");
+    term contents =
+`VBox (
+       `HBox (
+	      `HSpacing (8),
+	      `VBox (
+		     `VSpacing (3),
+		     `Left (`Label ("Configure the services that should be available from the internet")),
+		     `VSpacing (1),
+		     `Top (`VSquash (
+				     `HBox (`HSpacing (6),
+					    `VBox (
+						   // checkbox option
+						   `Left (`CheckBox (`id ("id_2"), _("telnet"), false)),
+						   // checkbox option
+						   `Left (`CheckBox (`id ("id_2"), _("Secure Shell (ssh)"), false)),
+						   // checkbox option
+						   `Left (`CheckBox (`id ("id_2"), _("http"), false)),
+						   // checkbox option
+						   `Left (`CheckBox (`id ("id_2"), _("http with ssl  (https)"), false)),
+						   // checkbox option
+						   `Left (`CheckBox (`id ("id_2"), _("smtp"), false)),
+						   // checkbox option
+						   `Left (`CheckBox (`id ("id_2"), _("pop3"), false)),
+						   // checkbox option
+						   `Left (`CheckBox (`id ("id_2"), _("imap  (imap impa3)"), false))
+						   ),
+					    `HSpacing (0)))),
+		     `VSpacing (1),
+		     `HBox (
+			    `Label ("Selected services:"),
+			    `Label (`opt (`hstretch), "")),
+		     `VStretch ()),
+	      `HSpacing (5)));
+
+    
+
+    UI::SetWizardContentsButtons(caption,contents,help,BackButtonLabel(),NextButtonLabel());
+
+    any ret = nil;
+    while(true) {
+	ret = UI::UserInput();
+	if(ret == `abort) {
+	    if(UI::ReallyAbortPopup(true)) break;
+	    else continue;
+	}
+	else {
+	    /* your code ... */
+	    break;
+	}
+    };
+
+    return ret;
+}
+
+
+/**
+ */
+global define FeatureDialog() ``{
+    string help = _("Masquerading means that all your internal machines which use services on
+the internet seem to come from your firewall. Please note that it is more secure to communicate via proxies to the internet than masquerading. ");
+    
+    string caption = _("Firewall configuration                      Step 3 of 4");
+    term contents = `VBox (
+			   `HBox (
+				  `HSpacing (8),
+				  `VBox (
+					 `VSpacing (3),
+					 `Left (`Label ("Features:")),
+					 `VSpacing (1),
+					 `HBox (`HSpacing (1),
+						`VBox (
+						       // checkboxentry
+						       `Left (`CheckBox (`id ("trace"), _("allow traceroute"), false)),
+						       `VSpacing (1),
+						       // checkboxentry
+						       `Left (`CheckBox (`id ("mask"), _("forward traffic and do masquerading"), false)),
+						       `VSpacing (1),
+						       // checkboxentry
+						       `Left (`CheckBox (`id ("protect"), _("protect all running services"), false))),
+						`HSpacing (0)),
+					 `VSpacing (1),
+					 `VStretch ()),
+				  `HSpacing (5)));
+    
+
+    UI::SetWizardContentsButtons(caption,contents,help,BackButtonLabel(),NextButtonLabel());
+
+    any ret = nil;
+    while(true) {
+	ret = UI::UserInput();
+	if(ret == `abort) {
+	    if(UI::ReallyAbortPopup(true)) break;
+	    else continue;
+	}
+	else {
+	    /* your code ... */
+	    break;
+	}
+    };
+
+    return ret;
+}
+
+
+
+/**
+ * Config dialog
+ */
+global define ConfigDialog() ``{
+    string help = _("Config help...");
+    string caption = _("Firewall configuration");
+    term contents = `Label(_("Config contents..."));
+
+    UI::SetWizardContentsButtons(caption,contents,help,BackButtonLabel(),NextButtonLabel());
+
+    any ret = nil;
+    while(true) {
+	ret = UI::UserInput();
+	if(ret == `abort) {
+	    if(UI::ReallyAbortPopup(true)) break;
+	    else continue;
+	}
+	else {
+	    /* your code ... */
+	    break;
+	}
+    };
+
+    return ret;
+}
+
+}
