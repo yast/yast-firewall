@@ -1,0 +1,566 @@
+-------------------------------------------------------------------
+Mon Jan 31 14:17:01 CET 2005 - locilka@suse.cz
+
+- added feature for better checking of the configuration, user is
+  informed if any network interface is not assigned to any firewall
+  zone and all network traffic would be blocked there
+  (bugzilla #50333)
+- 2.11.7
+
+-------------------------------------------------------------------
+Tue Jan 25 12:42:52 CET 2005 - locilka@suse.cz
+
+- replaced SuSEfirewall2_final with SuSEfirewall2_setup for
+  checking whether SuSEfirewall2 is running (bugzilla #50157)
+- 2.11.6
+
+-------------------------------------------------------------------
+Mon Jan 17 13:24:35 CET 2005 - locilka@suse.cz
+
+- Added comments for translators (CommandLine)
+- Added CommandLine and UI handling in RedirectToMasquerade
+  functionality to follow iptables/SuSEfirewall2 syntax
+- Fixed redrawing of allowed services after AdditionalServices
+  added
+- Fixed StartNow(), StopNow() and SaveAndRestart() functionality to
+  change the final service status after Write() operations
+- 2.11.5
+
+-------------------------------------------------------------------
+Tue Jan 11 16:13:20 CET 2005 - locilka@suse.cz
+
+- Added CommandLine support
+
+-------------------------------------------------------------------
+Mon Jan  3 10:23:53 CET 2005 - locilka@suse.cz
+
+- Adjusted start/stop dialog for new CWM functionality (own
+  functions for starting and stopping)
+- More informative Summarization
+- Support for new SuSEfirewall2's broadcast implementation
+- Added help texts
+- 2.11.4 
+
+-------------------------------------------------------------------
+Tue Dec 21 09:09:09 CET 2004 - locilka@suse.cz
+
+- New implementation of yast2-firewall UI (in progress)
+- 2.11.3
+
+-------------------------------------------------------------------
+Wed Oct 27 16:58:50 CEST 2004 - mvidner@suse.cz
+
+- Adjusted for changes in Mode.
+- 2.11.2
+
+-------------------------------------------------------------------
+Tue Oct 19 13:00:10 CEST 2004 - locilka@suse.cz
+
+- Fixed debug and error messages in log
+
+-------------------------------------------------------------------
+Sun Oct  3 01:53:28 CEST 2004 - nashif@suse.de
+
+- #46262: Firewall is always enabled
+- Firewall settings not written during autoinstall
+
+-------------------------------------------------------------------
+Fri Sep 24 17:19:14 CEST 2004 - locilka@suse.cz
+
+- fixed bug #46043
+  firewall enabled in network proposal was not disabled when user
+  went back again to the network proposal and disabled it
+- 2.10.12
+
+-------------------------------------------------------------------
+Mon Sep 20 09:01:46 CEST 2004 - locilka@suse.cz
+
+- fixed bug #45440
+  although special ipppX ISDN devices were proposed as external
+  devices, they weren't offered in combobox in the firewall
+  editation as a single item
+- 2.10.11
+
+-------------------------------------------------------------------
+Tue Sep 14 12:37:30 CEST 2004 - locilka@suse.cz
+
+- default values enable_firewall and open_ssh were moved into the
+  control file #45240
+- fixed texts to be matching the actual state of the naming of
+  network interfaces #45209
+
+-------------------------------------------------------------------
+Mon Sep 13 09:08:37 CEST 2004 - locilka@suse.cz
+
+- fixed SuSEfirewall2 defaults to be the same as in the SFW2
+  package (FW_PROTECT_FROM_INTERNAL=no FW_AUTOPROTECT_SERVICES=no).
+- added ISDN::NetDeviceList() into the firewall proposal to catch
+  just configured devices.
+- fixed testsuites
+- 2.10.10
+
+-------------------------------------------------------------------
+Fri Sep 10 12:30:33 CEST 2004 - locilka@suse.cz
+
+- fixed bug #44966, forgot text in CWMFirewall marked for
+  translation.
+
+-------------------------------------------------------------------
+Tue Sep  7 12:43:01 CEST 2004 - locilka@suse.cz
+
+- fixed bug #44759 because of chaned defaults, firewall wasn't
+  written in normal mode configuration
+- 2.10.9
+
+-------------------------------------------------------------------
+Mon Sep  6 13:35:07 CEST 2004 - locilka@suse.cz
+
+- added SetModified() function to autoyast
+- 2.10.8
+
+-------------------------------------------------------------------
+Mon Sep  6 09:01:35 CEST 2004 - locilka@suse.cz
+
+- fixed #44650 Function ActivateConfiguration now tests if you
+  really want to activate (start) the configuration (not only if
+  you call this function).
+- 2.10.7
+
+-------------------------------------------------------------------
+Fri Sep  3 12:44:38 CEST 2004 - locilka@suse.cz
+
+- fixed #44656 Firewall in install proposal is disabled by default
+  if there are any dial-up interfaces, they are proposed as 
+  external interfaces, other interfaces as internal interfaces and
+  the firewall is proposed to be enabled.
+
+-------------------------------------------------------------------
+Thu Sep  2 09:06:36 CEST 2004 - locilka@suse.cz
+
+- fixed #44566 Wrong handling with newly added interfaces into the
+  user-changed firewall proposal in the installation
+- fixed #44463 Firewall can be disabled in autoyast, added dialog
+  taken from the installation proposal
+- fixed #44568 Firewall didn't inform about UDP and RPC services
+  in the autoyast summary
+- fixed #44569 Firewall in autoyast was getting interfaces from
+  the running system instead of the autoyast settings
+
+-------------------------------------------------------------------
+Mon Aug 30 16:33:00 CEST 2004 - locilka@suse.cz
+
+- 2.10.6
+
+-------------------------------------------------------------------
+Mon Aug 30 14:38:35 CEST 2004 - locilka@suse.cz
+
+- added NFS-Server, NFS-Client, NIS-Server support
+- added functions for searching FW_SERVICES_XXX_RPC for serv. supp.
+
+-------------------------------------------------------------------
+Mon Aug 30 13:33:00 CEST 2004 - jsrain@suse.cz
+
+- added CWMFirewallInterfaces::Modified () function (#44106)
+- allowed CWMFirewallInterfaces to be used if Mode::config (#43904)
+
+-------------------------------------------------------------------
+Fri Aug 27 16:50:39 CEST 2004 - locilka@suse.cz
+
+- added allowing broadcast messages into ipp-client service
+- modified testsiutes to support new broadcast option
+- merged proofreaded UI messages
+- fixed Bugzilla bug #40287, helptext for Traceroute improved
+
+-------------------------------------------------------------------
+Fri Aug 27 11:23:55 CEST 2004 - visnov@suse.cz
+
+- fix HaveService() for any device (join separated by spaces) 
+
+-------------------------------------------------------------------
+Thu Aug 26 12:48:38 CEST 2004 - locilka@suse.cz
+
+- changed RunServiceSupport() to support all groups of interfaces
+- created testsuites for all global functions
+
+-------------------------------------------------------------------
+Tue Aug 24 15:13:23 CEST 2004 - locilka@suse.cz
+
+- removed "SSH open by default" from the Instalation Proposal
+
+-------------------------------------------------------------------
+Mon Aug 23 17:03:47 CEST 2004 - locilka@suse.cz
+
+- added functionality for adding/removing devices into/from
+  user-changed configuration in network proposal
+- 2.10.5
+
+-------------------------------------------------------------------
+Fri Aug 20 11:31:20 CEST 2004 - locilka@suse.cz
+
+- fixed Bugzilla bug #43975
+  FW wasn't started in install proposal when user didn't change it
+- 2.10.4
+
+-------------------------------------------------------------------
+Mon Aug 16 10:21:50 CEST 2004 - locilka@suse.cz
+
+- added functions SetModified() and GetModified()
+- added call SetModified() in all Set*() functions
+- changed selecting/deselecting additional TCP/UDP services
+- 2.10.3
+
+-------------------------------------------------------------------
+Tue Aug 10 09:39:32 CEST 2004 - locilka@suse.cz
+
+- merged proofread messages
+- added support for NTP
+
+-------------------------------------------------------------------
+Fri Aug  6 13:45:35 CEST 2004 - jsrain@suse.cz
+
+- disable firewall enabling checkbox after all interfaces were
+  deselected in interface selection popup
+
+-------------------------------------------------------------------
+Thu Aug  5 10:17:17 CEST 2004 - locilka@suse.cz
+
+- added support for ipp, LDAP and LDAPS
+- 2.10.2
+
+-------------------------------------------------------------------
+Wed Aug  4 16:52:53 CEST 2004 - locilka@suse.cz
+
+- added new functionality for enabling/disabling services defined
+  as list of ports and special functions
+- added global handling for other YaST modules
+
+-------------------------------------------------------------------
+Fri Jul 30 10:30:30 CEST 2004 - jsrain@suse.cz
+
+- added popup (CWM widget) for selecting interfaces to open in
+  firewall
+- added the CWM widget for openning/closing the firewall
+
+-------------------------------------------------------------------
+Wed Jul 21 09:50:51 CEST 2004 - locilka@suse.cz
+
+- added firewall proposal (for network proposal)
+- 2.10.1
+
+-------------------------------------------------------------------
+Tue Jun 15 15:05:57 CEST 2004 - msvec@suse.cz
+
+- 2.10.0
+
+-------------------------------------------------------------------
+Tue May  4 10:01:48 CEST 2004 - mvidner@suse.cz
+
+- merged proofread messages
+- 2.9.12
+
+-------------------------------------------------------------------
+Fri Apr  2 16:05:45 CEST 2004 - msvec@suse.cz
+
+- fixed network configurations listing
+- changed license to GPL
+- 2.9.11
+
+-------------------------------------------------------------------
+Wed Mar 31 17:57:23 CEST 2004 - msvec@suse.cz
+
+- fixed [Back] button behavior in step 2 (#37700)
+- 2.9.10
+
+-------------------------------------------------------------------
+Wed Mar 10 01:47:00 CET 2004 - sh@suse.de
+
+- V 2.9.9
+- Migration to new wizard 
+
+-------------------------------------------------------------------
+Tue Mar  9 11:30:07 CET 2004 - lnussel@suse.de
+
+- cast to string only if it's indeed a string to fix feature dialog
+- 2.9.8
+
+-------------------------------------------------------------------
+Mon Mar  8 17:09:00 CET 2004 - msvec@suse.cz
+
+- set title icon
+- 2.9.7
+
+-------------------------------------------------------------------
+Fri Mar  5 11:28:58 CET 2004 - msvec@suse.cz
+
+- more strict type casts
+- 2.9.6
+
+-------------------------------------------------------------------
+Wed Mar  3 13:34:05 CET 2004 - visnov@suse.cz
+
+- fixed type info 
+
+-------------------------------------------------------------------
+Tue Mar  2 12:30:43 CET 2004 - lnussel@suse.de
+
+- add option to allow IPsec traffic
+- 2.9.5
+
+-------------------------------------------------------------------
+Fri Feb 20 11:53:17 CET 2004 - lnussel@suse.de
+
+- fix warnings about useless global
+- move masquerading setting to top so users find it easier
+- state that the expert service config configures TCP services
+- 2.9.4
+
+-------------------------------------------------------------------
+Sat Feb  7 18:32:01 CET 2004 - msvec@suse.cz
+
+- fixed testsuite output
+- 2.9.3
+
+-------------------------------------------------------------------
+Fri Feb  6 14:37:24 CET 2004 - msvec@suse.cz
+
+- drop y2cc config file
+- 2.9.2
+
+-------------------------------------------------------------------
+Tue Feb  3 10:27:44 CET 2004 - visnov@suse.cz
+
+- use Sequencer module instead of WizardSequencer 
+
+-------------------------------------------------------------------
+Mon Jan 26 15:31:04 CET 2004 - msvec@suse.cz
+
+- updated for the new interpreter
+- 2.9.1
+
+-------------------------------------------------------------------
+Tue Dec  2 17:11:48 CET 2003 - msvec@suse.cz
+
+- extended help text (#33394)
+- 2.9.0
+
+-------------------------------------------------------------------
+Sun Sep 14 16:31:34 CEST 2003 - adrian@suse.de
+
+- let it work in kcontrol again
+- 2.8.13
+
+-------------------------------------------------------------------
+Sat Sep 13 18:46:58 CEST 2003 - nashif@suse.de
+
+- #30291: return list of needed packages for autoinstall
+
+-------------------------------------------------------------------
+Fri Aug 29 16:27:18 CEST 2003 - visnov@suse.de
+
+- fix #29659 (syntax errors) 
+- 2.8.11
+
+-------------------------------------------------------------------
+Mon Aug 25 15:35:42 CEST 2003 - visnov@suse.de
+
+- clarify a help text
+- 2.8.10 
+
+-------------------------------------------------------------------
+Wed Aug 20 15:56:03 CEST 2003 - jsuchome@suse.de
+
+- removed redundant "initialization dialog" (#28779)
+- 2.8.9
+
+-------------------------------------------------------------------
+Mon Aug 11 10:04:29 CEST 2003 - visnov@suse.de
+
+- merged in proofread texts 
+- 2.8.8
+
+-------------------------------------------------------------------
+Tue Aug  5 08:03:04 CEST 2003 - visnov@suse.de
+
+- read and write also DMZ/INT/EXT services and all interfaces 
+- 2.8.7
+
+-------------------------------------------------------------------
+Mon Aug  4 22:33:38 CEST 2003 - nashif@suse.de
+
+- Fixed sequence for autoyast
+- 2.8.6
+
+-------------------------------------------------------------------
+Mon Aug  4 16:43:03 CEST 2003 - visnov@suse.de
+
+- added API for enabling and disabling services
+- added desktop file
+- 2.8.5 
+ 
+-------------------------------------------------------------------
+Wed Jul 30 17:51:37 CEST 2003 - msvec@suse.cz
+
+- further sources and texts cleanup
+- 2.8.4
+
+-------------------------------------------------------------------
+Tue Jul 22 14:41:34 CEST 2003 - msvec@suse.cz
+
+- sources cleanup and fixes
+- 2.8.3
+
+-------------------------------------------------------------------
+Tue Jul 15 15:10:57 CEST 2003 - msvec@suse.de
+
+- fix the help text (#27857)
+- updated testsuite
+- 2.8.2
+
+-------------------------------------------------------------------
+Fri Jun 27 00:11:24 CEST 2003 - msvec@suse.cz
+
+- updated to the current yast2 interface
+- added minimal testsuite
+- 2.8.1
+
+-------------------------------------------------------------------
+Fri Mar  7 02:29:16 CET 2003 - nashif@suse.de
+
+- dont clone unconfigured firewall ( #24792 )
+- 2.7.7
+
+-------------------------------------------------------------------
+Tue Mar  4 14:23:58 CET 2003 - mvidner@suse.de
+
+- Texts from final proofreading.
+- 2.7.6
+
+-------------------------------------------------------------------
+Wed Feb 26 04:38:31 CET 2003 - nashif@suse.de
+
+- fixed bug when writing config in autoinst mode (#24221)
+- Use Runlevel to set runlevels
+- Improved Write function and removed duplicate code
+- 2.7.5
+
+-------------------------------------------------------------------
+Thu Feb 20 02:12:09 CET 2003 - nashif@suse.de
+
+- bug #23887: Finish installation after configuration is written
+- Using common text: Finish instead of Quit.
+- 2.7.4
+
+-------------------------------------------------------------------
+Mon Feb 17 16:39:05 CET 2003 - nashif@suse.de
+
+- Read configuration if firewall is activated
+- 2.7.2
+
+-------------------------------------------------------------------
+Wed Feb  5 17:31:33 CET 2003 - lnussel@suse.de
+
+- apply proof read texts
+
+-------------------------------------------------------------------
+Mon Feb  3 08:31:47 CET 2003 - nashif@suse.de
+
+- use SuSEFirewall module
+- added autoinstallation support
+- removed obsolete _write client
+
+-------------------------------------------------------------------
+Thu Jan 30 18:08:59 CET 2003 - lnussel@suse.de
+
+- apply proof read texts
+- 2.7.0
+
+-------------------------------------------------------------------
+Mon Sep  2 13:52:48 CEST 2002 - mvidner@suse.cz
+
+- Fixed firewall deactivation (broken by stricter insserv) (#18735).
+- 2.6.6
+
+-------------------------------------------------------------------
+Tue Aug 27 20:00:00 CEST 2002 - jsuchome@suse.cz
+
+- provide/obsolete old translation packages
+
+-------------------------------------------------------------------
+Mon Jul 22 16:37:08 CEST 2002 - lnussel@suse.de
+
+- more proof read texts
+- import Wizard instead of including it
+
+-------------------------------------------------------------------
+Fri Jul 12 16:35:48 CEST 2002 - arvin@suse.de
+
+- use proper namespace for Args and CallFunction (#16776)
+
+-------------------------------------------------------------------
+Thu Jul 11 14:53:29 CEST 2002 - lnussel@suse.de
+
+- re-insert proof read texts
+
+-------------------------------------------------------------------
+Mon Jul 08 15:29:30 CEST 2002 - arvin@suse.de
+
+- moved non binary files to /usr/share/YaST2
+
+-------------------------------------------------------------------
+Tue Jul 02 16:57:39 CEST 2002 - arvin@suse.de
+
+- removed personal-firewall.scr (use the one from yast2-network)
+
+-------------------------------------------------------------------
+Mon Jul  1 17:50:26 CEST 2002 - msvec@suse.cz
+
+- renamed to yast2-firewall
+- 2.6.0
+
+-------------------------------------------------------------------
+Fri Mar  8 13:55:47 CET 2002 - lnussel@suse.de
+
+- fix error dialog to display stdout and stderr, add TERM=raw to the
+  environment of the initscript to avoid escape sequences (#14695)
+
+-------------------------------------------------------------------
+Thu Feb 28 19:46:14 CET 2002 - mike@suse.de
+
+- undo "insert proofreaded texts" because the translation are
+  based on not proofreaded texts
+
+-------------------------------------------------------------------
+Thu Feb 21 11:58:04 CET 2002 - lnussel@suse.de
+
+- marked two more strings for translation
+
+-------------------------------------------------------------------
+Thu Feb 21 11:40:55 CET 2002 - lnussel@suse.de
+
+- dialogs for stopping the firewall
+
+-------------------------------------------------------------------
+Tue Feb 19 15:49:09 CET 2002 - lnussel@suse.de
+
+- use /etc/sysconfig/personal-firewall
+- minor fixes
+
+-------------------------------------------------------------------
+Mon Feb 18 16:08:18 CET 2002 - mike@suse.de
+
+- first working version
+
+-------------------------------------------------------------------
+Tue Feb 12 12:03:26 MET 2002 - tom@suse.de
+
+- Renamed menuentry_firewall.y2cc ---> menuentry_firewall2.y2cc (conflict)
+
+-------------------------------------------------------------------
+Fri Feb  8 20:40:48 MET 2002 - tom@suse.de
+
+- Now checked into STABLE
+
+-------------------------------------------------------------------
+Fri Feb  8 15:59:22 2002 - mike@suse.de
+
+- initial version

@@ -1,0 +1,81 @@
+/**
+ * File:	include/firewall/complex.ycp
+ * Package:	Firewall configuration
+ * Summary:	Complex dialogs definitions
+ * Authors:	Michal Svec <msvec@suse.cz>
+ *
+ * $Id$
+ */
+
+{
+
+    textdomain "firewall";
+
+    import "Popup";
+    import "SuSEFirewall";
+    import "Wizard";
+
+    include "firewall/helps.ycp";
+
+    /**
+     * Read settings dialog.
+     *
+     * @return `next if success, else `abort
+     */
+    define symbol ReadDialog() {
+
+	Wizard::RestoreHelp(HelpForDialog("reading_configuration"));
+
+	// reading firewall settings
+	boolean ret = SuSEFirewall::Read();
+
+	// testing for other firewall running
+	if (SuSEFirewall::IsOtherFirewallRunning()) {
+	    // TRANSLATORS: Popup headline
+	    if(Popup::ContinueCancelHeadline(_("Another firewall is active"),
+		// TRANSLATORS: Popup text
+		_("Another kind of firewall is active in your system.
+
+If you continue, SuSEfirewall2 may produce undefined errors.
+It would be better to remove the other firewall before
+configuring SuSEfirewall2.
+
+Continue with configuration?
+")) != true)
+	    return `abort;
+	}
+
+	// hidding finished progress
+	Wizard::SetContentsButtons ("", `Empty(), "", "", "");
+
+	/* FIXME: handle possible read errors */
+	return ret ? `next : `abort;
+    }
+
+    /**
+     * Write settings dialog
+     * @return `next if success, else `abort
+     */
+    define symbol WriteDialog() ``{
+
+	Wizard::RestoreHelp(HelpForDialog("saving_configuration"));
+
+	boolean ret = SuSEFirewall::Write();
+	return ret ? `next : `abort;
+
+	// hidding finished progress
+	Wizard::SetContentsButtons ("", `Empty(), "", "", "");
+    }
+
+    define boolean AbortDialog () {
+	return Popup::ContinueCancelHeadline(
+	    // TRANSLATORS: popup headline
+	    _("Aborting firewall configuration"),
+	    // TRANSLATORS: popup message
+	    _("Everything would be lost.
+Really abort configuration?")
+	);
+    }
+
+/* EOF */
+}

@@ -1,0 +1,140 @@
+/**
+ * File:	clients/firewall_proposal.ycp
+ * Package:	Firewall configuration
+ * Summary:	Firewall configuration proposal
+ * Authors:	Lukas Ocilka <locilka@suse.cz>
+ *
+ * $Id$
+ */
+
+{
+
+textdomain "firewall";
+
+/* The main () */
+y2milestone("----------------------------------------");
+y2milestone("Firewall proposal started");
+y2milestone("Arguments: %1", WFM::Args());
+
+import "SuSEFirewall";
+import "SuSEFirewallProposal";
+import "Popup";
+import "Progress";
+import "ProductFeatures";
+
+ProductFeatures::ProductFeatures();
+boolean enable_firewall_init_default = ProductFeatures::enable_firewall;
+boolean enable_ssh_default = ProductFeatures::firewall_enable_ssh;
+
+// run this only once
+if (!SuSEFirewallProposal::GetProposalInitialized()) {
+
+    // variables from control file
+    y2milestone("Default firewall values: enable_firewall=%1, enable_ssh=%2",
+        ProductFeatures::enable_firewall, ProductFeatures::firewall_enable_ssh);
+    SuSEFirewall::SetEnableService(ProductFeatures::enable_firewall);
+    SuSEFirewall::SetStartService (ProductFeatures::enable_firewall);
+
+    SuSEFirewallProposal::SetProposalInitialized(true);
+}
+
+string func = (string) WFM::Args(0);
+map param = (map) WFM::Args(1);
+map ret = $[];
+
+/* create a textual proposal */
+if(func == "MakeProposal") {
+    boolean force_reset = param["force_reset"]:false;
+
+    if (force_reset) {
+	SuSEFirewallProposal::Reset();
+	SuSEFirewallProposal::SetChangedByUser(false);
+    }
+    SuSEFirewallProposal::Propose();
+    // setting start-firewall to the same value as enable-firewall
+    SuSEFirewall::SetStartService(SuSEFirewall::GetEnableService());
+
+    string warning = nil;
+    symbol warning_level = nil;
+    map<string, string> proposal = (map<string, string>) SuSEFirewallProposal::ProposalSummary();
+    Progress::on();
+
+    ret = $[
+	"preformatted_proposal" : proposal["output"]:"",
+	"warning_level" : `warning,
+	"warning" : proposal["warning"]:nil,
+	"links" : [
+	    "firewall--enable_firewall_in_proposal", "firewall--disable_firewall_in_proposal",
+	    "firewall--enable_ssh_in_proposal", "firewall--disable_ssh_in_proposal",
+	],
+    ];
+}
+/* run the module */
+else if(func == "AskUser") {
+    any chosen_id = param["chosen_id"]:nil;
+    y2milestone("Firewall Proposal wanted to change with id %1", chosen_id);
+
+    // user clicked on any clickable <a href> in proposal
+    if (chosen_id == "firewall--enable_firewall_in_proposal") {
+	y2milestone("Firewall enabled by single-click");
+	SuSEFirewall::SetEnableService(true);
+	SuSEFirewall::SetStartService(true);
+	ret = $[ "workflow_sequence" : `next ];
+	SuSEFirewallProposal::SetChangedByUser(true);
+    } else if (chosen_id == "firewall--disable_firewall_in_proposal") {
+	y2milestone("Firewall disabled by single-click");
+	SuSEFirewall::SetEnableService(false);
+	SuSEFirewall::SetStartService(false);
+	ret = $[ "workflow_sequence" : `next ];
+	SuSEFirewallProposal::SetChangedByUser(true);
+    } else if (chosen_id == "firewall--enable_ssh_in_proposal") {
+	y2milestone("SSH enabled by single-click");
+	SuSEFirewall::SetServicesForZones (["ssh"], ["EXT"], true);
+	ret = $[ "workflow_sequence" : `next ];
+	SuSEFirewallProposal::SetChangedByUser(true);
+    } else if (chosen_id == "firewall--disable_ssh_in_proposal") {
+	y2milestone("SSH disabled by single-click");
+	SuSEFirewall::SetServicesForZones (["ssh"], ["EXT"], false);
+	ret = $[ "workflow_sequence" : `next ];
+	SuSEFirewallProposal::SetChangedByUser(true);
+    } else {
+	// user wants to change the firewall settings
+	map <string, any> stored = (map <string, any>) SuSEFirewall::Export();
+	symbol result = (symbol) WFM::CallFunction("firewall", [.propose]);
+
+	if (result != `next) SuSEFirewall::Import(stored);
+	else SuSEFirewallProposal::SetChangedByUser(true);
+
+	y2debug("stored=%1", stored);
+	y2debug("result=%1", result);
+	ret = $[ "workflow_sequence" : result ];
+    }
+}
+/* create titles */
+else if(func == "Description") {
+    ret = $[
+	/* RichText label */
+	"rich_text_title" : _("Firewall"),
+	/* Menu label */
+	"menu_title" : _("&Firewall"),
+	"id" : "firewall",
+    ];
+}
+/* write the proposal */
+else if(func == "Write") {
+    SuSEFirewall::SetModified();
+    SuSEFirewall::Write();
+}
+/* unknown function */
+else {
+    y2error("unknown function: %1", func);
+}
+
+/* Finish */
+y2debug("ret=%1",ret);
+y2milestone("Firewall proposal finished");
+y2milestone("----------------------------------------");
+return ret;
+
+/* EOF */
+}

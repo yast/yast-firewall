@@ -1,0 +1,134 @@
+/**
+ * Copyright 2004, Novell, Inc.  All rights reserved.
+ *
+ * File:	include/firewall/helps.ycp
+ * Package:	Firewall configuration
+ * Summary:	Firewall dialogs helps
+ * Authors:	Lukas Ocilka <locilka@suse.cz>
+ *
+ * $Id$
+ *
+ * File includes helps for yast2-firewall dialogs.
+ */
+
+{
+    textdomain "firewall";
+
+    map <string, string> HELPS = $[
+
+	// TRANSLATORS: Read dialog help
+	"reading_configuration" : _("<p><b><big>Reading Firewall Configuration</big></b>
+<br>Please wait...</p>"),
+
+	// TRANSLATORS: Write dialog help
+	"saving_configuration" : _("<p><b><big>Saving Firewall Configuration</big></b>
+<br>Please wait...</p>"),
+
+	// TRANSLATORS: Firewall interfaces dialog help
+	"firewall-interfaces" : _("<p><b><big>Interfaces</big></b>
+<br>Here you can dispose your network devices into firewall zones
+by selecting the device in the table and clicking the <b>Change</b>.</p>
+
+<p>You can also enter special strings like <i>any</i> into the External zone using the
+<b>User Defined</b> button. You can also enter not-yet configured interfaces here.
+If you need masquerading, <i>any</i> string is not allowed.</p>
+
+<p>Every network device should be assigned to any firewall zone,
+network traffic through any unassigned interface is blocked.</p>"),
+
+	// TRANSLATORS: Allowed services dialog help
+	"allowed-services" : _("<p><b><big>Allowed services</big></b>
+<br>Here you can allow services or ports to be accessible from network.
+Networks are divided into firewall zones.</p>
+
+<p>To add any allowed service, select <b>Zone</b> is select box, select
+<b>Service To Allow</b> and press the <b>Add</b> button.</p>
+
+<p>To remove any yet allowed service, seelct the <b>Zone</b> is select box,
+select the <b>Allowed Service<b> in the table below and press the <b>Remove</b>
+button.</p>
+
+<p>Unselecting the <b>Protect Firewall from Internal Zone</b> check box you can remove the
+protection for whole zone, all services and ports in this zone would be unprotected.</p>"),
+
+	// TRANSLATORS: Base masquerade dialog help
+	"base-masquerading" : _("<p><b><big>Masquerading</big></b>
+<br>Masquerading is a function which hides your internal network behind your firewall and allows
+your internal network to access external network (internet for instance) transparently. Requests
+from external network to the internal one are blocked.</p>
+
+<p>Select <b>Masquerade Networks</b> if you want to masquerade your networks
+to External network.</p>"),
+
+	// TRANSLATORS: Redirect-masquerade table dialog help
+	"masquerade-redirect-table" : _("<p><b><big>Redirect Requests To Masqueraded IP</big></b>
+<br>Although requests from external network cannot reach your internal network. It is possible to
+transparently redirect any requested ports on your firewall to any internal IP.</p>
+
+<p>To add new redirect rule, press the <b>Add</b> button and fill the redirect form.</p>
+
+<p>To removed any redirect rule, select it in table and press the <b>Remove</b> button.</p>"),
+
+	// TRANSLATORS: Simple broadcast configuration dialog help
+	"simple-broadcast-configuration" : _("<p><b><big>Broadcast Configuration</big></b>
+<br>Broadcast packets are special UDP packets sent to the whole network to find out
+neighbouring computers or for sending information to each computer in the network.
+For instance CUPS servers inform about their printing queues using broadcast packets.<p>
+
+<p>SuSEfirewall2 services selected in allowed interfaces automatically add needed broadcast
+ports here. If you want to remove any or add any other, edit lists of space-separated ports for
+particular zones.</p>
+
+<p>Other dropped broadcast packets are logged. It could be quite a lot of packets in wider networks.
+If you want to suppress logging of these packets, unselect the <b>Log Disallowed Broadcast Packets</b>
+select box for particular zone.</p>"),
+
+	// TRANSLATORS: Base IPsec configuration dialog help
+	"base-ipsec-support" : _("<p><b><big>IPsec Support</big></b>
+<br>IPsec is an encrypted communication between trusted hosts or networks through untrusted networks
+like for instace internet. This dialog opens IPsec for External zone using the
+<b>IPsec Support Enabled</b> check box.</p>
+
+<p><b>Details</b> allows to configure how are trusted and handled successfully decypted
+IPsec packets.</p>"),
+
+	// TRANSLATORS: Base Logging configuration dialog help
+	"base-logging" : _("<p><b><big>Logging Level</big></b>
+<br>This is a base configuration dialog for IP packets logging settings. Here you only
+configure inbound connection packets, outbound ones are not logged at all.</p>
+
+<p>There are two groups of logged IP packets: <b>Allowed Packets</b> and <b>Disallowed Packets</b>.
+You can choose from three levels of logging for each group: <b>Log All</b> for logging every
+packet, <b>Log Only Critical</b> for log only interesting ones, <b>Do Not Log Any</b>
+for no logging.</p>
+
+<p>You should log critical allowed packets at least.</p>"),
+
+	// TRANSLATORS: Base Summary dialog help
+	"box-summary" : _("<p><b><big>Summary</big></b>
+<br>Here you can find a summary of your configuration settings.
+This summary is divided into general configuration and parts for each firewall zone.
+Every existing zone is summarized here.</p>
+
+<p><b>Firewall Starting</b> shows information if the firewall is started in the
+<b>boot process</b> or only <b>manually</b>.</p>
+
+<p>Firewall zones must have any network interface assigned to list these items in
+summarization:</p>
+
+<p><b>Interfaces</b> - all interfaces are listed using their configuration name and device name.
+If the name is right, you see green mark-check on the left; If it is not right, you see red arrow
+on the left.</p>
+
+<p><b>Open Services, Ports and Protocols</b> - Here are listed all open network services, additional
+TCP (Transmission Control Protocol), UDP (User Datagram Protocol) and RPC (Remote Procedure Call)
+ports and IP (Internet Protocol) protocols.</p>"),
+
+    ];
+
+    string HelpForDialog (string identification) {
+	return HELPS[identification]:sformat("FIXME: Help for '%1' is missing!", identification);
+    }
+
+/* EOF */
+}
