@@ -43,12 +43,11 @@ Network traffic through any unassigned interface is blocked.</p>
 Networks are divided into firewall zones.</p>
 
 <p>To allow a service, select the <b>Zone</b> and the
-<b>Service to Allow</b> then press <b>Add</b>.</p>
+<b>Service to Allow</b> then press <b>Add</b>.
+To remove an allowed service, select the <b>Zone</b> and the <b>Allowed Service<b> then press <b>Remove</b>.</p>
 
-<p>To remove an allowed service, select the <b>Zone</b> and the <b>Allowed Service<b> then press <b>Remove</b>.</p>
-
-<p>By unselecting <b>Protect Firewall from Internal Zone</b>, remove the
-protection for the entire zone. All services and ports in this zone would be unprotected.</p>
+<p>By unselecting <b>Protect Firewall from Internal Zone</b>, remove 
+protection from the zone. All services and ports would be unprotected from this zone.</p>
 "),
 
 	// TRANSLATORS: Base masquerade dialog help
@@ -80,7 +79,7 @@ ports here. To remove any or add any others, edit lists of space-separated ports
 particular zones.</p>
 
 <p>Other dropped broadcast packets are logged. It could be quite a lot of packets in wider networks.
-To suppress logging of these packets, unselect <b>Log Not Accepted Broadcast Packets</b>
+To suppress logging of these packets, deselect <b>Log Not Accepted Broadcast Packets</b>
 for the desired zones.</p>
 "),
 
@@ -102,9 +101,7 @@ configure logging for incoming connection packets. Outgoing ones are not logged 
 <p>There are two groups of logged IP packets: <b>Accepted Packets</b> and <b>Not Accepted Packets</b>.
 You can choose from three levels of logging for each group: <b>Log All</b> for logging every
 packet, <b>Log Only Critical</b> for log only interesting ones, or <b>Do Not Log Any</b>
-for no logging.</p>
-
-<p>You should log at least critical accepted packets.</p>
+for no logging. You should log at least critical accepted packets.</p>
 "),
 
 	// TRANSLATORS: Base Summary dialog help
