@@ -1053,11 +1053,11 @@ when you boot your system.</p>
 		}
 	    }
 
-	    boolean linksremoved = false;
+	    boolean linksremoved = true;
 	    // can't write this in one line, because every command needs to be executed
-	    linksremoved = Runlevel::ServiceAdjust ("SuSEfirewall2_init", "disable") || linksremoved;
-	    linksremoved = Runlevel::ServiceAdjust ("SuSEfirewall2_setup", "disable") || linksremoved;
-	    linksremoved = Runlevel::ServiceAdjust ("SuSEfirewall2_final", "disable") || linksremoved;
+	    linksremoved = Runlevel::ServiceAdjust ("SuSEfirewall2_final", "disable") && linksremoved;
+	    linksremoved = Runlevel::ServiceAdjust ("SuSEfirewall2_setup", "disable") && linksremoved;
+	    linksremoved = Runlevel::ServiceAdjust ("SuSEfirewall2_init", "disable") && linksremoved;
 	    if( linksremoved && firewallstopped )
 	    {
 		UI::MessagePopup(_("The firewall is now turned off"));
@@ -1068,7 +1068,7 @@ when you boot your system.</p>
 		string errmsg = _("There has been some error while removing the
 firewall bootscripts, please use the runlevel
 editor to manually remove them");
-		UI::MessagePopup(errmsg);
+		UI::MessagePopup(errmsg + "\n" + Runlevel::error_msg);
 	    }
 	    break;
 	}
