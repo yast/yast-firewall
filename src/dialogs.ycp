@@ -3,6 +3,7 @@
  * Package:	Firewall configuration
  * Summary:	Dialogs definitions
  * Authors:	Michal Svec <msvec@suse.cz>
+ *		Lukas Ocilka <locilka@suse.cz>
  *
  * $Id$
  */
@@ -20,7 +21,9 @@ import "Service";
 import "SuSEFirewall";
 import "Wizard";
 
-define string ExpertServicePopup( string text ) ``{
+list<string> firewall_services_selected = [ ];
+
+define map<string,string> ExpertServicePopup( map<string,string> additional_services ) ``{
 
     /* Services dialog advanced help 1/2 */
     string advanced_helptext = _("<p>Enter any number of ports, known port names
@@ -31,7 +34,8 @@ define string ExpertServicePopup( string text ) ``{
 to 23, write \"21:23\"</p>");
 
     string headline = _("Edit additional services");
-    string tcpstext =  _("&Additional TCP Services");
+    string tcpstext = _("Additional &TCP Services");
+    string udpstext = _("Additional &UDP Services");
 
     UI::OpenDialog(`opt(`decorated), `VBox(
 	`VSpacing(0.5),
@@ -44,7 +48,9 @@ to 23, write \"21:23\"</p>");
 	    `HSpacing(1),
 	    `HWeight(50, `VBox (
 		`VSpacing(1),
-		`TextEntry(`id(`textwidget), tcpstext, text),
+		`TextEntry(`id(`textwidget_tcp), tcpstext, additional_services["tcp"]:""),
+		`VSpacing(1),
+		`TextEntry(`id(`textwidget_udp), udpstext, additional_services["udp"]:""),
 		`VStretch()
 	    )),
 	    `HSpacing(1)
@@ -57,14 +63,16 @@ to 23, write \"21:23\"</p>");
 	`VSpacing(0.2)
     ));
 
-    UI::SetFocus(`id(`textwidget));
+    UI::SetFocus(`id(`textwidget_tcp));
 
     any ret = UI::UserInput();
-    string text = (string) UI::QueryWidget(`id(`textwidget), `Value);
+    additional_services["tcp"] = (string) UI::QueryWidget(`id(`textwidget_tcp), `Value);
+    additional_services["udp"] = (string) UI::QueryWidget(`id(`textwidget_udp), `Value);
+
     UI::CloseDialog();
 
     if(ret != `ok) return nil;
-    return text;
+    return additional_services;
 }
 
 define void StdOutStdErrLog( string whatfailedmsg, string stdout, string stderr) ``{
@@ -181,9 +189,9 @@ interface in this case.</li></ul></p>");
 			    `VBox (`VWeight (80,
 					     `VBox (
 						    `VSpacing (2),
-						    `HBox ( `HWeight(20,`Top(`ComboBox (`id ("interface"),`opt(`hstretch, `editable), _("&External Interface:"), devices ))),
+						    `HBox ( `HWeight(25,`Top(`ComboBox (`id ("interface"),`opt(`hstretch, `editable), _("&External Interface:"), devices ))),
 							   `HSpacing(3),
-							   `HWeight(40,`Top( `Left( `Label (
+							   `HWeight(35,`Top( `Left( `Label (
  // to translater: please keep width and newlines. Use more lines if neccessary
 _("eth0 (eth1, eth2 ...) is typically
 used for ethernet cards, ippp0 for
@@ -192,9 +200,9 @@ connections
 ")))))
 							   ),
 						    `VSpacing (0),
-						    `HBox ( `HWeight(20,`Top(`ComboBox (`id ("intinterface"),`opt(`hstretch, `editable), _("&Internal Interface:"), intdevices ))),
+						    `HBox ( `HWeight(25,`Top(`ComboBox (`id ("intinterface"),`opt(`hstretch, `editable), _("&Internal Interface:"), intdevices ))),
 							   `HSpacing(3),
-							   `HWeight(40,`Top( `Left( `Label (
+							   `HWeight(35,`Top( `Left( `Label (
    // to translater: please keep width and newlines. Use more lines if neccessary
 _("Leave this empty if you do not
 have an internal network.
@@ -283,7 +291,7 @@ any of the services.</b></p>") +
 cannot save you from vulnerabilities that may be present in the services
 to which you allow access from the Internet. Use YOU (YaST2 Online Update)
 to keep your system up-to-date with the latest update packages from the
-SuSE FTP servers.</p>") +
+SUSE FTP servers.</p>") +
 
     /* Services dialog help 4/10 */
     _("<p><b>HTTP</b><br>Service to run a web server, such as Apache.</p>") +
@@ -308,79 +316,235 @@ transfers via FTP. It is optimized for slow links and quite easy to configure.</
     _("<p>Just enabling a service here is most likely not enough to provide
 services. Also start the appropriate daemons.</p>");
 
-    term contents = `Top( `VBox(
+    term contents = `VBox(
 	/* Label text */
 	`Left(`Label(_("Configure the services that should be available on your server"))),
 	`HBox(
-	    `HWeight(10, `Empty()),
-	    `HWeight(90, `VBox(
-		/* Label text */
-		`Left (`Label( _("Web Server") )),
-		/* CheckBox label */
-		`Left (`CheckBox (`id ("http"),`opt(`notify), _("&HTTP"), false)),
-		/* CheckBox label */
-		`Left (`CheckBox (`id ("https"),`opt(`notify), _("HTT&P with SSL (https)"), false)),
-		`VSpacing (0.3),
-		/* Label text */
-		`Left (`Label( _("Mail Server") )),
-		/* CheckBox label */
-		`Left (`CheckBox (`id ("smtp"),`opt(`notify), _("S&MTP"), false)),
-		/* CheckBox label */
-		`Left (`CheckBox (`id ("pop3"),`opt(`notify), _("POP&3"), false)),
-		/* CheckBox label */
-		`Left (`CheckBox (`id ("pop3s"),`opt(`notify), _("P&OP3 with SSL (POP3s)"), false)),
-		/* CheckBox label */
-		`Left (`CheckBox (`id ("imap"),`opt(`notify), _("&IMAP"), false)),
-		/* CheckBox label */
-		`Left (`CheckBox (`id ("imaps"),`opt(`notify), _("IM&AP with SSL (IMAPs)"), false)),
-		`VSpacing (0.3),
-		/* Label text */
-		`Left (`Label( _("Other Services") )),
-		/* CheckBox label */
-		`Left (`CheckBox (`id ("ssh"),`opt(`notify), _("&Secure Shell (ssh)"), false)),
-		/* CheckBox label */
-		`Left (`CheckBox (`id ("telnet"),`opt(`notify), _("&telnet"), false)),
-		/* CheckBox label */
-		`Left (`CheckBox (`id ("rsync"),`opt(`notify), _("Remote S&ynchronization (rsync)"), false)),
-		`VSpacing (0.3),
-		/* Label text */
-		`Left(`Label (_("Additional Services:"))),
-		`HBox(
-		    `Label(`id(`status), `opt(`outputField, `hstretch), ""),
-		    /* PushButton label */
-		    `PushButton(`id(`edit), _("&Expert..."))
+	    `HWeight(3, `Empty()),
+	    `HWeight(46,
+		`Top(
+		    `VBox(
+			/* Label text */
+			`Left (`Label( _("Web Services") )),
+			/* CheckBox label */
+			`Left (`CheckBox (`id ("http"),`opt(`notify), _("&HTTP"), false)),
+			/* CheckBox label */
+			`Left (`CheckBox (`id ("https"),`opt(`notify), _("HTT&P with SSL (https)"), false)),
+			`VSpacing (0.3),
+			/* Label text */
+			`Left (`Label( _("Mail Services") )),
+			/* CheckBox label */
+			`Left (`CheckBox (`id ("smtp"),`opt(`notify), _("S&MTP"), false)),
+			/* CheckBox label */
+			`Left (`CheckBox (`id ("pop3"),`opt(`notify), _("POP&3"), false)),
+			/* CheckBox label */
+			`Left (`CheckBox (`id ("pop3s"),`opt(`notify), _("P&OP3 with SSL (POP3s)"), false)),
+			/* CheckBox label */
+			`Left (`CheckBox (`id ("imap"),`opt(`notify), _("&IMAP"), false)),
+			/* CheckBox label */
+			`Left (`CheckBox (`id ("imaps"),`opt(`notify), _("IM&AP with SSL (IMAPs)"), false))
+		    )
 		)
-	    ))
+	    ),
+	    `HWeight(1, `Empty()),
+	    `HWeight(47,
+		`Top (
+		    `VBox(
+			/* Label text */
+			`Left (`Label( _("File Services") )),
+			/* CheckBox label */
+			`Left (`CheckBox (`id ("samba-server"),`opt(`notify), _("Samba Server"), false)),
+			/* CheckBox label */
+			`Left (`CheckBox (`id ("nfs-server"),`opt(`notify), _("NFS Server"), false)),
+			/* CheckBox label */
+			`Left (`CheckBox (`id ("rsync"),`opt(`notify), _("Remote S&ynchronization (rsync)"), false)),
+			/* CheckBox label */
+			`Left (`CheckBox (`id ("tftp"),`opt(`notify), _("TFTP Server"), false)),
+			`VSpacing (0.3),
+			/* Label text */
+			`Left (`Label( _("Login Services") )),
+			/* CheckBox label */
+			`Left (`CheckBox (`id ("ssh"),`opt(`notify), _("&Secure Shell (ssh)"), false)),
+			/* CheckBox label */
+			`Left (`CheckBox (`id ("vnc"),`opt(`notify), _("Remote Administration (VNC)"), false)),
+			/* CheckBox label */
+			`Left (`CheckBox (`id ("portmap"),`opt(`notify), _("Portmapper (NFS, NIS...)"), false)),
+			`VSpacing (0.3),
+			/* Label text */
+			`Left (`Label( _("Other") )),
+			/* CheckBox label */
+			`Left (`CheckBox (`id ("dhcp-server"),`opt(`notify), _("DHCP Server"), false)),
+			/* CheckBox label */
+			`Left (`CheckBox (`id ("dns-server"),`opt(`notify), _("DNS Server"), false))
+		    )
+		)
+	    ),
+	    `HWeight(2, `Empty())
+	),
+	`VBox (
+	    /* Label text */
+	    `Left(`Label (_("Additional Services:"))),
+	    `HBox(
+
+		`Label(`id(`status), `opt(`outputField, `hstretch), ""),
+		/* PushButton label */
+		`PushButton(`id(`edit), _("&Expert..."))
+	    )
 	)
-    ));
+    );
 
-    list<string> selectable_services = [ "telnet", "ssh", "http", "https", "smtp",
-	    "pop3", "pop3s", "imap", "imaps", "rsync" ];
+    # list firewall_services_selected
 
-    string services_string = firewall_settings["FW_SERVICES_EXT_TCP"]:"";
-    list<string> additional_services = [];
-    list<string> services_list = sort(splitstring(services_string, " "));
-    additional_services = filter(string s, services_list,``(s!="" && !contains(selectable_services, s)));
-    services_list = filter(string s, services_list,``(s!="" && contains(selectable_services, s)));
+    map<string, map<string, list> > services_definition = $[
+	"http" : $[
+	    "tcp_ports" : [ "http" ],
+	    "udp_ports" : [ ],
+	],
+	"https" : $[
+	    "tcp_ports" : [ "https" ],
+	    "udp_ports" : [ ],
+	],
+	"smtp" : $[
+	    "tcp_ports" : [ "smtp" ],
+	    "udp_ports" : [ ],
+	],
+	"pop3" : $[
+	    "tcp_ports" : [ "pop3" ],
+	    "udp_ports" : [ ],
+	],
+	"pop3s" : $[
+	    "tcp_ports" : [ "pop3s" ],
+	    "udp_ports" : [ ],
+	],
+	"imap" : $[
+	    "tcp_ports" : [ "imap" ],
+	    "udp_ports" : [ ],
+	],
+	"imaps" : $[
+	    "tcp_ports" : [ "imaps" ],
+	    "udp_ports" : [ ],
+	],
+	"samba-server" : $[
+	    "tcp_ports" : [ "netbios-ns", "netbios-dgm", "netbios-ssn", "microsoft-ds" ],
+	    "udp_ports" : [ ],
+	],
+	"ssh" : $[
+	    "tcp_ports" : [ "ssh" ],
+	    "udp_ports" : [ ],
+	],
+	"rsync" : $[
+	    "tcp_ports" : [ "rsync" ],
+	    "udp_ports" : [ ],
+	],
+	"dhcp-server" : $[
+	    "tcp_ports" : [ "bootpc" ],
+	    "udp_ports" : [ ],
+	],
+	"dns-server" : $[
+	    "tcp_ports" : [ "domain" ],
+	    "udp_ports" : [ "domain" ],
+	],
+	"portmap" : $[
+	    "tcp_ports" : [ "sunrpc" ],
+	    "udp_ports" : [ "sunrpc" ],
+	],
+	"nfs-server" : $[
+	    "tcp_ports" : [ "nfs" ],
+	    "udp_ports" : [ ],
+	],
+	"vnc" : $[
+	    "tcp_ports" : [ "5801", "5901" ],
+	    "udp_ports" : [ ],
+	],
+	"tftp" : $[
+	    "tcp_ports" : [ "tftp" ],
+	    "udp_ports" : [ ],
+	],
+    ];
 
     Wizard::SetContentsButtons(caption, contents, help,
 	    Label::BackButton(), Label::NextButton());
 
-//    services_string = mergestring(services_list," ");
+    string services_string_tcp = firewall_settings["FW_SERVICES_EXT_TCP"]:"";
+    string services_string_udp = firewall_settings["FW_SERVICES_EXT_UDP"]:"";
 
-    define void activate_checkboxes_for_services() ``{
-	// activate all selected services
-	foreach(string service, selectable_services, ``{
-	    if(contains(services_list, service))
-		UI::ChangeWidget(`id(service), `Value, true);
-	    else
-		UI::ChangeWidget(`id(service), `Value, false);
-	});
+    // all services selected to open the firewall
+    list<string> services_list_tcp = toset(splitstring(services_string_tcp, " "));
+    list<string> services_list_udp = toset(splitstring(services_string_udp, " "));
+
+    // services which are not hiddable under checkboxes
+    list<string> additional_services_tcp = [];
+    list<string> additional_services_udp = [];
+
+    list<string> selectable_services = [];
+
+    define void SwitchServices () {
+    // function for switching on/off the checkboxes if services should be on or off
+    additional_services_tcp = services_list_tcp;
+    additional_services_udp = services_list_udp;
+    foreach (string service_name, map<string, list> required_ports, services_definition, {
+	selectable_services = add(selectable_services, service_name);
+
+	boolean service_supported = true;
+	list<string> required_tcp = (list<string>) required_ports["tcp_ports"]:[];
+	list<string> required_udp = (list<string>) required_ports["udp_ports"]:[];
+
+	// if any ports are defined to control
+	if ((size(required_tcp)>0) || (size(required_udp)>0)) {
+	    // controlling all TCP ports if they are supported
+	    foreach (string tcp, required_tcp, {
+		if (!contains(services_list_tcp, tcp)) {
+		    service_supported = false;
+		}
+	    });
+	    // controlling all UDP port if they are supported
+	    foreach (string udp, required_udp, {
+		if (!contains(services_list_udp, udp)) {
+		    service_supported = false;
+		}
+	    });
+	} else {
+	// else the service is not supported by firewall
+	    service_supported = false;
+	}
+
+	if (service_supported) {
+	    UI::ChangeWidget(`id(service_name), `Value, true);
+	    // removing all services hiddable under checkboxes
+	    foreach (string tcp, required_tcp, {
+		additional_services_tcp = filter(string remove_tcp, additional_services_tcp, ``(remove_tcp != tcp));
+	    });
+	    foreach (string udp, required_udp, {
+		additional_services_udp = filter(string remove_udp, additional_services_udp, ``(remove_udp != udp));
+	    });
+	} else {
+	    UI::ChangeWidget(`id(service_name), `Value, false);
+	}
+    });
+    
+    string show_tcp = ((size(additional_services_tcp)>0) ?
+	    // Text for filling TextEntry, %1 = list of services
+	    sformat(_("TCP: %1"), mergestring((list<string>)additional_services_tcp, " "))
+	    :
+	    ""
+	);
+    string show_udp = ((size(additional_services_udp)>0) ?
+	    // Text for filling TextEntry, %1 = list of services
+	    sformat(_("UDP: %1"), mergestring((list<string>)additional_services_udp, " "))
+	    :
+	    ""
+	);
+
+    string additional_services_show =
+	((show_tcp != "") ? show_tcp : "")
+	+ (((show_tcp != "") && (show_udp != "")) ? ", " : "")
+	+ ((show_udp != "") ? show_udp : "");
+
+
+    UI::ChangeWidget(`id(`status), `Value, additional_services_show);
     }
 
-    activate_checkboxes_for_services();
-
-    UI::ChangeWidget(`id(`status), `Value, mergestring((list<string>)additional_services," "));
+    SwitchServices();
 
     any ret = nil;
     while(true) {
@@ -395,39 +559,46 @@ services. Also start the appropriate daemons.</p>");
 	}
 	else if ( ret == `next )
 	{
-	    SuSEFirewall::settings["FW_SERVICES_EXT_TCP"] = mergestring((list<string>) sort(union(services_list, additional_services))," ");
+	    SuSEFirewall::settings["FW_SERVICES_EXT_TCP"] = mergestring(services_list_tcp, " ");
+	    SuSEFirewall::settings["FW_SERVICES_EXT_UDP"] = mergestring(services_list_udp, " ");
 	    break;
 	}
 	else if ( ret == `edit )
 	{
-	    string serv = ExpertServicePopup(mergestring((list<string>)additional_services," "));
+	    map<string,string> additional_services = ExpertServicePopup($[
+		"tcp" : mergestring((list<string>)additional_services_tcp, " "),
+		"udp" : mergestring((list<string>)additional_services_udp, " "),
+	    ]);
 
-	    if ( serv != nil )
-	    {
-		additional_services = sort(splitstring(serv," "));
-		services_list = sort((list<string>)union(filter(string s,additional_services,``(s!="" && contains(selectable_services,s))), services_list));
-		additional_services =filter(string s,additional_services,``(s!="" && !contains(selectable_services,s)));
-	        activate_checkboxes_for_services();
-		UI::ChangeWidget(`id(`status), `Value, mergestring((list<string>)additional_services," "));
+	    if (additional_services != nil) {
+		services_list_tcp = (list<string>) union(services_list_tcp, splitstring(additional_services["tcp"]:"", " "));
+		services_list_udp = (list<string>) union(services_list_udp, splitstring(additional_services["udp"]:"", " "));
+		SwitchServices();
 	    }
 	}
 	else if(is(ret, string) && contains(selectable_services, (string)ret))
 	{
 	    boolean state = (boolean) UI::QueryWidget(`id(ret),`Value);
-	    if(state == true)
-	    {
-		if(!contains(services_list,(string)ret))
-		{
-		    services_list=add(services_list,(string)ret);
-		}
+
+	    // required TCP and UDP ports for the service
+	    map<string, list> required_ports = services_definition[(string) ret]:$[ "tcp_ports":[], "udp_ports":[] ];
+	    list<string> required_tcp = (list<string>) required_ports["tcp_ports"]:[];
+	    list<string> required_udp = (list<string>) required_ports["udp_ports"]:[];
+
+	    if(state == true) {
+	    // service was selected
+		services_list_tcp = (list<string>) union(services_list_tcp,required_tcp);
+		services_list_udp = (list<string>) union(services_list_udp,required_udp);
+	    } else {
+	    // service was unselected
+		foreach (string remove_tcp, required_tcp, {
+		    services_list_tcp = filter(string r, services_list_tcp,``(r!=remove_tcp));
+		});
+		foreach (string remove_udp, required_udp, {
+		    services_list_udp = filter(string r, services_list_udp,``(r!=remove_udp));
+		});
 	    }
-	    if(state == false)
-	    {
-		services_list=filter(string v,services_list,``(v!=ret));
-	    }
-	    services_list=sort(services_list);
-//	    services_string = mergestring(services_list," ");
-//	    UI::ChangeWidget(`id(`status), `Value, services_string);
+	    SwitchServices();
 	}
     }
 
@@ -482,16 +653,25 @@ originating from your internal network.</p>");
     term contents = `VBox(`HBox(
 	`HSpacing(8),
 	`VBox(
-	    `VSpacing(3),
+	    `VSpacing(2),
+	    /* Frame label */
+	    `Frame(_("Routing Features:"), `VBox(
+	    `VSpacing(1),
+	    `HBox(
+		`HSpacing(1),
+		/* CheckBox label */
+		`Left(`CheckBox(`id("masquerade"), _("&Forward Traffic and Do Masquerading"), false)),
+		`HSpacing(0)
+	    ),
+	    `VSpacing(1)
+	    )),
+	    `VSpacing(1),
 	    /* Frame label */
 	    `Frame(_("Firewall Features:"), `VBox(
 	    `VSpacing(1),
 	    `HBox(
 		`HSpacing(1),
 		`VBox(
-		    /* CheckBox label */
-		    `Left(`CheckBox(`id("masquerade"), _("&Forward Traffic and Do Masquerading"), false)),
-		    `VSpacing(1),
 		    /* CheckBox label */
 		    `Left(`CheckBox(`id("protect_int"), _("Protect from &Internal Network"), false)),
 		    `VSpacing(1),
@@ -1042,6 +1222,183 @@ If you want to to use SuSEfirewall2 to protect your system, select
     }
     return (symbol) ret;
 }
+
+/**
+ * uses and changes FW_SERVICES_EXT_TCP inside firewall_settings, abuses checkbox widget id as service name
+ */
+///**
+//*define any ServicesDialog_OBSOLETE() ``{
+//*
+//*    map firewall_settings = SuSEFirewall::settings;
+//*
+//*    /* Services dialog caption */
+//*    string caption = _("Firewall Configuration: Services");
+//*
+//*    /* Services dialog help 1/10 */
+//*    string help = _("<p>Choose the <b>services</b> that should be available from
+//*the Internet.</p>") +
+//*
+//*    /* Services dialog help 2/10 */
+//*    _("<p><b>If you are not running a server of some kind, you should not need
+//*any of the services.</b></p>") +
+//*
+//*    /* Services dialog help 3/10 */
+//*    _("<p><b>Attention:</b><br>Even correctly configured packet filtering rules
+//*cannot save you from vulnerabilities that may be present in the services
+//*to which you allow access from the Internet. Use YOU (YaST2 Online Update)
+//*to keep your system up-to-date with the latest update packages from the
+//*SuSE FTP servers.</p>") +
+//*
+//*    /* Services dialog help 4/10 */
+//*    _("<p><b>HTTP</b><br>Service to run a web server, such as Apache.</p>") +
+//*
+//*    /* Services dialog help 5/10 */
+//*    _("<p><b>SMTP</b><br>Service used by mail servers that accept incoming e-mail, such as sendmail.</p>") +
+//*
+//*    /* Services dialog help 6/10 */
+//*    _("<p><b>POP3</b> and <b>IMAP</b><br>Protocols for fetching e-mails from your host.</p>") +
+//*
+//*    /* Services dialog help 8/10 */
+//*    _("<p><b>ssh</b><br>ssh is preferred over telnet for both security and features.</p>") +
+//*
+//*    /* Services dialog help 7/10 */
+//*    _("<p><b>telnet</b><br>An obsolete method for remotely logging in to your computer.</p>") +
+//*
+//*    /* Services dialog help 9/10 */
+//*    _("<p><b>rsync</b><br>rsync can be used as a replacement for insecure file
+//*transfers via FTP. It is optimized for slow links and quite easy to configure.</p>") +
+//*
+//*    /* Services dialog help 10/10 */
+//*    _("<p>Just enabling a service here is most likely not enough to provide
+//*services. Also start the appropriate daemons.</p>");
+//*
+//*    term contents = `Top( `VBox(
+//*	/* Label text */
+//*	`Left(`Label(_("Configure the services that should be available on your server"))),
+//*	`HBox(
+//*	    `HWeight(10, `Empty()),
+//*	    `HWeight(90, `VBox(
+//*		/* Label text */
+//*		`Left (`Label( _("Web Server") )),
+//*		/* CheckBox label */
+//*		`Left (`CheckBox (`id ("http"),`opt(`notify), _("&HTTP"), false)),
+//*		/* CheckBox label */
+//*		`Left (`CheckBox (`id ("https"),`opt(`notify), _("HTT&P with SSL (https)"), false)),
+//*		`VSpacing (0.3),
+//*		/* Label text */
+//*		`Left (`Label( _("Mail Server") )),
+//*		/* CheckBox label */
+//*		`Left (`CheckBox (`id ("smtp"),`opt(`notify), _("S&MTP"), false)),
+//*		/* CheckBox label */
+//*		`Left (`CheckBox (`id ("pop3"),`opt(`notify), _("POP&3"), false)),
+//*		/* CheckBox label */
+//*		`Left (`CheckBox (`id ("pop3s"),`opt(`notify), _("P&OP3 with SSL (POP3s)"), false)),
+//*		/* CheckBox label */
+//*		`Left (`CheckBox (`id ("imap"),`opt(`notify), _("&IMAP"), false)),
+//*		/* CheckBox label */
+//*		`Left (`CheckBox (`id ("imaps"),`opt(`notify), _("IM&AP with SSL (IMAPs)"), false)),
+//*		`VSpacing (0.3),
+//*		/* Label text */
+//*		`Left (`Label( _("Other Services") )),
+//*		/* CheckBox label */
+//*		`Left (`CheckBox (`id ("ssh"),`opt(`notify), _("&Secure Shell (ssh)"), false)),
+//*		/* CheckBox label */
+//*		`Left (`CheckBox (`id ("telnet"),`opt(`notify), _("&telnet"), false)),
+//*		/* CheckBox label */
+//*		`Left (`CheckBox (`id ("rsync"),`opt(`notify), _("Remote S&ynchronization (rsync)"), false)),
+//*		`VSpacing (0.3),
+//*		/* Label text */
+//*		`Left(`Label (_("Additional Services:"))),
+//*		`HBox(
+//*		    `Label(`id(`status), `opt(`outputField, `hstretch), ""),
+//*		    /* PushButton label */
+//*		    `PushButton(`id(`edit), _("&Expert..."))
+//*		)
+//*	    ))
+//*	)
+//*    ));
+//*
+//*    list<string> selectable_services = [ "telnet", "ssh", "http", "https", "smtp",
+//*	    "pop3", "pop3s", "imap", "imaps", "rsync" ];
+//*
+//*    string services_string = firewall_settings["FW_SERVICES_EXT_TCP"]:"";
+//*    list<string> additional_services = [];
+//*    list<string> services_list = sort(splitstring(services_string, " "));
+//*    additional_services = filter(string s, services_list,``(s!="" && !contains(selectable_services, s)));
+//*    services_list = filter(string s, services_list,``(s!="" && contains(selectable_services, s)));
+//*
+//*    Wizard::SetContentsButtons(caption, contents, help,
+//*	    Label::BackButton(), Label::NextButton());
+//*
+//*//    services_string = mergestring(services_list," ");
+//*
+//*    define void activate_checkboxes_for_services() ``{
+//*	// activate all selected services
+//*	foreach(string service, selectable_services, ``{
+//*	    if(contains(services_list, service))
+//*		UI::ChangeWidget(`id(service), `Value, true);
+//*	    else
+//*		UI::ChangeWidget(`id(service), `Value, false);
+//*	});
+//*    }
+//*
+//*    activate_checkboxes_for_services();
+//*
+//*    UI::ChangeWidget(`id(`status), `Value, mergestring((list<string>)additional_services," "));
+//*
+//*    any ret = nil;
+//*    while(true) {
+//*	ret = UI::UserInput();
+//*	if(ret == `abort) {
+//*	    if(Popup::ReallyAbort(true)) break;
+//*	    else continue;
+//*	}
+//*	else if ( ret == `back )
+//*	{
+//*	    break;
+//*	}
+//*	else if ( ret == `next )
+//*	{
+//*	    SuSEFirewall::settings["FW_SERVICES_EXT_TCP"] = mergestring((list<string>) sort(union(services_list, additional_services))," ");
+//*	    break;
+//*	}
+//*	else if ( ret == `edit )
+//*	{
+//*	    string serv = ExpertServicePopup(mergestring((list<string>)additional_services," "));
+//*
+//*	    if ( serv != nil )
+//*	    {
+//*		additional_services = sort(splitstring(serv," "));
+//*		services_list = sort((list<string>)union(filter(string s,additional_services,``(s!="" && contains(selectable_services,s))), services_list));
+//*		additional_services =filter(string s,additional_services,``(s!="" && !contains(selectable_services,s)));
+//*	        activate_checkboxes_for_services();
+//*		UI::ChangeWidget(`id(`status), `Value, mergestring((list<string>)additional_services," "));
+//*	    }
+//*	}
+//*	else if(is(ret, string) && contains(selectable_services, (string)ret))
+//*	{
+//*	    boolean state = (boolean) UI::QueryWidget(`id(ret),`Value);
+//*	    if(state == true)
+//*	    {
+//*		if(!contains(services_list,(string)ret))
+//*		{
+//*		    services_list=add(services_list,(string)ret);
+//*		}
+//*	    }
+//*	    if(state == false)
+//*	    {
+//*		services_list=filter(string v,services_list,``(v!=ret));
+//*	    }
+//*	    services_list=sort(services_list);
+//*//	    services_string = mergestring(services_list," ");
+//*//	    UI::ChangeWidget(`id(`status), `Value, services_string);
+//*	}
+//*    }
+//*
+//*    y2milestone("settings=%1", SuSEFirewall::settings);
+//*    return ret;
+//*}
+//*/
 
 /* EOF */
 }
