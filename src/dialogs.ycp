@@ -41,7 +41,7 @@
 	]),
 	// FIXME: test after jsrain's enhancement
 	"start_stop" : CWMServiceStart::CreateStartStopWidget ($[
-	    "service_id"		: "SuSEfirewall2_final",
+	    "service_id"		: "SuSEfirewall2_setup",
 					  // TRANSLATORS: Informating label
 	    "service_running_label"	: _("Firewall is running"),
 					  // TRANSLATORS: Informating label
