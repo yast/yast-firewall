@@ -68,14 +68,18 @@ Continue with configuration?
     }
 
     define boolean AbortDialog () {
-	return Popup::ContinueCancelHeadline(
-	    // TRANSLATORS: popup headline
-	    _("Aborting Firewall Configuration"),
-	    // TRANSLATORS: popup message
-	    _("All changes would be lost.
+	if (SuSEFirewall::GetModified()) {
+	    return Popup::ContinueCancelHeadline(
+		// TRANSLATORS: popup headline
+		_("Aborting Firewall Configuration"),
+		// TRANSLATORS: popup message
+		_("All changes would be lost.
 Really abort configuration?
 ")
-	);
+	    );
+	} else {
+	    return true;
+	}
     }
 
 /* EOF */
