@@ -816,16 +816,22 @@ global define map<string, string> GetPreformattedProposal () {
 }
 
 /**
- * Function is the difference between Write() and WriteOny() functions
- * ActivateConfiguration() = Write() - WriteOnly()
+ * Function is the difference between Write() and WriteOny() functions.
+ * ActivateConfiguration() = Write() - WriteOnly().
+ * SuSEFirewall::start must be 'true' to start the firewall.
  *
  * @return boolean
  */
 global define boolean ActivateConfiguration () {
-    if (Service::RunInitScript("SuSEfirewall2_final", "start") == 0) {
-	return true;
+    // somebody wanted to call "Activating" even he didn't want to start the service
+    if (start==true) {
+	if (Service::RunInitScript("SuSEfirewall2_final", "start") == 0) {
+	    return true;
+	} else {
+	    return false;
+	}
     } else {
-	return false;
+	return true;
     }
 }
 

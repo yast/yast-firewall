@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Sep  6 09:01:35 CEST 2004 - locilka@suse.cz
+
+- fixed #44650 Function ActivateConfiguration now tests if you
+  really want to activate (start) the configuration (not only if
+  you call this function).
+
+-------------------------------------------------------------------
 Fri Sep  3 12:44:38 CEST 2004 - locilka@suse.cz
 
 - fixed #44656 Firewall in install proposal is disabled by default
