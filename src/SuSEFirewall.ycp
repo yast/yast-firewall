@@ -144,6 +144,7 @@ define boolean HandlePortmapSupport (boolean enable) {
 	    "tcp_ports" : [ "nfs" ],
 	    "udp_ports" : [ ],
 	],
+	// Default SUSE installation
 	"vnc" : $[
 	    "tcp_ports" : [ "5801", "5901" ],
 	    "udp_ports" : [ ],
@@ -161,6 +162,11 @@ define boolean HandlePortmapSupport (boolean enable) {
 	"ipp-udp" : $[
 	    "tcp_ports" : [ ],
 	    "udp_ports" : [ "ipp" ],
+	],
+	// Network Time Protocol for listening broadcast messages or as a server
+	"ntp-server" : $[
+	    "tcp_ports" : [ ],
+	    "udp_ports" : [ "ntp" ],
 	],
 	"tftp" : $[
 	    "tcp_ports" : [ "tftp" ],
@@ -479,7 +485,7 @@ global define string GetPreformattedProposal () {
 	string open_udp_ports = settings["FW_SERVICES_EXT_UDP"]:"";
 
 	// TRANSLATORS: Proposal rich text item, %1 is list of open TCP ports
-	ret = ret + sformat(_("<li>Open TCP ports: %1</li>"),
+	ret = ret + sformat(_("<li>Open TCP Ports: %1</li>"),
 	    (open_tcp_ports != "" ?
 		open_tcp_ports
 		:
@@ -487,7 +493,7 @@ global define string GetPreformattedProposal () {
 		_("none")
 	    )
 	// TRANSLATORS: Proposal rich text item, %1 is list of open UDP ports
-	) + sformat(_("<li>Open UDP ports: %1</li>"),
+	) + sformat(_("<li>Open UDP Ports: %1</li>"),
 	    (open_udp_ports != "" ?
 		open_udp_ports
 		:
@@ -741,10 +747,11 @@ global define string GetInterfaceGroup ( string interface ) {
 
     if (size(interface_group)>1) {
 	// Error message, %1 = interface name (eth0)
-	Report::Error(sformat(_("Interface %1 is presented in more groups of interfaces.\n
-Continuing with configuration can produce errors.\n
-Please, leave the configuration and repair it manually in\n
-file '/etc/sysconfig/SuSEfirewall2'."), interface));
+	Report::Error(sformat(_("Interface %1 is presented in more groups of interfaces.
+Continuing with configuration can produce errors.
+
+It is recommended to leave the configuration and repair it manually in
+the file '/etc/sysconfig/SuSEfirewall2'."), interface));
     }
 
     // return the first existence of interface in groups

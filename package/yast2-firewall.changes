@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Aug 10 09:39:32 CEST 2004 - locilka@suse.cz
+
+- merged proofread messages
+- added support for NTP
+
+-------------------------------------------------------------------
 Fri Aug  6 13:45:35 CEST 2004 - jsrain@suse.cz
 
 - disable firewall enabling checkbox after all interfaces were

@@ -77,9 +77,9 @@ to 23, write \"21:23\"</p>");
 
 define boolean SelectPortmapDialog () {
     return (boolean) Popup::YesNo(
-_("You have selected NFS Server to be supported on this server
-but you haven't selected Portmapper which is needed by NFS Server.
-Should be the Portmapper also selected?"));
+_("You have selected for an NFS server to be supported on this server,
+but you have not selected Portmapper, which is needed for NFS servers.
+Should the Portmapper also be selected?"));
 }
 
 define void StdOutStdErrLog( string whatfailedmsg, string stdout, string stderr) ``{
@@ -310,32 +310,32 @@ SUSE FTP servers.</p>") +
     _("<p><b>POP3</b> and <b>IMAP</b><br>Protocols for fetching e-mails from your host.</p>") +
 
     /* Services dialog help 7/16 */
-    _("<p><b>Samba Server</b><br> is an emulation for Windows fileserver.</p>") +
+    _("<p><b>Samba Server</b><br> is an emulation of Windows file servers.</p>") +
 
     /* Services dialog help 8/16 */
-    _("<p><b>NFS Server</b><br> is an UNIX Network File System.</p>") +
+    _("<p><b>NFS Server</b><br> is a UNIX network file system.</p>") +
 
     /* Services dialog help 9/16 */
-    _("<p><b>Remote Synchronization (rsync)</b><br> is an unsecure protocol for the data synchronizations.
-More secure is to use rsync over ssh.</p>") +
+    _("<p><b>Remote Synchronization (rsync)</b><br> is an insecure protocol for data synchronizations.
+A more secure option is to use rsync over SSH.</p>") +
 
     /* Services dialog help 10/16 */
-    _("<p><b>TFTP Server</b><br> is a Trivial File Transfer Protocol, tinny FTP Server.</p>") +
+    _("<p><b>TFTP Server</b><br> is a trivial file transfer protocol, tinny FTP server.</p>") +
 
     /* Services dialog help 11/16 */
-    _("<p><b>Secure Shell (ssh)</b><br> is preferred remote shell for both security and features.</p>") +
+    _("<p><b>Secure Shell (ssh)</b><br> is the preferred remote shell for both security and features.</p>") +
 
     /* Services dialog help 12/16 */
-    _("<p><b>Remote Administration (VNC)</b><br> allows remote clients to connect to local XServer via VNC protocol.</p>") +
+    _("<p><b>Remote Administration (VNC)</b><br> allows remote clients to connect to the local X server using the VNC protocol.</p>") +
 
     /* Services dialog help 13/16 */
-    _("<p><b>Portmapper</b><br> is a RPC (Remote Procedure Call) support for Servers like NFS or NIS (Network Information System).</p>") +
+    _("<p><b>Portmapper</b><br> is an RPC (Remote Procedure Call) support for servers like NFS or NIS (Network Information System).</p>") +
 
     /* Services dialog help 14/16 */
     _("<p><b>DHCP Server</b><br> is a protocol for the dynamic host configuration.</p>") +
 
     /* Services dialog help 15/16 */
-    _("<p><b>DNS Server</b><br> is a domain name system. Provides transformation between IPs and names.</p>") +
+    _("<p><b>DNS Server</b><br> is a domain name system. It provides transformation between IPs and names.</p>") +
 
     /* Services dialog help 16/16 */
     _("<p>Just enabling a service here is most likely not enough to provide
@@ -393,7 +393,7 @@ services. Also start the appropriate daemons.</p>");
 			/* CheckBox label */
 			`Left (`CheckBox (`id ("vnc"),`opt(`notify), _("Remote Administration (VNC)"), false)),
 			/* CheckBox label */
-			`Left (`CheckBox (`id ("portmap"),`opt(`notify), _("Portmapper (NFS, NIS...)"), false)),
+			`Left (`CheckBox (`id ("portmap"),`opt(`notify), _("Portmapper (NFS, NIS, etc.)"), false)),
 			`VSpacing (0.3),
 			/* Label text */
 			`Left (`Label( _("Other") )),
@@ -1023,7 +1023,7 @@ when you boot your system.</p>");
 define symbol StopDialog() ``{
 
     /* Stop dialog caption */
-    string caption = _("Firewall configuration: Deactivate firewall");
+    string caption = _("Firewall configuration: Deactivate Firewall");
 
     /* Stop dialog help 1/2 */
     string help = _("<p><b>Attention:</b><br>
@@ -1158,10 +1158,10 @@ define void SetNextButtonByStatus(string status) ``{
  */
 define symbol FigureFirewallDialog() ``{
     // TRANSLATORS: help text for enabling/disabling firewall in network proposal
-    string help = _("<p><b>Firewall Service</b><br>
-If you want to to use SuSEfirewall2 to protect your system, select
-<b>Enable firewall</b> and click <b>Next</b> to configure it.</p>
-<p>If you don't want use it, select <b>Disable firewall</b> and click <b>Finish</b>.
+    string help = _("Firewall Service</b><br>
+If you want to use SuSEfirewall2 to protect your system, select
+<b>Enable Firewall</b> and click <b>Next</b> to configure it.</p>
+<p>If you do not want to use it, select <b>Disable Firewall</b> and click <b>Finish</b>.
 </p>");
 
     // TRANSLATORS: dialog caption, main dialog for enabling/disablig firewall
@@ -1174,9 +1174,9 @@ If you want to to use SuSEfirewall2 to protect your system, select
 		`RadioButtonGroup(`id("firewall_status"),
 		    `VBox(
 			// TRANSLATORS: radio button
-			`Left(`RadioButton(`id("firewall_status_enable"), `opt(`notify), _("&Enable firewall"))),
+			`Left(`RadioButton(`id("firewall_status_enable"), `opt(`notify), _("&Enable Firewall"))),
 			// TRANSLATORS: radio button
-			`Left(`RadioButton(`id("firewall_status_disable"), `opt(`notify), _("&Disable firewall")))
+			`Left(`RadioButton(`id("firewall_status_disable"), `opt(`notify), _("&Disable Firewall")))
 		    )
 		)
 	    )
