@@ -647,6 +647,7 @@ define list<string> RemoveDevice (list<string> remove_from, string remove_device
  */
 global define void Propose () ``{
     SetModified();
+    list<string> known_devices_in_previous_run = known_devices;
     SetKnownDevices();
 
     y2milestone("Initializing proposal");
@@ -669,7 +670,7 @@ global define void Propose () ``{
 	// some devices (all) could be removed
 	return;
     // Devices were added, firewall would be enabled now
-    } else if (size(known_devices)==0) {
+    } else if (size(known_devices_in_previous_run)==0) {
 	SuSEFirewall::enable_firewall = true;
     }
 

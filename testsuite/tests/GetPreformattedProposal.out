@@ -1,4 +1,5 @@
 Read	.sysconfig.personal-firewall.REJECT_ALL_INCOMING_CONNECTIONS ""
 Dump	=======================
-Return	$["out":"<ul><li>Firewall is disabled</li></ul>", "warning":""]
+Return	$["out":"<ul><li>Firewall is <a href=\"firewall--enable_firewall_in_proposal\">disabled</a></li></ul>", "warning":""]
+Return	$["out":"<ul><li>Firewall is <a href=\"firewall--disable_firewall_in_proposal\">enabled</a></li><li>External Interfaces: eth-id-00:50:fc:74:b5:6f modem0 modem1</li><li>Internal Interfaces: eth-id-00:50:fc:74:b5:6f slp0 slp1</li><li>SSH: <a href=\"firewall--disable_ssh_in_proposal\">enabled</a></li><li>Additional Services: 32768 VNC(5801 5901) domain http microsoft-ds netbios-dgm netbios-ns netbios-ssn nfs sunrpc tftp</li></ul>", "warning":""]
 Dump	=======================

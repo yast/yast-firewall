@@ -85,7 +85,7 @@
 		"FW_ALLOW_FW_TRACEROUTE":"yes",
 		"FW_AUTOPROTECT_SERVICES":"yes",
 		"FW_DEV_DMZ":"",
-		"FW_DEV_EXT":"eth-id-00:c0:df:22:c6:a8 modem0 modem1",
+		"FW_DEV_EXT":"eth-id-00:50:fc:74:b5:6f modem0 modem1",
 		"FW_DEV_INT":"eth-id-00:50:fc:74:b5:6f slp0 slp1",
 		"FW_IPSEC_TRUST":"no",
 		"FW_LOG_ACCEPT_ALL":"no",
@@ -114,6 +114,9 @@
     Progress::off ();
 
     DUMP ("=======================");
+    SuSEFirewall::enable_firewall = false;
+    TEST (``(SuSEFirewall::GetPreformattedProposal ()), [READ, WRITE, EXEC], 0);
+    SuSEFirewall::enable_firewall = true;
     TEST (``(SuSEFirewall::GetPreformattedProposal ()), [READ, WRITE, EXEC], 0);
     DUMP ("=======================");
 }

@@ -132,6 +132,9 @@
     Mode::test = true;
     Progress::off ();
 
+    SuSEFirewall::enable_firewall = true;
+    SuSEFirewall::start = true;
+
     DUMP ("=======================");
     TEST (``(SuSEFirewall::Propose ()), [READ, WRITE, EXEC], 0);
     TEST (``(SuSEFirewall::GetPreformattedProposal ()), [READ, WRITE, EXEC], 0);
