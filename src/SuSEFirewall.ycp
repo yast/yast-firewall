@@ -33,7 +33,7 @@ global boolean personal_firewall_is_active = false;
 global boolean proposal_changed_by_user = false;
 
 /* default value for firewall enabled/disabled */
-global boolean enable_firewall = false;
+global boolean enable_firewall = true;
 
 /**
  * Write only, used during autoinstallation.
@@ -125,8 +125,6 @@ global define boolean Read() {
     // Check if firewall running
     start = Service::Enabled("SuSEfirewall2_init");
 
-//  DO NOT EDIT THIS CODE!, modify 'liste' instead!
-//  <AUTOCODE READ>
     string FW_IPSEC_TRUST = (string) SCR::Read(.sysconfig.SuSEfirewall2.FW_IPSEC_TRUST);
     if( FW_IPSEC_TRUST == nil ) FW_IPSEC_TRUST = "no";
     settings["FW_IPSEC_TRUST"] = FW_IPSEC_TRUST;
@@ -219,7 +217,9 @@ global define boolean Read() {
     if( FW_ALLOW_FW_TRACEROUTE == nil ) FW_ALLOW_FW_TRACEROUTE = "yes";
     settings["FW_ALLOW_FW_TRACEROUTE"] = FW_ALLOW_FW_TRACEROUTE;
 
-//  </AUTOCODE>
+    string FW_SERVICES_EXT_RPC = (string) SCR::Read(.sysconfig.SuSEfirewall2.FW_SERVICES_EXT_RPC);
+    if( FW_SERVICES_EXT_RPC == nil ) FW_SERVICES_EXT_RPC = "";
+    settings["FW_SERVICES_EXT_RPC"] = FW_SERVICES_EXT_RPC;
 
     y2milestone("settings=%1", settings);
     return true;
@@ -370,8 +370,9 @@ global define string GetPreformattedProposal () {
 global define boolean Write() {
 
     // only activated firewall's setting is writen in installation (proposal) mode
-    if ((Mode::config == false) && (enable_firewall == false))
+    if ((Mode::config == false) && (SuSEFirewall::enable_firewall == false)) {
 	return true;
+    }
 
     if(!start && !write_only)
 	return false;
@@ -427,8 +428,6 @@ global define boolean Write() {
     Progress::NextStage();
     boolean write_ret = false;
 
-//  DO NOT EDIT THIS CODE!, modify 'liste' instead!
-//  <AUTOCODE WRITE>
     string FW_IPSEC_TRUST = settings["FW_IPSEC_TRUST"]:"no";
     write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_IPSEC_TRUST, FW_IPSEC_TRUST);
 
@@ -498,7 +497,8 @@ global define boolean Write() {
     string FW_ALLOW_FW_TRACEROUTE = settings["FW_ALLOW_FW_TRACEROUTE"]:"yes";
     write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_ALLOW_FW_TRACEROUTE, FW_ALLOW_FW_TRACEROUTE);
 
-//  </AUTOCODE>
+    string FW_SERVICES_EXT_RPC = settings["FW_SERVICES_EXT_RPC"]:"";
+    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_EXT_RPC, FW_SERVICES_EXT_RPC);
 
     if(personal_firewall_is_active) {
 	write_ret = SCR::Write(.sysconfig.personal-firewall.REJECT_ALL_INCOMING_CONNECTIONS,"no");

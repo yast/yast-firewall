@@ -75,6 +75,13 @@ to 23, write \"21:23\"</p>");
     return additional_services;
 }
 
+define boolean SelectPortmapDialog () {
+    return (boolean) Popup::YesNo(
+_("You have selected NFS Server to be supported on this server
+but you haven't selected Portmapper which is needed by NFS Server.
+Should be the Portmapper also selected?"));
+}
+
 define void StdOutStdErrLog( string whatfailedmsg, string stdout, string stderr) ``{
     UI::OpenDialog(`opt(`decorated), `HBox(
 	`VSpacing(10),
@@ -188,7 +195,7 @@ interface in this case.</li></ul></p>");
 			    `HSpacing (3),
 			    `VBox (`VWeight (80,
 					     `VBox (
-						    `VSpacing (2),
+						    `VSpacing (1),
 						    `HBox ( `HWeight(25,`Top(`ComboBox (`id ("interface"),`opt(`hstretch, `editable), _("&External Interface:"), devices ))),
 							   `HSpacing(3),
 							   `HWeight(35,`Top( `Left( `Label (
@@ -199,7 +206,7 @@ ISDN, and ppp0 for modem and ADSL
 connections
 ")))))
 							   ),
-						    `VSpacing (0),
+						    `VSpacing (1),
 						    `HBox ( `HWeight(25,`Top(`ComboBox (`id ("intinterface"),`opt(`hstretch, `editable), _("&Internal Interface:"), intdevices ))),
 							   `HSpacing(3),
 							   `HWeight(35,`Top( `Left( `Label (
@@ -278,41 +285,59 @@ define any ServicesDialog() ``{
     /* Services dialog caption */
     string caption = _("Firewall Configuration: Services");
 
-    /* Services dialog help 1/10 */
+    /* Services dialog help 1/16 */
     string help = _("<p>Choose the <b>services</b> that should be available from
 the Internet.</p>") +
 
-    /* Services dialog help 2/10 */
+    /* Services dialog help 2/16 */
     _("<p><b>If you are not running a server of some kind, you should not need
 any of the services.</b></p>") +
 
-    /* Services dialog help 3/10 */
+    /* Services dialog help 3/16 */
     _("<p><b>Attention:</b><br>Even correctly configured packet filtering rules
 cannot save you from vulnerabilities that may be present in the services
 to which you allow access from the Internet. Use YOU (YaST2 Online Update)
 to keep your system up-to-date with the latest update packages from the
 SUSE FTP servers.</p>") +
 
-    /* Services dialog help 4/10 */
+    /* Services dialog help 4/16 */
     _("<p><b>HTTP</b><br>Service to run a web server, such as Apache.</p>") +
 
-    /* Services dialog help 5/10 */
+    /* Services dialog help 5/16 */
     _("<p><b>SMTP</b><br>Service used by mail servers that accept incoming e-mail, such as sendmail.</p>") +
 
-    /* Services dialog help 6/10 */
+    /* Services dialog help 6/16 */
     _("<p><b>POP3</b> and <b>IMAP</b><br>Protocols for fetching e-mails from your host.</p>") +
 
-    /* Services dialog help 8/10 */
-    _("<p><b>ssh</b><br>ssh is preferred over telnet for both security and features.</p>") +
+    /* Services dialog help 7/16 */
+    _("<p><b>Samba Server</b><br> is an emulation for Windows fileserver.</p>") +
 
-    /* Services dialog help 7/10 */
-    _("<p><b>telnet</b><br>An obsolete method for remotely logging in to your computer.</p>") +
+    /* Services dialog help 8/16 */
+    _("<p><b>NFS Server</b><br> is an UNIX Network File System.</p>") +
 
-    /* Services dialog help 9/10 */
-    _("<p><b>rsync</b><br>rsync can be used as a replacement for insecure file
-transfers via FTP. It is optimized for slow links and quite easy to configure.</p>") +
+    /* Services dialog help 9/16 */
+    _("<p><b>Remote Synchronization (rsync)</b><br> is an unsecure protocol for the data synchronizations.
+More secure is to use rsync over ssh.</p>") +
 
-    /* Services dialog help 10/10 */
+    /* Services dialog help 10/16 */
+    _("<p><b>TFTP Server</b><br> is a Trivial File Transfer Protocol, tinny FTP Server.</p>") +
+
+    /* Services dialog help 11/16 */
+    _("<p><b>Secure Shell (ssh)</b><br> is preferred remote shell for both security and features.</p>") +
+
+    /* Services dialog help 12/16 */
+    _("<p><b>Remote Administration (VNC)</b><br> allows remote clients to connect to local XServer via VNC protocol.</p>") +
+
+    /* Services dialog help 13/16 */
+    _("<p><b>Portmapper</b><br> is a RPC (Remote Procedure Call) support for Servers like NFS or NIS (Network Information System).</p>") +
+
+    /* Services dialog help 14/16 */
+    _("<p><b>DHCP Server</b><br> is a protocol for the dynamic host configuration.</p>") +
+
+    /* Services dialog help 15/16 */
+    _("<p><b>DNS Server</b><br> is a domain name system. Provides transformation between IPs and names.</p>") +
+
+    /* Services dialog help 16/16 */
     _("<p>Just enabling a service here is most likely not enough to provide
 services. Also start the appropriate daemons.</p>");
 
@@ -544,6 +569,29 @@ services. Also start the appropriate daemons.</p>");
     UI::ChangeWidget(`id(`status), `Value, additional_services_show);
     }
 
+    define void HandleService (string service_checkbox) {
+	boolean state = (boolean) UI::QueryWidget(`id(service_checkbox),`Value);
+
+	// required TCP and UDP ports for the service
+	map<string, list> required_ports = services_definition[(string) service_checkbox]:$[ "tcp_ports":[], "udp_ports":[] ];
+	list<string> required_tcp = (list<string>) required_ports["tcp_ports"]:[];
+	list<string> required_udp = (list<string>) required_ports["udp_ports"]:[];
+
+	if(state == true) {
+	// service was selected
+	    services_list_tcp = (list<string>) union(services_list_tcp,required_tcp);
+	    services_list_udp = (list<string>) union(services_list_udp,required_udp);
+	} else {
+	// service was unselected
+	    foreach (string remove_tcp, required_tcp, {
+		services_list_tcp = filter(string r, services_list_tcp,``(r!=remove_tcp));
+	    });
+	    foreach (string remove_udp, required_udp, {
+		services_list_udp = filter(string r, services_list_udp,``(r!=remove_udp));
+	    });
+	}
+    }
+
     SwitchServices();
 
     any ret = nil;
@@ -559,6 +607,31 @@ services. Also start the appropriate daemons.</p>");
 	}
 	else if ( ret == `next )
 	{
+	    // <-- Exceptions
+	    boolean nfs_state     = (boolean) UI::QueryWidget(`id("nfs-server"),`Value);
+	    boolean portmap_state = (boolean) UI::QueryWidget(`id("portmap"),`Value);
+	    if (portmap_state == true) {	// Portmap is selected
+		list<string> ext_rpc = splitstring(SuSEFirewall::settings["FW_SERVICES_EXT_RPC"]:"", " ");
+		// adding needed services
+		ext_rpc = (list<string>) union (ext_rpc, [
+		    // adding NFS support
+		    "nlockmgr", "status", "nfs", "nfs_acl", "mountd",
+		    // adding NIS support
+		    "ypserv", "fypxfrd", "ypbind"
+		]);
+		SuSEFirewall::settings["FW_SERVICES_EXT_RPC"] = mergestring(ext_rpc, " ");
+	    } else {				// Portmap is unselected
+		if (nfs_state == true) {	// NFS Server is selected
+		    boolean select_portmap = SelectPortmapDialog();
+		    if (select_portmap == true) {
+			UI::ChangeWidget(`id("portmap"),`Value, true);
+			HandleService("portmap");
+			SwitchServices();
+		    }
+		}
+	    }
+	    // --> Exceptions
+
 	    SuSEFirewall::settings["FW_SERVICES_EXT_TCP"] = mergestring(services_list_tcp, " ");
 	    SuSEFirewall::settings["FW_SERVICES_EXT_UDP"] = mergestring(services_list_udp, " ");
 	    break;
@@ -578,26 +651,7 @@ services. Also start the appropriate daemons.</p>");
 	}
 	else if(is(ret, string) && contains(selectable_services, (string)ret))
 	{
-	    boolean state = (boolean) UI::QueryWidget(`id(ret),`Value);
-
-	    // required TCP and UDP ports for the service
-	    map<string, list> required_ports = services_definition[(string) ret]:$[ "tcp_ports":[], "udp_ports":[] ];
-	    list<string> required_tcp = (list<string>) required_ports["tcp_ports"]:[];
-	    list<string> required_udp = (list<string>) required_ports["udp_ports"]:[];
-
-	    if(state == true) {
-	    // service was selected
-		services_list_tcp = (list<string>) union(services_list_tcp,required_tcp);
-		services_list_udp = (list<string>) union(services_list_udp,required_udp);
-	    } else {
-	    // service was unselected
-		foreach (string remove_tcp, required_tcp, {
-		    services_list_tcp = filter(string r, services_list_tcp,``(r!=remove_tcp));
-		});
-		foreach (string remove_udp, required_udp, {
-		    services_list_udp = filter(string r, services_list_udp,``(r!=remove_udp));
-		});
-	    }
+	    HandleService((string) ret);
 	    SwitchServices();
 	}
     }
@@ -852,8 +906,8 @@ logged.</p>") +
 
     /* Loggin dialog help 4/4 */
     _("<p><b>Log All Accepted Packets</b> logs all accepted packets.
-Attention: This option is dangerous as it causes your log file to grow 
-very quicky.</p>");
+Attention: This option is dangerous as it causes your log file /var/log/messages
+to grow very quicky.</p>");
 
     map<string,any> firewall_settings = SuSEFirewall::settings;
     string FW_LOG_DROP_CRIT = firewall_settings["FW_LOG_DROP_CRIT"]:"yes";
