@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Wed Aug  4 16:52:53 CEST 2004 - locilka@suse.cz
+
+- added new functionality for enabling/disabling services defined
+  as list of ports and special functions
+- added global handling for other YaST modules
+
+-------------------------------------------------------------------
 Fri Jul 30 10:30:30 CEST 2004 - jsrain@suse.cz
 
 - added popup (CWM widget) for selecting interfaces to open in
