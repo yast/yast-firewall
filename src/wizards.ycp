@@ -46,14 +46,7 @@ global define any FirewallSequence() ``{
 	]
     ];
 
-    /* Dialog caption */
-    string caption = _("Firewall configuration");
-    /* Label */
-    term contents = `Label(_("Initializing ..."));
-
     Wizard::CreateDialog();
-    Wizard::SetContentsButtons(caption, contents, "",
-	    Label::BackButton(), Label::NextButton());
 
     any ret = WizardSequencer(aliases, sequence);
 
