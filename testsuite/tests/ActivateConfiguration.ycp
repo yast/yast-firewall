@@ -64,6 +64,9 @@
 		"REJECT_ALL_INCOMING_CONNECTIONS":""
 	    ],
 	],
+	"target" : $[
+		"size" : 1, 
+	]
     ];
 
     map EXEC = $[
@@ -75,6 +78,7 @@
     map WRITE = $[];
 
     TESTSUITE_INIT ([READ, WRITE, EXEC], nil);
+
     
     import "Progress";
     import "SuSEFirewall";
