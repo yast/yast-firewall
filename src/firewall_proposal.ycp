@@ -34,6 +34,7 @@ if(func == "MakeProposal") {
 	Progress::off();
 	SuSEFirewall::Reset();
     }
+    SuSEFirewall::start = SuSEFirewall::enable_firewall;
 
     string warning = nil;
     symbol warning_level = nil;

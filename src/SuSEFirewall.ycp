@@ -171,8 +171,8 @@ define boolean HandlePortmapSupport (boolean enable) {
 	    "udp_ports" : [ ],
 	],
 	"tftp" : $[
-	    "tcp_ports" : [ "tftp" ],
-	    "udp_ports" : [ ],
+	    "tcp_ports" : [ ],
+	    "udp_ports" : [ "tftp" ],
 	],
 	// Internet Printing Protocol as a Server
 	"ipp-tcp" : $[
@@ -532,12 +532,27 @@ global define string GetPreformattedProposal () {
 }
 
 /**
+ * Function is the difference between Write() and WriteOny() functions
+ * ActivateConfiguration() = Write() - WriteOnly()
+ *
+ * @return boolean
+ */
+global define boolean ActivateConfiguration () {
+    if (Service::RunInitScript("SuSEfirewall2_final", "start") == 0) {
+	return true;
+    } else {
+	return false;
+    }
+}
+
+/**
  * Update the SCR from the map of all firewall settings
+ * Write() = WriteOnly() + ActivateConfiguration()
+ *
  * @param m a map of all firewall settings
  * @return true on success
  */
 global define boolean Write() {
-
     // indicates that the firewall settings weren't modified
     // usable for external use in other modules
     if (GetModified()==false) {
@@ -712,11 +727,21 @@ global define boolean Write() {
     Progress::NextStage();
 
     if(!write_only)
-	Service::RunInitScript("SuSEfirewall2_final", "start");
+	ActivateConfiguration();
 
     Progress::Finish();
 
     return true;
+}
+
+/**
+ * Write only, used during autoinstallation.
+ *
+ * @return boolean
+ */
+global define boolean WriteOnly () {
+    write_only = true;
+    return Write();
 }
 
 /**

@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Aug 20 11:31:20 CEST 2004 - locilka@suse.cz
+
+- fixed Bugzilla bug #43975
+  FW wasn't started in install proposal when user didn't change it
+- 2.10.4
+
+-------------------------------------------------------------------
 Mon Aug 16 10:21:50 CEST 2004 - locilka@suse.cz
 
 - added functions SetModified() and GetModified()
