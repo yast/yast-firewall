@@ -117,7 +117,12 @@ global define boolean Read() ``{
     // Check if firewall running
     start = Service::Enabled("SuSEfirewall2_init");
 
+//  DO NOT EDIT THIS CODE!, modify 'liste' instead!
 //  <AUTOCODE READ>
+    string FW_IPSEC_TRUST = (string) SCR::Read(.sysconfig.SuSEfirewall2.FW_IPSEC_TRUST);
+    if( FW_IPSEC_TRUST == nil ) FW_IPSEC_TRUST = "no";
+    settings["FW_IPSEC_TRUST"] = FW_IPSEC_TRUST;
+
     string FW_LOG_ACCEPT_ALL = (string) SCR::Read(.sysconfig.SuSEfirewall2.FW_LOG_ACCEPT_ALL);
     if( FW_LOG_ACCEPT_ALL == nil ) FW_LOG_ACCEPT_ALL = "no";
     settings["FW_LOG_ACCEPT_ALL"] = FW_LOG_ACCEPT_ALL;
@@ -149,6 +154,18 @@ global define boolean Read() ``{
     string FW_DEV_EXT = (string) SCR::Read(.sysconfig.SuSEfirewall2.FW_DEV_EXT);
     if( FW_DEV_EXT == nil ) FW_DEV_EXT = "";
     settings["FW_DEV_EXT"] = FW_DEV_EXT;
+
+    string FW_SERVICES_DMZ_IP = (string) SCR::Read(.sysconfig.SuSEfirewall2.FW_SERVICES_DMZ_IP);
+    if( FW_SERVICES_DMZ_IP == nil ) FW_SERVICES_DMZ_IP = "";
+    settings["FW_SERVICES_DMZ_IP"] = FW_SERVICES_DMZ_IP;
+
+    string FW_SERVICES_EXT_IP = (string) SCR::Read(.sysconfig.SuSEfirewall2.FW_SERVICES_EXT_IP);
+    if( FW_SERVICES_EXT_IP == nil ) FW_SERVICES_EXT_IP = "";
+    settings["FW_SERVICES_EXT_IP"] = FW_SERVICES_EXT_IP;
+
+    string FW_SERVICES_INT_IP = (string) SCR::Read(.sysconfig.SuSEfirewall2.FW_SERVICES_INT_IP);
+    if( FW_SERVICES_INT_IP == nil ) FW_SERVICES_INT_IP = "";
+    settings["FW_SERVICES_INT_IP"] = FW_SERVICES_INT_IP;
 
     string FW_SERVICES_DMZ_UDP = (string) SCR::Read(.sysconfig.SuSEfirewall2.FW_SERVICES_DMZ_UDP);
     if( FW_SERVICES_DMZ_UDP == nil ) FW_SERVICES_DMZ_UDP = "";
@@ -276,7 +293,11 @@ global define boolean Write() ``{
     Progress::NextStage();
     boolean write_ret = false;
 
+//  DO NOT EDIT THIS CODE!, modify 'liste' instead!
 //  <AUTOCODE WRITE>
+    string FW_IPSEC_TRUST = settings["FW_IPSEC_TRUST"]:"no";
+    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_IPSEC_TRUST, FW_IPSEC_TRUST);
+
     string FW_LOG_ACCEPT_ALL = settings["FW_LOG_ACCEPT_ALL"]:"no";
     write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_LOG_ACCEPT_ALL, FW_LOG_ACCEPT_ALL);
 
@@ -300,6 +321,15 @@ global define boolean Write() ``{
 
     string FW_DEV_EXT = settings["FW_DEV_EXT"]:"";
     write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_DEV_EXT, FW_DEV_EXT);
+
+    string FW_SERVICES_DMZ_IP = settings["FW_SERVICES_DMZ_IP"]:"";
+    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_DMZ_IP, FW_SERVICES_DMZ_IP);
+
+    string FW_SERVICES_EXT_IP = settings["FW_SERVICES_EXT_IP"]:"";
+    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_EXT_IP, FW_SERVICES_EXT_IP);
+
+    string FW_SERVICES_INT_IP = settings["FW_SERVICES_INT_IP"]:"";
+    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_INT_IP, FW_SERVICES_INT_IP);
 
     string FW_SERVICES_DMZ_UDP = settings["FW_SERVICES_DMZ_UDP"]:"";
     write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_DMZ_UDP, FW_SERVICES_DMZ_UDP);
@@ -430,6 +460,12 @@ define boolean AddServiceToConfig( string set, string service ) ``{
     list<string> servs = splitstring(settings[set]:"", " ");
     if(servs == nil) servs = [];
 
+    if(contains(servs, service))
+    {
+	y2warning("service %1 already allowed in %2", service, set);
+	return true;
+    }
+
     servs = add(servs, service);
     string sers = mergestring(servs, " ");
     if(servs == nil) return false;
@@ -463,14 +499,15 @@ define boolean RemoveServiceFromConfig( string set, string service ) ``{
  *  Add service for a given interface and protocol into a firewall. Will not
  *  modify the list of configured interfaces in the firewall.
  *
- *  @param service	the name of the service, or INT, EXT or DMZ
- *  @param proto	UDP or TCP
- *  @param interface	the name of the interface, for example eth0, "all" for all interfaces
+ *  @param service	the name of the service
+ *  @param proto	UDP, TCP or IP
+ *  @param interface	the name of the interface, for example eth0, "all" for
+ *  all interfaces, INT, EXT or DMZ for the respective zone
  *  @return boolean	true on success
  */
 global define boolean AddService(string service, string proto, string interface) ``{
 
-    if( proto != "UDP" && proto != "TCP" ) {
+    if( proto != "UDP" && proto != "TCP" && proto != "IP" ) {
 	y2debug( "Unknown protocol: %1", proto );
 	return false;
     }
@@ -506,14 +543,15 @@ global define boolean AddService(string service, string proto, string interface)
  *  Remove service for a given interface and protocol from a firewall. Will not
  *  modify the list of configured interfaces in the firewall.
  *
- *  @param service	the name of the service, or INT, EXT or DMZ
- *  @param proto	UDP or TCP
- *  @param interface	the name of the interface, for example eth0, "all" for all interfaces
+ *  @param service	the name of the service
+ *  @param proto	UDP, TCP or IP
+ *  @param interface	the name of the interface, for example eth0, "all" for
+ *  all interfaces, INT, EXT or DMZ for the respective zone
  *  @return boolean	true on success
  */
 global define boolean RemoveService(string service, string proto, string interface) ``{
 
-    if( proto != "UDP" && proto != "TCP" ) {
+    if( proto != "UDP" && proto != "TCP" && proto != "IP" ) {
 	y2error( "Unknown protocol: %1", proto );
 	return false;
     }
@@ -546,6 +584,53 @@ global define boolean RemoveService(string service, string proto, string interfa
 }
 
 /**
+ *  Whether a service is allowed on the specified interface
+ *
+ *  @param proto	UDP, TCP or IP
+ *  @param name		Service name, e.g. "isakmp"
+ *  @param interface	the name of the interface, for example eth0, "any" for
+ *  any interface, INT, EXT or DMZ for the respective zone
+ *  @return boolean	true if service is allowed
+ */
+global define boolean HaveService(string service, string proto, string interface)
+{
+    if( proto != "UDP" && proto != "TCP" && proto != "IP" ) {
+	y2error( "Unknown protocol: %1", proto );
+	return false;
+    }
+
+    string servstr = "";
+
+    if( interface == "any" )
+    {
+	servstr = settings["FW_SERVICES_EXT_"+proto]:""
+	    + settings["FW_SERVICES_INT_"+proto]:""
+	    + settings["FW_SERVICES_DMZ_"+proto]:"";
+    } else
+    {
+	// find out where is the interface
+	if(interface == "EXT" || IsExtInterface( interface )) {
+	    servstr = settings["FW_SERVICES_EXT_"+proto]:"";
+	}
+	else if( interface == "INT" || IsIntInterface( interface )) {
+	    servstr = settings["FW_SERVICES_INT_"+proto]:"";
+	}
+	else if( interface == "DMZ" || IsDmzInterface( interface )) {
+	    servstr = settings["FW_SERVICES_DMZ_"+proto]:"";
+	}
+	else
+	{
+	    y2warning( "Interface %1 is not configured for firewall", interface );
+	    return false;
+	}
+    }
+
+    list<string> servs = splitstring(servstr, " ");
+    if(servs == nil) servs = [];
+    return contains(servs, service);
+}
+
+/**
   * Get the interface with the smallest security
   * @param interfaces list of interfaces
   * @return string in SuSEfirewall syntax - no, yes, dmz, ext
@@ -563,6 +648,48 @@ global define string MostInsecureInterface (list interfaces) ``{
     return result;
 }
 
+/**
+ * whether IPsec traffic is allowed and treated as internal
+ * @returns true if it is allowed, false if not and nil if unknown
+ * */
+global define boolean IsIPsecAllowed()
+{
+    boolean isakmpallowed	= SuSEFirewall::HaveService("isakmp", "UDP", "EXT")
+					    || SuSEFirewall::HaveService("500", "UDP", "EXT");
+
+    boolean espallowed		= SuSEFirewall::HaveService("esp", "IP", "INT")
+					    || SuSEFirewall::HaveService("50", "IP", "INT");
+
+    string FW_IPSEC_TRUST	= SuSEFirewall::settings["FW_IPSEC_TRUST"]:"no";
+    if( (FW_IPSEC_TRUST == "yes" || FW_IPSEC_TRUST == "int") && isakmpallowed && espallowed)
+	return true;
+    else if( FW_IPSEC_TRUST == "no" && !isakmpallowed && !espallowed)
+	return false;
+    else
+	return nil;
+}
+
+/**
+ * Allow or Disallow IPsec Traffic and treat it as internal
+ * @param yes true, false or nil for no change
+ * */
+global define void AllowIPsec(boolean yes)
+{
+    if ( yes == nil ) return;
+
+    if( yes == true )
+    {
+	SuSEFirewall::AddService("isakmp", "UDP", "EXT");
+	SuSEFirewall::AddService("esp", "IP", "INT");
+	settings["FW_IPSEC_TRUST"] = "int";
+    }
+    else if( yes == false )
+    {
+	SuSEFirewall::RemoveService("isakmp", "UDP", "EXT");
+	SuSEFirewall::RemoveService("esp", "IP", "INT");
+	settings["FW_IPSEC_TRUST"] = "no";
+    }
+}
 
 /* EOF */
 }

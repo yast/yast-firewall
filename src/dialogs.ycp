@@ -438,14 +438,14 @@ define symbol FeatureDialog() ``{
 
     string help =
 
-    /* Features dialog help 1/4 */
+    /* Features dialog help 1/5 */
     _("<p><b>Forward Traffic and Do Masquerading</b> means that external machines
 see all usage of services on the Internet coming from the firewall rather than
 internal machines. Set this option if you have only one IP address but want to
 grant Internet access to multiple machines. It is more secure to communicate
 via proxies to the Internet than to use masquerading.</p>") +
 
-    /* Features dialog help 2/4 */
+    /* Features dialog help 2/5 */
     _("<p><b>Protect from Internal Network</b> means that <i>internal</i>
 machines may only access explicitly allowed services on the machine.
 They will also be affected by the FW_AUTOPROTECT_SERVICES option. However,
@@ -454,17 +454,20 @@ beyond the scope of this workflow. For your machine to be accessible from
 the internal network, <i>unset</i> this option.</p>") +
 
 
-    /* Features dialog help 3/4 */
+    /* Features dialog help 3/5 */
     _("<p><b>Allow Traceroute</b> means that ICMP time-to-live-exceeded
 messages are allowed to be sent from your firewall. This is used for
 traceroutes <i>to</i> your firewall (or traceroute-like tools).</p> ") +
 
-    /* Features dialog help 4/4 */
+    /* Features dialog help 4/5 */
     _("<p><b>Protect All Running Services</b> means that all network access
 to services, TCP, and UDP on this machine will be prevented except for those
-to which you explicitly allowed access in the previous dialog.</p>");
+to which you explicitly allowed access in the previous dialog.</p>") +
 
-    map firewall_settings = SuSEFirewall::settings;
+    /* Features dialog help 5/5 */
+    _("<p><b>Treat IPsec Traffic as Interal</b> means that encrypted IPsec
+    packets that where successfully decrypted are treated the same as packets
+    originating from your internal network.</p>");
 
     /* Features dialog caption */
     term contents = `VBox(`HBox(
@@ -487,7 +490,10 @@ to which you explicitly allowed access in the previous dialog.</p>");
 		    `Left(`CheckBox(`id("protect"), _("&Protect All Running Services"), false)),
 		    `VSpacing(1),
 		    /* CheckBox label */
-		    `Left(`CheckBox(`id("traceroute"), _("Allow &Traceroute"), false))
+		    `Left(`CheckBox(`id("traceroute"), _("Allow &Traceroute"), false)),
+		    `VSpacing(1),
+		    /* CheckBox label */
+		    `Left(`CheckBox(`id("ipsec"), _("Treat IPsec Traffic as Internal"), false))
 		),
 		`HSpacing(0)
 	    ),
@@ -499,13 +505,12 @@ to which you explicitly allowed access in the previous dialog.</p>");
 	`HSpacing(5)
     ));
 
-    string FW_ALLOW_FW_TRACEROUTE	= firewall_settings["FW_ALLOW_FW_TRACEROUTE"]:"no";
-    string FW_MASQUERADE		= firewall_settings["FW_MASQUERADE"]:"no";
-    string FW_ROUTE			= firewall_settings["FW_ROUTE"]:"no";
-    string FW_MASQ_NETS			= firewall_settings["FW_MASQ_NETS"]:"";
-    string FW_AUTOPROTECT_SERVICES	= firewall_settings["FW_AUTOPROTECT_SERVICES"]:"no";
-    string FW_PROTECT_FROM_INTERNAL	= firewall_settings["FW_PROTECT_FROM_INTERNAL"]:"yes";
-
+    string FW_ALLOW_FW_TRACEROUTE	= SuSEFirewall::settings["FW_ALLOW_FW_TRACEROUTE"]:"no";
+    string FW_MASQUERADE		= SuSEFirewall::settings["FW_MASQUERADE"]:"no";
+    string FW_ROUTE			= SuSEFirewall::settings["FW_ROUTE"]:"no";
+    string FW_MASQ_NETS			= SuSEFirewall::settings["FW_MASQ_NETS"]:"";
+    string FW_AUTOPROTECT_SERVICES	= SuSEFirewall::settings["FW_AUTOPROTECT_SERVICES"]:"no";
+    string FW_PROTECT_FROM_INTERNAL	= SuSEFirewall::settings["FW_PROTECT_FROM_INTERNAL"]:"yes";
     Wizard::SetContentsButtons(caption, contents, help,
 	    Label::BackButton(), Label::NextButton());
 
@@ -536,6 +541,8 @@ to which you explicitly allowed access in the previous dialog.</p>");
     {
 	UI::ChangeWidget(`id("protect_int"), `Value, true);
     }
+
+    UI::ChangeWidget(`id("ipsec"), `Value, SuSEFirewall::IsIPsecAllowed());
 
     any ret = nil;
     while(true) {
@@ -597,15 +604,36 @@ Proceed with this setup?
 
 	    }
 
-	    firewall_settings["FW_ALLOW_FW_TRACEROUTE"] = FW_ALLOW_FW_TRACEROUTE;
-	    firewall_settings["FW_MASQUERADE"] = FW_MASQUERADE;
-	    firewall_settings["FW_ROUTE"] = FW_ROUTE;
-	    firewall_settings["FW_MASQ_NETS"] = FW_MASQ_NETS;
-	    firewall_settings["FW_AUTOPROTECT_SERVICES"] = FW_AUTOPROTECT_SERVICES;
-	    firewall_settings["FW_PROTECT_FROM_INTERNAL"] = FW_PROTECT_FROM_INTERNAL;
+	    // nil is valid, don't check for it!
+	    boolean allowipsec = (boolean)UI::QueryWidget(`id("ipsec"),`Value);
 
-	    y2debug("settings %1", firewall_settings);
-	    SuSEFirewall::settings = firewall_settings;
+	    if( FW_PROTECT_FROM_INTERNAL == "yes" && allowipsec == true )
+	    {
+		boolean choice = Popup::ContinueCancel(
+		    _("It usually does not make sense to activate both
+\"Treat IPsec Packets as Internal\" and
+\"Protect from Internal Network\"
+as your computer would not accept any packets
+from the internal network.
+
+Proceed with this setup?
+"));
+		if ( choice == false )
+		{
+		    continue;
+		}
+	    }
+
+	    SuSEFirewall::AllowIPsec( allowipsec );
+
+	    SuSEFirewall::settings["FW_ALLOW_FW_TRACEROUTE"] = FW_ALLOW_FW_TRACEROUTE;
+	    SuSEFirewall::settings["FW_MASQUERADE"] = FW_MASQUERADE;
+	    SuSEFirewall::settings["FW_ROUTE"] = FW_ROUTE;
+	    SuSEFirewall::settings["FW_MASQ_NETS"] = FW_MASQ_NETS;
+	    SuSEFirewall::settings["FW_AUTOPROTECT_SERVICES"] = FW_AUTOPROTECT_SERVICES;
+	    SuSEFirewall::settings["FW_PROTECT_FROM_INTERNAL"] = FW_PROTECT_FROM_INTERNAL;
+
+	    y2debug("settings %1", SuSEFirewall::settings);
 	    break;
 	}
     }

@@ -18,4 +18,9 @@ desktop_DATA = firewall.desktop
 
 EXTRA_DIST = $(client_DATA) $(ynclude_DATA) $(module_DATA) $(desktop_DATA)
 
+autocode: liste liste2ycp.pl
+	cp -a SuSEFirewall.ycp SuSEFirewall.ycp.tmp
+	./liste2ycp.pl < SuSEFirewall.ycp.tmp > SuSEFirewall.ycp
+	rm SuSEFirewall.ycp.tmp
+
 include $(top_srcdir)/Makefile.am.common

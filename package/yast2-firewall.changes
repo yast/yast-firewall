@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Mar  2 12:30:43 CET 2004 - lnussel@suse.de
+
+- add option to allow IPsec traffic
+- 2.9.5
+
+-------------------------------------------------------------------
 Fri Feb 20 11:53:17 CET 2004 - lnussel@suse.de
 
 - fix warnings about useless global
