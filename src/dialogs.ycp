@@ -384,6 +384,11 @@ services. Also start the appropriate daemons.</p>
 	    if(Popup::ReallyAbort(true)) break;
 	    else continue;
 	}
+	else if ( ret == `next )
+	{
+	    SuSEFirewall::settings["FW_SERVICES_EXT_TCP"] = mergestring((list<string>) sort(union(services_list, additional_services))," ");
+	    break;
+	}
 	else if ( ret == `edit )
 	{
 	    string serv = ExpertServicePopup(mergestring((list<string>)additional_services," "));
@@ -414,11 +419,6 @@ services. Also start the appropriate daemons.</p>
 	    services_list=sort(services_list);
 //	    services_string = mergestring(services_list," ");
 //	    UI::ChangeWidget(`id(`status), `Value, services_string);
-	}
-	else
-	{
-	    SuSEFirewall::settings["FW_SERVICES_EXT_TCP"] = mergestring((list<string>) sort(union(services_list, additional_services))," ");
-	    break;
 	}
     }
     y2milestone("settings=%1", SuSEFirewall::settings);
