@@ -1,0 +1,319 @@
+/**
+ * File:	modules/CWMFirewallInterfaces.ycp
+ * Package:	Common widget manipulation, firewall interfaces widget
+ * Summary:	Routines for selecting interfaces opened in firewall
+ * Authors:	Jiri Srain <jsrain@suse.cz>
+ *
+ * $Id$
+ *
+ */
+
+{
+
+module "CWMFirewallInterfaces";
+textdomain "base";
+
+import "CWM";
+import "Label";
+import "Popup";
+import "SuSEFirewall";
+
+
+// private variables
+
+/**
+ * List of all interfaces relevant for firewall settings
+ */
+list<string> all_interfaces = nil;
+
+/**
+ * List of all items of interfaces to the selection box
+ */
+list interface_items = nil;
+
+
+// public functions
+
+/**
+ * Init function of the widget
+ * @param map widget a widget description map
+ * @param key strnig the widget key
+ */
+global define void Init (map<string,any> widget, string key) {
+    // set the list of ifaces
+    if (all_interfaces == nil)
+    {
+	// FIXME use NetworkDevices instead of SCR!!!
+	all_interfaces = (list<string>)SCR::Dir (.network.section);
+	all_interfaces = filter (string i, all_interfaces, {
+	    return i != "lo";
+	});
+	interface_items = maplist (string i, all_interfaces, {
+	    string label = (string)
+		SCR::Read (add (add (.network.value, i), "BOOTPROTO"));
+	    string ipaddr = (string)
+		    SCR::Read (add (add (.network.value, i), "IPADDR"));
+	    if (tolower (label) == "static" || label == "" || label == nil)
+	    {
+		label = ipaddr;
+	    }
+	    else
+	    {
+		label = toupper (label);
+		if (ipaddr != nil && ipaddr != "")
+		    label = sformat ("%1/%2", label, ipaddr);
+	    }
+	    if (label == nil || label == "")
+	    {
+		label = i;
+	    }
+	    else
+	    {
+		label = sformat ("%1 (%2)", i, label);
+	    }
+	    return `item (`id (i), label);
+	});
+    }
+    UI::ReplaceWidget (`id ("_cwm_interface_list_rp"),
+	`MultiSelectionBox (
+	    `id ("_cwm_interface_list"),
+            _("&Network Interfaces with Open Port in Firewall"),
+	    interface_items
+	)
+    );
+    // mark open ifaces as open
+    list<string>() get_ifaces = (list<string>())
+	widget["get_allowed_interfaces"]:nil;
+    list<string> ifaces = get_ifaces ();
+    UI::ChangeWidget (`id ("_cwm_interface_list"), `SelectedItems, ifaces);
+}
+
+/**
+ * Handle function of the widget
+ * @param map widget a widget description map
+ * @param key strnig the widget key
+ * @param event map event to be handled
+ * @return symbol for wizard sequencer or nil
+ */
+global define symbol Handle (map<string,any> widget, string key, map event) {
+    any event_id = event["ID"]:nil;
+    if (event_id == "_cwm_interface_select_all")
+    {
+	UI::ChangeWidget (`id ("_cwm_interface_list"), `SelectedItems,
+	    all_interfaces);
+	return nil;
+    }
+    if (event_id == "_cwm_interface_select_none")
+    {
+	UI::ChangeWidget (`id ("_cwm_interface_list"), `SelectedItems, []);
+	return nil;
+    }
+    return nil;
+}
+
+/**
+ * Store function of the widget
+ * @param map widget a widget description map
+ * @param key strnig the widget key
+ * @param event map that caused widget data storing
+ */
+global define void Store (map<string,any> widget, string key, map event) {
+    void (list<string>) set_ifaces = (void(list<string>))
+	widget["set_allowed_interfaces"]:nil;
+    list<string> ifaces = (list<string>)
+	UI::QueryWidget (`id ("_cwm_interface_list"), `SelectedItems);
+    // FIXME add also autoselected interfaces
+    set_ifaces (ifaces);
+}
+
+/**
+ * Validate function of the widget
+ * @param map widget a widget description map
+ * @param key strnig the widget key
+ * @param event map event that caused the validation
+ * @return true if validation succeeded, false otherwise
+ */
+global boolean Validate (map<string,any> widget, string key, map event) {
+    list<string> ifaces = (list<string>)
+	UI::QueryWidget (`id ("_cwm_interface_list"), `SelectedItems);
+    ifaces = toset (ifaces);
+    if (size (ifaces) == 0)
+    {
+	if (! Popup::YesNo (_("No interface is selected. Service will not
+be available for other computers.
+
+Continue?")))
+	{
+	    return false;
+	}
+    }
+    // FIXME 2 lines
+    list<string> firewall_ifaces = ifaces;
+    firewall_ifaces = add (firewall_ifaces, "eth999");
+
+    firewall_ifaces = toset (firewall_ifaces);
+    if (size (firewall_ifaces) != size (ifaces))
+    {
+	// todo difflist
+	firewall_ifaces = filter (string i, firewall_ifaces, {
+	    return ! contains (ifaces, i);
+	});
+	string ifaces_list = mergestring (firewall_ifaces, ", ");
+	if (! Popup::YesNo (sformat (
+	    _("Because of SuSE Firewall settings, the port
+on folowing interfaces will be additionally open:
+%1
+
+Continue?"),
+	    ifaces_list)))
+	{
+	    return false;
+	}
+    }
+    return true;
+}
+
+/**
+ * Init function of the widget
+ * @param key strnig the widget key
+ */
+global define void InitWrapper (string key) {
+    Init (CWM::GetProcessedWidget (), key);
+}
+
+/**
+ * Handle function of the widget
+ * @param key strnig the widget key
+ * @param event map event to be handled
+ * @return symbol for wizard sequencer or nil
+ */
+global define symbol HandleWrapper (string key, map event) {
+    return Handle (CWM::GetProcessedWidget (), key, event);
+}
+
+/**
+ * Store function of the widget
+ * @param key strnig the widget key
+ * @param event map that caused widget data storing
+ */
+global define void StoreWrapper (string key, map event) {
+    Store (CWM::GetProcessedWidget (), key, event);
+}
+
+/**
+ * Validate function of the widget
+ * @param key strnig the widget key
+ * @param event map event that caused the validation
+ * @return true if validation succeeded, false otherwise
+ */
+global boolean ValidateWrapper (string key, map event) {
+    return Validate (CWM::GetProcessedWidget (), key, event);
+}
+
+/**
+ * Remove the shortcut sign (&) from a widget label to be used in help
+ * FIXME TODO Put to library of common functions
+ * @param label string widget label (usually with the & sign)
+ * @return string label with the & removed
+ */
+global define string RemoveShortcut (string label) {
+    while (regexpmatch (label, "^.*&.*$"))
+	label = regexpsub (label, "^(.*)&(.*)$", "\\1\\2");
+    return label;
+}
+
+/**
+ * Get the widget description map
+ * @param settings a map of all parameters needed to create the widget properly
+ * <pre>
+ *
+ * Behavior manipulating functions (mandatory)
+ * - "get_allowed_interfaces" : list<string>() -- function that returns
+ *          the list of allowed network interfaces
+ * - "set_allowed_interfaces" : void (list<string>) -- function that sets
+ *          the list of allowed interfaces
+ *
+ * Additional settings:
+ * - "help" : string -- help to the whole widget. If not specified, generic help
+ *          is used (button labels are patched correctly)
+ * </pre>
+ * @return map the widget description map
+ */
+global define map<string,any> CreateWidget (map<string,any> settings) {
+    term widget = `HBox (
+	`HSpacing (1),
+	`VBox (
+	    `HSpacing (48),
+	    `VSpacing (1),
+	    `ReplacePoint (`id ("_cwm_interface_list_rp"),
+		`MultiSelectionBox (
+		    `id ("_cwm_interface_list"),
+	            _("&Network Interfaces with Open Port in Firewall"),
+		    []
+		)
+	    ),
+	    `VSpacing (1),
+	    `HBox (
+		`HStretch (),
+		`HWeight (1, `PushButton (`id ("_cwm_interface_select_all"),
+		    _("Select &All"))),
+		`HWeight (1, `PushButton (`id ("_cwm_interface_select_none"),
+		    _("Select &None"))),
+		`HStretch ()
+	    ),
+	    `VSpacing (1)
+	),
+	`HSpacing (1)
+    );
+
+    string help = ""; // TODO
+
+    if (haskey (settings, "help"))
+    {
+	help = settings["help"]:"";
+    }
+
+    map<string,any> ret = (map<string,any>)union (settings, $[
+	"widget" : `custom,
+	"custom_widget" : widget,
+	"help" : help,
+	"init" : InitWrapper,
+	"store" : StoreWrapper,
+	"handle" : HandleWrapper,
+	"validate_type" : `function,
+	"validate_function" : ValidateWrapper,
+    ]);
+
+    return ret;
+}
+
+/**
+ * Display the firewall interfaces selection as a popup
+ * @return symbol return value of the dialog
+ */
+global symbol DisplayFirewallDetailsPopup (map<string,any> settings) {
+    list<map <string, any> > w = CWM::CreateWidgets (
+	["firewall_ifaces"],
+	$[
+	    "firewall_ifaces" : CreateWidget (settings),
+	]
+    );
+    string help = CWM::MergeHelps (w);
+    term contents = `VBox (
+	"firewall_ifaces",
+	`HBox (
+	    `HStretch (),
+	    `PushButton (`id (`ok), Label::OKButton ()),
+	    `PushButton (`id (`cancel), Label::CancelButton ()),
+	    `HStretch ()
+	)
+    );
+    contents = CWM::PrepareDialog (contents, w);
+    UI::OpenDialog (contents);
+    symbol ret = CWM::Run (w, $[]);
+    UI::CloseDialog ();
+    return ret;
+}
+
+// EOF
+}

@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Jul 30 10:30:30 CEST 2004 - jsrain@suse.cz
+
+- added popup (CWM widget) for selecting interfaces to open in
+  firewall
+
+-------------------------------------------------------------------
 Wed Jul 21 09:50:51 CEST 2004 - locilka@suse.cz
 
 - added firewall proposal (for network proposal)

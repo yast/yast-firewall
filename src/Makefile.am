@@ -2,7 +2,9 @@
 
 yncludedir = @yncludedir@/firewall
 
-module_DATA = SuSEFirewall.ycp
+module_DATA =		\
+	SuSEFirewall.ycp\
+	CWMFirewallInterfaces.ycp
 
 client_DATA =		\
 	firewall.ycp	\
