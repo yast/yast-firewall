@@ -289,45 +289,48 @@
  *
  */
 
-    term AddNetworkMasqueradeRule () {
-	term dialog = `Frame (
-	    // TRANSLATORS: frame label
-	    _("Add New Allowed Masquerading Rule"),
-	    `VBox (
-		`HBox (
-		    `HWeight ( 50,
-		    `VBox (
-			// TRANSLATORS: editable select box
-			`ComboBox (`id("add_source_network"), `opt(`editable,`hstretch), _("Source Network"), [
-			    `item( `id("0/0"), "0/0")
-			]),
-			// TRANSLATORS: editable select box
-			`ComboBox (`id("add_protocol"), `opt(`editable,`hstretch), _("Protocol"), [
-			    `item( `id(""), ""),
-			    `item( `id("tcp"), "tcp"),
-			    `item( `id("tcp"), "udp")
-			])
-		    )),
-		    `HWeight ( 50,
-		    `VBox (
-			// TRANSLATORS: editable select box
-			`ComboBox (`id("add_destination_network"), `opt(`editable,`hstretch), _("Destination Network"), [
-			    `item( `id("0/0"), "0/0")
-			]),
-			// TRANSLATORS: text entry
-			`TextEntry (`id("add_destination_port"), _("Port"))
-		    ))
-		),
-		`VSpacing(1),
-		`HBox (
-		    `PushButton(`id("ok"), Label::AddButton()),
-		    `PushButton(`id("cancel"), Label::CancelButton())
-		)
-	    )
-	);
-	
-	return dialog;
-    }
+/*
+ *    term AddNetworkMasqueradeRule () {
+ *	term dialog = `Frame (
+ *	    // TRANSLATORS: frame label
+ *	    _("Add New Allowed Masquerading Rule"),
+ *	    `VBox (
+ *		`HBox (
+ *		    `HWeight ( 50,
+ *		    `VBox (
+ *			// TRANSLATORS: editable select box
+ *			`ComboBox (`id("add_source_network"), `opt(`editable,`hstretch), _("Source Network"), [
+ *			    `item( `id("0/0"), "0/0")
+ *			]),
+ *			// TRANSLATORS: editable select box
+ *			`ComboBox (`id("add_protocol"), `opt(`editable,`hstretch), _("Protocol"), [
+ *			    `item( `id(""), ""),
+ *			    `item( `id("tcp"), "tcp"),
+ *			    `item( `id("tcp"), "udp")
+ *			])
+ *		    )),
+ *		    `HWeight ( 50,
+ *		    `VBox (
+ *			// TRANSLATORS: editable select box
+ *			`ComboBox (`id("add_destination_network"), `opt(`editable,`hstretch), _("Destination Network"), [
+ *			    `item( `id("0/0"), "0/0")
+ *			]),
+ *			// TRANSLATORS: text entry
+ *			`TextEntry (`id("add_destination_port"), _("Port"))
+ *		    ))
+ *		),
+ *		`VSpacing(1),
+ *		`HBox (
+ *		    `PushButton(`id("ok"), Label::AddButton()),
+ *		    `PushButton(`id("cancel"), Label::CancelButton())
+ *		)
+ *	    )
+ *	);
+ *	
+ *	return dialog;
+ *    }
+ *
+ */
 
     term RedirectToMasqueradedIP () {
 	term dialog = `Frame (
