@@ -1,9 +1,22 @@
 -------------------------------------------------------------------
-Fri Mar  4 10:57:00 CET 2005 - locilka@suse.cz
+Fri Mar  4 09:05:56 CET 2005 - locilka@suse.cz
 
 - fixed bug #67335
   Fixed unnecessary warning aborting the unchanged configuration
+- 2.11.11
+
+-------------------------------------------------------------------
+Wed Mar  2 12:51:51 CET 2005 - locilka@suse.cz
+
 - merged proofed texts
+- 2.11.10 
+
+-------------------------------------------------------------------
+Wed Mar  2 10:40:40 CET 2005 - locilka@suse.cz
+
+- fixed bug #66119
+  Profile Exported for AutoYaST had been lowercased.
+  Profile Imported from AutoYaST had been uppercased.
 
 -------------------------------------------------------------------
 Mon Feb 21 16:14:46 CET 2005 - locilka@suse.cz
