@@ -47,6 +47,11 @@ global boolean start = false;
 /* default value for firewall settings modified */
 global boolean modified = false;
 
+/* defines know network devices, usable for proposal for the "next run" */
+global list<string> known_devices = [];
+
+/* defines warning which are printed in the proposal - one times */
+global list<string> proposal_warnings = [];
 
 /**
  * Function sets internal variable, which indicates, that any
@@ -392,11 +397,36 @@ global define boolean Read() {
     return true;
 }
 
-/*
+/**
+ * Sets all known devices as a list of devices into the
+ * known_devices list.
+ */
+define void SetKnownDevices () ``{
+    known_devices = (list<string>) NetworkDevices::List("");
+    known_devices = filter(string dev, known_devices, ``{
+	return dev != "" && !issubstring(dev, "lo") && !issubstring(dev, "sit");
+    });
+}
+
+/**
+ * Removes the device from the list of devices
+ *
+ * @param list<string>	devices
+ * @param string	device to remove
+ * @return list<string>	devices
+ */
+define list<string> RemoveDevice (list<string> remove_from, string remove_device) ``{
+    return filter(string one_device, remove_from, ``{
+	return one_device != remove_device;
+    });
+}
+
+/**
  * Propose Firewall settings
  */
 global define void Propose () ``{
     SetModified();
+    SetKnownDevices();
 
     y2milestone("Initializing proposal");
     
@@ -409,6 +439,7 @@ global define void Propose () ``{
     // Firewall is disabled if there is no network
     if (size(netdevices)==0) {
 	SuSEFirewall::enable_firewall = false;
+	// some devices (all) could be removed
 	return;
     }
     SuSEFirewall::enable_firewall = true;
@@ -484,7 +515,7 @@ global define void Reset () ``{
 /**
  * Returns Preformatted text for proposal
  */
-global define string GetPreformattedProposal () {
+global define map<string, string> GetPreformattedProposal () {
     string ret = "<ul>";
 
     // TRANSLATORS: Proposal rich text item, %1 is the firewall status - enabled or disabled
@@ -526,9 +557,20 @@ global define string GetPreformattedProposal () {
 	);
     }
 
+    string warning = "";
+    if (SuSEFirewall::enable_firewall == true) {
+	foreach (string warning_item, proposal_warnings, {
+	    warning = warning + "<li>" + warning_item + "</li>";
+	});
+	if (warning != "") {
+	    warning = "<ul>" + warning + "</ul>";
+	}
+    }
+    proposal_warnings = [];
+
     ret = ret + "</ul>";
 
-    return ret;
+    return $[ "out" : ret, "warning" : warning ];
 }
 
 /**
@@ -1362,6 +1404,73 @@ global define map<string, map<string, boolean> > GetServices (list<string> servi
 
     return ret;
 }
+
+/**
+ * Update proposal even it was changed by user.
+ * Usable for instance for adding just created netdevices.
+ */
+global define void UpdateProposal () ``{
+    SetKnownDevices();
+    y2milestone("Updating proposal");
+
+    boolean proposal_updated = false;
+
+    list<string> devices_ext = toset(splitstring(settings["FW_DEV_EXT"]:"", " "));
+    list<string> devices_int = toset(splitstring(settings["FW_DEV_INT"]:"", " "));
+    list<string> devices_dmz = toset(splitstring(settings["FW_DEV_DMZ"]:"", " "));
+    list<string> all_devices_in_configuration = flatten([ devices_ext, devices_int, devices_dmz ]);
+
+    // All network devices known now
+    list<string> netdevices = (list<string>) NetworkDevices::List("");
+    netdevices = filter(string dev, netdevices, ``{
+	return dev != "" && !issubstring(dev, "lo") && !issubstring(dev, "sit");
+    });
+
+    // listing all now known devices
+    foreach (string netdevice, netdevices, {
+	// device, which is placed somewhere yet
+	if (IsExtInterface(netdevice)) return;
+	if (IsIntInterface(netdevice)) return;
+	if (IsDmzInterface(netdevice)) return;
+
+	// if this device was known and was removed
+	if (contains(all_devices_in_configuration, netdevice)) return;
+
+	y2milestone("New device found '%1', adding into FW_DEV_EXT devices", netdevice);
+	proposal_warnings = add(proposal_warnings, sformat(
+	    // TRANSLATORS: Warning in proposal
+	    _("New network device '%1' found, added as an external firewall interface"), netdevice)
+	);
+	devices_ext = add(devices_ext, netdevice);
+	proposal_updated = true;
+    });
+
+    // listing all devices known in the previous turn
+    foreach (string netdevice, all_devices_in_configuration, {
+	// device is known now
+	if (contains(known_devices, netdevice)) return;
+
+	// else was removed
+	y2milestone("Device lost '%1', removing from user configuration.", netdevice);
+	proposal_warnings = add(proposal_warnings, sformat(
+	    // TRANSLATORS: Warning in proposal
+	    _("Configured device '%1' lost, removed from all firewall interfaces"), netdevice)
+	);
+	devices_ext = RemoveDevice(devices_ext, netdevice);
+	devices_int = RemoveDevice(devices_int, netdevice);
+	devices_dmz = RemoveDevice(devices_dmz, netdevice);
+	proposal_updated = true;
+    });
+
+    if (proposal_updated) {
+	// only if the proposal was updated
+	settings["FW_DEV_EXT"] = mergestring(toset(devices_ext), " ");
+	settings["FW_DEV_INT"] = mergestring(toset(devices_int), " ");
+	settings["FW_DEV_DMZ"] = mergestring(toset(devices_dmz), " ");
+    }
+}
+
+
 
 /* EOF */
 }

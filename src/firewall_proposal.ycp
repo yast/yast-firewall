@@ -30,21 +30,24 @@ map ret = $[];
 if(func == "MakeProposal") {
     boolean force_reset = param["force_reset"]:false;
 
-    if(force_reset || !SuSEFirewall::proposal_changed_by_user) {
+    if (force_reset || !SuSEFirewall::proposal_changed_by_user) {
 	Progress::off();
 	SuSEFirewall::Reset();
+    } else if (SuSEFirewall::proposal_changed_by_user) {
+	// proposal was changed by user though but there are still some things to add maybe
+	SuSEFirewall::UpdateProposal();
     }
     SuSEFirewall::start = SuSEFirewall::enable_firewall;
 
     string warning = nil;
     symbol warning_level = nil;
-    string proposal = (string) SuSEFirewall::GetPreformattedProposal ();
+    map<string, string> proposal = (map<string, string>) SuSEFirewall::GetPreformattedProposal ();
     Progress::on();
 
     ret = $[
-	"preformatted_proposal" : proposal,
-	"warning_level" : warning_level,
-	"warning" : warning,
+	"preformatted_proposal" : proposal["out"]:"",
+	"warning_level" : (proposal["warning"]:"" == "" ? nil : `warning),
+	"warning" : proposal["warning"]:nil,
     ];
 }
 /* run the module */
