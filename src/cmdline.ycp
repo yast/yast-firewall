@@ -898,7 +898,11 @@
 		"handler" : FWCMDStartup,
 		// TRANSLATORS: CommandLine help
 		"help" : _("Start-up settings"),
-		"example" : "startup show; startup atboot; startup manual",
+		"example" : [
+		    "startup show",
+		    "startup atboot",
+		    "startup manual",
+		],
 	    ],
 	    "zones" : $[
 		"handler" : FWCMDZones,
@@ -910,13 +914,21 @@
 		"handler" : FWCMDInterfaces,
 		// TRANSLATORS: CommandLine help
 		"help" : _("Network interfaces configuration"),
-		"example" : "interfaces show; interfaces add interface=eth0 zone=INT",
+		"example" : [
+		    "interfaces show",
+		    "interfaces add interface=eth0 zone=INT",
+		],
 	    ],
 	    "services" : $[
 		"handler" : FWCMDServices,
 		// TRANSLATORS: CommandLine help
 		"help" : _("Allowed services, ports and protocols"),
-		"examle" : "FIXME: ...; services set protect=yes zone=INT",
+		"example" : [
+		    "services show detailed",
+		    "services set protect=yes zone=INT",
+		    "services add service=dhcp-server zone=EXT",
+		    "services remove ipprotocol=esp tcpport=12,13,ipp zone=DMZ",
+		],
 	    ],
 	    "broadcast" : $[
 		"handler" : FWCMDBroadcast,
@@ -928,7 +940,10 @@
 		"handler" : FWCMDMasquerade,
 		// TRANSLATORS: CommandLine 
 		"help" : _("Masquerade settings"),
-		"example" : "masquerade show; masquerade enable",
+		"example" : [
+		    "masquerade show",
+		    "masquerade enable",
+		],
 	    ],
 	    "masqredirect" : $[
 		"handler" : FWCMDMasqRedirect,
@@ -940,13 +955,19 @@
 		"handler" : FWCMDLogging,
 		// TRANSLATORS: CommandLine help
 		"help" : _("Logging settings"),
-		"example" : "logging set accepted=critical; logging set logbroadcast=no zone=INT",
+		"example" : [
+		    "logging set accepted=critical",
+		    "logging set logbroadcast=no zone=INT",
+		],
 	    ],
 	    "summary" : $[
 		"handler" : FWCMDSummary,
 		// TRANSLATORS: CommandLine help
 		"help" : _("Firewall configuration summary"),
-		"example" : "summary; summary zone=EXT",
+		"example" : [
+		    "summary",
+		    "summary zone=EXT",
+		],
 	    ],
 	],
 	"options" : $[
