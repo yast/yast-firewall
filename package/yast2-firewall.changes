@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Aug 23 17:03:47 CEST 2004 - locilka@suse.cz
+
+- added functionality for adding/removing devices into/from
+  user-changed configuration in network proposal
+- 2.10.5
+
+-------------------------------------------------------------------
 Fri Aug 20 11:31:20 CEST 2004 - locilka@suse.cz
 
 - fixed Bugzilla bug #43975
