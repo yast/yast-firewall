@@ -1,7 +1,0 @@
-Read	.sysconfig.personal-firewall.REJECT_ALL_INCOMING_CONNECTIONS ""
-Dump	=======================
-Return	true
-Return	false
-Return	false
-Return	false
-Dump	=======================

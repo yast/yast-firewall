@@ -1,5 +1,0 @@
-Read	.sysconfig.personal-firewall.REJECT_ALL_INCOMING_CONNECTIONS ""
-Dump	=======================
-Return	nil
-Return	$["out":"<ul><li>Firewall is <a href=\"firewall--disable_firewall_in_proposal\">enabled</a></li><li>External Interfaces: eth-id-00:c0:df:22:c6:a8 modem0 modem1</li><li>Internal Interfaces: eth-id-00:50:fc:74:b5:6f slp0 slp1</li><li>SSH: <a href=\"firewall--disable_ssh_in_proposal\">enabled</a></li><li>Additional Services: 32768 VNC(5801 5901) domain http microsoft-ds netbios-dgm netbios-ns netbios-ssn nfs sunrpc tftp</li></ul>", "warning":""]
-Dump	=======================
