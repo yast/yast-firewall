@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Wed Mar  3 13:34:05 CET 2004 - visnov@suse.cz
+
+- fixed type info 
+
+-------------------------------------------------------------------
 Tue Mar  2 12:30:43 CET 2004 - lnussel@suse.de
 
 - add option to allow IPsec traffic

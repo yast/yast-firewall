@@ -63,7 +63,7 @@ else if (func == "Change") {
 }
 /* Import configuration */
 else if (func == "Import") {
-    ret = SuSEFirewall::Import(Map::KeysToUpper(param));
+    ret = SuSEFirewall::Import(Map::KeysToUpper((map<string,any>)param));
 }
 /* Read firewall data */
 else if (func == "Read") {
@@ -71,7 +71,7 @@ else if (func == "Read") {
 }
 /* Return actual state */
 else if (func == "Export") {
-    ret = Map::KeysToLower(SuSEFirewall::Export());
+    ret = Map::KeysToLower((map<string,any>)SuSEFirewall::Export());
 }
 /* Write givven settings */
 else if (func == "Write") {

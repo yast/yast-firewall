@@ -349,12 +349,12 @@ services. Also start the appropriate daemons.</p>
 	)
     ));
 
-    list selectable_services = [ "telnet", "ssh", "http", "https", "smtp",
+    list<string> selectable_services = [ "telnet", "ssh", "http", "https", "smtp",
 	    "pop3", "pop3s", "imap", "imaps", "rsync" ];
 
     string services_string = firewall_settings["FW_SERVICES_EXT_TCP"]:"";
-    list additional_services = [];
-    list services_list = sort(splitstring(services_string, " "));
+    list<string> additional_services = [];
+    list<string> services_list = sort(splitstring(services_string, " "));
     additional_services = filter(string s, services_list,``(s!="" && !contains(selectable_services, s)));
     services_list = filter(string s, services_list,``(s!="" && contains(selectable_services, s)));
 
@@ -391,20 +391,20 @@ services. Also start the appropriate daemons.</p>
 	    if ( serv != nil )
 	    {
 		additional_services = sort(splitstring(serv," "));
-		services_list = sort(union(filter(string s,additional_services,``(s!="" && contains(selectable_services,s))), services_list));
+		services_list = sort((list<string>)union(filter(string s,additional_services,``(s!="" && contains(selectable_services,s))), services_list));
 		additional_services =filter(string s,additional_services,``(s!="" && !contains(selectable_services,s)));
 	        activate_checkboxes_for_services();
 		UI::ChangeWidget(`id(`status), `Value, mergestring((list<string>)additional_services," "));
 	    }
 	}
-	else if(contains(selectable_services, ret))
+	else if(contains(selectable_services, (string)ret))
 	{
 	    boolean state = (boolean) UI::QueryWidget(`id(ret),`Value);
 	    if(state == true)
 	    {
-		if(!contains(services_list,ret))
+		if(!contains(services_list,(string)ret))
 		{
-		    services_list=add(services_list,ret);
+		    services_list=add(services_list,(string)ret);
 		}
 	    }
 	    if(state == false)
@@ -667,7 +667,7 @@ Attention: This option is dangerous as it causes your log file to grow
 very quicky.</p>
 ");
 
-    map firewall_settings = SuSEFirewall::settings;
+    map<string,any> firewall_settings = SuSEFirewall::settings;
     string FW_LOG_DROP_CRIT = firewall_settings["FW_LOG_DROP_CRIT"]:"yes";
     string FW_LOG_DROP_ALL = firewall_settings["FW_LOG_DROP_ALL"]:"no";
     string FW_LOG_ACCEPT_CRIT = firewall_settings["FW_LOG_ACCEPT_CRIT"]:"yes";

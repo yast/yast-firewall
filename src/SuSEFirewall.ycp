@@ -23,7 +23,7 @@ import "Service";
 import "Summary";
 
 /* global settings map */
-global map settings = $[];
+global map<string,any> settings = $[];
 
 global boolean personal_firewall_is_active = false;
 
@@ -62,8 +62,8 @@ global define void SuSEFirewall () ``{
  * @return true on success
  */
 global define boolean Import(map s) ``{
-    settings = s;
-	start = settings["start_firewall"]:false;
+    settings = (map<string,any>)s;
+    start = settings["start_firewall"]:false;
     return true;
 }
 
@@ -214,7 +214,7 @@ global define boolean Read() ``{
 //  </AUTOCODE>
 
     // fetch list of network devices
-    list devicelist = (list) SCR::Read(.probe.netif);
+    list<map> devicelist = (list<map>) SCR::Read(.probe.netif);
     if (devicelist == nil) devicelist = [];
 
     // filter the device names
@@ -385,7 +385,7 @@ global define boolean Write() ``{
     if (personal_firewall_is_active)
 	SCR::Execute (.target.bash,"/sbin/SuSEpersonal-firewall",$[]);
 
-    list services = [
+    list<string> services = [
 	"SuSEfirewall2_init",
 	"SuSEfirewall2_setup",
 	"SuSEfirewall2_final",
@@ -635,7 +635,7 @@ global define boolean HaveService(string service, string proto, string interface
   * @param interfaces list of interfaces
   * @return string in SuSEfirewall syntax - no, yes, dmz, ext
   */
-global define string MostInsecureInterface (list interfaces) ``{
+global define string MostInsecureInterface (list<string> interfaces) ``{
     string result = "no";
     foreach (string iface, interfaces, ``{
         if (IsExtInterface (iface))
