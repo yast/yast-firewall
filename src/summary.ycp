@@ -224,16 +224,23 @@
 	    return "";
 	}
 
-	ret_message = ret_message + ul_start;
+	integer interfaces_unassigned = 0;
+	ret_message = ret_message + ul_start +
+	    // TRANSLATORS: Warning plain text in summary
+	    _("No network traffic is permitted through these interfaces.");
 	foreach (map <string, string> interface, SuSEFirewall::GetAllKnownInterfaces(), {
 	    if (interface["zone"]:nil==nil) {
 		ret_message = ret_message + li_start + " " + sformat(
-		    // TRANSLATORS: Summary, %1 is the network interface name, %2 is the device name, 
-		    _("Warning: Network interface '%1' / '%2' is not mentioned in any firewall zone. All network traffic on this interface will be blocked!"), interface["name"]:"", interface["id"]:"")
+		    "%1 / %2", interface["name"]:"", interface["id"]:""
+		)
 		+ li_end + "\n";
+		interfaces_unassigned = interfaces_unassigned + 1;
 	    }
 	});
 	ret_message = ret_message + ul_end + "\n";
+
+	// no need to return the headline when all interfaces are assigned
+	if (interfaces_unassigned == 0) return "";
 
 	return ret_message;
     }
