@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Mon Aug 16 10:21:50 CEST 2004 - locilka@suse.cz
+
+- added functions SetModified() and GetModified()
+- added call SetModified() in all Set*() functions
+- changed selecting/deselecting additional TCP/UDP services
+- 2.10.3
+
+-------------------------------------------------------------------
 Tue Aug 10 09:39:32 CEST 2004 - locilka@suse.cz
 
 - merged proofread messages

@@ -31,6 +31,8 @@ import "SuSEFirewall";
 
 include "firewall/wizards.ycp";
 
+SuSEFirewall::SetModified();
+
 any ret = nil;
 string func = "";
 map param = $[];

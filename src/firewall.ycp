@@ -22,6 +22,8 @@ y2milestone("Firewall module started");
 import "SuSEFirewall";
 include "firewall/wizards.ycp";
 
+SuSEFirewall::SetModified();
+
 boolean propose = false;
 list args = WFM::Args();
 if(size(args) > 0) {

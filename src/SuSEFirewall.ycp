@@ -44,6 +44,27 @@ global boolean write_only = false;
 
 global boolean start = false;
 
+/* default value for firewall settings modified */
+global boolean modified = false;
+
+
+/**
+ * Function sets internal variable, which indicates, that any
+ * "firewall settings were modified", to "true"
+ */
+global define void SetModified () {
+    modified = true;
+}
+
+/**
+ * Functions which returns if the firewall settings were modified
+ *
+ * @return boolean	firewall was modified
+ */
+global define boolean GetModified () {
+    return modified;
+}
+
 /**
  * Private function for handling the Portmapper support
  *
@@ -375,6 +396,8 @@ global define boolean Read() {
  * Propose Firewall settings
  */
 global define void Propose () ``{
+    SetModified();
+
     y2milestone("Initializing proposal");
     
     // All network devices
@@ -514,6 +537,12 @@ global define string GetPreformattedProposal () {
  * @return true on success
  */
 global define boolean Write() {
+
+    // indicates that the firewall settings weren't modified
+    // usable for external use in other modules
+    if (GetModified()==false) {
+	return true;
+    }
 
     // only activated firewall's setting is writen in installation (proposal) mode
     if ((Mode::config == false) && (SuSEFirewall::enable_firewall == false)) {
@@ -826,6 +855,7 @@ global define list<string> GetGroupsOfInterfaces ( list<string> interfaces ) {
  *  @return boolean	true on success
  */
 define boolean AddServiceToConfig( string set, string service ) {
+    SetModified();
 
     y2debug( "Before adding services: %1" , settings[set]:"");
 
@@ -856,6 +886,8 @@ define boolean AddServiceToConfig( string set, string service ) {
  *  @return boolean	true on success
  */
 define boolean RemoveServiceFromConfig( string set, string service ) {
+    SetModified();
+
     list<string> servs = splitstring(settings[set]:"", " ");
     if(servs == nil) servs = [];
 
@@ -880,6 +912,7 @@ define boolean RemoveServiceFromConfig( string set, string service ) {
  *  @return boolean	true on success
  */
 global define boolean AddService(string service, string proto, string interface) {
+    SetModified();
 
     if( proto != "UDP" && proto != "TCP" && proto != "IP" ) {
 	y2debug( "Unknown protocol: %1", proto );
@@ -924,6 +957,7 @@ global define boolean AddService(string service, string proto, string interface)
  *  @return boolean	true on success
  */
 global define boolean RemoveService(string service, string proto, string interface) {
+    SetModified();
 
     if( proto != "UDP" && proto != "TCP" && proto != "IP" ) {
 	y2error( "Unknown protocol: %1", proto );
@@ -1074,6 +1108,8 @@ global define void AllowIPsec(boolean yes)
  * @return boolean	true is successful
  */
 global define boolean RunServiceSupport (string service_id, boolean new_service_state) {
+    SetModified();
+
     boolean(boolean) function = (boolean(boolean)) firewall_services_definition[service_id,"special"]:nil;
     if (function == nil) {
 	return true;
@@ -1091,6 +1127,8 @@ global define boolean RunServiceSupport (string service_id, boolean new_service_
  * @param boolean	true to open, false to close
  */
 global define boolean SetPortForGroup (string port_name, string protocol, string device_group, boolean new_state) {
+    SetModified();
+
     if (device_group != "INT" && device_group != "DMZ" && device_group != "EXT") {
 	y2error("Not allowed device group '%1'", device_group);
 	return false;
@@ -1133,6 +1171,8 @@ global define boolean SetPortForGroup (string port_name, string protocol, string
  * @return boolean	if successful
  */
 global define boolean SetServicesForGroups (list<string> services_id, list<string> device_groups, boolean new_status) {
+    SetModified();
+
     list<string> allowed_device_groups = ["INT", "EXT", "DMZ"];
 
     // no groups == all groups
@@ -1181,6 +1221,8 @@ global define boolean SetServicesForGroups (list<string> services_id, list<strin
  * @return boolean	if successful
  */
 global define boolean SetServices (list<string> services_id, list<string> devices, boolean new_status) {
+    SetModified();
+
     list<string> groups_of_interfaces = GetGroupsOfInterfaces(devices);
     if (size(groups_of_interfaces)==0) {
 	y2error("Devices %1 are not in any group if interfaces", devices);
