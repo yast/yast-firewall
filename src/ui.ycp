@@ -1040,10 +1040,9 @@ global define StopDialog() ``{
 your system will no longer be protected.</p>
 <p><b>Action:</b><br>
 Stop any running SuSE Firewall2 and remove it from the boot process.
-In this case the firewall will no longer be activated
+In this case, the firewall will no longer be activated
 when you boot your system.</p>
-
-");
+\n");
     string caption = _("Firewall configuration - deactivate firewall");
 
     // Translator: please keep layout

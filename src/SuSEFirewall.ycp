@@ -94,11 +94,11 @@
 	summary = Summary::AddLine(summary, (settings["FW_DEV_INT"]:"" != "") ?
 				   settings["FW_DEV_INT"]:"" : Summary::NotConfigured());
 
-	summary = Summary::AddHeader(summary, _("Protect from internal"));
+	summary = Summary::AddHeader(summary, _("Protect from Internal"));
 	summary = Summary::AddLine(summary, (settings["FW_PROTECT_FROM_INTERNAL"]:"" != "") ?
 				   settings["FW_PROTECT_FROM_INTERNAL"]:"" : Summary::NotConfigured());
 
-	summary = Summary::AddHeader(summary, _("External TCP services"));
+	summary = Summary::AddHeader(summary, _("External TCP Services"));
 	summary = Summary::AddLine(summary, (settings["FW_SERVICES_EXT_TCP"]:"" != "") ?
 				   settings["FW_SERVICES_EXT_TCP"]:"" : Summary::NotConfigured());
 
