@@ -13,11 +13,9 @@ ynclude_DATA =		\
 	dialogs.ycp	\
 	wizards.ycp
 
-config_DATA = firewall.y2cc
-
 desktop_DATA = firewall.desktop
 
 
-EXTRA_DIST = $(client_DATA) $(ynclude_DATA) $(config_DATA)  $(module_DATA) $(desktop_DATA)
+EXTRA_DIST = $(client_DATA) $(ynclude_DATA) $(module_DATA) $(desktop_DATA)
 
 include $(top_srcdir)/Makefile.am.common
