@@ -257,7 +257,9 @@ global define boolean Import(map s) {
  */
 global define map Export() {
     if(haskey(settings, "network_devices" ))
-	settings = remove(settings, "network_devices" );
+    {
+        settings = remove(settings, "network_devices" );
+    }
 
     settings["start_firewall"] = start;
     return settings;

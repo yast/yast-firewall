@@ -31,7 +31,6 @@ import "SuSEFirewall";
 
 include "firewall/wizards.ycp";
 
-SuSEFirewall::SetModified();
 
 any ret = nil;
 string func = "";
@@ -74,6 +73,10 @@ else if (func == "Read") {
 /* Return actual state */
 else if (func == "Export") {
     ret = Map::KeysToLower((map<string,any>)SuSEFirewall::Export());
+}
+/* Return actual state */
+else if (func == "GetModified") {
+    ret = SuSEFirewall::GetModified();
 }
 /* Write givven settings */
 else if (func == "Write") {
