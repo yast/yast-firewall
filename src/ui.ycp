@@ -85,8 +85,8 @@ global define Firewall() ``{
             `next: "write"
         ],
         "write" : $[
-	    `abort: `abort,
-            `next: `next
+			`abort: `abort,
+            `next: `ws_finish
         ]
     ];
 
@@ -108,8 +108,8 @@ global define Firewall() ``{
  * Main interface function
  */
 global define FirewallAutoSequence() ``{
-    map aliases = $[   
-        "stop"		: ``(StopDialog()),     
+    map aliases = $[
+        "stop"		: ``(StopDialog()),
         "step1"		: ``(DevDialog()),
         "step2"		: ``(ServicesDialog()),
         "step3"		: ``(FeatureDialog()),
@@ -289,7 +289,7 @@ global define WriteDialog() ``{
     Wizard::SetContents("",`Empty(),"",false,true);
     UI::ChangeWidget(`id(`abort),`Enabled, false);
     // Translator: Button to finally write settings
-    UI::ChangeWidget(`id(`next),`Label, _("Quit"));
+    UI::ChangeWidget(`id(`next),`Label, FinishButtonLabel());
 
     Progress::New (
         _("Firewall configuration -- saving settings"),
@@ -333,15 +333,14 @@ global define WriteDialog() ``{
 
     sleep(1000);
     ret = SuSEFirewall::Write();
-        
     if (ret == false)
     {
 	UI::Messagepopup(_("Writing settings failed"));
     }
-    
+
     Progress::NextStage();
     map firewall_settings = SuSEFirewall::settings;
-    
+
     if (SuSEFirewall::personal_firewall_is_active)
     {
 	SCR::Execute (.target.bash,"/sbin/SuSEpersonal-firewall",$[]);
@@ -388,19 +387,6 @@ global define WriteDialog() ``{
     Progress::NextStage();
 
     UI::ChangeWidget(`id(`next),`Enabled, true);
-    
-    any ret = nil;
-    while(true) {
-	ret = UI::UserInput();
-	if(ret == `abort) {
-	    if(UI::ReallyAbortPopup(true)) break;
-	    else continue;
-	}
-	else
-	{
-	    return ret;
-	}
-    };
 
 
     /* handle possible write errors */
@@ -410,7 +396,7 @@ global define WriteDialog() ``{
 /**
  */
 global define DevDialog() ``{
-    
+
     map firewall_settings = SuSEFirewall::settings;
     string help = _("<br><p><b>General:</b><br>This tools aims to be an easy to use configuration front-end for the Linux
 packet filter engine. The configuration items in the following menus are
