@@ -64,24 +64,6 @@
 		"REJECT_ALL_INCOMING_CONNECTIONS":""
 	    ],
 	],
-	"network" : $[
-	    "section" : $[
-		"eth-id-00:c0:df:22:c6:a8" : nil,
-		"modem0" : nil,
-		"modem1" : nil,
-		"eth-id-00:50:fc:74:b5:6f" : nil,
-		"slp0" : nil,
-		"slp1" : nil,
-	    ],
-	    "values" : $[
-		"eth-id-00:c0:df:22:c6:a8" : $["BOOTPROTO":"static", "IPADDR":"1.2.3.4", "STARTMODE" : "onboot"],
-		"modem0" : $["BOOTPROTO":"dhcp", "STARTMODE":"manual"],
-		"modem1" : $["BOOTPROTO":"dhcp", "STARTMODE":"manual"],
-		"eth-id-00:50:fc:74:b5:6f" : $["BOOTPROTO":"dhcp", "STARTMODE":"onboot"],
-		"slp0" : $["BOOTPROTO":"dhcp", "STARTMODE":"hotplug"],
-		"slp1" : $["BOOTPROTO":"dhcp", "STARTMODE":"hotplug"],
-	    ],
-	],
     ];
 
     map EXEC = $[
@@ -97,7 +79,6 @@
     import "Progress";
     import "SuSEFirewall";
     import "Mode";
-    import "NetworkDevices";
 
     // variable in SuSEFirewall to store the settings
     SuSEFirewall::settings = $[
@@ -118,24 +99,24 @@
 		"FW_SERVICES_DMZ_IP":"",
 		"FW_SERVICES_DMZ_TCP":"",
 		"FW_SERVICES_DMZ_UDP":"",
-		"FW_SERVICES_DMZ_RPC":"",
 		"FW_SERVICES_EXT_IP":"",
 		"FW_SERVICES_EXT_RPC":"nlockmgr status nfs nfs_acl mountd ypserv fypxfrd ypbind yppasswdd",
 		"FW_SERVICES_EXT_TCP":"domain ssh sunrpc 5801 5901 http nfs 32768 netbios-ns netbios-dgm netbios-ssn microsoft-ds",
 		"FW_SERVICES_EXT_UDP":"domain sunrpc 32768 tftp",
 		"FW_SERVICES_INT_IP":"",
 		"FW_SERVICES_INT_TCP":"",
-		"FW_SERVICES_INT_UDP":"",
-		"FW_SERVICES_INT_RPC":"",
+		"FW_SERVICES_INT_UDP":""
 	    ];
 
     READ[ "sysconfig", "SuSEfirewall2" ] = SuSEFirewall::settings;
 
     Mode::test = true;
     Progress::off ();
-    NetworkDevices::Read ();
 
     DUMP ("=======================");
-    TEST (``(SuSEFirewall::SuSEFirewall ()), [READ, WRITE, EXEC], 0);
+    map tmp_settings = SuSEFirewall::settings;
+    SuSEFirewall::settings = $[];
+    TEST (``(SuSEFirewall::Read ()), [READ, WRITE, EXEC], 0);
+    TEST (``(SuSEFirewall::Write ()), [READ, WRITE, EXEC], 0);
     DUMP ("=======================");
 }

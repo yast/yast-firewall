@@ -136,6 +136,6 @@
     NetworkDevices::Read ();
 
     DUMP ("=======================");
-    TEST (``(SuSEFirewall::SuSEFirewall ()), [READ, WRITE, EXEC], 0);
+    TEST (``(SuSEFirewall::Summary ()), [READ, WRITE, EXEC], 0);
     DUMP ("=======================");
 }

@@ -1,0 +1,4 @@
+Read	.sysconfig.personal-firewall.REJECT_ALL_INCOMING_CONNECTIONS ""
+Dump	=======================
+Return	["<h3>External Device</h3><p>eth-id-00:c0:df:22:c6:a8 modem0 modem1</p><h3>Internal Device</h3><p>eth-id-00:50:fc:74:b5:6f slp0 slp1</p><h3>Protect from Internal</h3><p>yes</p><h3>External TCP Services</h3><p>domain ssh sunrpc 5801 5901 http nfs 32768 netbios-ns netbios-dgm netbios-ssn microsoft-ds</p><p>(Start the configuration to view more options)</p>", []]
+Dump	=======================

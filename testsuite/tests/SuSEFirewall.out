@@ -1,5 +1,4 @@
-Read	.sysconfig.personal-firewall.REJECT_ALL_INCOMING_CONNECTIONS nil
-Return	true
-Return	false
-Return	true
-Dump	$["BZUM":"http", "FW_DEV_DMZ":"eth0 eth2"]
+Read	.sysconfig.personal-firewall.REJECT_ALL_INCOMING_CONNECTIONS ""
+Dump	=======================
+Return	nil
+Dump	=======================
