@@ -68,7 +68,7 @@
 		// FIXME: really?
 		ret_val = " '" + spec_interface + "' "
 		    // TRANSLATORS: informative text
-		    + _("Currently supported only in External Zone.");
+		    + _("Currently supported only in external zone.");
 	    }
 	} else {
 	    // TRANSLATORS: informative text
@@ -133,15 +133,15 @@
 	if (size(interfaces_in_zone)>0 || size(special_interfaces)>0) {
 	    ret_val = (simple_text ?
 		// TRANSLATORS: CommandLine summary header
-		String::UnderlinedHeader(_("Open Services, Ports and Protocols"),4)
+		String::UnderlinedHeader(_("Open Services, Ports, and Protocols"),4)
 		:
 		// TRANSLATORS: UI summary header
-		("<h3>" + _("Open Services, Ports and Protocols") + "</h3>")
+		("<h3>" + _("Open Services, Ports, and Protocols") + "</h3>")
 	    ) + "\n";
 	    // internal zone and unprotected
 	    if (zone_id == "INT" && SuSEFirewall::GetProtectFromInternalZone()) {
 		// TRANSLATORS: informative text
-		ret_val = ret_val + ul_start + li_start + _("Internal zone is unprotected, all ports are open.") + li_end + ul_end + "\n";
+		ret_val = ret_val + ul_start + li_start + _("Internal zone is unprotected.  All ports are open.") + li_end + ul_end + "\n";
 	    } else {
 		string open_services = "";
 

@@ -110,7 +110,7 @@
 	    foreach (string special, specials, {
 		table_items = add (table_items, `item( `id("special-" + special),
 		    // TRANSLATORS: table item, "User defined string" instead of Device_name
-		    _("User defined string"),
+		    _("Custom string"),
 		    special,
 		    zone_name
 		));
@@ -282,9 +282,10 @@
 		    _("Uknown Port Name"),
 		    sformat(
 			// TRANSLATORS: popup message, %1 is a port-name
-			_("Port name '%1' is uknown in your current system.
+			_("Port name '%1' is unknown in your current system.
 It probably would not work at all.
-Do you really want to use this port?"),
+Really use this port?
+"),
 			port
 		    )
 		);
@@ -406,7 +407,7 @@ Do you really want to use this port?"),
 	UI::ChangeWidget(`id("table_allowed_services"), `Items, allowed_services);
 	UI::ReplaceWidget(`id("allow_service_names_replacepoint"),
 	    // TRANSLATORS: select box
-	    `ComboBox(`id("allow_service_names"), _("Service To Allow"), not_allowed_services)
+	    `ComboBox(`id("allow_service_names"), _("Service to Allow"), not_allowed_services)
 	);
 
 	// disable or enable buttons, selectboxes, table
@@ -523,7 +524,7 @@ Do you really want to use this port?"),
 	    UI::ReplaceWidget(`id("replacepoint_masquerade_information"),
 		(!IsThisExpertConfiguration() ?
 		    // TRANSLATORS: informative label
-		    `Left(`Label(_("Masquerading needs at least one external interface and one another.")))
+		    `Left(`Label(_("Masquerading needs at least one external interface and one other interface.")))
 		    :
 		    `Left(`Label("FIXME: missing functionality for expert configuration"))
 		)
@@ -537,7 +538,7 @@ Do you really want to use this port?"),
 	if (UI::QueryWidget(`id(ui_id), `Value) == "") {
 	    UI::SetFocus(`id(ui_id));
 	    // TRANSLATORS: popup message
-	    Popup::Error(_("This entry has to be filled."));
+	    Popup::Error(_("This entry must be completed."));
 	    return false;
 	}
 	return true;
@@ -578,8 +579,9 @@ Do you really want to use this port?"),
 	    Popup::Error(
 		// TRANSLATORS: popup error message
 		_("Wrong port definition.
-Cannot find port number for this port name.
-Please, use port number instead of using port name.")
+No port number found for this port name.
+Use the port number instead of the port name.
+")
 	    );
 
 	    // setfocus for GUI
@@ -789,7 +791,7 @@ Please, use port number instead of using port name.")
 		    `VBox (
 			`Label(""),
 			// TRANSLATORS: check box
-			`CheckBox(`id("bcast_log_" + zone), _("Log Disallowed Broadcast Packets"), log_packets)
+			`CheckBox(`id("bcast_log_" + zone), _("Log Not Accepted Broadcast Packets"), log_packets)
 		    )
 		)
 	    );

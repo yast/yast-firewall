@@ -58,7 +58,7 @@
 			// TRANSLATORS: table header item
 			_("Device"),
 			// TRANSLATORS: table header item
-			_("Interface / String"),
+			_("Interface or String"),
 			// TRANSLATORS: table header item
 			_("Configured In")
 	    	    ), []
@@ -67,7 +67,7 @@
 		    // TRANSLATORS: push button
 		    `PushButton(`id("change_firewall_interface"), _("Change")),
 		    // TRANSLATORS: push button
-		    `PushButton(`id("user_defined_firewall_interface"), _("User Defined"))
+		    `PushButton(`id("user_defined_firewall_interface"), _("Custom"))
 		)
 	    )
 	);
@@ -78,7 +78,7 @@
     term SetFirewallInterfaceIntoZone (string device, string interface, list <term> zones) {
 	term dialog = `Frame (
 	    // TRANSLATORS: frame label
-	    _("Select Zone For Network Interface"),
+	    _("Select Zone for Network Interface"),
 	    `VBox (
 		`HBox (
 		    `VBox (
@@ -116,7 +116,7 @@
 
 	term dialog = `Frame (
 	    // TRANSLATORS: frame label
-	    _("Additional Interface Settings For Zones"),
+	    _("Additional Interface Settings for Zones"),
 	    `VBox (
 		`HStretch(),
 		`VSpacing(1),
@@ -145,7 +145,7 @@
 		),
 		(IsThisExpertConfiguration() ?
 		    // TRANSLATORS: select box
-		    `Left( `ComboBox(`id("masquerade_outer_zone"), _("Outer Masqueraded Zone"), GetZonesListedItems() ) )
+		    `Left( `ComboBox(`id("masquerade_outer_zone"), _("Zone to Masquerade On"), GetZonesListedItems() ) )
 		    :
 		    nil
 		)
@@ -180,7 +180,7 @@
 	term dialog = `VBox(
 	    `Left( `ComboBox(`id("allowed_services_zone"), `opt(`notify),
 		// TRANSLATORS: combo box
-		_("Allowed Services For Selected Zone"), GetZonesListedItems() )
+		_("Allowed Services for Selected Zone"), GetZonesListedItems() )
 	    ),
 	    `VSquash (
 		`HBox (
@@ -188,7 +188,7 @@
 			`Bottom ( `Left( `ReplacePoint( `id("allow_service_names_replacepoint"),
 			    // items handled by replacepoint
 			    // TRANSLATORS: combo box
-			    `ComboBox(`id("allow_service_names"), _("Service To Allow"),[])
+			    `ComboBox(`id("allow_service_names"), _("Service to Allow"),[])
 			)))
 		    ),
 		    `HWeight ( 2,
@@ -335,7 +335,7 @@
     term RedirectToMasqueradedIP () {
 	term dialog = `Frame (
 	    // TRANSLATORS: frame label
-	    _("Redirect Requests To Masqueraded IP"),
+	    _("Redirect Requests to Masqueraded IP"),
 	    `VBox (
 		`Table (
 		    `id("table_redirect_masq"),
@@ -350,9 +350,9 @@
 			_("Req. Port"),
 			"",
 			// TRANSLATORS: table header item, Redir. == Redirect
-			_("Redir. To IP"),
+			_("Redir. to IP"),
 			// TRANSLATORS: table header item, Redir. == Redirect
-			_("Redir. To Port")
+			_("Redir. to Port")
 		    ), []
 		),
 		`VSquash (
@@ -399,9 +399,9 @@
 		`Left( `Label(_("Redirection:")) ),
 		`HBox (
 		    // TRANSLATORS: text entry
-		    `TextEntry (`id("add_redirectto_ip"), _("Redirect To Masqueraded IP")),
+		    `TextEntry (`id("add_redirectto_ip"), _("Redirect to Masqueraded IP")),
 		    // TRANSLATORS: text entry
-		    `TextEntry (`id("add_redirectto_port"), _("Redirect To Port"))
+		    `TextEntry (`id("add_redirectto_port"), _("Redirect to Port"))
 		),
 		`VSpacing(1),
 		`HBox (
@@ -649,11 +649,11 @@
 		`VBox (
 		    `Left (
 			// TRANSLATORS: select box
-			`ComboBox (`id("logging_ACCEPT"), _("Logging Allowed Packets"), logging_options)
+			`ComboBox (`id("logging_ACCEPT"), _("Logging Accepted Packets"), logging_options)
 		    ),
 		    `Left (
 			// TRANSLATORS: select box
-			`ComboBox (`id("logging_DROP"), _("Logging Disallowed Packets"), logging_options)
+			`ComboBox (`id("logging_DROP"), _("Logging Not Accepted Packets"), logging_options)
 		    )
 		)
 	    )
@@ -687,7 +687,7 @@
  *		    )
  *		),
  *		`Left (
- *		    `CheckBox (`id("dropped_packets"), _("Log Disallowed Broadcast Packets"))
+ *		    `CheckBox (`id("dropped_packets"), _("Log Not Accepted Broadcast Packets"))
  *		)
  *	    )
  *	);
@@ -774,7 +774,7 @@
     term IPsecTrustAsZone () {
 	list<term> trust_zones = add(GetZonesListedItems(), `item(`id("no"),
 	    // TRANSLATORS: select box item, trust IPsec packet the same as the origin of the packet
-	    _("The Same Zone as The Original Source Network")));
+	    _("Same Zone as Original Source Network")));
 
 	term dialog = `Frame (
 	    // TRANSLATORS: frame label
@@ -888,7 +888,7 @@
     term BoxSummary () {
 	term dialog = `HBox (
 	    // TRANSLATORS: informative label in dialog
-	    `RichText(`id("box_summary_richtext"), _("Creating summary, please wait..."))
+	    `RichText(`id("box_summary_richtext"), _("Creating summary.  Please wait..."))
 	);
 
 	return dialog;

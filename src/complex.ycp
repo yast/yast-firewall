@@ -32,7 +32,7 @@
 	// testing for other firewall running
 	if (SuSEFirewall::IsOtherFirewallRunning()) {
 	    // TRANSLATORS: Popup headline
-	    if(Popup::ContinueCancelHeadline(_("Another firewall is active"),
+	    if(Popup::ContinueCancelHeadline(_("Another Firewall Active"),
 		// TRANSLATORS: Popup text
 		_("Another kind of firewall is active in your system.
 
@@ -70,10 +70,11 @@ Continue with configuration?
     define boolean AbortDialog () {
 	return Popup::ContinueCancelHeadline(
 	    // TRANSLATORS: popup headline
-	    _("Aborting firewall configuration"),
+	    _("Aborting Firewall Configuration"),
 	    // TRANSLATORS: popup message
-	    _("Everything would be lost.
-Really abort configuration?")
+	    _("All changes would be lost.
+Really abort configuration?
+")
 	);
     }
 

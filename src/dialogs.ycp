@@ -33,7 +33,7 @@
 	    "start_manual_button"	: _("Start Firewall &Manually"),
 	    "help"			: sformat(CWMServiceStart::AutoStartHelpTemplate (),
 		// TRANSLATORS: part of help text - radio button label, NO SHORTCUT!!!
-		_("Start Firewall when Booting"),
+		_("Start Firewall When Booting"),
 		// TRANSLATORS: part of help text - radio button label, NO SHORTCUT!!!
 		_("Start Firewall Manually")
 	    )
