@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Aug 27 11:23:55 CEST 2004 - visnov@suse.cz
+
+- fix HaveService() for any device (join separated by spaces) 
+
+-------------------------------------------------------------------
 Thu Aug 26 12:48:38 CEST 2004 - locilka@suse.cz
 
 - changed RunServiceSupport() to support all groups of interfaces

@@ -1087,8 +1087,8 @@ global define boolean HaveService(string service, string proto, string interface
 
     if( interface == "any" )
     {
-	servstr = settings["FW_SERVICES_EXT_"+proto]:""
-	    + settings["FW_SERVICES_INT_"+proto]:""
+	servstr = settings["FW_SERVICES_EXT_"+proto]:"" + " "
+	    + settings["FW_SERVICES_INT_"+proto]:"" + " "
 	    + settings["FW_SERVICES_DMZ_"+proto]:"";
     } else
     {
