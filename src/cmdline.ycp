@@ -89,7 +89,13 @@
 	// no zone => all zones
 	string for_zone = (string) options["zone"]:nil;
 	list <string> for_zones = [];
-	if (for_zone!=nil) for_zones = [for_zone];
+	if (for_zone!=nil) {
+	    if (!CheckZone(for_zone, false)) {
+		return false;
+	    } else {
+		for_zones = [for_zone];
+	    }
+	}
 
 	CommandLine::Print("");
 	CommandLine::Print(String::UnderlinedHeader(_("Summary"), 0));
@@ -118,9 +124,8 @@
 	    CommandLine::Print(_("Removing firewall from the boot process"));
 	    CommandLine::Print("");
 	    SuSEFirewall::SetEnableService(false);
-	}
-
-	if (options["show"]:nil!=nil) {
+	} else if (options["show"]:nil!=nil) {
+	    CommandLine::Print("");
 	    CommandLine::Print(String::UnderlinedHeader(_("Start-Up"), 0));
 	    CommandLine::Print("");
 	    if (SuSEFirewall::GetEnableService()) {
@@ -626,7 +631,6 @@
 		record["forward_to"]:"", record["to_port"]:"",
 	    ]);
 	});
-	y2milestone("%1", table_items);
 	CommandLine::Print(String::TextTable(
 	    [ _("Id"), _("Source Network"), _("Protocol"), _("Req. IP"), _("Req. Port"), _("Redir. To IP"), _("Redir. To Port") ],
 	    table_items, $[]
@@ -640,12 +644,14 @@
 	    return false;
 	} else if (options["add"]:nil!=nil) {
 	    // checking existency
+	    boolean checked = true;
 	    foreach (string option, [ "sourcenet", "protocol", "req_port", "redir_ip" ], {
-		if (options[option]:nil!=nil) {
+		if (options[option]:nil==nil) {
 		    CommandLine::Error(sformat(_("Parameter '%1' must be set"), option));
-		    return false;
+		    checked = false;
 		}
 	    });
+	    if (!checked) return false;
 
 	    // filling strings
 	    map <string, string> new = $[];
