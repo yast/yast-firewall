@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Aug  4 16:43:03 CEST 2003 - visnov@suse.de
+
+- added API for enabling and disabling services
+- added desktop file
+- 2.8.5 
+ 
+-------------------------------------------------------------------
 Wed Jul 30 17:51:37 CEST 2003 - msvec@suse.cz
 
 - further sources and texts cleanup

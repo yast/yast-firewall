@@ -344,18 +344,168 @@ global define boolean Write() ``{
 }
 
 /**
+ *  Add service into a given setting variable. Low-level manipulation.
+ *
+ *  @param set		the name of the sysconfig variable to be modified
+ *  @param service	the name of the service
+ *  @return boolean	true on success
  */
-global define boolean AddService(string service) ``{
-
-    list servs = splitstring(settings["FW_SERVICES_EXT_TCP"]:"", " ");
+define boolean AddServiceToConfig( string set, string service ) ``{
+    
+    y2error( "Before adding services: %1" , settings[set]:"");
+    
+    list servs = splitstring(settings[set]:"", " ");
     if(servs == nil) servs = [];
 
     servs = add(servs, service);
     string sers = mergestring(servs, " ");
     if(servs == nil) return false;
-    settings["FW_SERVICES_EXT_TCP"] = sers;
+    settings[ set ] = sers;
+
+    y2error( "After adding services: %1" , settings[set]:"");
+    
+    return true;
+}
+
+/**
+ *  Remove service from a given setting variable. Low-level manipulation.
+ *
+ *  @param set		the name of the sysconfig variable to be modified
+ *  @param service	the name of the service
+ *  @return boolean	true on success
+ */
+define boolean RemoveServiceFromConfig( string set, string service ) ``{
+    list servs = splitstring(settings[set]:"", " ");
+    if(servs == nil) servs = [];
+
+    servs = filter(string s, servs, ``(service != s) );
+    string sers = mergestring(servs, " ");
+    if(servs == nil) return false;
+    settings[ set ] = sers;
+    
+    return true;
+}
+
+/**
+ *  Add service for a given interface and protocol into a firewall. Will not
+ *  modify the list of configured interfaces in the firewall.
+ *
+ *  @param service	the name of the service
+ *  @param proto	UDP or TCP
+ *  @param interface	the name of the interface, for example eth0, "all" for all interfaces
+ *  @return boolean	true on success
+ */
+global define boolean AddService(string service, string proto, string interface) ``{
+
+    if( proto != "UDP" && proto != "TCP" ) {
+	y2error( "Unknown protocol: %1", proto );
+	return false;
+    }
+    
+    if( interface == "all" ) {
+	y2error( "Adding to all %1", service );
+	AddServiceToConfig ( "FW_SERVICES_EXT_"+proto, service );
+	AddServiceToConfig ( "FW_SERVICES_INT_"+proto, service );
+	AddServiceToConfig ( "FW_SERVICES_DMZ_"+proto, service );
+	y2error( "FW_SERVICES_EXT: ", settings["FW_SERVICES_EXT_TCP"]:nil );
+    } else {
+	// find out where is the interface
+	if( IsExtInterface( interface ) ) {
+	    AddServiceToConfig ( "FW_SERVICES_EXT_"+proto, service );
+	}
+	else if( IsIntInterface( interface ) ) {
+	    AddServiceToConfig ( "FW_SERVICES_INT_"+proto, service );
+	}
+	else if( IsDmzInterface( interface ) ) {
+	    AddServiceToConfig ( "FW_SERVICES_DMZ_"+proto, service );
+	}
+	else
+	{
+	    y2warning( "Interface %1 is not configured for firewall", interface );
+	    return false;
+	}
+    }
 
     return true;
+}
+
+/**
+ *  Remove service for a given interface and protocol from a firewall. Will not
+ *  modify the list of configured interfaces in the firewall.
+ *
+ *  @param service	the name of the service
+ *  @param proto	UDP or TCP
+ *  @param interface	the name of the interface, for example eth0, "all" for all interfaces
+ *  @return boolean	true on success
+ */
+global define boolean RemoveService(string service, string proto, string interface) ``{
+
+    if( proto != "UDP" && proto != "TCP" ) {
+	y2error( "Unknown protocol: %1", proto );
+	return false;
+    }
+    
+    if( interface == "all" ) {
+	y2error( "Removing from all %1", service );
+	RemoveServiceFromConfig ( "FW_SERVICES_EXT_"+proto, service );
+	RemoveServiceFromConfig ( "FW_SERVICES_INT_"+proto, service );
+	RemoveServiceFromConfig ( "FW_SERVICES_DMZ_"+proto, service );
+	y2error( "FW_SERVICES_EXT: ", settings["FW_SERVICES_EXT_TCP"]:nil );
+    } else {
+	// find out where is the interface
+	if( IsExtInterface( interface ) ) {
+	    RemoveServiceFromConfig ( "FW_SERVICES_EXT_"+proto, service );
+	}
+	else if( IsIntInterface( interface ) ) {
+	    RemoveServiceFromConfig ( "FW_SERVICES_INT_"+proto, service );
+	}
+	else if( IsDmzInterface( interface ) ) {
+	    RemoveServiceFromConfig ( "FW_SERVICES_DMZ_"+proto, service );
+	}
+	else
+	{
+	    y2warning( "Interface %1 is not configured for firewall", interface );
+	    return false;
+	}
+    }
+
+    return true;
+}
+
+/**
+ * Is this interface external for firewall?
+ *
+ * @param interface	the name of the interface
+ * @return boolean	true if it is an external interface
+ */
+global define boolean IsExtInterface( string interface ) ``{
+    list servs = splitstring(settings[ "FW_DEV_EXT" ]:"", " ");
+    if(servs == nil) servs = [];
+    return contains( servs, interface );
+}
+
+/**
+ * Is this interface internal for firewall?
+ *
+ * @param interface	the name of the interface
+ * @return boolean	true if it is an internal interface
+ */
+global define boolean IsIntInterface( string interface ) ``{
+    list servs = splitstring(settings[ "FW_DEV_INT" ]:"", " ");
+    if(servs == nil) servs = [];
+    return contains( servs, interface );
+}
+
+/**
+ * Is this interface DMZ for firewall?
+ *
+ * @param interface	the name of the interface
+ * @return boolean	true if it is a DMZ interface
+ */
+global define boolean IsDmzInterface( string interface ) ``{
+    list servs = splitstring(settings[ "FW_DEV_DMZ" ]:"", " ");
+    if(servs == nil) servs = [];
+    return contains( servs, interface );
 }
 
 /* EOF */
