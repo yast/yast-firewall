@@ -924,7 +924,7 @@ global define boolean Write() {
 //    }
 
     if (Mode::config==true || Mode::autoinst==true) {
-	if (!start ) {
+	if (!start && !write_only ) {
 	    y2milestone("Firewall should not start and should not be written");
 	    return false;
 	}
