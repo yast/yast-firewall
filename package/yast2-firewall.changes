@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Aug  5 10:17:17 CEST 2004 - locilka@suse.cz
+
+- added support for ipp, LDAP and LDAPS
+- 2.10.2
+
+-------------------------------------------------------------------
 Wed Aug  4 16:52:53 CEST 2004 - locilka@suse.cz
 
 - added new functionality for enabling/disabling services defined
