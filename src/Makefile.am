@@ -1,8 +1,6 @@
 #
 # Makefile.am for y2c_firewall/src
 #
-# $Id$
-#
 
 yncludedir = @yncludedir@/firewall
 
@@ -16,7 +14,6 @@ ynclude_DATA =		\
 
 config_DATA = firewall.y2cc
 
-scrconf_DATA = firewall2.scr personal-firewall.scr
-
+scrconf_DATA = cfg_firewall2.scr
 
 EXTRA_DIST = $(client_DATA) $(ynclude_DATA) $(config_DATA) $(scrconf_DATA)

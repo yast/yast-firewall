@@ -1,8 +1,9 @@
 @HEADER-COMMENT@
-# neededforbuild yast2-devel-packages
+
+# neededforbuild  yast2-devel-packages
 
 @HEADER@
-Requires:	yast2 SuSEfirewall2
+Requires:	yast2 yast2-network SuSEfirewall2
 
 Provides:	yast2-config-firewall
 Obsoletes:	yast2-config-firewall
@@ -16,9 +17,9 @@ Summary:	Configuration of firewall
 
 @PREP@
 
-@BUILD-YCP@
+@BUILD@
 
-@INSTALL-YCP@
+@INSTALL@
 
 @CLEAN@
 

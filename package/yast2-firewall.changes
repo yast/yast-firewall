@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Jul 02 16:57:39 CEST 2002 - arvin@suse.de
+
+- removed personal-firewall.scr (use the one from yast2-network)
+
+-------------------------------------------------------------------
 Mon Jul  1 17:50:26 CEST 2002 - msvec@suse.cz
 
 - renamed to yast2-firewall
@@ -13,10 +18,8 @@ Fri Mar  8 13:55:47 CET 2002 - lnussel@suse.de
 -------------------------------------------------------------------
 Thu Feb 28 19:46:14 CET 2002 - mike@suse.de
 
-- undo "insert proofreaded texts" because the translation are based on
-  not proofreaded texts
-  approved by tom
-
+- undo "insert proofreaded texts" because the translation are
+  based on not proofreaded texts
 
 -------------------------------------------------------------------
 Thu Feb 21 11:58:04 CET 2002 - lnussel@suse.de
