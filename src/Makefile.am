@@ -11,7 +11,9 @@ client_DATA =		\
 	firewall_auto.ycp
 
 ynclude_DATA =		\
-	ui.ycp
+	complex.ycp	\
+	dialogs.ycp	\
+	wizards.ycp
 
 config_DATA = firewall.y2cc
 

@@ -26,4 +26,3 @@
 `ag_ini(
     SysConfigFile("/etc/sysconfig/SuSEfirewall2")
 )
-

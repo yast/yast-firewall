@@ -20,7 +20,7 @@ y2milestone("----------------------------------------");
 y2milestone("Firewall module started");
 
 import "SuSEFirewall";
-include "firewall/ui.ycp";
+include "firewall/wizards.ycp";
 
 /* main ui function */
 any ret = Firewall();

@@ -26,39 +26,14 @@ textdomain "firewall";
 y2milestone("----------------------------------------");
 y2milestone("Firewall auto started");
 
-import "Mode";
+import "Map";
 import "SuSEFirewall";
 
-include "firewall/ui.ycp";
+include "firewall/wizards.ycp";
 
 any ret = nil;
 string func = "";
 map param = $[];
-
-/**
- * Switch map keys to lower case
- * @param s map with upper case
- * @return map with lower case
- */
-define map switch2Lower(map s) ``{
-	map new_s = mapmap(`k,`v, s, ``{
-			return([tolower(k),v]);
-			});
-	return new_s;
-}
-
-/**
- * Switch map keys to upper case
- * @param s map with low case
- * @return map with upper case
- */
-define map switch2Upper(map s) ``{
-	map new_s = mapmap(`k,`v, s, ``{
-			return([toupper(k),v]);
-			});
-	return new_s;
-}
-
 
 /* Check arguments */
 if(size(Args()) > 0 && is(Args(0), string)) {
@@ -84,7 +59,7 @@ else if (func == "Change") {
 }
 /* Import configuration */
 else if (func == "Import") {
-    ret = SuSEFirewall::Import(switch2Upper(param));
+    ret = SuSEFirewall::Import(Map::KeysToUpper(param));
 }
 /* Read firewall data */
 else if (func == "Read") {
@@ -92,7 +67,7 @@ else if (func == "Read") {
 }
 /* Return actual state */
 else if (func == "Export") {
-    ret = switch2Lower(SuSEFirewall::Export());
+    ret = Map::KeysToLower(SuSEFirewall::Export());
 }
 /* Write givven settings */
 else if (func == "Write") {

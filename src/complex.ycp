@@ -1,0 +1,68 @@
+/**
+ * File:	include/firewall/complex.ycp
+ * Package:	Firewall configuration
+ * Summary:	Complex dialogs definitions
+ * Authors:	Michal Svec <msvec@suse.cz>
+ *
+ * $Id$
+ */
+
+{
+
+textdomain "firewall";
+
+import "Label";
+import "Popup";
+import "SuSEFirewall";
+import "Wizard";
+
+/**
+ * Read settings dialog
+ * @return `next if success, else `abort
+ */
+global define symbol ReadDialog() ``{
+
+    /* Read dialog help */
+    Wizard::RestoreHelp(_("<p><b><big>Reading Firewall Configuration</big></b>
+Please wait ...</p>"));
+
+    // Wizard::RestoreHelp(HELPS["read"]:"");
+    // Firewall::AbortFunction = ``{return PollAbort();};
+    boolean ret = SuSEFirewall::Read();
+
+    /* FIXME:
+     * - possible more reads
+     * - progress bar
+     * - UI::UserInput `abort handling
+     */
+    if (SuSEFirewall::personal_firewall_is_active ) {
+	/* Popup text */
+	if(Popup::ContinueCancelHeadline(_("Personal Firewall is active"),
+	    _("The Personal Firewall is activated.
+If you continue, it will be turned off and replaced by SuSEfirewall2.
+")) != true)
+	    return `abort;
+    }
+
+    /* FIXME: handle possible read errors */
+    return ret ? `next : `abort;
+}
+
+/**
+ * Write settings dialog
+ * @return `next if success, else `abort
+ */
+global define symbol WriteDialog() ``{
+
+    /* Write dialog help */
+    Wizard::RestoreHelp(_("<p><b><big>Saving Firewall Configuration</big></b>
+<br>Please wait...</p>"));
+
+    // Wizard::RestoreHelp(HELPS["write"]:"");
+    // Firewall::AbortFunction = ``{return PollAbort();};
+    boolean ret = SuSEFirewall::Write();
+    return ret ? `next : `abort;
+}
+
+/* EOF */
+}
