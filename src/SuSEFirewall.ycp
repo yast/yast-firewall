@@ -19,7 +19,7 @@ import "Mode";
 import "Popup";
 import "Progress";
 import "Report";
-import "Runlevel";
+import "Service";
 import "Summary";
 
 /* global settings map */
@@ -115,7 +115,7 @@ global define list Summary() ``{
 global define boolean Read() ``{
 
     // Check if firewall running
-    start = Runlevel::ServiceEnabled("SuSEfirewall2_init");
+    start = Service::Enabled("SuSEfirewall2_init");
 
 //  <AUTOCODE READ>
     string FW_LOG_ACCEPT_ALL = (string) SCR::Read(.sysconfig.SuSEfirewall2.FW_LOG_ACCEPT_ALL);
@@ -256,7 +256,7 @@ global define boolean Write() ``{
     while(retry) {
 
 	retry = false;
-	if(Runlevel::RunInitScript("SuSEfirewall2_setup", "stop") != 0) {
+	if(Service::RunInitScript("SuSEfirewall2_setup", "stop") != 0) {
 
 	    /* Popup text */
 	    string whatfailedmsg = _("Stopping the firewall failed");
@@ -364,7 +364,7 @@ global define boolean Write() ``{
     foreach(string service, services, ``{
 
 	y2milestone("Enabling service %1", service);
-	if(!Runlevel::ServiceAdjust(service , "enable"))
+	if(!Service::Enable(service))
 	    /* Popup text */
 	    Report::Error(_("Starting the firewall failed"));
 
@@ -373,7 +373,7 @@ global define boolean Write() ``{
     Progress::NextStage();
 
     if(!write_only)
-	Runlevel::RunInitScript("SuSEfirewall2_final", "start");
+	Service::RunInitScript("SuSEfirewall2_final", "start");
 
     Progress::Finish();
 
