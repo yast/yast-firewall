@@ -478,7 +478,7 @@ to which you explicitly allowed access in the previous dialog.</p>") +
 
     /* Features dialog help 5/5 */
     _("<p><b>Treat IPsec Traffic as Interal</b> means that encrypted IPsec
-    packets that where successfully decrypted are treated the same as packets
+    packets that were successfully decrypted are treated the same as packets
     originating from your internal network.</p>");
 
     /* Features dialog caption */
