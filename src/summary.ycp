@@ -136,10 +136,11 @@
 
 	// any interface must be assigned
 	if (size(interfaces_in_zone)>0 || size(special_interfaces)>0) {
-	    // TRANSLATORS: summary item label
 	    ret_val = (simple_text ?
+		// TRANSLATORS: CommandLine summary header
 		String::UnderlinedHeader(_("Open Services, Ports and Protocols"),4)
 		:
+		// TRANSLATORS: UI summary header
 		("<h3>" + _("Open Services, Ports and Protocols") + "</h3>")
 	    ) + "\n";
 	    // internal zone and unprotected
@@ -190,8 +191,10 @@
     string SummaryFirewallStart () {
 	// TRANSLATORS: Summary header item
 	string ret_message = "\n" + (simple_text ?
+	    // TRANSLATORS: CommandLine Summary header
 	    String::UnderlinedHeader(_("Firewall Starting"),0)
 	    :
+	    // TRANSLATORS: UI Summary header
 	    ("<h2>" + _("Firewall Starting") + "</h2>")
 	) + "\n";
 
@@ -230,7 +233,7 @@
 	foreach (map <string, string> interface, SuSEFirewall::GetAllKnownInterfaces(), {
 	    if (interface["zone"]:nil==nil) {
 		ret_message = ret_message + li_start + ErrMark + " " + sformat(
-		    // TRANSLATORS: Summary
+		    // TRANSLATORS: Summary, %1 is the network interface name, %2 is the device name, 
 		    _("Warning: Network interface '%1' / '%2' is not mentioned in any firewall zone. All network traffic on this interface will be blocked!"), interface["name"]:"", interface["id"]:"")
 		+ li_end + "\n";
 	    }

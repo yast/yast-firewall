@@ -222,11 +222,11 @@
 	    }
 	    // unknown interface
 	    if (interfaces[interface]:$[]==$[]) {
-		// TRANSLATORS: CommandLine progress information
+		// TRANSLATORS: CommandLine progress information, %1 is the special string, %2 is the zone name
 		CommandLine::Print(sformat(_("Adding special string '%1' into zone '%2'"), interface, for_zone));
 		SuSEFirewall::AddSpecialInterfaceIntoZone(interface, for_zone);
 	    } else {
-		// TRANSLATORS: CommandLine progress information
+		// TRANSLATORS: CommandLine progress information, %1 is the network interface name, %2 is the zone name
 		CommandLine::Print(sformat(_("Adding interface '%1' into zone '%2'"), interface, for_zone));
 		SuSEFirewall::AddInterfaceIntoZone(interface, for_zone);
 	    }
@@ -244,11 +244,11 @@
 	    }
 	    // unknown interface
 	    if (interfaces[interface]:$[]==$[]) {
-		// TRANSLATORS: CommandLine progress information
+		// TRANSLATORS: CommandLine progress information, %1 is the special string, %2 is the zone name
 		CommandLine::Print(sformat(_("Removing special string '%1' from zone '%2'"), interface, for_zone));
 		SuSEFirewall::RemoveSpecialInterfaceFromZone(interface, for_zone);
 	    } else {
-		// TRANSLATORS: CommandLine progress information
+		// TRANSLATORS: CommandLine progress information, %1 is the network interface name, %2 is the zone name
 		CommandLine::Print(sformat(_("Removing interface '%1' from zone '%2'"), interface, for_zone));
 		SuSEFirewall::RemoveInterfaceFromZone(interface, for_zone);
 	    }
@@ -870,12 +870,13 @@
 	    CommandLine::Print(String::UnderlinedHeader(_("Masquerading settings"),0));
 	    CommandLine::Print("");
 	    CommandLine::Print(sformat(
+		// TRANSLATORS: CommandLine informative text, %1 is "enabled" or "disabled"
 		_("Masquerading is %1"),
 		(SuSEFirewall::GetMasquerade()==true ?
-		    // TRANSLATORS: CommandLine firewall service status
+		    // TRANSLATORS: CommandLine masquerade status
 		    _("enabled")
 		    :
-		    // TRANSLATORS: CommandLine firewall service status
+		    // TRANSLATORS: CommandLine masquerade status
 		    _("disabled"))
 	    ));
 	    CommandLine::Print("");
