@@ -199,28 +199,27 @@ global define Firewall() ``{
  */
 global define FirewallAutoSequence() ``{
     map aliases = $[
-        "stop"		: ``(StopDialog()),
-        "step1"		: ``(DevDialog()),
-        "step2"		: ``(ServicesDialog()),
-        "step3"		: ``(FeatureDialog()),
-        "step4"		: ``(LoggingDialog()),
+	"devices"	: ``(DevicesDialog()),
+	"services"	: ``(ServicesDialog()),
+	"features"	: ``(FeatureDialog()),
+	"logging"	: ``(LoggingDialog())
     ];
 
     map sequence = $[
-        "ws_start" : "step1",
-        "step1" : $[
+        "ws_start" : "devices",
+        "devices" : $[
 	    `abort: `abort,
-            `next: "step2"
+            `next: "services"
         ],
-        "step2" : $[
+        "services" : $[
 	    `abort: `abort,
-            `next: "step3"
+            `next: "features"
         ],
-        "step3" : $[
+        "features" : $[
 	    `abort: `abort,
-            `next: "step4"
+            `next: "logging"
         ],
-        "step4" : $[
+        "logging" : $[
 	    `abort: `abort,
             `next: `next
         ]
