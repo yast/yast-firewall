@@ -1,0 +1,265 @@
+/**
+ * File:        firewall/dialogs.ycp
+ * Package:     Configuration YaST2 Firewall
+ * Summary:     Configuration dialogs and workflow
+ * Authors:     Lukas Ocilka <locilka@suse.cz>
+ *
+ * $Id$
+ *
+ * Configuration dialogs and workflow.
+ * Both Expert and Simple.
+ */
+{
+    textdomain "firewall";
+
+    import "CWM";
+    import "CWMServiceStart";
+    import "DialogTree";
+    import "Label";
+    import "Mode";
+
+    include "firewall/subdialogs.ycp";
+    include "firewall/uifunctions.ycp";
+    include "firewall/helps.ycp";
+    include "firewall/summary.ycp";
+
+    map<string,map<string,any> > widgets_handling = $[
+	"auto_start_up" : CWMServiceStart::CreateAutoStartWidget ($[
+	    "get_service_auto_start"	: SuSEFirewall::GetEnableService,
+	    "set_service_auto_start"	: SuSEFirewall::SetEnableService,
+	    // TRANSLATORS: Radio selection
+	    "start_auto_button"		: _("Start Firewall When &Booting"),
+	    // TRANSLATORS: Radio selection
+	    "start_manual_button"	: _("Start Firewall &Manually"),
+	    "help"			: sformat(CWMServiceStart::AutoStartHelpTemplate (),
+		// TRANSLATORS: part of help text - radio button label, NO SHORTCUT!!!
+		_("Start Firewall When Booting"),
+		// TRANSLATORS: part of help text - radio button label, NO SHORTCUT!!!
+		_("Start Firewall Manually")
+	    )
+	]),
+	"start_stop" : CWMServiceStart::CreateStartStopWidget ($[
+	    "service_id"		: "SuSEfirewall2_setup",
+					  // TRANSLATORS: Informating label
+	    "service_running_label"	: _("Firewall is running"),
+					  // TRANSLATORS: Informating label
+	    "service_not_running_label"	: _("Firewall is not running"),
+					  // TRANSLATORS: Push button
+	    "start_now_button"		: _("&Start Firewall Now"),
+					  // TRANSLATORS: Push button
+	    "stop_now_button"		: _("S&top Firewall Now"),
+	    "save_now_action"		: SaveAndRestart,
+					  // TRANSLATORS: Push button
+	    "save_now_button"		: _("Save Settings and Restart Firewall &Now"),
+	    "start_now_action"		: StartNow,
+	    "stop_now_action"		: StopNow,
+	    "help"			: sformat (CWMServiceStart::StartStopHelpTemplate (true),
+		// TRANSLATORS: part of help text - push button label, NO SHORTCUT!!!
+		_("Start Firewall Now"),
+		// TRANSLATORS: part of help text - push button label, NO SHORTCUT!!!
+		_("Stop Firewall Now"),
+		// TRANSLATORS: part of help text - push button label, NO SHORTCUT!!!
+		_("Save Settings and Restart Firewall Now")
+	    )
+	]),
+	// hack function for disabling BackButon
+	"DisableBackButton" : $[
+	    "widget"		: `custom,
+	    "custom_widget"	: `Empty(),
+	    "init"		: DisableBackButton,
+	    "help"		: " ",
+	],
+	"FirewallInterfaces" : $[
+	    "widget"		: `custom,
+	    "custom_widget"	: `VBox(),
+	    "init"		: InitFirewallInterfaces,
+	    "handle"		: HandleFirewallInterfaces,
+	    //"store"		: NoStoreNeeded,
+	    "help"		: HelpForDialog("firewall-interfaces"),
+	],
+	"AllowedServices" : $[
+	    "widget"		: `custom,
+	    "custom_widget"	: `VBox(),
+	    "init"		: InitAllowedServices,
+	    "handle"		: HandleAllowedServices,
+	    //"store"		: NoStoreNeeded,
+	    "help"		: HelpForDialog("allowed-services"),
+	],
+	"Masquerading"		: $[
+	    "widget"		: `custom,
+	    "custom_widget"	: `VBox(),
+	    "init"		: InitMasquerading,
+	    "handle"		: HandleMasquerading,
+	    //"store"		: NoStoreNeeded,
+	    "help"		: HelpForDialog("base-masquerading"),
+	],
+	"BroadcastConfigurationSimple": $[
+	    "widget"		: `custom,
+	    "custom_widget"	: `VBox(),
+	    "init"		: InitBroadcastConfigurationSimple,
+	    //"handle"		: NoHandlingNeeded,
+	    "store"		: StoreBroadcastConfigurationSimple,
+	    "help"		: HelpForDialog("simple-broadcast-configuration"),
+	],
+	"IPsecSupport"		: $[
+	    "widget"		: `custom,
+	    "custom_widget"	: `VBox(),
+	    "init"		: InitIPsecSupport,
+	    "handle"		: HandleIPsecSupport,
+	    "store"		: StoreIPsecSupport,
+	    "help"		: HelpForDialog("base-ipsec-support"),
+	],
+	"LoggingLevel"		: $[
+	    "widget"		: `custom,
+	    "custom_widget"	: `VBox(),
+	    "init"		: InitLoggingLevel,
+	    //"handle"		: NoHandlingNeeded,
+	    "store"		: StoreLoggingLevel,
+	    "help"		: HelpForDialog("base-logging"),
+	],
+	"RedirectToMasqueradedIP" : $[
+	    "widget"		: `custom,
+	    "custom_widget"	: `VBox(),
+	    "init"		: InitRedirectToMasqueradedIP,
+	    "handle"		: HandleRedirectToMasqueradedIP,
+	    //"store"		: NoStoreNeeded,
+	    "help"		: HelpForDialog("masquerade-redirect-table"),
+	],
+    ];
+
+    // TRANSLATORS: Part of dialog caption
+    string firewall_caption = _("Firewall Configuration");
+
+    map<string, map<string, any> > tabs = $[
+	"start_up"		: $[
+	    "contents"		: `VBox (
+		"auto_start_up",
+		`VSpacing (1),
+		// disabling start/stop buttons when it doesn't make sense
+		(Mode::normal() ? "start_stop" : `Empty()),
+		"hide_back_button",
+		`VStretch ()
+	    ),
+	    // TRANSLATORS: part of dialog caption
+	    "caption"		: firewall_caption + " - " + _("Start-Up"),
+	    // TRANSLATORS: tree menu item
+	    "tree_item_label"	: _("Start-Up"),
+	    "widget_names"	: [ "auto_start_up", "start_stop", "DisableBackButton" ]
+	],
+	"interfaces"		: $[
+	    "contents"		: `VBox (
+		FirewallInterfaces(),
+		`VSpacing (1)
+	    ),
+	    // TRANSLATORS: part of dialog caption
+	    "caption"		: firewall_caption + " - " + _("Interfaces"),
+	    // TRANSLATORS: tree menu item
+	    "tree_item_label"	: _("Interfaces"),
+	    "widget_names"	: [ "FirewallInterfaces" ]
+	],
+	"allowed_services"	: $[
+	    "contents"		: `VBox (
+		AllowedServices(),
+		`VSpacing (1)
+	    ),
+	    // TRANSLATORS: part of dialog caption
+	    "caption"		: firewall_caption + " - " + _("Allowed Services"),
+	    // TRANSLATORS: tree menu item
+	    "tree_item_label"	: _("Allowed Services"),
+	    "widget_names"	: [ "AllowedServices" ]
+	],
+	"masquerading"		: $[
+	    "contents"		: `VBox (
+		Masquerading(),
+		`VSpacing(1),
+		RedirectToMasqueradedIP(),
+		`VSpacing (1)
+	    ),
+	    // TRANSLATORS: part of dialog caption
+	    "caption"		: firewall_caption + " - " + _("Network Masquerading"),
+	    // TRANSLATORS: tree menu item
+	    "tree_item_label"	: _("Masquerading"),
+	    "widget_names"	: [ "Masquerading", "RedirectToMasqueradedIP" ]
+	],
+	"broadcast_simple"	: $[
+	    "contents"		: `VBox (
+		BroadcastConfigurationSimple(),
+		`VStretch ()
+	    ),
+	    // TRANSLATORS: part of dialog caption
+	    "caption"		: firewall_caption + " - " + _("Broadcast Configuration"),
+	    // TRANSLATORS: tree menu item
+	    "tree_item_label"	: _("Broadcast"),
+	    "widget_names"	: [ "BroadcastConfigurationSimple" ]
+	],
+	"ipsec_support"		: $[
+	    "contents"		: `VBox (
+		IPsecSupport(),
+		`VStretch ()
+	    ),
+	    // TRANSLATORS: part of dialog caption
+	    "caption"		: firewall_caption + " - " + _("IPsec Support"),
+	    // TRANSLATORS: tree menu item
+	    "tree_item_label"	: _("IPsec Support"),
+	    "widget_names"	: [ "IPsecSupport" ]
+	],
+	"logging_level"		: $[
+	    "contents"		: `VBox (
+		LoggingLevel(),
+		`VStretch ()
+	    ),
+	    // TRANSLATORS: part of dialog caption
+	    "caption"		: firewall_caption + " - " + _("Logging Level"),
+	    // TRANSLATORS: tree menu item
+	    "tree_item_label"	: _("Logging Level"),
+	    "widget_names"	: [ "LoggingLevel" ]
+	],
+    ];
+
+    map<symbol,any> functions = $[
+	`abort : AbortDialog,
+    ];
+
+    symbol RunFirewallDialogs () {
+	list<string> simple_dialogs = [ "start_up", "interfaces", "allowed_services",
+	    "masquerading", "broadcast_simple", "ipsec_support", "logging_level" ];
+
+	return DialogTree::ShowAndRun ($[
+	    "ids_order"		: simple_dialogs,
+	    "initial_screen"	: "start_up",
+	    "screens"		: tabs,
+	    "widget_descr"	: widgets_handling,
+	    "back_button"	: Label::BackButton(),
+	    "abort_button"	: Label::AbortButton(),
+	    // if 'normal' or 'installation', [Next] button, else [Accept]
+	    "next_button"	: (Mode::normal() ?
+		Label::NextButton () : Label::AcceptButton ()
+	    ),
+	    "functions"		: functions,
+	]);
+    }
+
+    symbol BoxSummaryDialog () {
+	Wizard::SetContentsButtons (
+	    // TRANSLATORS: part of dialog caption
+	    firewall_caption + " - " + _("Summary"),
+	    BoxSummary(),
+	    HelpForDialog("box-summary"),
+	    Label::BackButton (), Label::AcceptButton ()
+	);
+	UI::ChangeWidget(`id(`back), `Enabled, true);
+
+	InitBoxSummary([]);
+
+	symbol ret = nil;
+	while (true) {
+	    ret = (symbol) UI::UserInput();
+
+	    if (ret == `back || ret == `next) break;
+
+	    if (ret == `abort && AbortDialog() == true) break;
+	}
+
+	return ret;
+    }
+}

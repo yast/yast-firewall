@@ -1,0 +1,139 @@
+/**
+ * Copyright 2004, Novell, Inc.  All rights reserved.
+ *
+ * File:	firewall/wizards.ycp
+ * Package:	Firewall configuration
+ * Summary:	Wizards definition
+ * Authors:	Lukas Ocilka <locilka@suse.cz>
+ *
+ * $Id$
+ */
+
+{
+    import "Wizard";
+    import "Sequencer";
+
+    include "firewall/complex.ycp";
+    include "firewall/dialogs.ycp";
+
+    /**
+     * Main workflow of the firewall configuration
+     *
+     * @return any returned value from Sequencer::Run() call
+     */
+    define any MainSequence() {
+	map aliases = $[
+	    "configuration" : ``(RunFirewallDialogs()),
+	];
+
+	map sequence = $[
+	    "ws_start" : "configuration",
+	    "configuration" : $[
+		`abort	: `abort,
+		`next	: `next,
+	    ],
+	];
+
+	return Sequencer::Run(aliases, sequence);
+    }
+
+    /**
+     * Whole configuration of firewall
+     *
+     * @return any returned value from Sequencer::Run() call
+     */
+    define any FirewallSequence() {
+	map aliases = $[
+	    "read"  	: [ ``( ReadDialog() ), true ],
+	    "main"  	:   ``( MainSequence() ),
+	    "summary"	:   ``( BoxSummaryDialog() ),
+	    "write" 	: [ ``( WriteDialog() ), true ]
+	];
+
+	map sequence = $[
+	    "ws_start" : "read",
+	    "read" : $[
+		`abort      : `abort,
+		`next       : "main"
+	    ],
+	    "main" : $[
+		`abort      : `abort,
+		`next       : "summary"
+	    ],
+	    "summary" : $[
+		`abort      : `abort,
+		`next       : "write"
+	    ],
+	    "write" : $[
+		`abort      : `abort,
+		`next       : `next
+	    ],
+	];
+
+	Wizard::CreateDialog();
+	Wizard::SetDesktopIcon("firewall");
+
+	any ret = Sequencer::Run(aliases, sequence);
+
+	UI::CloseDialog();
+	return ret;
+    }
+
+    /**
+     * Whole configuration of firewall
+     *
+     * @return any returned value from Sequencer::Run() call
+     */
+    define any FirewallAutoSequence() {
+	map aliases = $[
+	    "main"  	:   ``( MainSequence() ),
+	    "summary"	:   ``( BoxSummaryDialog() ),
+	];
+
+	map sequence = $[
+	    "ws_start" : "main",
+	    "main" : $[
+		`abort      : `abort,
+		`next       : `next
+	    ],
+	];
+
+	Wizard::CreateDialog();
+	Wizard::SetDesktopIcon("firewall");
+
+	any ret = Sequencer::Run(aliases, sequence);
+
+	UI::CloseDialog();
+	return ret;
+    }
+
+    /**
+     * Whole configuration of firewall
+     *
+     * @return any returned value from Sequencer::Run() call
+     */
+    define any FirewallInstallationSequence() {
+	map aliases = $[
+	    "main"  	:   ``( MainSequence() ),
+	    "summary"	:   ``( BoxSummaryDialog() ),
+	];
+
+	map sequence = $[
+	    "ws_start" : "main",
+	    "main" : $[
+		`abort      : `abort,
+		`next       : `next
+	    ],
+	];
+
+	Wizard::CreateDialog();
+	Wizard::SetDesktopIcon("firewall");
+
+	any ret = Sequencer::Run(aliases, sequence);
+
+	UI::CloseDialog();
+	return ret;
+    }
+
+/* EOF */
+}

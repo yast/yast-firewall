@@ -1,0 +1,65 @@
+/**
+ * File:        firewall/generalfunctions
+ * Package:     Configuration YaST2 Firewall
+ * Summary:     General Handling Functions
+ * Authors:     Lukas Ocilka <locilka@suse.cz>
+ *
+ * $Id$
+ */
+{
+    textdomain "firewall";
+
+    import "PortAliases";
+
+    /**
+     * Function returns port number of port name got as parameter.
+     * If no port number found, nil is returned.
+     */
+    string GetPortNumber (string port_to_be_checked) {
+	if (port_to_be_checked=="") {
+	    y2error("Port name/number must be defined");
+	    return nil;
+	}
+	// if port is a port name, find port number
+	if (!regexpmatch(port_to_be_checked, "^[0123456789]+$")) {
+	    list <string> port_aliases = PortAliases::GetListOfServiceAliases(port_to_be_checked);
+	    // clear port name
+	    port_to_be_checked = nil;
+	    foreach (string port_alias, port_aliases, {
+		// if found port number in aliases, assigning port number instead of port name
+		if (regexpmatch(port_alias, "^[0123456789]+$")) {
+		    port_to_be_checked = port_alias;
+		    break;
+		}
+	    });
+	}
+
+	return port_to_be_checked;
+    }
+
+    /**
+     * Function returns port name of port number got as parameter.
+     * If no port name found, nil is returned.
+     */
+    string GetPortName (string port_to_be_checked) {
+	if (port_to_be_checked=="") {
+	    y2error("Port name/number must be defined");
+	    return nil;
+	}
+	// if port is a port number, find port number
+	if (regexpmatch(port_to_be_checked, "^[0123456789]+$")) {
+	    list <string> port_aliases = PortAliases::GetListOfServiceAliases(port_to_be_checked);
+	    // clear port name
+	    port_to_be_checked = nil;
+	    foreach (string port_alias, port_aliases, {
+		// if found port name in aliases, assigning port name instead of port number
+		if (!regexpmatch(port_alias, "^[0123456789]+$")) {
+		    port_to_be_checked = port_alias;
+		    break;
+		}
+	    });
+	}
+	
+	return port_to_be_checked;
+    }
+}

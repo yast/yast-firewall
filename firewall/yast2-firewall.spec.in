@@ -1,0 +1,33 @@
+@HEADER-COMMENT@
+# neededforbuild yast2-devel-packages yast2-installation
+
+@HEADER@
+Requires:	yast2 SuSEfirewall2
+
+Provides:	yast2-config-firewall
+Obsoletes:	yast2-config-firewall
+Provides:	yast2-trans-firewall
+Obsoletes:	yast2-trans-firewall
+
+BuildArchitectures:	noarch
+
+Summary:	Configuration of firewall
+
+%description
+-
+
+@PREP@
+
+@BUILD@
+
+@INSTALL@
+
+@CLEAN@
+
+%files
+%defattr(-,root,root)
+%dir @yncludedir@/firewall
+@yncludedir@/firewall/*
+@clientdir@/firewall*
+@desktopdir@/firewall.desktop
+%doc @docdir@
