@@ -1,6 +1,6 @@
 /**
  * File:	clients/firewall_auto.ycp
- * Package:	Configuration of firewall
+ * Package:	SuSE firewall configuration
  * Summary:	Client for autoinstallation
  * Authors:	Anas Nashif <nashif@suse.de>
  *
@@ -24,10 +24,10 @@
 textdomain "firewall";
 
 y2milestone("----------------------------------------");
-y2milestone("firewall auto started");
+y2milestone("Firewall auto started");
 
-import "SuSEFirewall";
 import "Mode";
+import "SuSEFirewall";
 
 include "firewall/ui.ycp";
 
@@ -35,14 +35,12 @@ any ret = nil;
 string func = "";
 map param = $[];
 
-
-
 /**
  * Switch map keys to lower case
- * @param map with upper case
+ * @param s map with upper case
  * @return map with lower case
  */
-define  switch2Lower(map s) ``{
+define map switch2Lower(map s) ``{
 	map new_s = mapmap(`k,`v, s, ``{
 			return([tolower(k),v]);
 			});
@@ -51,10 +49,10 @@ define  switch2Lower(map s) ``{
 
 /**
  * Switch map keys to upper case
- * @param map with low case
+ * @param s map with low case
  * @return map with upper case
  */
-define switch2Upper(map s) ``{
+define map switch2Upper(map s) ``{
 	map new_s = mapmap(`k,`v, s, ``{
 			return([toupper(k),v]);
 			});
@@ -111,7 +109,7 @@ else {
 }
 
 y2debug("ret=%1", ret);
-y2milestone("firewall auto finished");
+y2milestone("Firewall auto finished");
 y2milestone("----------------------------------------");
 
 return ret;

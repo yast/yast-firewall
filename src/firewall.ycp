@@ -1,37 +1,26 @@
 /**
- * File:
- *   firewall.ycp
- *
- * Module:
- *   Configuration of firewall
- *
- * Summary:
- *   Main file
- *
- * Authors:
- *   Michael Hager <mike@suse.de>
+ * File:	clients/firewall.ycp
+ * Package:	SuSE firewall configuration
+ * Summary:	Main file
+ * Authors:	Michael Hager <mike@suse.de>
  *
  * $Id$
- *
- * Main file for firewall configuration. Uses all other files.
- *
  */
 
 {
+
 /***
- * <h3>Configuration of the firewall</h3>
+ * <h3>SuSE Firewall2 Configuration</h3>
  */
 
 textdomain "firewall";
 
+/* The main() */
+y2milestone("----------------------------------------");
+y2milestone("Firewall module started");
+
 import "SuSEFirewall";
 include "firewall/ui.ycp";
-
-/* The main() */
-y2milestone("Firewall module started");
-y2milestone("----------------------------------------");
-
-
 
 /* main ui function */
 any ret = Firewall();
@@ -39,5 +28,9 @@ y2debug("ret=%1",ret);
 
 /* Finish */
 y2milestone("Firewall module finished");
+y2milestone("----------------------------------------");
+
 return ret;
+
+/* EOF */
 }

@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Jun 27 00:11:24 CEST 2003 - msvec@suse.cz
+
+- updated to the current yast2 interface
+- added minimal testsuite
+- 2.8.1
+
+-------------------------------------------------------------------
 Fri Mar  7 02:29:16 CET 2003 - nashif@suse.de
 
 - dont clone unconfigured firewall ( #24792 )

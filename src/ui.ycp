@@ -1,35 +1,23 @@
 /**
- * File:
- *   ui.ycp
- *
- * Module:
- *   Configuration of firewall
- *
- * Summary:
- *   User interface functions.
- *
- * Authors:
- *   Michael Hager <mike@suse.de>
+ * File:	include/firewall/ui.ycp
+ * Package:	SuSE firewall configuration
+ * Summary:	User interface functions.
+ * Authors:	Michael Hager <mike@suse.de>
  *
  * $Id$
- *
- * All user interface functions.
- *
  */
 
 {
 
 textdomain "firewall";
 
-include "ui/common_popups.ycp";
-include "ui/common_messages.ycp";
-
-
-
-import "Progress";
-import "Wizard";
+import "Label";
 import "Mode";
+import "Popup";
+import "Progress";
 import "Runlevel";
+import "SuSEFirewall";
+import "Wizard";
 
 include "wizard/sequencer.ycp";
 
@@ -95,7 +83,7 @@ global define Firewall() ``{
     term contents = `Label(_("Initializing ..."));
 
     Wizard::CreateDialog();
-    Wizard::SetContentsButtons(caption,contents,help,BackButtonLabel(),NextButtonLabel());
+    Wizard::SetContentsButtons(caption,contents,help,Label::BackButton(),Label::NextButton());
 
     any ret = WizardSequencer(aliases, sequence);
     UI::CloseDialog();
@@ -141,7 +129,7 @@ global define FirewallAutoSequence() ``{
     term contents = `Label(_("Initializing ..."));
 
     Wizard::CreateDialog();
-    Wizard::SetContentsButtons(caption,contents,help,BackButtonLabel(),NextButtonLabel());
+    Wizard::SetContentsButtons(caption,contents,help,Label::BackButton(),Label::NextButton());
 
     any ret = WizardSequencer(aliases, sequence);
     UI::CloseDialog();
@@ -170,8 +158,8 @@ UI (``{
 			       ),
 			`VSpacing(1),
 			`HBox(
-			      `PushButton(`id(`ok),    `opt(`default), OKButtonLabel() ),
-			      `PushButton(`id(`cancel),`opt(`default), CancelButtonLabel())
+			      `PushButton(`id(`ok),    `opt(`default), Label::OKButton() ),
+			      `PushButton(`id(`cancel),`opt(`default), Label::CancelButton())
 			      ),
 			`VSpacing(0.2)
 			)
@@ -200,7 +188,7 @@ UI (``{
 				    `Left(`Heading( whatfailedmsg )),
 				    `VSpacing(0.2),
 				    `LogView(`id(`log),_("\nCommand output:"),10,100),
-				    `PushButton( `id(`ok), `opt(`default), OKButtonLabel() )
+				    `PushButton( `id(`ok), `opt(`default), Label::OKButton() )
 				    )
 			     )
 		      );
@@ -225,24 +213,31 @@ global define bool2string(boolean tf)
 /**
  * Read settings dialog
  */
-global define ReadDialog() ``{
-    string help = _("<p>Please be patient</p>");
-    string caption = _("Firewall configuration");
-    term contents = `Label(_("Reading settings ..."));
-    /* use ProgressBar if possible */
+global define symbol ReadDialog() ``{
 
-    Wizard::SetContentsButtons(caption,contents,help,BackButtonLabel(),NextButtonLabel());
+    /* Read dialog caption */
+    string caption = _("Firewall configuration");
+
+    /* Read dialog help */
+    string help = _("<p>Please be patient</p>");
+
+    /* Read dialog contents */
+    term contents = `Label(_("Reading settings ..."));
+
+    Wizard::SetContentsButtons(caption, contents, help,
+	    Label::BackButton(), Label::NextButton());
+
     UI::ChangeWidget(`id(`back),`Enabled, false);
     UI::ChangeWidget(`id(`next),`Enabled, false);
     UI::SetFocus(`id(`abort));
 
     SuSEFirewall::Read();
-    /* possible more reads, progress bar and UI::UserInput `abort handling */
+    /* FIXME: possible more reads, progress bar and UI::UserInput `abort handling */
     map firewall_settings = SuSEFirewall::settings;
 
     if (SuSEFirewall::personal_firewall_is_active )
     {
-	if(UI::ContinueCancelHeadlinePopup(_("Personal Firewall is active"),
+	if(Popup::ContinueCancelHeadline(_("Personal Firewall is active"),
 	    _("The Personal Firewall is activated.
 If you continue, it will be turned off and replaced by SuSEfirewall2.
 "))!=true)
@@ -251,7 +246,7 @@ If you continue, it will be turned off and replaced by SuSEfirewall2.
 	}
     }
 
-    /* handle possible read errors */
+    /* FIXME: handle possible read errors */
     return `next;
 }
 
@@ -267,7 +262,7 @@ global define PreWriteDialog() ``{
 
 ");
 
-    boolean continuecancel = UI::ContinueCancelHeadlinePopup(_("Save settings and activate firewall"),text);
+    boolean continuecancel = Popup::ContinueCancelHeadline(_("Save settings and activate firewall"),text);
 
     if( continuecancel == true )
     {
@@ -282,23 +277,18 @@ global define PreWriteDialog() ``{
     return ret;
 }
 
-
-
 /**
  * Write settings dialog
  * @return `abort if aborted and `next otherwise
  */
-
 global define symbol WriteDialog() ``{
-    /* Firewall write dialog help 1/2 */
+    /* Firewall write dialog help */
     string helptext = _("<P><B><BIG>Saving Firewall Configuration</BIG></B><BR>
 Please wait...<BR></P>");
     Wizard::RestoreHelp(helptext);
     boolean ret = SuSEFirewall::Write();
     return ret ? `next : `abort;
 }
-
-
 
 /**
  * Device Dialog
@@ -376,7 +366,7 @@ have an internal network.
        );
 
 
-    Wizard::SetContentsButtons(caption,contents,help,BackButtonLabel(),NextButtonLabel());
+    Wizard::SetContentsButtons(caption,contents,help,Label::BackButton(),Label::NextButton());
     UI::ChangeWidget(`id(`back),`Enabled, false);
 
     if( FW_DEV_EXT != "" )
@@ -392,14 +382,14 @@ have an internal network.
     while(true) {
 	ret = UI::UserInput();
 	if(ret == `abort) {
-	    if(UI::ReallyAbortPopup(true)) break;
+	    if(Popup::ReallyAbort(true)) break;
 	    else continue;
 	}
 	else {
 	    FW_DEV_EXT = UI::QueryWidget(`id("interface"),`Value);
 	    if( ret == `next && FW_DEV_EXT == none )
 	    {
-		UI::MessagePopup(_("Select an external interface."));
+		Popup::Message(_("Select an external interface."));
 		continue;
 	    }
 	    SuSEFirewall::settings["FW_DEV_EXT"] = FW_DEV_EXT;
@@ -513,7 +503,7 @@ provide server services. You also have to start the appropriate daemons.</p>
     additional_services =filter(`s,services_list,``(s!="" && !contains(selectable_services,s)));
     services_list = filter(`s,services_list,``(s!="" && contains(selectable_services,s)));
 
-    Wizard::SetContentsButtons(caption,contents,help,BackButtonLabel(),NextButtonLabel());
+    Wizard::SetContentsButtons(caption,contents,help,Label::BackButton(),Label::NextButton());
 
 //    services_string = mergestring(services_list," ");
 
@@ -540,7 +530,7 @@ provide server services. You also have to start the appropriate daemons.</p>
     while(true) {
 	ret = UI::UserInput();
 	if(ret == `abort) {
-	    if(UI::ReallyAbortPopup(true)) break;
+	    if(Popup::ReallyAbort(true)) break;
 	    else continue;
 	}
 	else if ( ret == `edit )
@@ -587,54 +577,70 @@ provide server services. You also have to start the appropriate daemons.</p>
 
 
 /**
+ * Features dialog
+ * @return dialog result
  */
-global define FeatureDialog() ``{
-    string help = _("
-<p><b>Allow traceroute</b> means that ICMP time-to-live-exceeded messages are
-allowed to be sent from your firewall. This is used for traceroutes <u>to</u>
-your firewall (or traceroute like tools).</p>
-<p><b>Forward traffic and do masquerading</b> means that all your
-internal machines that use services on
-the Internet seem to come from your firewall. It is more secure to
-communicate via proxies to the Internet than to use masquerading.</p>
-<p><b>Protect all running services</b> means that all network access to services, TCP, and UDP on this machine
-will be prevented except for those to which you explicitly allowed access in the previous dialog.</p>
-<p><b>Protect from internal network</b> means that <u>internal</u> machines may
-only access explicitly allowed services on the machine. They will also be
-affected by the FW_AUTOPROTECT_SERVICES option. However, specifying services
-that should be available from the internal network is beyond the scope of this
-workflow. For your machine to be accessible from the internal
-network, <u>unset</u> this option.</p>
-");
+global define symbol FeatureDialog() ``{
+
+    /* Features dialog help 1/4 */
+    string help = _("<p><b>Allow Traceroute</b> means that ICMP
+time-to-live-exceeded messages are allowed to be sent from your firewall.
+This is used for traceroutes <u>to</u> your firewall
+(or traceroute like tools).</p>") +
+
+    /* Features dialog help 2/4 */
+    _("<p><b>Forward Traffic and Do Masquerading</b> means that all your
+internal machines that use services on the Internet seem to come from your
+firewall. It is more secure to communicate via proxies to the Internet than
+to use masquerading.</p>") +
+
+    /* Features dialog help 3/4 */
+    _("<p><b>Protect All Running Services</b> means that all network access
+to services, TCP, and UDP on this machine will be prevented except for those
+to which you explicitly allowed access in the previous dialog.</p>") +
+
+    /* Features dialog help 4/4 */
+    _("<p><b>Protect from Internal Network</b> means that <u>internal</u>
+machines may only access explicitly allowed services on the machine.
+They will also be affected by the FW_AUTOPROTECT_SERVICES option. However,
+specifying services that should be available from the internal network is
+beyond the scope of this workflow. For your machine to be accessible from
+the internal network, <u>unset</u> this option.</p>");
 
     map firewall_settings = SuSEFirewall::settings;
-    
+
+    /* Features dialog caption */
     string caption = _("Firewall Configuration (Step 3 of 4): Features");
-    term contents = `VBox (
-			   `HBox (
-				  `HSpacing (8),
-				  `VBox (
-					 `VSpacing (3),
-					 `Left (`Label (_("Features:"))),
-					 `VSpacing (1),
-					 `HBox (`HSpacing (1),
-						`VBox (
-						       // checkboxentry
-						       `Left (`CheckBox (`id ("traceroute"), _("Allow traceroute"), false)),
-						       `VSpacing (1),
-						       // checkboxentry
-						       `Left (`CheckBox (`id ("masquerade"), _("Forward traffic and do masquerading"), false)),
-						       `VSpacing (1),
-						       // checkboxentry
-						       `Left (`CheckBox (`id ("protect"), _("Protect all running services"), false)),
-						       `VSpacing (1),
-						       // checkboxentry
-						       `Left (`CheckBox (`id ("protect_int"), _("Protect from internal network"), false))
-						       ),
-						`HSpacing (0)),
-					 `VSpacing (1),
-					 `VStretch ()),
-				  `HSpacing (5)));
+
+    /* Features dialog caption */
+    term contents = `VBox(`HBox(
+	`HSpacing(8),
+	`VBox(
+	    `VSpacing(3),
+	    `Left(`Label(_("Firewall Features:"))),
+	    `VSpacing(1),
+	    `HBox(
+		`HSpacing(1),
+		`VBox(
+		    /* CheckBox label */
+		    `Left(`CheckBox(`id("traceroute"), _("Allow &Traceroute"), false)),
+		    `VSpacing(1),
+		    /* CheckBox label */
+		    `Left(`CheckBox(`id("masquerade"), _("&Forward Traffic and Do Masquerading"), false)),
+		    `VSpacing(1),
+		    /* CheckBox label */
+		    `Left(`CheckBox(`id("protect"), _("&Protect All Running Services"), false)),
+		    `VSpacing(1),
+		    /* CheckBox label */
+		    `Left(`CheckBox(`id("protect_int"), _("Protect from &Internal Network"), false))
+		),
+		`HSpacing(0)
+	    ),
+	    `VSpacing(1),
+	    `VStretch()
+	),
+	`HSpacing(5)
+    ));
 
     string FW_ALLOW_FW_TRACEROUTE	= lookup(firewall_settings,"FW_ALLOW_FW_TRACEROUTE",  "no");
     string FW_MASQUERADE		= lookup(firewall_settings,"FW_MASQUERADE",           "no");
@@ -643,7 +649,7 @@ network, <u>unset</u> this option.</p>
     string FW_AUTOPROTECT_SERVICES	= lookup(firewall_settings,"FW_AUTOPROTECT_SERVICES", "no");
     string FW_PROTECT_FROM_INTERNAL	= lookup(firewall_settings,"FW_PROTECT_FROM_INTERNAL","yes");
 
-    Wizard::SetContentsButtons(caption,contents,help,BackButtonLabel(),NextButtonLabel());
+    Wizard::SetContentsButtons(caption,contents,help,Label::BackButton(),Label::NextButton());
 
     if( FW_ALLOW_FW_TRACEROUTE == "yes" )
     {
@@ -677,7 +683,7 @@ network, <u>unset</u> this option.</p>
     while(true) {
 	ret = UI::UserInput();
 	if(ret == `abort) {
-	    if(UI::ReallyAbortPopup(true)) break;
+	    if(Popup::ReallyAbort(true)) break;
 	    else continue;
 	}
 	else {
@@ -717,7 +723,7 @@ network, <u>unset</u> this option.</p>
 
 	    if( FW_PROTECT_FROM_INTERNAL == "yes" && FW_ROUTE == "yes" )
 	    {
-		boolean choice = UI::ContinueCancelPopup(
+		boolean choice = Popup::ContinueCancel(
 		    _("It usually does not make sense to activate both
 \"Forward traffic and do masquerading\" and
 \"Protect from internal network\"
@@ -753,18 +759,28 @@ Proceed with this setup?
 
 /**
  * Logging Dialog
+ * @return dialog result
  */
-global define LoggingDialog() ``{
-    string help = _("
-<p>Choose which packets should be logged.
-With <b>Log critical dropped and accepted packets</b>, only packets arriving on
-critical ports that were dropped or accepted, as specified, are 
-logged.  <b>Log all dropped packets</b> logs all dropped packets.
-<b>Log all accepted packets</b> logs all accepted packets. Attention: This
-option is dangerous as your log file will grow very quicky if you activate this.</p>
-");
-    string caption = _("Firewall configuration (step 4 of 4): Logging options");
+global define symbol LoggingDialog() ``{
 
+    /* Loggin dialog help 1/4 */
+    string help = _("<p>Choose which packets should be logged.</p>") +
+
+    /* Loggin dialog help 2/4 */
+    _("<p>With <b>Log Critical Dropped and Accepted Packets</b>, only packets
+arriving on critical ports that were dropped or accepted, as specified, are 
+logged.</p>") +
+
+    /* Loggin dialog help 3/4 */
+    _("<p><b>Log all dropped packets</b> logs all dropped packets.</p>") +
+
+    /* Loggin dialog help 4/4 */
+    _("<p><b>Log all accepted packets</b> logs all accepted packets.
+Attention: This option is dangerous as your log file will grow very quicky
+if you activate this.</p>");
+
+    /* Loggin dialog caption */
+    string caption = _("Firewall configuration (step 4 of 4): Logging options");
 
     map firewall_settings = SuSEFirewall::settings;
     string FW_LOG_DROP_CRIT = lookup(firewall_settings,"FW_LOG_DROP_CRIT","yes");
@@ -772,51 +788,50 @@ option is dangerous as your log file will grow very quicky if you activate this.
     string FW_LOG_ACCEPT_CRIT = lookup(firewall_settings,"FW_LOG_ACCEPT_CRIT","yes");
     string FW_LOG_ACCEPT_ALL = lookup(firewall_settings,"FW_LOG_ACCEPT_ALL","no");
 
-    term contents =
-    `VBox(
-	  `VSpacing(3),
-	`HBox (`HSpacing (3),
-	    `Frame( `opt(`vstretch), _("Logging options"),
-		`HBox(
-		    `HSpacing (2),
+    /* Loggin dialog contents */
+    term contents = `VBox(
+	`VSpacing(3),
+	    `HBox(`HSpacing(3),
+		/* Frame label */
+		`Frame(`opt(`vstretch), _("Logging options"), `HBox(
+		    `HSpacing(2),
 		    `VBox(
 			`VSpacing(0.5),
-			//Lable for Checkbox
+			/* Label */
 			`Left(`Label(_("Standard options"))),
-			// Checkbox option
-			`Left(`CheckBox (`id ("drop_crit"), _("Log critical dropped packets"), FW_LOG_DROP_CRIT=="yes")),
-			// Checkbox option
-			`Left(`CheckBox (`id ("accept_crit"), _("Log critical accepted packets"), FW_LOG_ACCEPT_CRIT=="yes")),
+			/* CheckBox label */
+			`Left(`CheckBox(`id("drop_crit"), _("Log &critical dropped packets"), FW_LOG_DROP_CRIT=="yes")),
+			/* CheckBox label */
+			`Left(`CheckBox(`id("accept_crit"), _("Log critical acce&pted packets"), FW_LOG_ACCEPT_CRIT=="yes")),
 			`VSpacing(1),
-			//Lable for Checkbox
+			/* Label */
 			`Left(`Label(_("Debug options "))),
-			//Helplable for Checkbox
+			/* CheckBox label */
 			`Left(`Label(_("This option causes a large amount of output."))),
-			// Checkbox option
-			`Left(`CheckBox (`id ("drop_all"), _("Log all dropped packets"), FW_LOG_DROP_ALL=="yes")),
-			// Checkbox option
-			`Left(`CheckBox (`id ("accept_all"), _("Log all accepted packets"), FW_LOG_ACCEPT_ALL=="yes")),
+			/* CheckBox label */
+			`Left(`CheckBox(`id("drop_all"), _("Log all &dropped packets"), FW_LOG_DROP_ALL=="yes")),
+			/* CheckBox label */
+			`Left(`CheckBox(`id("accept_all"), _("Log all &accepted packets"), FW_LOG_ACCEPT_ALL=="yes")),
 			`VSpacing(1.5)
 		    ),
-		    `HSpacing (2)
-		)
+		    `HSpacing(2)
+		)),
+	    `HSpacing(3)
 	    ),
-	    `HSpacing (3)
-	),
 	`HVStretch()
     );
 
-    if (Mode::config)
-	Wizard::SetContentsButtons(caption,contents,help,BackButtonLabel(),FinishButtonLabel());
+    if(Mode::config)
+	Wizard::SetContentsButtons(caption,contents,help,Label::BackButton(),Label::FinishButton());
     else
-	Wizard::SetContentsButtons(caption,contents,help,BackButtonLabel(),NextButtonLabel());
+	Wizard::SetContentsButtons(caption,contents,help,Label::BackButton(),Label::NextButton());
 
     any ret = nil;
     while(true) {
 	ret = UI::UserInput();
 	if(ret == `abort)
 	{
-	    if(UI::ReallyAbortPopup(true)) break;
+	    if(Popup::ReallyAbort(true)) break;
 	    else continue;
 	}
 	else
@@ -892,13 +907,13 @@ when you boot your system.</p>
 	return `config;
     }
 
-    Wizard::SetContentsButtons(caption,contents,help,BackButtonLabel(),NextButtonLabel());
+    Wizard::SetContentsButtons(caption,contents,help,Label::BackButton(),Label::NextButton());
 
     any ret = nil;
     while(true) {
 	ret = UI::UserInput();
 	if(ret == `abort) {
-	    if(UI::ReallyAbortPopup(true)) break;
+	    if(Popup::ReallyAbort(true)) break;
 	    else continue;
 	}
 	else if( ret==`next)
@@ -967,7 +982,7 @@ when you boot your system.</p>
 	`HVStretch()
     );
 
-    Wizard::SetContentsButtons(caption,contents,help,BackButtonLabel(),NextButtonLabel());
+    Wizard::SetContentsButtons(caption,contents,help,Label::BackButton(),Label::NextButton());
     UI::ChangeWidget(`id(`back),`Enabled, false);
 
     boolean firewallstopped = true;
@@ -979,7 +994,7 @@ when you boot your system.</p>
 	
 	if(ret == `abort)
 	{
-	    if(UI::ReallyAbortPopup(true)) break;
+	    if(Popup::ReallyAbort(true)) break;
 	    else continue;
 	}
 	else if( ret==`next)
@@ -1000,7 +1015,7 @@ when you boot your system.</p>
 			firewallstopped = false;
 		    }
 
-		    symbol ret = UI::AnyQuestionPopup3( whatfailedmsg, "", _("Continue"), _("Abort"), _("Retry"), `focus_yes );
+		    symbol ret = Popup::AnyQuestion3( whatfailedmsg, "", _("Continue"), _("Abort"), _("Retry"), `focus_yes );
 		    if(ret==`retry)
 		    {
 			retry=true;
@@ -1020,7 +1035,7 @@ when you boot your system.</p>
 	    linksremoved = Runlevel::ServiceAdjust ("SuSEfirewall2_init", "disable") && linksremoved;
 	    if( linksremoved && firewallstopped )
 	    {
-		UI::MessagePopup(_("The firewall is now turned off"));
+		Popup::Message(_("The firewall is now turned off"));
 		SuSEFirewall::start = false;
 	    }
 	    else if( linksremoved == false )
@@ -1029,7 +1044,7 @@ when you boot your system.</p>
 		string errmsg = _("There has been some error while removing the
 firewall bootscripts, please use the runlevel
 editor to manually remove them");
-		UI::MessagePopup(errmsg + "\n" + Runlevel::error_msg);
+		Popup::Message(errmsg + "\n" + Runlevel::error_msg);
 	    }
 	    break;
 	}
@@ -1041,4 +1056,5 @@ editor to manually remove them");
     return ret;
 }
 
+/* EOF */
 }

@@ -1,0 +1,34 @@
+/**
+ * File:	XXXXXX
+ * Package:	Configuration of network
+ * Summary:	XXXXXX
+ * Author:	Michal Svec <msvec@suse.cz>
+ *
+ * $Id$
+ */
+
+{
+
+map READ = $[
+    "target" : $[
+	"size" : 1,
+	"tmpdir" : "/tmp",
+	"string" : "Blah\n",
+    ],
+    "init" : $[
+	"scripts" : $[
+	    "exists" : true,
+	]
+    ],
+    "probe" : $[
+	"system" : [],
+    ],
+];
+
+include "testsuite.ycp";
+TESTSUITE_INIT([READ], nil);
+
+import "SuSEFirewall.ycp";
+
+/* EOF */
+}

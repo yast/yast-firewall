@@ -1,133 +1,124 @@
 /**
  * File:	modules/SuSEFirewall.ycp
- * Package:	Configuration of SuSE firewall
+ * Package:	SuSE firewall configuration
  * Summary:	Main module, providing IO functions
- *
- * Authors:	Anas Nashif (nashif@suse.de)
- *          Michael Hager <mike@suse.de>
+ * Authors:	Anas Nashif <nashif@suse.de>
+ *		Michal Svec <msvec@suse.cz>
+ *		Michael Hager <mike@suse.de>
  *
  * $Id$
  */
 
 {
-    module "SuSEFirewall";
-    textdomain "firewall";
 
-    import "Report";
-    import "Summary";
-    import "Progress";
-    import "Mode";
-    import "Runlevel";
+module "SuSEFirewall";
+textdomain "firewall";
 
-    include "ui/common_messages.ycp";
-    /* global settings map */
-    global map settings = $[];
+import "Label";
+import "Mode";
+import "Popup";
+import "Progress";
+import "Report";
+import "Runlevel";
+import "Summary";
+
+/* global settings map */
+global map settings = $[];
+
+global boolean personal_firewall_is_active = false;
+
+/**
+ * Write only, used during autoinstallation.
+ * Don't run services and SuSEconfig, it's all done at one place.
+ */
+global boolean write_only = false;
 
 
-    global boolean personal_firewall_is_active = false;
+global boolean start = false;
 
+/**
+ * Constructor
+ */
+global define void SuSEFirewall () ``{
 
-    /**
-     * Write only, used during autoinstallation.
-     * Don't run services and SuSEconfig, it's all done at one place.
-     */
-    global boolean write_only = false;
-
-
-    global boolean start = false;
-
-    /**
-     * Constructor
-     *
-     */
-
-    global define void SuSEFirewall () ``{
-
-	if (!Mode::config)
+    if (!Mode::config)
+    {
+	string REJECT_ALL_INCOMING_CONNECTIONS = SCR::Read(.sysconfig.personal-firewall.REJECT_ALL_INCOMING_CONNECTIONS);
+	if( REJECT_ALL_INCOMING_CONNECTIONS == nil ) REJECT_ALL_INCOMING_CONNECTIONS = "";
+	if( REJECT_ALL_INCOMING_CONNECTIONS != "" &&  REJECT_ALL_INCOMING_CONNECTIONS != "no")
 	{
-	    string REJECT_ALL_INCOMING_CONNECTIONS = SCR::Read(.sysconfig.personal-firewall.REJECT_ALL_INCOMING_CONNECTIONS);
-	    if( REJECT_ALL_INCOMING_CONNECTIONS == nil ) REJECT_ALL_INCOMING_CONNECTIONS = "";
-	    if( REJECT_ALL_INCOMING_CONNECTIONS != "" &&  REJECT_ALL_INCOMING_CONNECTIONS != "no")
-	    {
-		personal_firewall_is_active = true;
-	    }
-	    else
-	    {
-		personal_firewall_is_active = false;
-	    }
+	    personal_firewall_is_active = true;
 	}
-	return;
+	else
+	{
+	    personal_firewall_is_active = false;
+	}
     }
+    return;
+}
 
+/**
+ * Get all firewall settings from the first parameter
+ * (for use by autoinstallation).
+ * @param s data to be imported
+ * @return true on success
+ */
+global define boolean Import(map s) ``{
+    settings = s;
+    return true;
+}
 
+/**
+ * Dump the firewall settings to a single map
+ * (for use by autoinstallation).
+ * @return dumped settings (later acceptable by Import())
+ */
+global define map Export() ``{
+    if(haskey(settings, "network_devices" ))
+	settings = remove(settings, "network_devices" );
 
-    /**
-     * Get all firewall settings from the first parameter
-     * (For use by autoinstallation.)
-     * @param settings The YCP structure to be imported.
-     * @return boolean True on success
-     */
-    global define boolean Import (map s) ``{
-	settings = s;
-	return true;
-    }
+    settings["start_firewall"] = start;
+    return settings;
+}
 
-    /**
-     * Dump the firewall settings to a single map
-     * (For use by autoinstallation.)
-     * @return map Dumped settings (later acceptable by Import ())
-     */
-    global define map Export () ``{
-	if (haskey(settings, "network_devices" ))
-	    settings = remove(settings, "network_devices" );
-	
-	settings["start_firewall"] = start;
-	
-	return settings;
-    }
+/**
+ * Create a textual summary and a list of unconfigured cards
+ * @return summary of the current configuration
+ */
+global define list Summary() ``{
 
-    /**
-     * Create a textual summary and a list of unconfigured cards
-     * @param split split configured and unconfigured?
-     * @return summary of the current configuration
-     */
-    global define list Summary() ``{
+    string summary = "";
+    summary = Summary::AddHeader(summary, _("External Device"));
+    summary = Summary::AddLine(summary, (settings["FW_DEV_EXT"]:"" != "") ?
+			       settings["FW_DEV_EXT"]:"" : Summary::NotConfigured());
 
-	string summary = "";
-	summary = Summary::AddHeader(summary, _("External Device"));
-	summary = Summary::AddLine(summary, (settings["FW_DEV_EXT"]:"" != "") ?
-				   settings["FW_DEV_EXT"]:"" : Summary::NotConfigured());
+    summary = Summary::AddHeader(summary, _("Internal Device"));
+    summary = Summary::AddLine(summary, (settings["FW_DEV_INT"]:"" != "") ?
+			       settings["FW_DEV_INT"]:"" : Summary::NotConfigured());
 
-	summary = Summary::AddHeader(summary, _("Internal Device"));
-	summary = Summary::AddLine(summary, (settings["FW_DEV_INT"]:"" != "") ?
-				   settings["FW_DEV_INT"]:"" : Summary::NotConfigured());
+    summary = Summary::AddHeader(summary, _("Protect from Internal"));
+    summary = Summary::AddLine(summary, (settings["FW_PROTECT_FROM_INTERNAL"]:"" != "") ?
+			       settings["FW_PROTECT_FROM_INTERNAL"]:"" : Summary::NotConfigured());
 
-	summary = Summary::AddHeader(summary, _("Protect from Internal"));
-	summary = Summary::AddLine(summary, (settings["FW_PROTECT_FROM_INTERNAL"]:"" != "") ?
-				   settings["FW_PROTECT_FROM_INTERNAL"]:"" : Summary::NotConfigured());
+    summary = Summary::AddHeader(summary, _("External TCP Services"));
+    summary = Summary::AddLine(summary, (settings["FW_SERVICES_EXT_TCP"]:"" != "") ?
+			       settings["FW_SERVICES_EXT_TCP"]:"" : Summary::NotConfigured());
 
-	summary = Summary::AddHeader(summary, _("External TCP Services"));
-	summary = Summary::AddLine(summary, (settings["FW_SERVICES_EXT_TCP"]:"" != "") ?
-				   settings["FW_SERVICES_EXT_TCP"]:"" : Summary::NotConfigured());
+    summary = Summary::AddLine(summary, _("(Start the configuration to view more options)"));
 
-	summary = Summary::AddLine(summary, _("(Start the configuration to view more options)"));
-
-	return [ summary, [] ];
-
-    }
-
-
+    return [ summary, [] ];
+}
 
     /**
      * Fill the map of all firewall settings from the SCR
-     * @return map all firewall settings
+     * @return true on success
      */
     global define boolean Read() ``{
 
 	// Check if firewall running
 	start = Runlevel::ServiceEnabled("SuSEfirewall2_init");
 
-	
+
 //  <AUTOCODE READ>
 	string FW_LOG_ACCEPT_ALL = SCR::Read(.sysconfig.SuSEfirewall2.FW_LOG_ACCEPT_ALL);
 	if( FW_LOG_ACCEPT_ALL == nil ) FW_LOG_ACCEPT_ALL = "no";
@@ -213,22 +204,22 @@
     /**
      * Update the SCR from the map of all firewall settings
      * @param m a map of all firewall settings
-     * @return boolean success of operation
+     * @return true on success
      */
     global define boolean Write() ``{
 
 	if (!start)
 	    return false;
-	
-	string help = "";	
+
+	string help = "";
 	string whatfailedmsg = _("Stopping the firewall failed");
 	boolean retry = true;
 	boolean rlret = false;
-	
-	
+
+
 	// Wizard::SetContents("",`Empty(),"",false,true);
 	// UI::ChangeWidget(`id(`abort),`Enabled, false);
-	// UI::ChangeWidget(`id(`next),`Label, FinishButtonLabel());
+	// UI::ChangeWidget(`id(`next),`Label, Label::FinishButton());
 
 	Progress::New (
 		       _("Firewall configuration -- saving settings"),
@@ -255,12 +246,12 @@
 	{
 	    retry = false;
 	    if(Runlevel::RunInitScript("SuSEfirewall2_setup", "stop") != 0)
-	    {	    
-		symbol ret = UI::AnyQuestionPopup3( whatfailedmsg,
+	    {
+		symbol ret = Popup::AnyQuestion3( whatfailedmsg,
 						    "",
-						    ContinueButtonLabel(),
-						    AbortButtonLabel(),
-						    RetryButtonLabel(),
+						    Label::ContinueButton(),
+						    Label::AbortButton(),
+						    Label::RetryButton(),
 						    `focus_yes );
 		if( ret == `retry)
 		{
@@ -276,7 +267,7 @@
 	sleep(1000);
 	boolean write_ret = false;
 
-	
+
 //  <AUTOCODE WRITE>
 	string FW_LOG_ACCEPT_ALL = settings["FW_LOG_ACCEPT_ALL"]:"no";
 	write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_LOG_ACCEPT_ALL, FW_LOG_ACCEPT_ALL);
@@ -324,24 +315,24 @@
 	    write_ret = SCR::Write(.sysconfig.personal-firewall.REJECT_ALL_INCOMING_CONNECTIONS,"no");
 	    write_ret = SCR::Write(.sysconfig.personal-firewall,nil);
 	}
-	
+
 	// sync settings to file !!!
 	write_ret = SCR::Write(.sysconfig.SuSEfirewall2, nil);
 	if (!write_ret)
 	{
-	    Report::Error(_("Writing settings failed"));	    
+	    Report::Error(_("Writing settings failed"));
 	}
 	Progress::NextStage();
-	
+
 	y2milestone("writing firewall settings finished, return code %1", write_ret);
 
 
 	// Why is this needed?
-	if (SuSEFirewall::personal_firewall_is_active)
+	if (personal_firewall_is_active)
 	{
 	    SCR::Execute (.target.bash,"/sbin/SuSEpersonal-firewall",$[]);
 	}
-	    
+
 	list services =  [		
 			  "SuSEfirewall2_init",
 			  "SuSEfirewall2_setup",
@@ -374,4 +365,5 @@
     }
 
 
+/* EOF */
 }
