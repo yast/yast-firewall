@@ -58,7 +58,7 @@ while(<>)
 			$service = pop @myservices;
 			$default = pop @mydefaults;
 			print "    string $service = settings[\"$service\"]:$default;\n";
-			print "    ret = SCR::Write(.sysconfig.SuSEfirewall2.$service, $service);\n";
+			print "    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.$service, $service);\n";
 			print "\n"
 		}
 	}

@@ -283,61 +283,61 @@ global define boolean Write() ``{
 
 //  <AUTOCODE WRITE>
     string FW_LOG_ACCEPT_ALL = settings["FW_LOG_ACCEPT_ALL"]:"no";
-    ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_LOG_ACCEPT_ALL, FW_LOG_ACCEPT_ALL);
+    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_LOG_ACCEPT_ALL, FW_LOG_ACCEPT_ALL);
 
     string FW_LOG_ACCEPT_CRIT = settings["FW_LOG_ACCEPT_CRIT"]:"yes";
-    ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_LOG_ACCEPT_CRIT, FW_LOG_ACCEPT_CRIT);
+    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_LOG_ACCEPT_CRIT, FW_LOG_ACCEPT_CRIT);
 
     string FW_LOG_DROP_ALL = settings["FW_LOG_DROP_ALL"]:"no";
-    ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_LOG_DROP_ALL, FW_LOG_DROP_ALL);
+    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_LOG_DROP_ALL, FW_LOG_DROP_ALL);
 
     string FW_LOG_DROP_CRIT = settings["FW_LOG_DROP_CRIT"]:"yes";
-    ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_LOG_DROP_CRIT, FW_LOG_DROP_CRIT);
+    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_LOG_DROP_CRIT, FW_LOG_DROP_CRIT);
 
     string FW_PROTECT_FROM_INTERNAL = settings["FW_PROTECT_FROM_INTERNAL"]:"yes";
-    ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_PROTECT_FROM_INTERNAL, FW_PROTECT_FROM_INTERNAL);
+    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_PROTECT_FROM_INTERNAL, FW_PROTECT_FROM_INTERNAL);
 
     string FW_DEV_DMZ = settings["FW_DEV_DMZ"]:"";
-    ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_DEV_DMZ, FW_DEV_DMZ);
+    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_DEV_DMZ, FW_DEV_DMZ);
 
     string FW_DEV_INT = settings["FW_DEV_INT"]:"";
-    ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_DEV_INT, FW_DEV_INT);
+    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_DEV_INT, FW_DEV_INT);
 
     string FW_DEV_EXT = settings["FW_DEV_EXT"]:"";
-    ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_DEV_EXT, FW_DEV_EXT);
+    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_DEV_EXT, FW_DEV_EXT);
 
     string FW_SERVICES_DMZ_UDP = settings["FW_SERVICES_DMZ_UDP"]:"";
-    ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_DMZ_UDP, FW_SERVICES_DMZ_UDP);
+    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_DMZ_UDP, FW_SERVICES_DMZ_UDP);
 
     string FW_SERVICES_INT_UDP = settings["FW_SERVICES_INT_UDP"]:"";
-    ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_INT_UDP, FW_SERVICES_INT_UDP);
+    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_INT_UDP, FW_SERVICES_INT_UDP);
 
     string FW_SERVICES_EXT_UDP = settings["FW_SERVICES_EXT_UDP"]:"";
-    ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_EXT_UDP, FW_SERVICES_EXT_UDP);
+    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_EXT_UDP, FW_SERVICES_EXT_UDP);
 
     string FW_SERVICES_DMZ_TCP = settings["FW_SERVICES_DMZ_TCP"]:"";
-    ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_DMZ_TCP, FW_SERVICES_DMZ_TCP);
+    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_DMZ_TCP, FW_SERVICES_DMZ_TCP);
 
     string FW_SERVICES_INT_TCP = settings["FW_SERVICES_INT_TCP"]:"";
-    ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_INT_TCP, FW_SERVICES_INT_TCP);
+    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_INT_TCP, FW_SERVICES_INT_TCP);
 
     string FW_SERVICES_EXT_TCP = settings["FW_SERVICES_EXT_TCP"]:"";
-    ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_EXT_TCP, FW_SERVICES_EXT_TCP);
+    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_EXT_TCP, FW_SERVICES_EXT_TCP);
 
     string FW_AUTOPROTECT_SERVICES = settings["FW_AUTOPROTECT_SERVICES"]:"yes";
-    ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_AUTOPROTECT_SERVICES, FW_AUTOPROTECT_SERVICES);
+    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_AUTOPROTECT_SERVICES, FW_AUTOPROTECT_SERVICES);
 
     string FW_MASQ_NETS = settings["FW_MASQ_NETS"]:"";
-    ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_MASQ_NETS, FW_MASQ_NETS);
+    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_MASQ_NETS, FW_MASQ_NETS);
 
     string FW_ROUTE = settings["FW_ROUTE"]:"no";
-    ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_ROUTE, FW_ROUTE);
+    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_ROUTE, FW_ROUTE);
 
     string FW_MASQUERADE = settings["FW_MASQUERADE"]:"no";
-    ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_MASQUERADE, FW_MASQUERADE);
+    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_MASQUERADE, FW_MASQUERADE);
 
     string FW_ALLOW_FW_TRACEROUTE = settings["FW_ALLOW_FW_TRACEROUTE"]:"yes";
-    ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_ALLOW_FW_TRACEROUTE, FW_ALLOW_FW_TRACEROUTE);
+    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_ALLOW_FW_TRACEROUTE, FW_ALLOW_FW_TRACEROUTE);
 
 //  </AUTOCODE>
 
