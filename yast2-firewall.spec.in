@@ -1,5 +1,5 @@
 @HEADER-COMMENT@
-# neededforbuild yast2-devel-packages yast2-network
+# neededforbuild yast2-devel-packages yast2-network yast2-country yast2-installation
 
 @HEADER@
 Requires:	yast2 yast2-network SuSEfirewall2
@@ -30,6 +30,7 @@ Summary:	Configuration of firewall
 @yncludedir@/firewall/*
 @clientdir@/firewall*
 @moduledir@/SuSEFirewall.*
+@moduledir@/CWMFirewallInterfaces.*
 @desktopdir@/firewall.desktop
 @scrconfdir@/*.scr
 %doc @docdir@
