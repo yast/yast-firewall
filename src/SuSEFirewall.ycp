@@ -747,6 +747,39 @@ global define list<string> GetInterfacesInGroup ( string interface_group ) {
 }
 
 /**
+ * In which group is the interface
+ *
+ * @param string	interface
+ * @return string	group
+ */ 
+global define string GetGroupOfInterface ( string interface ) {
+    if (IsIntInterface(interface)) {
+	return "INT";
+    } else if (IsDmzInterface(interface)) {
+	return "DMZ";
+    } else if (IsExtInterface(interface)) {
+	return "EXT";
+    } else {
+	return nil;
+    }
+}
+
+/**
+ * In which groups are the interfaces
+ * @param list<string>	interfaces
+ * @param list<string>	groups
+ */
+global define list<string> GetGroupsOfInterfaces ( list<string> interfaces ) {
+    list<string> ret = [];
+    foreach (string interface, interfaces, {
+	string group = GetGroupOfInterface(interface);
+	if (group != nil) ret = add(ret, group);
+    });
+
+    return toset(ret);
+}
+
+/**
  *  Add service into a given setting variable. Low-level manipulation.
  *
  *  @param set		the name of the sysconfig variable to be modified
@@ -1010,6 +1043,14 @@ global define boolean RunServiceSupport (string service_id, boolean new_service_
     return function(new_service_state);
 }
 
+/**
+ * Function for Opening or Closing ports for device_groups
+ *
+ * @param string	name or number of port
+ * @param string	protocol (TCP|UDP)
+ * @param string	device group (INT|DMZ|EXT)
+ * @param boolean	true to open, false to close
+ */
 global define boolean SetPortForGroup (string port_name, string protocol, string device_group, boolean new_state) {
     if (device_group != "INT" && device_group != "DMZ" && device_group != "EXT") {
 	y2error("Not allowed device group '%1'", device_group);
@@ -1027,16 +1068,16 @@ global define boolean SetPortForGroup (string port_name, string protocol, string
 	settings[setting_ident] =
 	    mergestring(
 		toset(
-		    splitstring((settings[setting_ident]:"" + port_name), " ")
+		    splitstring((settings[setting_ident]:"" + " " + port_name), " ")
 		), " "
 	    );
     // disabling support
     } else {
 	settings[setting_ident] =
 	    mergestring(
-		(filter ( string service_in_fw, ( toset(
-			splitstring( settings[setting_ident]:"", " " )
-		    ) ), ``{
+		(filter ( string service_in_fw, (
+		    toset( splitstring( settings[setting_ident]:"", " " ) )
+		    ), ``{
 			return service_in_fw != port_name;
 		    }
 		)), " "
@@ -1044,7 +1085,15 @@ global define boolean SetPortForGroup (string port_name, string protocol, string
     }
 }
 
-global define boolean SetServiceForGroups (list<string> services_id, list<string> device_groups, boolean new_status) {
+/**
+ * Function for enabling or disabling more services in more device groups at once
+ *
+ * @param list<string>	list of services [ "dhcp-server" | "ssh" | "vnc"... ]
+ * @param list<string>	list of device groups [ "INT" | "DMZ" | "EXT" ]
+ * @param boolean	true = enable, false = disable
+ * @return boolean	if successful
+ */
+global define boolean SetServicesForGroups (list<string> services_id, list<string> device_groups, boolean new_status) {
     list<string> allowed_device_groups = ["INT", "EXT", "DMZ"];
 
     // no groups == all groups
@@ -1070,34 +1119,142 @@ global define boolean SetServiceForGroups (list<string> services_id, list<string
 		continue;
 	    }
 
-
+	    // setting all TCP ports
+	    foreach (string tcp_port, service_tcp_ports, ``{
+		SetPortForGroup(tcp_port, "TCP", device_group, new_status);
+	    });
+	    // setting all UDP ports
+	    foreach (string udp_port, service_udp_ports, ``{
+		SetPortForGroup(udp_port, "UDP", device_group, new_status);
+	    });
 	});
     });
-}
 
-global boolean SetService (list<string> services_id, list<string> devices, boolean new_status) {
     return true;
 }
 
-global map<string, map<string, boolean> > GetServicesInGroups (list<string> services) {
-    return $[
-	"service" : $[
-	    "INT" : true,
-	    "DMZ" : true,
-	    "EXT" : false,
-	],
-    ];
+/**
+ * Function for enabling or disabling more services in more devices at once
+ *
+ * @param list<string>	list of services [ "dhcp-server" | "ssh" | "vnc" ... ]
+ * @param list<string>	list of device groups [ "eth0" | "ppp0" | "eth4"... ]
+ * @param boolean	true = enable, false = disable
+ * @return boolean	if successful
+ */
+global define boolean SetServices (list<string> services_id, list<string> devices, boolean new_status) {
+    list<string> groups_of_interfaces = GetGroupsOfInterfaces(devices);
+    if (size(groups_of_interfaces)==0) {
+	y2error("Devices %1 are not in any group if interfaces", devices);
+	return false;
+    }
+
+    return SetServicesForGroups (services_id, groups_of_interfaces, new_status);
 }
 
-global map<string, map<string, boolean> > GetServices (list<string> services) {
-    return $[
-	"service" : $[
-	    "device0" : true,
-	    "device1" : true,
-	    "device2" : false,
-	    "device3" : false,
-	],
-    ];
+/**
+ * Function for getting information if service is enabled in firewall in device group
+ *
+ * @param string	service for testing ( "dhcp-server" | "ssh" | "vnc" ... )
+ * @param string	device group ( "INT", "DMZ", "EXT" )
+ * @return boolean	true is supported, false is unsupported
+ */
+global define boolean IsServiceSupportedInGroup (string service, string group) {
+    list<string> device_groups = [ "INT", "DMZ", "EXT" ];
+    if (contains(device_groups, group) == false) {
+	y2error("Unknown group '%1'", group);
+	return nil;
+    }
+
+    list<string> tcp_ports_needed = (list<string>) firewall_services_definition[service, "tcp_ports"]:[];
+    list<string> udp_ports_needed = (list<string>) firewall_services_definition[service, "udp_ports"]:[];
+    if ((size(tcp_ports_needed)==0) && (size(udp_ports_needed)==0)) {
+	y2error("Service '%1' is not defined", service);
+	return nil;
+    }
+
+    boolean supported = true;
+
+    foreach(string tcp_port, tcp_ports_needed, {
+	if (HaveService(tcp_port, "TCP", group)==false) {
+	    supported = false;
+	    break;
+	}
+    });
+    foreach(string udp_port, udp_ports_needed, {
+	if (HaveService(udp_port, "UDP", group)==false) {
+	    supported = false;
+	    break;
+	}
+    });
+
+    return supported;
+}
+
+/**
+ * Function return map of support status for services in all device groups
+ *
+ * @param list<string>	list of services [ "dhcp-server" | "ssh" | "vnc" ... ]
+ * @return map<string, map<string, boolean> >	map<service, map<device_group, status> >
+ */
+global define map<string, map<string, boolean> > GetServicesInGroups (list<string> services) {
+    map<string, map<string, boolean> > ret = $[ ];
+    list<string> device_groups = [ "INT", "DMZ", "EXT" ];
+
+    foreach (string service_id, services, {
+	ret[service_id] = $[];
+	foreach (string device_group, device_groups, {
+	    ret[service_id,device_group] = (IsServiceSupportedInGroup (service_id, device_group));
+	});
+    });
+
+    return ret;
+}
+
+/**
+ * Function return list of network devices used by firewall
+ * (Mentioned in FW_DEV_INT, FW_DEV_DMZ or FW_DEV_EXT)
+ *
+ * @return list<string>	list of devices
+ */
+global list<string> GetFirewallDevices () {
+    if (Mode::installation==false) {
+	NetworkDevices::Read();
+    }
+
+    list<string> netdevices = NetworkDevices::List("");
+    netdevices = filter(string dev, netdevices, ``{
+	return dev != "" && !issubstring(dev, "lo") && !issubstring(dev, "sit") && GetGroupOfInterface(dev)!=nil;
+    });
+
+    return netdevices;
+}
+
+/**
+ * Function return map of support status for services in all network device
+ * used by firewall
+ *
+ * @param list<string>	list of services [ "dhcp-server" | "ssh" | "vnc" ... ]
+ * @return map<string, map<string, boolean> >	map<service, map<network_device, status> >
+ */
+global define map<string, map<string, boolean> > GetServices (list<string> services) {
+    map<string, map<string, boolean> > ret = $[ ];
+    map<string, map<string, boolean> > supported_in_groups = GetServicesInGroups(services);
+    list<string> network_devices = GetFirewallDevices();
+
+    map<string, string> device_to_group = $[ ];
+    foreach (string network_device, network_devices, {
+	device_to_group[network_device] = GetGroupOfInterface(network_device);
+    });
+
+    foreach (string service, services, {
+	ret[service] = $[ ];
+	foreach (string device, network_devices, {
+	    string device_is_in_group = device_to_group[device]:nil;
+	    ret[service,device] = supported_in_groups[service,device_is_in_group]:nil;
+	});
+    });
+
+    return ret;
 }
 
 /* EOF */
