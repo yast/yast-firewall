@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Aug  4 22:33:38 CEST 2003 - nashif@suse.de
+
+- Fixed sequence for autoyast
+- 2.8.6
+
+-------------------------------------------------------------------
 Mon Aug  4 16:43:03 CEST 2003 - visnov@suse.de
 
 - added API for enabling and disabling services
