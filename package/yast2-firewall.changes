@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Fri Aug 27 16:50:39 CEST 2004 - locilka@suse.cz
+
+- added allowing broadcast messages into ipp-client service
+- modified testsiutes to support new broadcast option
+- merged proofreaded UI messages
+- fixed Bugzilla bug #40287, helptext for Traceroute improved
+
+-------------------------------------------------------------------
 Fri Aug 27 11:23:55 CEST 2004 - visnov@suse.cz
 
 - fix HaveService() for any device (join separated by spaces) 

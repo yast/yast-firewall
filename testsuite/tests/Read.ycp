@@ -82,6 +82,7 @@
 
     // variable in SuSEFirewall to store the settings
     SuSEFirewall::settings = $[
+		"FW_ALLOW_FW_BROADCAST":"int",
 		"FW_ALLOW_FW_TRACEROUTE":"yes",
 		"FW_AUTOPROTECT_SERVICES":"yes",
 		"FW_DEV_DMZ":"",

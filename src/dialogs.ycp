@@ -655,9 +655,9 @@ the internal network, <i>unset</i> this option.</p>") +
 
 
     /* Features dialog help 3/5 */
-    _("<p><b>Allow Traceroute</b> means that ICMP time-to-live-exceeded
-messages are allowed to be sent from your firewall. This is used for
-traceroutes <i>to</i> your firewall (or traceroute-like tools).</p> ") +
+    _("<p><b>Allow Traceroute</b> means that ICMP time-to-live exceeded
+messages are allowed to be sent <i>through</i> your firewall. This is not used for
+traceroutes <i>to</i> your firewall.</p> ") +
 
     /* Features dialog help 4/5 */
     _("<p><b>Protect All Running Services</b> means that all network access
@@ -1044,7 +1044,7 @@ when you boot your system.</p>");
 define symbol StopDialog() ``{
 
     /* Stop dialog caption */
-    string caption = _("Firewall configuration: Deactivate Firewall");
+    string caption = _("Firewall Configuration: Deactivate Firewall");
 
     /* Stop dialog help 1/2 */
     string help = _("<p><b>Attention:</b><br>
@@ -1181,8 +1181,8 @@ define symbol FigureFirewallDialog() ``{
     // TRANSLATORS: help text for enabling/disabling firewall in network proposal
     string help = _("Firewall Service</b><br>
 If you want to use SuSEfirewall2 to protect your system, select
-<b>Enable Firewall</b> and click <b>Next</b> to configure it.</p>
-<p>If you do not want to use it, select <b>Disable Firewall</b> and click <b>Finish</b>.
+<b>Enable Firewall</b> and click <b>Next</b> to configure it.
+If you do not want to use it, select <b>Disable Firewall</b> and click <b>Finish</b>.
 </p>");
 
     // TRANSLATORS: dialog caption, main dialog for enabling/disablig firewall

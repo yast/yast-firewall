@@ -70,6 +70,26 @@ global define boolean GetModified () {
     return modified;
 }
 
+define boolean HandleIPPClientSupport (string interface, boolean enable) {
+    // "interface" is here only for the compatibility with other "Handle" functions
+    string port = "631";
+    list<string> broadcast = splitstring(SuSEFirewall::settings["FW_ALLOW_FW_BROADCAST"]:"", " ");
+    
+    // adding port "port" to allowed broadcasted ports
+    if (enable == true) {
+	y2milestone("Allowing broadcasts for port %1", port);
+	broadcast = (list<string>) union (broadcast, [ port ]);
+    // removing port "port" from allowed broadcasted ports
+    } else {
+	y2milestone("Disallowing broadcasts for port %1", port);
+	broadcast = filter (string record, broadcast, ``{
+	    return record != port && record != "";
+	});
+    }
+
+    SuSEFirewall::settings["FW_ALLOW_FW_BROADCAST"] = mergestring(broadcast, " ");
+}
+
 /**
  * Private function for handling the Portmapper support
  *
@@ -193,6 +213,7 @@ define boolean HandlePortmapSupport (string interface, boolean enable) {
 	"ipp-udp" : $[
 	    "tcp_ports" : [ ],
 	    "udp_ports" : [ "ipp" ],
+	    "special"	: HandleIPPClientSupport,
 	],
 	// Network Time Protocol for listening broadcast messages or as a server
 	"ntp-server" : $[
@@ -399,6 +420,10 @@ global define boolean Read() {
     string FW_SERVICES_EXT_RPC = (string) SCR::Read(.sysconfig.SuSEfirewall2.FW_SERVICES_EXT_RPC);
     if( FW_SERVICES_EXT_RPC == nil ) FW_SERVICES_EXT_RPC = "";
     settings["FW_SERVICES_EXT_RPC"] = FW_SERVICES_EXT_RPC;
+
+    string FW_ALLOW_FW_BROADCAST = (string) SCR::Read(.sysconfig.SuSEfirewall2.FW_ALLOW_FW_BROADCAST);
+    if( FW_ALLOW_FW_BROADCAST == nil ) FW_ALLOW_FW_BROADCAST = "";
+    settings["FW_ALLOW_FW_BROADCAST"] = FW_ALLOW_FW_BROADCAST;
 
     y2milestone("settings=%1", settings);
     return true;
@@ -741,6 +766,9 @@ global define boolean Write() {
     string FW_SERVICES_EXT_RPC = settings["FW_SERVICES_EXT_RPC"]:"";
     write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_EXT_RPC, FW_SERVICES_EXT_RPC);
 
+    string FW_ALLOW_FW_BROADCAST = settings["FW_ALLOW_FW_BROADCAST"]:"";
+    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_ALLOW_FW_BROADCAST, FW_ALLOW_FW_BROADCAST);
+
     if(personal_firewall_is_active) {
 	write_ret = SCR::Write(.sysconfig.personal-firewall.REJECT_ALL_INCOMING_CONNECTIONS,"no");
 	write_ret = SCR::Write(.sysconfig.personal-firewall,nil);
@@ -852,7 +880,7 @@ global define string GetInterfaceGroup ( string interface ) {
 
     if (size(interface_group)>1) {
 	// Error message, %1 = interface name (eth0)
-	Report::Error(sformat(_("Interface %1 is presented in more groups of interfaces.
+	Report::Error(sformat(_("Interface %1 is included in multiple groups of interfaces.
 Continuing with configuration can produce errors.
 
 It is recommended to leave the configuration and repair it manually in
@@ -1454,8 +1482,8 @@ global define void UpdateProposal () ``{
 
 	y2milestone("New device found '%1', adding into FW_DEV_EXT devices", netdevice);
 	proposal_warnings = add(proposal_warnings, sformat(
-	    // TRANSLATORS: Warning in proposal
-	    _("New network device '%1' found, added as an external firewall interface"), netdevice)
+	    // TRANSLATORS: Warning in installation proposal, %1 is a device (eth0, sl0, ...)
+	    _("New network device '%1' found; added as an external firewall interface"), netdevice)
 	);
 	devices_ext = add(devices_ext, netdevice);
 	proposal_updated = true;
@@ -1469,8 +1497,8 @@ global define void UpdateProposal () ``{
 	// else was removed
 	y2milestone("Device lost '%1', removing from user configuration.", netdevice);
 	proposal_warnings = add(proposal_warnings, sformat(
-	    // TRANSLATORS: Warning in proposal
-	    _("Configured device '%1' lost, removed from all firewall interfaces"), netdevice)
+	    // TRANSLATORS: Warning in installation proposal, %1 is a device (eth0, sl0, ...)
+	    _("Configured device '%1' lost; removed from all firewall interfaces"), netdevice)
 	);
 	devices_ext = RemoveDevice(devices_ext, netdevice);
 	devices_int = RemoveDevice(devices_int, netdevice);
