@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Mar  9 11:30:07 CET 2004 - lnussel@suse.de
+
+- cast to string only if it's indeed a string to fix feature dialog
+- 2.9.8
+
+-------------------------------------------------------------------
 Mon Mar  8 17:09:00 CET 2004 - msvec@suse.cz
 
 - set title icon

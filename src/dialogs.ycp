@@ -402,7 +402,7 @@ services. Also start the appropriate daemons.</p>
 		UI::ChangeWidget(`id(`status), `Value, mergestring((list<string>)additional_services," "));
 	    }
 	}
-	else if(contains(selectable_services, (string)ret))
+	else if(is(ret, string) && contains(selectable_services, (string)ret))
 	{
 	    boolean state = (boolean) UI::QueryWidget(`id(ret),`Value);
 	    if(state == true)
