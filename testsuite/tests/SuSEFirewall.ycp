@@ -28,7 +28,7 @@ map READ = $[
 include "testsuite.ycp";
 TESTSUITE_INIT([READ], nil);
 
-import "SuSEFirewall.ycp";
+import "SuSEFirewall";
 
 /* EOF */
 }
