@@ -29,8 +29,6 @@ Summary:	Configuration of firewall
 %dir @yncludedir@/firewall
 @yncludedir@/firewall/*
 @clientdir@/firewall*
-@moduledir@/SuSEFirewall.*
-@moduledir@/CWMFirewallInterfaces.*
 @desktopdir@/firewall.desktop
 @scrconfdir@/*.scr
 %doc @docdir@
