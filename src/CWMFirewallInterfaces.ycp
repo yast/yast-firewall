@@ -31,6 +31,35 @@ list<string> all_interfaces = nil;
  */
 list interface_items = nil;
 
+// private functions
+
+/**
+ * Enable or disable the firewall details widget according to the status
+ * of "open firewall" checkbox
+ */
+void EnableOrDisableFirewallDetails () {
+    if (! UI::WidgetExists (`id ("_cwm_open_firewall")))
+	return;
+    if (! UI::WidgetExists (`id ("_cwm_firewall_details")))
+	return;
+    boolean enabled = (boolean)
+	UI::QueryWidget (`id ("_cwm_open_firewall"), `Value);
+    if (enabled == nil)
+	enabled = false;
+    UI::ChangeWidget (`id ("_cwm_firewall_details"), `Enabled, enabled);
+}
+
+/**
+ * Display popup with firewall settings details
+ */
+void DisplayFirewallDetailsPopupHandler (map<string,any> widget) {
+
+    void (map<string,any>) common_details_handler = (void(map<string,any>))
+	widget["common_details_handler"]:nil;
+    if (common_details_handler != nil)
+	common_details_handler (widget);
+}
+
 
 // public functions
 
@@ -39,7 +68,7 @@ list interface_items = nil;
  * @param map widget a widget description map
  * @param key strnig the widget key
  */
-global define void Init (map<string,any> widget, string key) {
+global define void PopupInit (map<string,any> widget, string key) {
     // set the list of ifaces
     if (all_interfaces == nil)
     {
@@ -95,7 +124,7 @@ global define void Init (map<string,any> widget, string key) {
  * @param event map event to be handled
  * @return symbol for wizard sequencer or nil
  */
-global define symbol Handle (map<string,any> widget, string key, map event) {
+global define symbol PopupHandle (map<string,any> widget, string key, map event) {
     any event_id = event["ID"]:nil;
     if (event_id == "_cwm_interface_select_all")
     {
@@ -117,7 +146,7 @@ global define symbol Handle (map<string,any> widget, string key, map event) {
  * @param key strnig the widget key
  * @param event map that caused widget data storing
  */
-global define void Store (map<string,any> widget, string key, map event) {
+global define void PopupStore (map<string,any> widget, string key, map event) {
     void (list<string>) set_ifaces = (void(list<string>))
 	widget["set_allowed_interfaces"]:nil;
     list<string> ifaces = (list<string>)
@@ -133,7 +162,7 @@ global define void Store (map<string,any> widget, string key, map event) {
  * @param event map event that caused the validation
  * @return true if validation succeeded, false otherwise
  */
-global boolean Validate (map<string,any> widget, string key, map event) {
+global boolean PopupValidate (map<string,any> widget, string key, map event) {
     list<string> ifaces = (list<string>)
 	UI::QueryWidget (`id ("_cwm_interface_list"), `SelectedItems);
     ifaces = toset (ifaces);
@@ -177,8 +206,8 @@ Continue?"),
  * Init function of the widget
  * @param key strnig the widget key
  */
-global define void InitWrapper (string key) {
-    Init (CWM::GetProcessedWidget (), key);
+global define void PopupInitWrapper (string key) {
+    PopupInit (CWM::GetProcessedWidget (), key);
 }
 
 /**
@@ -187,8 +216,8 @@ global define void InitWrapper (string key) {
  * @param event map event to be handled
  * @return symbol for wizard sequencer or nil
  */
-global define symbol HandleWrapper (string key, map event) {
-    return Handle (CWM::GetProcessedWidget (), key, event);
+global define symbol PopupHandleWrapper (string key, map event) {
+    return PopupHandle (CWM::GetProcessedWidget (), key, event);
 }
 
 /**
@@ -196,8 +225,8 @@ global define symbol HandleWrapper (string key, map event) {
  * @param key strnig the widget key
  * @param event map that caused widget data storing
  */
-global define void StoreWrapper (string key, map event) {
-    Store (CWM::GetProcessedWidget (), key, event);
+global define void PopupStoreWrapper (string key, map event) {
+    PopupStore (CWM::GetProcessedWidget (), key, event);
 }
 
 /**
@@ -206,8 +235,8 @@ global define void StoreWrapper (string key, map event) {
  * @param event map event that caused the validation
  * @return true if validation succeeded, false otherwise
  */
-global boolean ValidateWrapper (string key, map event) {
-    return Validate (CWM::GetProcessedWidget (), key, event);
+global boolean PopupValidateWrapper (string key, map event) {
+    return PopupValidate (CWM::GetProcessedWidget (), key, event);
 }
 
 /**
@@ -265,11 +294,11 @@ global define map<string,any> CreateWidget (map<string,any> settings) {
 	"widget" : `custom,
 	"custom_widget" : widget,
 	"help" : help,
-	"init" : InitWrapper,
-	"store" : StoreWrapper,
-	"handle" : HandleWrapper,
+	"init" : PopupInitWrapper,
+	"store" : PopupStoreWrapper,
+	"handle" : PopupHandleWrapper,
 	"validate_type" : `function,
-	"validate_function" : ValidateWrapper,
+	"validate_function" : PopupValidateWrapper,
     ]);
 
     return ret;
@@ -302,6 +331,229 @@ global symbol DisplayPopup (map<string,any> settings) {
     UI::CloseDialog ();
     return ret;
 }
+
+
+// firewall openning widget
+
+/**
+ * Initialize the open firewall widget
+ * @param widget a map describing the whole widget
+ */
+void OpenFirewallInit (map<string,any> widget, string key) {
+    if (! UI::WidgetExists (`id ("_cwm_open_firewall")))
+    {
+	y2error ("Firewall widget doesn't exist");
+	return;
+    }
+    boolean() get_open_firewall = (boolean())widget["get_open_firewall"]:nil;
+    boolean open_firewall = get_open_firewall ();
+    UI::ChangeWidget (`id ("_cwm_open_firewall"), `Value, open_firewall);
+    EnableOrDisableFirewallDetails ();
+}
+
+/**
+ * Store function of the widget
+ * @param key strnig the widget key
+ * @param event map that caused widget data storing
+ */
+global void OpenFirewallStore (map<string,any> widget, string key, map event) {
+    if (! UI::WidgetExists (`id ("_cwm_open_firewall")))
+    {
+	y2error ("Widget _cwm_open_firewall does not exist");
+	return;
+    }
+    boolean open_firewall = (boolean)
+	UI::QueryWidget (`id ("_cwm_open_firewall"), `Value);
+    void(boolean) set_open_firewall
+	= (void(boolean))widget["set_open_firewall"]:nil;
+    set_open_firewall (open_firewall);
+}
+
+/**
+ * Handle the immediate start and stop of the service
+ * @param widget a map describing the widget
+ * @param key strnig the widget key
+ * @param event_id any the ID of the occurred event
+ * @return always nil
+ */
+global symbol OpenFirewallHandle (map<string,any> widget, string key, map event) {
+    any event_id = event["ID"]:nil;
+    if (event_id == "_cwm_firewall_details")
+    {
+	symbol() handle_firewall_details
+	    = (symbol())widget["firewall_details_handler"]:nil;
+	if (handle_firewall_details != nil)
+	{
+	    return handle_firewall_details ();
+	}
+	else
+	{
+	    DisplayFirewallDetailsPopupHandler (widget);
+	    return nil;
+	}
+    }
+    if (event_id == "_cwm_open_firewall")
+    {
+	 EnableOrDisableFirewallDetails ();
+    }
+
+}
+
+/**
+ * Init function of the widget
+ * @param key strnig the widget key
+ */
+global void OpenFirewallInitWrapper (string key) {
+    OpenFirewallInit (CWM::GetProcessedWidget (), key);
+}
+
+/**
+ * Store function of the widget
+ * @param key strnig the widget key
+ * @param event map that caused widget data storing
+ */
+global void OpenFirewallStoreWrapper (string key, map event) {
+    OpenFirewallStore (CWM::GetProcessedWidget (), key, event);
+}
+
+/**
+ * Handle the immediate start and stop of the service
+ * @param key strnig the widget key
+ * @param event_id any the ID of the occurred event
+ * @return always nil
+ */
+global symbol OpenFirewallHandleWrapper (string key, map event) {
+    return OpenFirewallHandle (CWM::GetProcessedWidget (), key, event);
+}
+
+/**
+ * Get the template for the help text to the firewall opening widget
+ * @param restart_displayed shold be true if "Save and restart" is displayed
+ * @return string help text template with %1 and %2 placeholders
+ */
+global string OpenFirewallHelpTemplate (boolean restart_displayed) {
+    // help text for firewall settings widget 1/2,
+    // %1 is check box label, eg. "Open Port in Firewall" (without quotes)
+    string help = _("<p><b><big>Firewall Settings</big></b><br>
+To open the firewall to allow access the service from remote computers,
+set <b>%1</b>.");
+    if (restart_displayed)
+    {
+	// help text for firewall port openning widget 2/2, optional
+	// %1 is push button label, eg. "Firewall &Details" (without quotes)
+	// note: %2 is correct, do not replace with %1!!!
+	help = help + _("<br>To tune the firewall settings,
+click <b>%2</b>.");
+    }
+    help = help + "</p>";
+    return help;
+}
+
+/**
+ * Get the help text to the firewall opening widget
+ * @param restart_displayed shold be true if "Save and restart" is displayed
+ * @return string help text
+ */
+global string OpenFirewallHelp (boolean restart_displayed) {
+    return sformat (OpenFirewallHelpTemplate (restart_displayed),
+	// part of help text - check box label, NO SHORTCUT!!!
+	_("Open Port in Firewall"),
+	// part of help text - push button label, NO SHORTCUT!!!
+	_("Firewall Details"));
+}
+
+
+/**
+ * Get the widget description map of the firewall enablement widget
+ * TODO move to yast2-firewall
+ * @param settings a map of all parameters needed to create the widget properly
+ * <pre>
+ *
+ * - "get_open_firewall" : boolean () -- function to return current status
+ *          if the firewall should be opened. If not specified, check box
+ *          will not be shown
+ * - "set_open_firewall" : void (boolean) -- function to set if the
+ *          furewall should be opened. If not specified, check box
+ *          will not be shown
+ * - "open_firewall_checkbox" : string -- label of the check box
+ * - "firewall_details_handler" : symbol () -- function to handle the firewall
+ *          details button. If returns something else than nil, dialog is
+ *          exited with the returned symbol as value for wizard sequencer.
+ *          If not specified, but "common_details_handler" specified,
+ *          the button bevavior will be driven by "common_details_handler.
+ *          If not specified, and "common_details_handler" not specified,
+ *          the button will not be shown.
+ * - "common_details_handler" : void (map<string,any>) -- function to
+ *          run the common popup for firewall, should be always
+ *          CWMFirewallInterfaces::DisplayPopup
+ *          Is not used if "firewall_details_handler", requires
+ *          "get_allowed_interfaces" and "set_allowed_interfaces".
+ * - "get_allowed_interfaces" : list<string>() -- function that returns
+ *          the current list of the opened interfaces for the service
+ * - "set_allowed_interfaces" : void(list<string>) -- function that sets
+ *          the list of interfaces to be opened to the service
+ * - "firewall_details_button" : string -- label of the push button for
+ *          changing firewall details
+ * - "help" : string -- help to the widget. If not specified, generic help
+ *          is used (button labels are patched correctly)
+ * </pre>
+ * @return map the widget description map
+ */
+global map<string,any> CreateOpenFirewallWidget (map<string,any> settings) {
+    string help = "";
+    string open_firewall_checkbox
+	// check box
+	= settings["open_firewall_checkbox"]:_("Open Port in &Firewall");
+    string firewall_details_button
+	// push button
+	= settings["firewall_details_button"]:_("Firewall &Details");
+    boolean display_firewall_details
+	= haskey (settings, "firewall_details_handler")
+	    || (haskey (settings, "common_details_handler")
+		&& haskey (settings, "get_allowed_interfaces")
+		&& haskey (settings, "set_allowed_interfaces"));
+    if (haskey (settings, "help"))
+    {
+	help = settings["help"]:"";
+    }
+    else
+    {
+	help = OpenFirewallHelp (display_firewall_details);
+    }
+
+    term firewall_settings = `CheckBox (`id ("_cwm_open_firewall"),
+	`opt (`notify),
+	open_firewall_checkbox);
+    if (display_firewall_details)
+    {
+	firewall_settings = `Left (`HBox (
+	    firewall_settings,
+	    `HSpacing (2),
+	    `PushButton (`id ("_cwm_firewall_details"),
+		firewall_details_button)
+	));
+    }
+
+    if (! (haskey (settings, "get_open_firewall")
+	&& haskey (settings, "set_open_firewall")))
+    {
+	firewall_settings = `VBox ();
+	help = "";
+    }
+
+    map<string,any> ret = (map<string,any>)union ($[
+	"widget" : `custom,
+	"custom_widget" : firewall_settings,
+	"help" : help,
+	"init" : OpenFirewallInitWrapper,
+	"store" : OpenFirewallStoreWrapper,
+	"handle" : OpenFirewallHandleWrapper,
+	"handle_events" : [ "_cwm_firewall_details", "_cwm_open_firewall" ],
+    ], settings);
+
+    return ret;
+}
+
 
 // EOF
 }
