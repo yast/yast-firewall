@@ -38,7 +38,7 @@ global boolean start = false;
 /**
  * Constructor
  */
-global define void SuSEFirewall () ``{
+global define void SuSEFirewall () {
 
     if (!Mode::config) {
 
@@ -61,7 +61,7 @@ global define void SuSEFirewall () ``{
  * @param s data to be imported
  * @return true on success
  */
-global define boolean Import(map s) ``{
+global define boolean Import(map s) {
     settings = (map<string,any>)s;
     start = settings["start_firewall"]:false;
     return true;
@@ -72,7 +72,7 @@ global define boolean Import(map s) ``{
  * (for use by autoinstallation).
  * @return dumped settings (later acceptable by Import())
  */
-global define map Export() ``{
+global define map Export() {
     if(haskey(settings, "network_devices" ))
 	settings = remove(settings, "network_devices" );
 
@@ -84,7 +84,7 @@ global define map Export() ``{
  * Create a textual summary and a list of unconfigured cards
  * @return summary of the current configuration
  */
-global define list Summary() ``{
+global define list Summary() {
 
     string summary = "";
     summary = Summary::AddHeader(summary, _("External Device"));
@@ -112,7 +112,7 @@ global define list Summary() ``{
  * Fill the map of all firewall settings from the SCR
  * @return true on success
  */
-global define boolean Read() ``{
+global define boolean Read() {
 
     // Check if firewall running
     start = Service::Enabled("SuSEfirewall2_init");
@@ -219,7 +219,7 @@ global define boolean Read() ``{
 
     // filter the device names
     list devices = [];
-    foreach(map device, devicelist, ``{
+    foreach(map device, devicelist, {
 	string dev = device["dev_name"]:"";
 	if(dev != "" && !issubstring(dev, "lo") && !issubstring(dev, "sit")) {
             devices[size(devices)] = dev;
@@ -237,7 +237,7 @@ global define boolean Read() ``{
  * @param m a map of all firewall settings
  * @return true on success
  */
-global define boolean Write() ``{
+global define boolean Write() {
 
     if(!start && !write_only)
 	return false;
@@ -391,7 +391,7 @@ global define boolean Write() ``{
 	"SuSEfirewall2_final",
     ];
 
-    foreach(string service, services, ``{
+    foreach(string service, services, {
 
 	y2milestone("Enabling service %1", service);
 	if(!Service::Enable(service))
@@ -416,7 +416,7 @@ global define boolean Write() ``{
  * @param interface	the name of the interface
  * @return boolean	true if it is an external interface
  */
-global define boolean IsExtInterface( string interface ) ``{
+global define boolean IsExtInterface( string interface ) {
     list servs = splitstring(settings[ "FW_DEV_EXT" ]:"", " ");
     if(servs == nil) servs = [];
     return contains( servs, interface );
@@ -428,7 +428,7 @@ global define boolean IsExtInterface( string interface ) ``{
  * @param interface	the name of the interface
  * @return boolean	true if it is an internal interface
  */
-global define boolean IsIntInterface( string interface ) ``{
+global define boolean IsIntInterface( string interface ) {
     list servs = splitstring(settings[ "FW_DEV_INT" ]:"", " ");
     if(servs == nil) servs = [];
     return contains( servs, interface );
@@ -440,7 +440,7 @@ global define boolean IsIntInterface( string interface ) ``{
  * @param interface	the name of the interface
  * @return boolean	true if it is a DMZ interface
  */
-global define boolean IsDmzInterface( string interface ) ``{
+global define boolean IsDmzInterface( string interface ) {
     list servs = splitstring(settings[ "FW_DEV_DMZ" ]:"", " ");
     if(servs == nil) servs = [];
     return contains( servs, interface );
@@ -453,7 +453,7 @@ global define boolean IsDmzInterface( string interface ) ``{
  *  @param service	the name of the service
  *  @return boolean	true on success
  */
-define boolean AddServiceToConfig( string set, string service ) ``{
+define boolean AddServiceToConfig( string set, string service ) {
 
     y2debug( "Before adding services: %1" , settings[set]:"");
 
@@ -483,11 +483,13 @@ define boolean AddServiceToConfig( string set, string service ) ``{
  *  @param service	the name of the service
  *  @return boolean	true on success
  */
-define boolean RemoveServiceFromConfig( string set, string service ) ``{
+define boolean RemoveServiceFromConfig( string set, string service ) {
     list<string> servs = splitstring(settings[set]:"", " ");
     if(servs == nil) servs = [];
 
-    servs = filter(string s, servs, ``(service != s) );
+    servs = filter(string s, servs, {
+	return service != s;
+    });
     string sers = mergestring(servs, " ");
     if(servs == nil) return false;
     settings[ set ] = sers;
@@ -505,7 +507,7 @@ define boolean RemoveServiceFromConfig( string set, string service ) ``{
  *  all interfaces, INT, EXT or DMZ for the respective zone
  *  @return boolean	true on success
  */
-global define boolean AddService(string service, string proto, string interface) ``{
+global define boolean AddService(string service, string proto, string interface) {
 
     if( proto != "UDP" && proto != "TCP" && proto != "IP" ) {
 	y2debug( "Unknown protocol: %1", proto );
@@ -549,7 +551,7 @@ global define boolean AddService(string service, string proto, string interface)
  *  all interfaces, INT, EXT or DMZ for the respective zone
  *  @return boolean	true on success
  */
-global define boolean RemoveService(string service, string proto, string interface) ``{
+global define boolean RemoveService(string service, string proto, string interface) {
 
     if( proto != "UDP" && proto != "TCP" && proto != "IP" ) {
 	y2error( "Unknown protocol: %1", proto );
@@ -635,9 +637,9 @@ global define boolean HaveService(string service, string proto, string interface
   * @param interfaces list of interfaces
   * @return string in SuSEfirewall syntax - no, yes, dmz, ext
   */
-global define string MostInsecureInterface (list<string> interfaces) ``{
+global define string MostInsecureInterface (list<string> interfaces) {
     string result = "no";
-    foreach (string iface, interfaces, ``{
+    foreach (string iface, interfaces, {
         if (IsExtInterface (iface))
             result = "ext";
         else if (IsDmzInterface (iface) && result != "ext")

@@ -943,7 +943,7 @@ when you boot your system.</p>");
 		string errmsg = _("There has been some error while removing the
 firewall bootscripts, please use the runlevel
 editor to manually remove them");
-		Popup::Message(errmsg + "\n" + Service::error_msg);
+		Popup::Message(errmsg + "\n" + Service::Error());
 	    }
 	    break;
 	}
