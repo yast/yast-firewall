@@ -3,6 +3,7 @@ Fri Jul 30 10:30:30 CEST 2004 - jsrain@suse.cz
 
 - added popup (CWM widget) for selecting interfaces to open in
   firewall
+- added the CWM widget for openning/closing the firewall
 
 -------------------------------------------------------------------
 Wed Jul 21 09:50:51 CEST 2004 - locilka@suse.cz
