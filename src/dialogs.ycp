@@ -17,6 +17,8 @@
     import "DialogTree";
     import "Label";
     import "Mode";
+    import "SuSEFirewall";
+    import "Wizard";
 
     include "firewall/subdialogs.ycp";
     include "firewall/uifunctions.ycp";

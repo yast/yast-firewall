@@ -18,6 +18,7 @@
     import "PortAliases";
     import "Popup";
     import "Address";
+    import "Wizard";
 
     include "firewall/generalfunctions.ycp";
 
@@ -526,7 +527,9 @@ Really use this port?
 		    // TRANSLATORS: informative label
 		    `Left(`Label(_("Masquerading needs at least one external interface and one other interface.")))
 		    :
-		    `Left(`Label("FIXME: missing functionality for expert configuration"))
+		    // TRANSLATORS: error message, which user shouldn't see
+		    //   Please, do not translate this message
+		    `Left(`Label(_("FIXME: missing functionality for expert configuration")))
 		)
 	    );
 	}
@@ -791,7 +794,7 @@ Use the port number instead of the port name.
 		    `VBox (
 			`Label(""),
 			// TRANSLATORS: check box
-			`CheckBox(`id("bcast_log_" + zone), _("Log Not Accepted Broadcast Packets"), log_packets)
+			`CheckBox(`id("bcast_log_" + zone), _("&Log Not Accepted Broadcast Packets"), log_packets)
 		    )
 		)
 	    );

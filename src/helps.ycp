@@ -73,7 +73,7 @@ To add a new redirect rule, press <b>Add</b> and complete the redirect form.</p>
 	"simple-broadcast-configuration" : _("<p><b><big>Broadcast Configuration</big></b>
 <br>Broadcast packets are special UDP packets sent to the whole network to find 
 neighboring computers or send information to each computer in the network.
-For example, CUPS servers provide information about their printing queues using broadcast packets.<p>
+For example, CUPS servers provide information about their printing queues using broadcast packets.</p>
 
 <p>SuSEfirewall2 services selected in allowed interfaces automatically add needed broadcast
 ports here. To remove any or add any others, edit lists of space-separated ports for
