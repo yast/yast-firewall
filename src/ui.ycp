@@ -302,7 +302,6 @@ global define WriteDialog() ``{
     Progress::NextStage();
 
 
-
     retry=true;
     while(retry)
     {
@@ -388,7 +387,7 @@ global define WriteDialog() ``{
     Progress::NextStage();
 
     UI::ChangeWidget(`id(`next),`Enabled, true);
-
+    
     any ret = nil;
     while(true) {
 	ret = UI::UserInput();
@@ -1037,8 +1036,8 @@ when you boot your system.</p>
  * Summary what will be done for stopping the firewall
  */
 global define StopDialog() ``{
-    string help = _("<p><b>Attention:</b><br>If deactivate your firewall,
-your system is no longer protected</p>
+    string help = _("<p><b>Attention:</b><br>If you deactivate the firewall,
+your system will no longer be protected.</p>
 <p><b>Action:</b><br>
 Stop any running SuSE Firewall2 and remove it from the boot process.
 In this case the firewall will no longer be activated
