@@ -281,119 +281,26 @@ global define PreWriteDialog() ``{
     return ret;
 }
 
-global define WriteDialog() ``{
-    string help = "";
-    boolean retry = true;
-    string whatfailedmsg = _("Stopping the firewall failed");
 
-    Wizard::SetContents("",`Empty(),"",false,true);
-    UI::ChangeWidget(`id(`abort),`Enabled, false);
-    // Translator: Button to finally write settings
-    UI::ChangeWidget(`id(`next),`Label, FinishButtonLabel());
-
-    Progress::New (
-        _("Firewall configuration -- saving settings"),
-        _("Preparing ..."),
-        3,
-        [ _("stop firewall"), _("save settings"), _("start firewall") ],
-        [ _("stopping firewall"), _("saving settings"), _("starting firewall"), _("Finished, press Quit") ],
-        help
-        );
-
-    Progress::NextStage();
-
-
-    retry=true;
-    while(retry)
-    {
-	retry = false;
-	map firewall_stop_map = SCR::Execute (.target.bash_output, "/etc/init.d/SuSEfirewall2_setup stop",$["TERM":"raw"]);
-
-	if(firewall_stop_map == nil || lookup(firewall_stop_map,"exit",0)>0)
-	{
-	    if( firewall_stop_map != nil )
-	    {
-		UI::StdOutStdErrLog( whatfailedmsg,lookup(firewall_stop_map,"stdout",""), lookup(firewall_stop_map,"stderr",""));
-	    }
-
-	    symbol ret = UI::AnyQuestionPopup3( whatfailedmsg, "", _("Continue"), _("Abort"), _("Retry"), `focus_yes );
-	    if(ret==`retry)
-	    {
-		retry=true;
-	    }
-	    else if(ret==`no)
-	    {
-		return `next;
-	    }
-
-	}
-    }
-
-    Progress::NextStage();
-
-    sleep(1000);
-    ret = SuSEFirewall::Write();
-    if (ret == false)
-    {
-	UI::Messagepopup(_("Writing settings failed"));
-    }
-
-    Progress::NextStage();
-    map firewall_settings = SuSEFirewall::settings;
-
-    if (SuSEFirewall::personal_firewall_is_active)
-    {
-	SCR::Execute (.target.bash,"/sbin/SuSEpersonal-firewall",$[]);
-    }
-
-    list cmds =  [  "/sbin/insserv /etc/init.d/SuSEfirewall2_init",
-		    "/sbin/insserv /etc/init.d/SuSEfirewall2_setup",
-		    "/sbin/insserv /etc/init.d/SuSEfirewall2_final",
-		    "/etc/init.d/SuSEfirewall2_final start"
-		    ];
-
-    whatfailedmsg = _("Starting the firewall failed");
-
-    foreach(`cmd,cmds,
-    ``{
-	retry=true;
-	while(retry)
-	{
-	    retry = false;
-	    map return_map = SCR::Execute (.target.bash_output,cmd,$["TERM":"raw"]);
-
-	    if(return_map == nil || lookup(return_map,"exit",0)>0)
-	    {
-		if( return_map != nil )
-		{
-		    UI::StdOutStdErrLog( whatfailedmsg,lookup(return_map,"stdout",""), lookup(return_map,"stderr",""));
-		}
-
-		symbol ret = UI::AnyQuestionPopup3( whatfailedmsg, "", _("Continue"), _("Abort"), _("Retry"), `focus_yes );
-		if(ret==`retry)
-		{
-		    retry=true;
-		}
-		else if(ret==`no)
-		{
-		    return `next;
-		}
-
-	    }
-	}
-    });
-
-
-    Progress::NextStage();
-
-    UI::ChangeWidget(`id(`next),`Enabled, true);
-
-
-    /* handle possible write errors */
-    return `next;
-}
 
 /**
+ * Write settings dialog
+ * @return `abort if aborted and `next otherwise
+ */
+
+global define symbol WriteDialog() ``{
+    /* Firewall write dialog help 1/2 */
+    string helptext = _("<P><B><BIG>Saving Firewall Configuration</BIG></B><BR>
+Please wait...<BR></P>");
+    Wizard::RestoreHelp(helptext);
+    boolean ret = SuSEFirewall::Write();
+    return ret ? `next : `abort;
+}
+
+
+
+/**
+ * Device Dialog
  */
 global define DevDialog() ``{
 
@@ -549,60 +456,53 @@ provide server services. You also have to start the appropriate daemons.</p>
 </p>");
 
     term contents =
-`VBox (
-       `HBox (
-	      `HSpacing (8),
-	      `VBox (
-		     `VSpacing (1),
+	`Top (
+	      `VBox (	       
 		     `Left (`Label (_("Configure the services that should be available on your server"))),
-		     `VSpacing (0.5),
-		     `Top (`VSquash (
-				     `HBox (`HSpacing (6),
-					    `VBox (
-						   // Label for checkboxoption
-						   `Left (`Label( _("Web server") )),
-						   // checkbox option
-						   `Left (`CheckBox (`id ("http"),`opt(`notify), _("&HTTP"), false)),
-						   // checkbox option
-						   `Left (`CheckBox (`id ("https"),`opt(`notify), _("HTT&P with SSL (https)"), false)),
-						   `VSpacing (0.5),
-						   // Label for checkboxoption
-						   `Left (`Label( _("Mail server") )),
-						   // checkbox option
-						   `Left (`CheckBox (`id ("smtp"),`opt(`notify), _("S&MTP"), false)),
-						   // checkbox option
-						   `Left (`CheckBox (`id ("pop3"),`opt(`notify), _("POP&3"), false)),
-						   // checkbox option
-						   `Left (`CheckBox (`id ("pop3s"),`opt(`notify), _("P&OP3 with SSL (POP3s)"), false)),
-						   // checkbox option
-						   `Left (`CheckBox (`id ("imap"),`opt(`notify), _("&IMAP"), false)),
-						   // checkbox option
-						   `Left (`CheckBox (`id ("imaps"),`opt(`notify), _("IM&AP with SSL (IMAPs)"), false)),
-						   `VSpacing (0.5),
-						   // Label for checkboxoption
-						   `Left (`Label( _("Other services") )),
-						   // checkbox option
-						   `Left (`CheckBox (`id ("ssh"),`opt(`notify), _("&Secure Shell (ssh)"), false)),
-						   // checkbox option
-						   `Left (`CheckBox (`id ("telnet"),`opt(`notify), _("&telnet"), false)),
-						   // checkbox option
-						   `Left (`CheckBox (`id ("rsync"),`opt(`notify), _("Remote S&ynchronization (rsync)"), false))
-						   ),
-					    `HSpacing (0)
-//					      `VBox(`VSpacing (0.5),
-//						    `RichText(_("If you are not running a server, then you shouldn't need any of the services.")),
-//						    `VSpacing (5)
-//						    )
-					    ))),
-		     `VSpacing (0),
-		     `VBox (
-			    `Left(`Label (_("Additional services:"))),
-			    `HBox(
-				 `Label(`id(`status),`opt(`outputField,`hstretch),""),
-				 `PushButton(`id(`edit),_("&Expert...")))
-			    ),
-		     `VStretch ()),
-	      `HSpacing (5)));
+
+		     `HBox(
+			   `HWeight(10, `Empty()),
+			   `HWeight(90, `VBox(
+					      // Label for checkboxoption
+					      `Left (`Label( _("Web server") )),
+					      // checkbox option
+					      `Left (`CheckBox (`id ("http"),`opt(`notify), _("&HTTP"), false)),
+					      // checkbox option
+					      `Left (`CheckBox (`id ("https"),`opt(`notify), _("HTT&P with SSL (https)"), false)),
+					      `VSpacing (0.3),
+					      // Label for checkboxoption
+					      `Left (`Label( _("Mail server") )),
+					      // checkbox option
+					      `Left (`CheckBox (`id ("smtp"),`opt(`notify), _("S&MTP"), false)),
+					      // checkbox option
+					      `Left (`CheckBox (`id ("pop3"),`opt(`notify), _("POP&3"), false)),
+					      // checkbox option
+					      `Left (`CheckBox (`id ("pop3s"),`opt(`notify), _("P&OP3 with SSL (POP3s)"), false)),
+					      // checkbox option
+					      `Left (`CheckBox (`id ("imap"),`opt(`notify), _("&IMAP"), false)),
+					      // checkbox option
+					      `Left (`CheckBox (`id ("imaps"),`opt(`notify), _("IM&AP with SSL (IMAPs)"), false)),
+					      `VSpacing (0.3),
+					      // Label for checkboxoption
+					      `Left (`Label( _("Other services") )),
+					      // checkbox option
+					      `Left (`CheckBox (`id ("ssh"),`opt(`notify), _("&Secure Shell (ssh)"), false)),
+					      // checkbox option
+					      `Left (`CheckBox (`id ("telnet"),`opt(`notify), _("&telnet"), false)),
+					      // checkbox option
+					      `Left (`CheckBox (`id ("rsync"),`opt(`notify), _("Remote S&ynchronization (rsync)"), false)),
+	
+					      `Left(`Label (_("Additional services:"))),
+					      `HBox(
+						    `Label(`id(`status),`opt(`outputField,`hstretch),""),
+						    `PushButton(`id(`edit),_("&Expert..."))
+						    )
+					      )
+				    )
+			   )
+		     )
+	      );
+	
 
     list selectable_services = ["telnet","ssh","http","https","smtp","pop3", "pop3s", "imap", "imaps", "rsync" ];
 
