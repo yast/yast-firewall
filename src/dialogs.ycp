@@ -28,7 +28,7 @@
 	    "get_service_auto_start"	: SuSEFirewall::GetEnableService,
 	    "set_service_auto_start"	: SuSEFirewall::SetEnableService,
 	    // TRANSLATORS: Radio selection
-	    "start_auto_button"		: _("Start Firewall When &Booting"),
+	    "start_auto_button"		: _("Start Firew&all When Booting"),
 	    // TRANSLATORS: Radio selection
 	    "start_manual_button"	: _("Start Firewall &Manually"),
 	    "help"			: sformat(CWMServiceStart::AutoStartHelpTemplate (),
@@ -50,7 +50,7 @@
 	    "stop_now_button"		: _("S&top Firewall Now"),
 	    "save_now_action"		: SaveAndRestart,
 					  // TRANSLATORS: Push button
-	    "save_now_button"		: _("Save Settings and Restart Firewall &Now"),
+	    "save_now_button"		: _("Sa&ve Settings and Restart Firewall Now"),
 	    "start_now_action"		: StartNow,
 	    "stop_now_action"		: StopNow,
 	    "help"			: sformat (CWMServiceStart::StartStopHelpTemplate (true),

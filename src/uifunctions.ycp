@@ -407,7 +407,7 @@ Really use this port?
 	UI::ChangeWidget(`id("table_allowed_services"), `Items, allowed_services);
 	UI::ReplaceWidget(`id("allow_service_names_replacepoint"),
 	    // TRANSLATORS: select box
-	    `ComboBox(`id("allow_service_names"), _("Service to Allow"), not_allowed_services)
+	    `ComboBox(`id("allow_service_names"), _("&Service to Allow"), not_allowed_services)
 	);
 
 	// disable or enable buttons, selectboxes, table

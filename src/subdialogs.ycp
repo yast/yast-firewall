@@ -65,9 +65,9 @@
 		),
 		`HBox (
 		    // TRANSLATORS: push button
-		    `PushButton(`id("change_firewall_interface"), _("Change")),
+		    `PushButton(`id("change_firewall_interface"), _("&Change")),
 		    // TRANSLATORS: push button
-		    `PushButton(`id("user_defined_firewall_interface"), _("Custom"))
+		    `PushButton(`id("user_defined_firewall_interface"), _("C&ustom"))
 		)
 	    )
 	);
@@ -88,7 +88,7 @@
 		    ),
 		    `ComboBox (`id("zone_for_interface"), `opt(`hstretch),
 			// TRANSLATORS: select box
-			_("Interface Zone"), zones
+			_("&Interface Zone"), zones
 		    )
 		),
 		`VSpacing(1),
@@ -141,11 +141,11 @@
 		`ReplacePoint( `id("replacepoint_masquerade_information"), `Empty() ),
 		`Left( `CheckBox(`id("masquerade_networks"), `opt(`notify),
 		    // TRANSLATORS: check box
-		    _("Masquerade Networks"))
+		    _("&Masquerade Networks"))
 		),
 		(IsThisExpertConfiguration() ?
 		    // TRANSLATORS: select box
-		    `Left( `ComboBox(`id("masquerade_outer_zone"), _("Zone to Masquerade On"), GetZonesListedItems() ) )
+		    `Left( `ComboBox(`id("masquerade_outer_zone"), _("Zone &to Masquerade On"), GetZonesListedItems() ) )
 		    :
 		    nil
 		)
@@ -180,7 +180,7 @@
 	term dialog = `VBox(
 	    `Left( `ComboBox(`id("allowed_services_zone"), `opt(`notify),
 		// TRANSLATORS: combo box
-		_("Allowed Services for Selected Zone"), GetZonesListedItems() )
+		_("All&owed Services for Selected Zone"), GetZonesListedItems() )
 	    ),
 	    `VSquash (
 		`HBox (
@@ -188,7 +188,7 @@
 			`Bottom ( `Left( `ReplacePoint( `id("allow_service_names_replacepoint"),
 			    // items handled by replacepoint
 			    // TRANSLATORS: combo box
-			    `ComboBox(`id("allow_service_names"), _("Service to Allow"),[])
+			    `ComboBox(`id("allow_service_names"), _("&Service to Allow"),[])
 			)))
 		    ),
 		    `HWeight ( 2,
@@ -209,7 +209,7 @@
 			`VSpacing(1),
 			`Left( `CheckBox(`id("protect_from_internal"), `opt(`notify),
 			    // TRANSLATORS: check box
-			    _("Protect Firewall from Internal Zone"))
+			    _("&Protect Firewall from Internal Zone"))
 			)
 		    )
 		),
@@ -218,7 +218,7 @@
 			`Top ( `PushButton ( `id ( "remove_allowed_service" ), `opt ( `hstretch ), Label::RemoveButton() ) ),
 			`HStretch(),
 			// TRANSLATORS: push button
-			`Bottom ( `PushButton ( `id ( "advanced_allowed_service" ), `opt ( `hstretch ), _("Advanced") ) )
+			`Bottom ( `PushButton ( `id ( "advanced_allowed_service" ), `opt ( `hstretch ), _("A&dvanced") ) )
 		    )
 		)
 	    )
@@ -299,11 +299,11 @@
  *		    `HWeight ( 50,
  *		    `VBox (
  *			// TRANSLATORS: editable select box
- *			`ComboBox (`id("add_source_network"), `opt(`editable,`hstretch), _("Source Network"), [
+ *			`ComboBox (`id("add_source_network"), `opt(`editable,`hstretch), _("&Source Network"), [
  *			    `item( `id("0/0"), "0/0")
  *			]),
  *			// TRANSLATORS: editable select box
- *			`ComboBox (`id("add_protocol"), `opt(`editable,`hstretch), _("Protocol"), [
+ *			`ComboBox (`id("add_protocol"), `opt(`editable,`hstretch), _("&Protocol"), [
  *			    `item( `id(""), ""),
  *			    `item( `id("tcp"), "tcp"),
  *			    `item( `id("tcp"), "udp")
@@ -378,20 +378,20 @@
 		`HBox (
 		    `VBox (
 			// TRANSLATORS: editable select box
-			`ComboBox (`id("add_source_network"), `opt(`editable,`hstretch), _("Source Network"), [
+			`ComboBox (`id("add_source_network"), `opt(`editable,`hstretch), _("&Source Network"), [
 			    `item( `id("0/0"), "0/0")
 			]),
 			// TRANSLATORS: text entry
-			`TextEntry (`id("add_requested_ip"), _("Requested IP"))
+			`TextEntry (`id("add_requested_ip"), _("Re&quested IP"))
 		    ),
 		    `VBox (
 			// TRANSLATORS: select box
-			`ComboBox (`id("add_protocol"), `opt(`hstretch), _("Protocol"), [
+			`ComboBox (`id("add_protocol"), `opt(`hstretch), _("&Protocol"), [
 			    `item( `id("tcp"), "TCP"),
 			    `item( `id("udp"), "UDP")
 			]),
 			// TRANSLATORS: text entry
-			`TextEntry (`id("add_requested_port"), _("Requested Port"))
+			`TextEntry (`id("add_requested_port"), _("R&equested Port"))
 		    )
 		),
 		`VSpacing(1),
@@ -399,9 +399,9 @@
 		`Left( `Label(_("Redirection:")) ),
 		`HBox (
 		    // TRANSLATORS: text entry
-		    `TextEntry (`id("add_redirectto_ip"), _("Redirect to Masqueraded IP")),
+		    `TextEntry (`id("add_redirectto_ip"), _("Re&direct to Masqueraded IP")),
 		    // TRANSLATORS: text entry
-		    `TextEntry (`id("add_redirectto_port"), _("Redirect to Port"))
+		    `TextEntry (`id("add_redirectto_port"), _("&Redirect to Port"))
 		),
 		`VSpacing(1),
 		`HBox (
@@ -649,11 +649,11 @@
 		`VBox (
 		    `Left (
 			// TRANSLATORS: select box
-			`ComboBox (`id("logging_ACCEPT"), _("Logging Accepted Packets"), logging_options)
+			`ComboBox (`id("logging_ACCEPT"), _("&Logging Accepted Packets"), logging_options)
 		    ),
 		    `Left (
 			// TRANSLATORS: select box
-			`ComboBox (`id("logging_DROP"), _("Logging Not Accepted Packets"), logging_options)
+			`ComboBox (`id("logging_DROP"), _("L&ogging Not Accepted Packets"), logging_options)
 		    )
 		)
 	    )
@@ -761,10 +761,10 @@
 	    _("IPsec Support"),
 	    `HBox (
 		// TRANSLATORS: check box
-		`Left ( `CheckBox (`id("ispsec_support"), _("IPsec Support Enabled")) ),
+		`Left ( `CheckBox (`id("ispsec_support"), _("&IPsec Support Enabled")) ),
 		`HStretch (),
 		// TRANSLATORS: push button
-		`Right ( `PushButton(`id("ipsec_details"), _("Details")) )
+		`Right ( `PushButton(`id("ipsec_details"), _("&Details")) )
 	    )
 	);
 
@@ -784,7 +784,7 @@
 		`Left (
 		    `ComboBox (`id("trust_ipsec_as"),
 			// TRANSLATORS: select box
-			_("Trust IPsec As"),
+			_("&Trust IPsec As"),
 			trust_zones
 		    )
 		),

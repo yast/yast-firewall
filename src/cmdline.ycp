@@ -1014,7 +1014,7 @@
 	    "nonaccepted" : $[
 		"type" : "string",
 		// TRANSLATORS: CommandLine help
-		"help" : _("Logging packets not accepted (all|crit|none)"),
+		"help" : _("Logging not accepted packets (all|crit|none)"),
 	    ],
 	    "logbroadcast" : $[
 		"type" : "string",
