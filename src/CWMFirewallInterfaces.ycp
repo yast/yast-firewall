@@ -37,6 +37,11 @@ list interface_items = nil;
  */
 list<string> allowed_interfaces = nil;
 
+/**
+ * Information if configuration was changed by user
+ */
+boolean configuration_changed = nil;
+
 // private functions
 
 /**
@@ -177,7 +182,6 @@ void DisplayFirewallDetailsPopupHandler (map<string,any> widget) {
 global void InitAllowedInterfaces (list<string> services) {
     map<string,boolean> service_status = $[];
 
-
     map<string,map<string,boolean> > ifaces_info
 	= SuSEFirewall::GetServices (services);
     foreach (string s, map<string,boolean> status, ifaces_info, {
@@ -191,6 +195,8 @@ global void InitAllowedInterfaces (list<string> services) {
     allowed_interfaces = maplist (string iface, boolean en, service_status, {
 	return iface;
     });
+
+    configuration_changed = false;
 }
 
 /**
@@ -199,6 +205,9 @@ global void InitAllowedInterfaces (list<string> services) {
  * @param services a list of services
  */
 global void StoreAllowedInterfaces (list<string> services) {
+    // do not save anything if configuration didn't change
+    if (! configuration_changed)
+	return;
     list<string> forbidden_ifaces = filter (string i, all_interfaces, {
 	return ! contains (allowed_interfaces, i);
     });
@@ -269,6 +278,7 @@ global define void InterfacesStore (map<string,any> widget, string key, map even
     allowed_interfaces = (list<string>)
 	UI::QueryWidget (`id ("_cwm_interface_list"), `SelectedItems);
     allowed_interfaces = Selected2Opened (allowed_interfaces);
+    configuration_changed = true;
 }
 
 /**
@@ -527,6 +537,7 @@ global symbol OpenFirewallHandle (map<string,any> widget, string key, map event)
 	    allowed_interfaces = [];
 	EnableOrDisableFirewallDetails ();
 	UpdateFirewallStatus ();
+	configuration_changed = true;
     }
     return nil;
 }
