@@ -11,7 +11,7 @@
 {
 
 module "CWMFirewallInterfaces";
-textdomain "base";
+textdomain "firewall";
 
 import "CWM";
 import "Label";
@@ -208,18 +208,6 @@ global define void StoreWrapper (string key, map event) {
  */
 global boolean ValidateWrapper (string key, map event) {
     return Validate (CWM::GetProcessedWidget (), key, event);
-}
-
-/**
- * Remove the shortcut sign (&) from a widget label to be used in help
- * FIXME TODO Put to library of common functions
- * @param label string widget label (usually with the & sign)
- * @return string label with the & removed
- */
-global define string RemoveShortcut (string label) {
-    while (regexpmatch (label, "^.*&.*$"))
-	label = regexpsub (label, "^(.*)&(.*)$", "\\1\\2");
-    return label;
 }
 
 /**
