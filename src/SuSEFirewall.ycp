@@ -913,44 +913,68 @@ global define boolean Write() {
 	return true;
     }
 
-    // only activated firewall's setting is writen in installation (proposal) mode
-    if ((Mode::installation == true) && (SuSEFirewall::enable_firewall == false)) {
-	y2milestone("Firewall disabled in proposal");
-	return true;
+//    Disabled firewall have to be also written, bug #46043
+//    // only activated firewall's setting is writen in installation (proposal) mode
+//    if ((Mode::installation == true) && (SuSEFirewall::enable_firewall == false)) {
+//	y2milestone("Firewall disabled in proposal");
+//	return true;
+//    }
+
+    if (Mode::config==true || Mode::autoinst==true) {
+	if (!start && !write_only) {
+	    y2milestone("Firewall should not start and should not be written");
+	    return false;
+	}
     }
 
-    if (!start && !write_only) {
-	y2milestone("Firewall should not start and should not be written");
-	return false;
+    if (start) {
+	Progress::New(
+	    /* Progress caption */
+	    _("Firewall configuration -- saving settings"),
+	    /* Progress contents */
+	    _("Preparing ..."),
+	    3,
+	    [
+		/* Progress stage 1/3 */
+		_("Stop firewall"),
+		/* Progress stage 2/3 */
+		_("Save settings"),
+		/* Progress stage 3/3 */
+		_("Start firewall")
+	    ],
+	    [
+		/* Progress step 1/3 */
+		_("Stopping firewall..."),
+		/* Progress step 2/3 */
+		_("Saving settings..."),
+		/* Progress step 3/3 */
+		_("Starting firewall...")
+	    ],
+	    ""
+	);
+    } else {
+	Progress::New(
+	    /* Progress caption */
+	    _("Firewall configuration -- saving settings"),
+	    /* Progress contents */
+	    _("Preparing ..."),
+	    1,
+	    [
+		/* Progress stage 1/1 */
+		_("Stop firewall"),
+	    ],
+	    [
+		/* Progress step 1/1 */
+		_("Stopping firewall..."),
+	    ],
+	    ""
+	);
     }
 
-    Progress::New(
-	/* Progress caption */
-	_("Firewall configuration -- saving settings"),
-	/* Progress contents */
-	_("Preparing ..."),
-	3,
-	[
-	    /* Progress stage 1/3 */
-	    _("Stop firewall"),
-	    /* Progress stage 2/3 */
-	    _("Save settings"),
-	    /* Progress stage 3/3 */
-	    _("Start firewall")
-	],
-	[
-	    /* Progress step 1/3 */
-	    _("Stopping firewall..."),
-	    /* Progress step 2/3 */
-	    _("Saving settings..."),
-	    /* Progress step 3/3 */
-	    _("Starting firewall...")
-	],
-	""
-    );
 
     Progress::NextStage();
 
+    # stopping the firewall (1st progress step)
     boolean retry = true;
     while(retry) {
 
@@ -960,8 +984,8 @@ global define boolean Write() {
 	    /* Popup text */
 	    string whatfailedmsg = _("Stopping the firewall failed");
 	    symbol ret = Popup::AnyQuestion3(whatfailedmsg,
-		    "", Label::ContinueButton(), Label::AbortButton(),
-		    Label::RetryButton(), `focus_yes );
+		"", Label::ContinueButton(), Label::AbortButton(),
+		Label::RetryButton(), `focus_yes );
 
 	    if(ret == `retry) {
 		retry = true;
@@ -972,125 +996,135 @@ global define boolean Write() {
 	}
     }
 
-    Progress::NextStage();
-    boolean write_ret = false;
+    if (start) {
+        Progress::NextStage();
+	boolean write_ret = false;
 
-    string FW_IPSEC_TRUST = settings["FW_IPSEC_TRUST"]:"no";
-    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_IPSEC_TRUST, FW_IPSEC_TRUST);
+        string FW_IPSEC_TRUST = settings["FW_IPSEC_TRUST"]:"no";
+        write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_IPSEC_TRUST, FW_IPSEC_TRUST);
 
-    string FW_LOG_ACCEPT_ALL = settings["FW_LOG_ACCEPT_ALL"]:"no";
-    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_LOG_ACCEPT_ALL, FW_LOG_ACCEPT_ALL);
+        string FW_LOG_ACCEPT_ALL = settings["FW_LOG_ACCEPT_ALL"]:"no";
+        write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_LOG_ACCEPT_ALL, FW_LOG_ACCEPT_ALL);
 
-    string FW_LOG_ACCEPT_CRIT = settings["FW_LOG_ACCEPT_CRIT"]:"yes";
-    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_LOG_ACCEPT_CRIT, FW_LOG_ACCEPT_CRIT);
+        string FW_LOG_ACCEPT_CRIT = settings["FW_LOG_ACCEPT_CRIT"]:"yes";
+        write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_LOG_ACCEPT_CRIT, FW_LOG_ACCEPT_CRIT);
 
-    string FW_LOG_DROP_ALL = settings["FW_LOG_DROP_ALL"]:"no";
-    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_LOG_DROP_ALL, FW_LOG_DROP_ALL);
+        string FW_LOG_DROP_ALL = settings["FW_LOG_DROP_ALL"]:"no";
+        write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_LOG_DROP_ALL, FW_LOG_DROP_ALL);
 
-    string FW_LOG_DROP_CRIT = settings["FW_LOG_DROP_CRIT"]:"yes";
-    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_LOG_DROP_CRIT, FW_LOG_DROP_CRIT);
+        string FW_LOG_DROP_CRIT = settings["FW_LOG_DROP_CRIT"]:"yes";
+        write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_LOG_DROP_CRIT, FW_LOG_DROP_CRIT);
 
-    string FW_PROTECT_FROM_INTERNAL = settings["FW_PROTECT_FROM_INTERNAL"]:"no";
-    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_PROTECT_FROM_INTERNAL, FW_PROTECT_FROM_INTERNAL);
+        string FW_PROTECT_FROM_INTERNAL = settings["FW_PROTECT_FROM_INTERNAL"]:"no";
+        write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_PROTECT_FROM_INTERNAL, FW_PROTECT_FROM_INTERNAL);
 
-    string FW_DEV_DMZ = settings["FW_DEV_DMZ"]:"";
-    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_DEV_DMZ, FW_DEV_DMZ);
+        string FW_DEV_DMZ = settings["FW_DEV_DMZ"]:"";
+        write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_DEV_DMZ, FW_DEV_DMZ);
 
-    string FW_DEV_INT = settings["FW_DEV_INT"]:"";
-    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_DEV_INT, FW_DEV_INT);
+        string FW_DEV_INT = settings["FW_DEV_INT"]:"";
+        write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_DEV_INT, FW_DEV_INT);
 
-    string FW_DEV_EXT = settings["FW_DEV_EXT"]:"";
-    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_DEV_EXT, FW_DEV_EXT);
+        string FW_DEV_EXT = settings["FW_DEV_EXT"]:"";
+        write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_DEV_EXT, FW_DEV_EXT);
 
-    string FW_SERVICES_DMZ_IP = settings["FW_SERVICES_DMZ_IP"]:"";
-    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_DMZ_IP, FW_SERVICES_DMZ_IP);
+        string FW_SERVICES_DMZ_IP = settings["FW_SERVICES_DMZ_IP"]:"";
+        write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_DMZ_IP, FW_SERVICES_DMZ_IP);
 
-    string FW_SERVICES_EXT_IP = settings["FW_SERVICES_EXT_IP"]:"";
-    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_EXT_IP, FW_SERVICES_EXT_IP);
+        string FW_SERVICES_EXT_IP = settings["FW_SERVICES_EXT_IP"]:"";
+        write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_EXT_IP, FW_SERVICES_EXT_IP);
 
-    string FW_SERVICES_INT_IP = settings["FW_SERVICES_INT_IP"]:"";
-    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_INT_IP, FW_SERVICES_INT_IP);
+        string FW_SERVICES_INT_IP = settings["FW_SERVICES_INT_IP"]:"";
+        write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_INT_IP, FW_SERVICES_INT_IP);
 
-    string FW_SERVICES_DMZ_UDP = settings["FW_SERVICES_DMZ_UDP"]:"";
-    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_DMZ_UDP, FW_SERVICES_DMZ_UDP);
+        string FW_SERVICES_DMZ_UDP = settings["FW_SERVICES_DMZ_UDP"]:"";
+        write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_DMZ_UDP, FW_SERVICES_DMZ_UDP);
 
-    string FW_SERVICES_INT_UDP = settings["FW_SERVICES_INT_UDP"]:"";
-    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_INT_UDP, FW_SERVICES_INT_UDP);
+        string FW_SERVICES_INT_UDP = settings["FW_SERVICES_INT_UDP"]:"";
+        write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_INT_UDP, FW_SERVICES_INT_UDP);
 
-    string FW_SERVICES_EXT_UDP = settings["FW_SERVICES_EXT_UDP"]:"";
-    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_EXT_UDP, FW_SERVICES_EXT_UDP);
+        string FW_SERVICES_EXT_UDP = settings["FW_SERVICES_EXT_UDP"]:"";
+        write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_EXT_UDP, FW_SERVICES_EXT_UDP);
 
-    string FW_SERVICES_DMZ_TCP = settings["FW_SERVICES_DMZ_TCP"]:"";
-    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_DMZ_TCP, FW_SERVICES_DMZ_TCP);
+        string FW_SERVICES_DMZ_TCP = settings["FW_SERVICES_DMZ_TCP"]:"";
+        write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_DMZ_TCP, FW_SERVICES_DMZ_TCP);
 
-    string FW_SERVICES_INT_TCP = settings["FW_SERVICES_INT_TCP"]:"";
-    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_INT_TCP, FW_SERVICES_INT_TCP);
+        string FW_SERVICES_INT_TCP = settings["FW_SERVICES_INT_TCP"]:"";
+        write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_INT_TCP, FW_SERVICES_INT_TCP);
 
-    string FW_SERVICES_EXT_TCP = settings["FW_SERVICES_EXT_TCP"]:"";
-    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_EXT_TCP, FW_SERVICES_EXT_TCP);
+        string FW_SERVICES_EXT_TCP = settings["FW_SERVICES_EXT_TCP"]:"";
+        write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_EXT_TCP, FW_SERVICES_EXT_TCP);
 
-    string FW_AUTOPROTECT_SERVICES = settings["FW_AUTOPROTECT_SERVICES"]:"no";
-    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_AUTOPROTECT_SERVICES, FW_AUTOPROTECT_SERVICES);
+        string FW_AUTOPROTECT_SERVICES = settings["FW_AUTOPROTECT_SERVICES"]:"no";
+        write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_AUTOPROTECT_SERVICES, FW_AUTOPROTECT_SERVICES);
 
-    string FW_MASQ_NETS = settings["FW_MASQ_NETS"]:"";
-    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_MASQ_NETS, FW_MASQ_NETS);
+        string FW_MASQ_NETS = settings["FW_MASQ_NETS"]:"";
+        write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_MASQ_NETS, FW_MASQ_NETS);
 
-    string FW_ROUTE = settings["FW_ROUTE"]:"no";
-    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_ROUTE, FW_ROUTE);
+        string FW_ROUTE = settings["FW_ROUTE"]:"no";
+        write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_ROUTE, FW_ROUTE);
 
-    string FW_MASQUERADE = settings["FW_MASQUERADE"]:"no";
-    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_MASQUERADE, FW_MASQUERADE);
+        string FW_MASQUERADE = settings["FW_MASQUERADE"]:"no";
+        write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_MASQUERADE, FW_MASQUERADE);
 
-    string FW_ALLOW_FW_TRACEROUTE = settings["FW_ALLOW_FW_TRACEROUTE"]:"yes";
-    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_ALLOW_FW_TRACEROUTE, FW_ALLOW_FW_TRACEROUTE);
+        string FW_ALLOW_FW_TRACEROUTE = settings["FW_ALLOW_FW_TRACEROUTE"]:"yes";
+        write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_ALLOW_FW_TRACEROUTE, FW_ALLOW_FW_TRACEROUTE);
 
-    string FW_SERVICES_EXT_RPC = settings["FW_SERVICES_EXT_RPC"]:"";
-    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_EXT_RPC, FW_SERVICES_EXT_RPC);
+        string FW_SERVICES_EXT_RPC = settings["FW_SERVICES_EXT_RPC"]:"";
+        write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_EXT_RPC, FW_SERVICES_EXT_RPC);
 
-    string FW_SERVICES_INT_RPC = settings["FW_SERVICES_INT_RPC"]:"";
-    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_INT_RPC, FW_SERVICES_INT_RPC);
+        string FW_SERVICES_INT_RPC = settings["FW_SERVICES_INT_RPC"]:"";
+        write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_INT_RPC, FW_SERVICES_INT_RPC);
 
-    string FW_SERVICES_DMZ_RPC = settings["FW_SERVICES_DMZ_RPC"]:"";
-    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_DMZ_RPC, FW_SERVICES_DMZ_RPC);
+        string FW_SERVICES_DMZ_RPC = settings["FW_SERVICES_DMZ_RPC"]:"";
+        write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_DMZ_RPC, FW_SERVICES_DMZ_RPC);
 
-    string FW_ALLOW_FW_BROADCAST = settings["FW_ALLOW_FW_BROADCAST"]:"";
-    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_ALLOW_FW_BROADCAST, FW_ALLOW_FW_BROADCAST);
+        string FW_ALLOW_FW_BROADCAST = settings["FW_ALLOW_FW_BROADCAST"]:"";
+        write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_ALLOW_FW_BROADCAST, FW_ALLOW_FW_BROADCAST);
 
-    if(personal_firewall_is_active) {
-	write_ret = SCR::Write(.sysconfig.personal-firewall.REJECT_ALL_INCOMING_CONNECTIONS,"no");
-	write_ret = SCR::Write(.sysconfig.personal-firewall,nil);
+        if(personal_firewall_is_active) {
+	    write_ret = SCR::Write(.sysconfig.personal-firewall.REJECT_ALL_INCOMING_CONNECTIONS,"no");
+	    write_ret = SCR::Write(.sysconfig.personal-firewall,nil);
+        }
+
+	// sync settings to file !!!
+	write_ret = SCR::Write(.sysconfig.SuSEfirewall2, nil);
+	if (!write_ret)
+	    /* Popup text */
+	    Report::Error(_("Writing settings failed"));
+
+	Progress::NextStage();
+
+	y2milestone("Writing firewall settings finished, return code %1", write_ret);
+
+	// Why is this needed?
+	if (personal_firewall_is_active)
+	    SCR::Execute (.target.bash,"/sbin/SuSEpersonal-firewall",$[]);
     }
 
-    // sync settings to file !!!
-    write_ret = SCR::Write(.sysconfig.SuSEfirewall2, nil);
-    if (!write_ret)
-	/* Popup text */
-	Report::Error(_("Writing settings failed"));
-
-    Progress::NextStage();
-
-    y2milestone("Writing firewall settings finished, return code %1", write_ret);
-
-    // Why is this needed?
-    if (personal_firewall_is_active)
-	SCR::Execute (.target.bash,"/sbin/SuSEpersonal-firewall",$[]);
-
-    list<string> services = [
+    list<string> services_start = [
 	"SuSEfirewall2_init",
 	"SuSEfirewall2_setup",
 	"SuSEfirewall2_final",
     ];
 
+    list<string> services_stop = [
+	"SuSEfirewall2_final",
+	"SuSEfirewall2_setup",
+	"SuSEfirewall2_init",
+    ];
+
+    # enabling firewall in init.d
     if (start==true) {
-	foreach(string service, services, {
+	foreach(string service, services_start, {
 	    y2milestone("Enabling service %1", service);
 	    if(!Service::Enable(service)) {
 		/* Popup text */
 		Report::Error(_("Starting the firewall failed"));
 	    }
 	});
+    # disabling firewall in init.d
     } else {
-	foreach(string service, services, {
+	foreach(string service, services_stop, {
 	    y2milestone("Disabling service %1", service);
 	    if(!Service::Disable(service)) {
 		// FIXME: added after the text freeze, should report something in 9.3

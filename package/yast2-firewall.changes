@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Fri Sep 24 17:19:14 CEST 2004 - locilka@suse.cz
+
+- fixed bug #46043
+  firewall enabled in network proposal was not disabled when user
+  went back again to the network proposal and disabled it
+- 2.10.12
+
+-------------------------------------------------------------------
 Mon Sep 20 09:01:46 CEST 2004 - locilka@suse.cz
 
 - fixed bug #45440
