@@ -1,0 +1,31 @@
+/**
+ * Copyright 2004, Novell, Inc.  All rights reserved.
+ *
+ * File:	include/firewall/helps.ycp
+ * Package:	Firewall configuration
+ * Summary:	Firewall dialogs helps
+ * Authors:	Lukas Ocilka <locilka@suse.cz>
+ *
+ * $Id$
+ *
+ * File includes helps for yast2-firewall dialogs.
+ */
+
+{
+    textdomain "firewall";
+
+    map <string, string> HELPS = $[
+	// TRANSLATORS: Read dialog help
+	"reading_configuration" : _("<p><b><big>Reading Firewall Configuration</big></b>
+Please wait...</p>"),
+	// TRANSLATORS: Write dialog help
+	"saving_configuration" : _("<p><b><big>Saving Firewall Configuration</big></b>
+<br>Please wait...</p>"),
+    ];
+
+    global define string HelpForDialog (string identification) {
+	return HELPS[identification]:sformat("FIXME: Help for '%1' is missing!", identification);
+    }
+
+/* EOF */
+}
