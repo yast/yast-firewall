@@ -248,20 +248,26 @@ global define void Propose () ``{
     settings["FW_DEV_INT"] = "";
     settings["FW_DEV_DMZ"] = "";
 
-    list<string> allowed_tcp_services = [];
+    // list of Open TCP ports
+    list<string> allowed_tcp_ports = [];
     // SSH installation opens SSH in firewall by default
     if (Mode::usessh==true) {
-	allowed_tcp_services = add(allowed_tcp_services, "ssh");
+	allowed_tcp_ports = add(allowed_tcp_ports, "ssh");
     }
     // VNC installation or Alowed Remote administration opens VNC in firewall by default
     if ((Mode::vnc==true) || (Remote::allow_administration==true)) {
-	allowed_tcp_services = add(allowed_tcp_services, "5801 5901");
+	allowed_tcp_ports = add(allowed_tcp_ports, "5801 5901");
     }
+    // SSH should be open by default [after meeting 2004-07-29]
+    allowed_tcp_ports = add(allowed_tcp_ports, "ssh");
 
-    // No services are allowed by default, excepting allowed_tcp_services for EXT_TCP
+    // list of Open UDP ports
+    list<string> allowed_udp_ports = [];
+
+    // No services are allowed by default, excepting allowed_tcp_ports for EXT_TCP
     settings["FW_SERVICES_EXT_IP"] = "";
-    settings["FW_SERVICES_EXT_TCP"] = mergestring(allowed_tcp_services, " ");
-    settings["FW_SERVICES_EXT_UDP"] = "";
+    settings["FW_SERVICES_EXT_TCP"] = mergestring(toset(allowed_tcp_ports), " ");
+    settings["FW_SERVICES_EXT_UDP"] = mergestring(toset(allowed_udp_ports), " ");
 
     settings["FW_SERVICES_INT_IP"] = "";
     settings["FW_SERVICES_INT_TCP"] = "";
@@ -324,12 +330,28 @@ global define string GetPreformattedProposal () {
     );
 
     if (SuSEFirewall::enable_firewall == true) {
-	// TRANSLATORS: Proposal rich text item, %1 is list of open ports
-	ret = ret + sformat(_("<li>Open ports: %1</li>"),
-	    (settings["FW_SERVICES_EXT_TCP"]:"" != "" ?
-		settings["FW_SERVICES_EXT_TCP"]:""
+	string open_tcp_ports = settings["FW_SERVICES_EXT_TCP"]:"";
+	// This is the hack for presenting unregistered ports of VNC
+	if (regexpmatch(open_tcp_ports,"5801 5901")) {
+	    open_tcp_ports = regexpsub(open_tcp_ports, "(.*)(5801 5901)(.*)", "\\1VNC\(\\2\)\\3");
+	}
+
+	string open_udp_ports = settings["FW_SERVICES_EXT_UDP"]:"";
+
+	// TRANSLATORS: Proposal rich text item, %1 is list of open TCP ports
+	ret = ret + sformat(_("<li>Open TCP ports: %1</li>"),
+	    (open_tcp_ports != "" ?
+		open_tcp_ports
 		:
 		// TRANSLATORS: Proposal rich text - Opened ports: none
+		_("none")
+	    )
+	// TRANSLATORS: Proposal rich text item, %1 is list of open UDP ports
+	) + sformat(_("<li>Open UDP ports: %1</li>"),
+	    (open_udp_ports != "" ?
+		open_udp_ports
+		:
+		// TRANSLATORS: Proposal rich text - Opened UDP ports: none
 		_("none")
 	    )
 	);
