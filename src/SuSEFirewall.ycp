@@ -91,38 +91,170 @@ define boolean HandleIPPClientSupport (string interface, boolean enable) {
 }
 
 /**
+ * Map defines needed dynamic services (holes in firewall) for portmap services
+ */
+global map<string, list<string> > global_portmap_services = $[
+    "nfs-client"   : [ "status", "nlockmgr" ],
+    "nfs-server"   : [ "status", "nlockmgr", "mountd", "nfs", "nfs_acl" ],
+    "nis-server"   : [ "ypserv", "fypxfrd", "ypbind", "yppasswdd" ],
+    "nis-server"   : [ "ypbind" ],
+    "all-services" : [ "status", "nlockmgr", "mountd", "nfs", "nfs_acl", "ypserv", "fypxfrd", "ypbind", "yppasswdd" ],
+];
+
+/**
  * Private function for handling the Portmapper support
  *
+ * @param string	service name (nfs-client|nfs-server|nis-client|nis-server|all-services)
+ * @param string	interface (EXT|INT|DMZ)
  * @param boolean	enable or disable the support
+ * @return boolean	success
  */
-define boolean HandlePortmapSupport (string interface, boolean enable) {
+define boolean HandleRPCServices (string service, string interface, boolean enable) {
     if (interface != "EXT" && interface != "INT" && interface != "DMZ") {
 	y2error("Interface must be one of EXT|INT|DMZ, not %1", interface);
 	return false;
     }
     string ident = "FW_SERVICES_" + interface + "_RPC";
-    list<string> ext_rpc = splitstring(SuSEFirewall::settings[ident]:"", " ");
+    list<string> rpcs = splitstring(SuSEFirewall::settings[ident]:"", " ");
 
-    // All needed services for Portmapper
-    list<string> rpc_services = [
-	// NFS support
-	"nlockmgr", "status", "nfs", "nfs_acl", "mountd",
-	// NIS support
-	"ypserv", "fypxfrd", "ypbind", "yppasswdd",
-    ];
+    // dynamic services needed for "service"
+    list<string> rpc_services = global_portmap_services[service]:[];
+
     if (enable == true) {
 	// adding needed rpc services
-	ext_rpc = (list<string>) union (ext_rpc, rpc_services);
+	rpcs = (list<string>) union (rpcs, rpc_services);
     } else {
 	// removing all rpc services
 	foreach ( string remove_this, rpc_services, {
-	    ext_rpc = filter (string service, ext_rpc, ``{
+	    rpcs = filter (string service, rpcs, ``{
 		return service != remove_this;
 	    });
 	});
     }
 
-    SuSEFirewall::settings[ident] = mergestring(ext_rpc, " ");
+    SuSEFirewall::settings[ident] = mergestring(toset(rpcs), " ");
+    return true;
+}
+
+/**
+ * Private function for handling the Portmapper support (all-services)
+ *
+ * @param string	interface (EXT|INT|DMZ)
+ * @param boolean	enable or disable the support
+ * @return boolean	success
+ */
+define boolean HandlePortmapSupport (string interface, boolean enable) {
+    return HandleRPCServices("all-services", interface, enable);
+}
+
+/**
+ * Private function for handling the Portmapper support (nfs-client)
+ *
+ * @param string	interface (EXT|INT|DMZ)
+ * @param boolean	enable or disable the support
+ * @return boolean	success
+ */
+define boolean HandlePortmapSupportNFSClient (string interface, boolean enable) {
+    return HandleRPCServices("nfs-client", interface, enable);
+}
+
+/**
+ * Private function for handling the Portmapper support (nfs-server)
+ *
+ * @param string	interface (EXT|INT|DMZ)
+ * @param boolean	enable or disable the support
+ * @return boolean	success
+ */
+define boolean HandlePortmapSupportNFSServer (string interface, boolean enable) {
+    return HandleRPCServices("nfs-server", interface, enable);
+}
+
+/**
+ * Private function for handling the Portmapper support (nis-client)
+ *
+ * @param string	interface (EXT|INT|DMZ)
+ * @param boolean	enable or disable the support
+ * @return boolean	success
+ */
+define boolean HandlePortmapSupportNISClient (string interface, boolean enable) {
+    return HandleRPCServices("nis-client", interface, enable);
+}
+
+/**
+ * Private function for handling the Portmapper support (nfs-server)
+ *
+ * @param string	interface (EXT|INT|DMZ)
+ * @param boolean	enable or disable the support
+ * @return boolean	success
+ */
+define boolean HandlePortmapSupportNISServer (string interface, boolean enable) {
+    return HandleRPCServices("nis-server", interface, enable);
+}
+
+/**
+ * Private function for getting the RPC support for services
+ *
+ * @param string	service name (nfs-client|nfs-server|nis-client|nis-server|all-services)
+ * @param string	interface (EXT|INT|DMZ)
+ * @return boolean	enabled support
+ */
+define boolean GetRPCSupportStatus (string service, string interface) {
+    if (interface != "EXT" && interface != "INT" && interface != "DMZ") {
+	y2error("Interface must be one of EXT|INT|DMZ, not %1", interface);
+	return false;
+    }
+    string ident = "FW_SERVICES_" + interface + "_RPC";
+    list<string> rpcs = splitstring(SuSEFirewall::settings[ident]:"", " ");
+
+    // dynamic services needed for "service"
+    list<string> rpc_services = global_portmap_services[service]:[];
+
+    boolean supported = true;
+    foreach (string needed_service, rpc_services, {
+	// testing allowed RPC for needed services
+	if (!contains(rpcs, needed_service)) supported = false;
+    });
+    return supported;
+}
+
+/**
+ * Private function for getting the RPC support for service nfs-client
+ *
+ * @param string	interface (EXT|INT|DMZ)
+ * @return boolean	enabled support
+ */
+define boolean GetSupportStatusNFSClient (string interface) {
+    return GetRPCSupportStatus("nfs-client", interface);
+}
+
+/**
+ * Private function for getting the RPC support for service nfs-server
+ *
+ * @param string	interface (EXT|INT|DMZ)
+ * @return boolean	enabled support
+ */
+define boolean GetSupportStatusNFSServer (string interface) {
+    return GetRPCSupportStatus("nfs-server", interface);
+}
+
+/**
+ * Private function for getting the RPC support for service nis-client
+ *
+ * @param string	interface (EXT|INT|DMZ)
+ * @return boolean	enabled support
+ */
+define boolean GetSupportStatusNISClient (string interface) {
+    return GetRPCSupportStatus("nis-client", interface);
+}
+
+/**
+ * Private function for getting the RPC support for service nis-server
+ *
+ * @param string	interface (EXT|INT|DMZ)
+ * @return boolean	enabled support
+ */
+define boolean GetSupportStatusNISServer (string interface) {
+    return GetRPCSupportStatus("nis-server", interface);
 }
 
     /* Definition of the TCP and UDP ports needed for services
@@ -130,7 +262,8 @@ define boolean HandlePortmapSupport (string interface, boolean enable) {
      * "service_id" : $[
      *    "tcp_ports" : [ "list", "of", "ports" ],
      *    "udp_ports" : [ "list", "of", "ports" ],
-     *    "special"   : LocalFunctionForHandlingSpecialNeeds,
+     *    "special"   : LocalFunctionForHandlingSpecialNeeds, special_get_support
+     *    "special_get_support" : LocalFunctionForGettingSpecialSupportStatus,
      * ]
      */
     global map<string, map<string, any> > firewall_services_definition = $[
@@ -189,11 +322,30 @@ define boolean HandlePortmapSupport (string interface, boolean enable) {
 	"portmap" : $[
 	    "tcp_ports" : [ "sunrpc" ],
 	    "udp_ports" : [ "sunrpc" ],
-	    "special"	: HandlePortmapSupport,
+	],
+	"nfs-client" : $[
+	    "tcp_ports" : [ ],
+	    "udp_ports" : [ ],
+	    "special"	: HandlePortmapSupportNFSClient,
+	    "special_get_support" : GetSupportStatusNFSClient,
 	],
 	"nfs-server" : $[
-	    "tcp_ports" : [ "nfs" ],
+	    "tcp_ports" : [ ],
 	    "udp_ports" : [ ],
+	    "special"	: HandlePortmapSupportNFSServer,
+	    "special_get_support" : GetSupportStatusNFSServer,
+	],
+	"nis-client" : $[
+	    "tcp_ports" : [ ],
+	    "udp_ports" : [ ],
+	    "special"	: HandlePortmapSupportNISClient,
+	    "special_get_support" : GetSupportStatusNISClient,
+	],
+	"nis-server" : $[
+	    "tcp_ports" : [ ],
+	    "udp_ports" : [ ],
+	    "special"	: HandlePortmapSupportNISServer,
+	    "special_get_support" : GetSupportStatusNISServer,
 	],
 	// Default SUSE installation
 	"vnc" : $[
@@ -420,6 +572,14 @@ global define boolean Read() {
     string FW_SERVICES_EXT_RPC = (string) SCR::Read(.sysconfig.SuSEfirewall2.FW_SERVICES_EXT_RPC);
     if( FW_SERVICES_EXT_RPC == nil ) FW_SERVICES_EXT_RPC = "";
     settings["FW_SERVICES_EXT_RPC"] = FW_SERVICES_EXT_RPC;
+
+    string FW_SERVICES_INT_RPC = (string) SCR::Read(.sysconfig.SuSEfirewall2.FW_SERVICES_INT_RPC);
+    if( FW_SERVICES_INT_RPC == nil ) FW_SERVICES_INT_RPC = "";
+    settings["FW_SERVICES_INT_RPC"] = FW_SERVICES_INT_RPC;
+
+    string FW_SERVICES_DMZ_RPC = (string) SCR::Read(.sysconfig.SuSEfirewall2.FW_SERVICES_DMZ_RPC);
+    if( FW_SERVICES_DMZ_RPC == nil ) FW_SERVICES_DMZ_RPC = "";
+    settings["FW_SERVICES_DMZ_RPC"] = FW_SERVICES_DMZ_RPC;
 
     string FW_ALLOW_FW_BROADCAST = (string) SCR::Read(.sysconfig.SuSEfirewall2.FW_ALLOW_FW_BROADCAST);
     if( FW_ALLOW_FW_BROADCAST == nil ) FW_ALLOW_FW_BROADCAST = "";
@@ -765,6 +925,12 @@ global define boolean Write() {
 
     string FW_SERVICES_EXT_RPC = settings["FW_SERVICES_EXT_RPC"]:"";
     write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_EXT_RPC, FW_SERVICES_EXT_RPC);
+
+    string FW_SERVICES_INT_RPC = settings["FW_SERVICES_INT_RPC"]:"";
+    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_INT_RPC, FW_SERVICES_INT_RPC);
+
+    string FW_SERVICES_DMZ_RPC = settings["FW_SERVICES_DMZ_RPC"]:"";
+    write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_SERVICES_DMZ_RPC, FW_SERVICES_DMZ_RPC);
 
     string FW_ALLOW_FW_BROADCAST = settings["FW_ALLOW_FW_BROADCAST"]:"";
     write_ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_ALLOW_FW_BROADCAST, FW_ALLOW_FW_BROADCAST);
@@ -1205,7 +1371,7 @@ global define void AllowIPsec(boolean yes)
 
 /**
  * Function for handling needed support for services in SuSEfirewall2
- * For example: "portmap" fills some strings in FW_SERVICES_EXT_RPC
+ * For example: "nfs-server" fills some strings in FW_SERVICES_*_RPC
  * 
  * @param string	service to change it's state
  * @param boolean	new service state
@@ -1292,9 +1458,10 @@ global define boolean SetServicesForGroups (list<string> services_id, list<strin
 
 	list<string> service_tcp_ports = (list<string>) firewall_services_definition[service_id,"tcp_ports"]:[];
 	list<string> service_udp_ports = (list<string>) firewall_services_definition[service_id,"udp_ports"]:[];
+	any special_function           =		firewall_services_definition[service_id,"special"]:nil;
 
 	// controling if service is defined
-	if ((size(service_tcp_ports)==0) && (size(service_udp_ports)==0)) {
+	if ((size(service_tcp_ports)==0) && (size(service_udp_ports)==0) && (special_function == nil)) {
 	    y2error("Service '%1' has no TCP or UDP ports defined for Firewall support", service_id);
 	    continue;
 	}
@@ -1359,11 +1526,13 @@ global define boolean IsServiceSupportedInGroup (string service, string group) {
 
     list<string> tcp_ports_needed = (list<string>) firewall_services_definition[service, "tcp_ports"]:[];
     list<string> udp_ports_needed = (list<string>) firewall_services_definition[service, "udp_ports"]:[];
-    if ((size(tcp_ports_needed)==0) && (size(udp_ports_needed)==0)) {
+    any special_get_support_function = firewall_services_definition[service, "special_get_support"]:nil;
+    if ((size(tcp_ports_needed)==0) && (size(udp_ports_needed)==0) && (special_get_support_function==nil)) {
 	y2error("Service '%1' is not defined", service);
 	return nil;
     }
 
+    // the default "supported" is true, any "not-supported" will turn it into false
     boolean supported = true;
 
     foreach(string tcp_port, tcp_ports_needed, {
@@ -1378,6 +1547,14 @@ global define boolean IsServiceSupportedInGroup (string service, string group) {
 	    break;
 	}
     });
+
+    // special functions for getting supported status, for instance RPC
+    boolean(string) function = (boolean(string)) firewall_services_definition[service,"special_get_support"]:nil;
+    if (function != nil) {
+	if (function(group)==false) {
+	    supported = false;
+	}
+    }
 
     return supported;
 }

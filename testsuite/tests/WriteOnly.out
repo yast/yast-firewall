@@ -24,6 +24,8 @@ Read	.sysconfig.SuSEfirewall2.FW_ROUTE "no"
 Read	.sysconfig.SuSEfirewall2.FW_MASQUERADE "no"
 Read	.sysconfig.SuSEfirewall2.FW_ALLOW_FW_TRACEROUTE "yes"
 Read	.sysconfig.SuSEfirewall2.FW_SERVICES_EXT_RPC "nlockmgr status nfs nfs_acl mountd ypserv fypxfrd ypbind yppasswdd"
+Read	.sysconfig.SuSEfirewall2.FW_SERVICES_INT_RPC ""
+Read	.sysconfig.SuSEfirewall2.FW_SERVICES_DMZ_RPC ""
 Read	.sysconfig.SuSEfirewall2.FW_ALLOW_FW_BROADCAST "int"
 Return	true
 Return	true

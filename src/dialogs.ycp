@@ -138,7 +138,7 @@ define any DevicesDialog() ``{
 
     map firewall_settings = SuSEFirewall::settings;
 
-y2milestone("SETTINGS: %1", firewall_settings);
+y2debug("SETTINGS: %1", firewall_settings);
 
     /* Devices dialog caption */
     string caption = _("Firewall Configuration: Basic Settings");
@@ -282,6 +282,10 @@ define any ServicesDialog() ``{
 
     map firewall_settings = SuSEFirewall::settings;
 
+    map <string, boolean> special_check_boxes = $[
+	"nfs-server" : SuSEFirewall::IsServiceSupportedInGroup("nfs-server","EXT"),
+    ];
+
     /* Services dialog caption */
     string caption = _("Firewall Configuration: Services");
 
@@ -328,8 +332,8 @@ A more secure option is to use rsync over SSH.</p>") +
     /* Services dialog help 12/16 */
     _("<p><b>Remote Administration (VNC)</b><br> allows remote clients to connect to the local X server using the VNC protocol.</p>") +
 
-    /* Services dialog help 13/16 */
-    _("<p><b>Portmapper</b><br> is an RPC (Remote Procedure Call) support for servers like NFS or NIS (Network Information System).</p>") +
+//    /* Services dialog help 13/16 */
+//    _("<p><b>Portmapper</b><br> is an RPC (Remote Procedure Call) support for servers like NFS or NIS (Network Information System).</p>") +
 
     /* Services dialog help 14/16 */
     _("<p><b>DHCP Server</b><br> is a protocol for the dynamic host configuration.</p>") +
@@ -392,8 +396,8 @@ services. Also start the appropriate daemons.</p>");
 			`Left (`CheckBox (`id ("ssh"),`opt(`notify), _("&Secure Shell (ssh)"), false)),
 			/* CheckBox label */
 			`Left (`CheckBox (`id ("vnc"),`opt(`notify), _("Remote Administration (VNC)"), false)),
-			/* CheckBox label */
-			`Left (`CheckBox (`id ("portmap"),`opt(`notify), _("Portmapper (NFS, NIS, etc.)"), false)),
+//			/* CheckBox label */
+//			`Left (`CheckBox (`id ("portmap"),`opt(`notify), _("Portmapper (NFS, NIS, etc.)"), false)),
 			`VSpacing (0.3),
 			/* Label text */
 			`Left (`Label( _("Other") )),
@@ -455,12 +459,13 @@ services. Also start the appropriate daemons.</p>");
 
 	    boolean current_service_status = (boolean) UI::QueryWidget(`id(service_name), `Value);
 	    boolean service_supported = true;
+	    any service_special_get_support = SuSEFirewall::firewall_services_definition[service_name,"special_get_support"]:nil;
 
 	    list<string> required_tcp = (list<string>) required_ports["tcp_ports"]:[];
 	    list<string> required_udp = (list<string>) required_ports["udp_ports"]:[];
 
 	    // if any ports are defined to control
-	    if ((size(required_tcp)>0) || (size(required_udp)>0)) {
+	    if ((size(required_tcp)>0) || (size(required_udp)>0) || (service_special_get_support!=nil)) {
 		// controlling all TCP ports if they are supported
 		foreach (string tcp, required_tcp, {
 		    if (!contains(services_list_tcp, tcp)) service_supported = false;
@@ -469,6 +474,11 @@ services. Also start the appropriate daemons.</p>");
 		foreach (string udp, required_udp, {
 		    if (!contains(services_list_udp, udp)) service_supported = false;
 		});
+		if (service_special_get_support!=nil) {
+		    if (special_check_boxes[service_name]:nil!=nil) {
+			service_supported = special_check_boxes[service_name]:false;
+		    }
+		}
 	    // else the service is not supported by firewall
 	    } else {
 		service_supported = false;
@@ -531,6 +541,9 @@ services. Also start the appropriate daemons.</p>");
 
 	// Additional special function for service
 	SuSEFirewall::RunServiceSupport(service_checkbox, "EXT", state);
+	if (special_check_boxes[service_checkbox]:nil!=nil) {
+	    special_check_boxes[service_checkbox] = state;
+	}
 
 	if (state == true) {
 	// service was selected
@@ -562,20 +575,20 @@ services. Also start the appropriate daemons.</p>");
 	}
 	else if ( ret == `next )
 	{
-	    // <-- Exceptions
-	    boolean nfs_state     = (boolean) UI::QueryWidget(`id("nfs-server"),`Value);
-	    boolean portmap_state = (boolean) UI::QueryWidget(`id("portmap"),`Value);
-
-	    // Portmap is unselected && NFS Server is selected
-	    if (portmap_state == false && nfs_state == true) {
-		boolean select_portmap = SelectPortmapDialog();
-		if (select_portmap == true) {	// Portmap was disabled, now is enabled
-		    UI::ChangeWidget(`id("portmap"),`Value, true);
-		    HandleService("portmap");
-		    SwitchServices(true);
-		}
-	    }
-	    // --> Exceptions
+//	    // <-- Exceptions
+//	    boolean nfs_state     = (boolean) UI::QueryWidget(`id("nfs-server"),`Value);
+//	    boolean portmap_state = (boolean) UI::QueryWidget(`id("portmap"),`Value);
+//
+//	    // Portmap is unselected && NFS Server is selected
+//	    if (portmap_state == false && nfs_state == true) {
+//		boolean select_portmap = SelectPortmapDialog();
+//		if (select_portmap == true) {	// Portmap was disabled, now is enabled
+//		    UI::ChangeWidget(`id("portmap"),`Value, true);
+//		    HandleService("portmap");
+//		    SwitchServices(true);
+//		}
+//	    }
+//	    // --> Exceptions
 
 	    SuSEFirewall::settings["FW_SERVICES_EXT_TCP"] = mergestring(services_list_tcp, " ");
 	    SuSEFirewall::settings["FW_SERVICES_EXT_UDP"] = mergestring(services_list_udp, " ");

@@ -136,9 +136,9 @@
     NetworkDevices::Read ();
 
     DUMP ("=======================");
-    TEST (``(SuSEFirewall::SetServices (["portmap", "dns-server"], ["eth-id-00:c0:df:22:c6:a8"], false)), [READ, WRITE, EXEC], 0);
+    TEST (``(SuSEFirewall::SetServices (["nfs-server", "dns-server"], ["eth-id-00:c0:df:22:c6:a8"], false)), [READ, WRITE, EXEC], 0);
     DUMP (SuSEFirewall::settings);
-    TEST (``(SuSEFirewall::SetServices (["portmap", "dns-server"], ["slp0", "slp1"], true)), [READ, WRITE, EXEC], 0);
+    TEST (``(SuSEFirewall::SetServices (["nfs-server", "dns-server"], ["slp0", "slp1"], true)), [READ, WRITE, EXEC], 0);
     DUMP (SuSEFirewall::settings);
     DUMP ("=======================");
 }

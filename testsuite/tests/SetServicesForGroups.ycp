@@ -120,7 +120,7 @@
 		"FW_SERVICES_DMZ_UDP":"",
 		"FW_SERVICES_DMZ_RPC":"",
 		"FW_SERVICES_EXT_IP":"",
-		"FW_SERVICES_EXT_RPC":"nlockmgr status nfs nfs_acl mountd ypserv fypxfrd ypbind yppasswdd",
+		"FW_SERVICES_EXT_RPC":"",
 		"FW_SERVICES_EXT_TCP":"domain ssh sunrpc 5801 5901 http nfs 32768 netbios-ns netbios-dgm netbios-ssn microsoft-ds",
 		"FW_SERVICES_EXT_UDP":"domain sunrpc 32768 tftp",
 		"FW_SERVICES_INT_IP":"",
@@ -136,9 +136,9 @@
     NetworkDevices::Read ();
 
     DUMP ("=======================");
-    TEST (``(SuSEFirewall::SetServicesForGroups (["portmap", "dns-server"], ["EXT", "DMZ"], false)), [READ, WRITE, EXEC], 0);
+    TEST (``(SuSEFirewall::SetServicesForGroups (["nis-server", "dns-server"], ["EXT", "DMZ"], false)), [READ, WRITE, EXEC], 0);
     DUMP (SuSEFirewall::settings);
-    TEST (``(SuSEFirewall::SetServicesForGroups (["portmap", "dns-server"], ["INT", "DMZ"], true)), [READ, WRITE, EXEC], 0);
+    TEST (``(SuSEFirewall::SetServicesForGroups (["nis-server", "dns-server"], ["INT", "DMZ"], true)), [READ, WRITE, EXEC], 0);
     DUMP (SuSEFirewall::settings);
     DUMP ("=======================");
 }
