@@ -72,7 +72,7 @@ global define boolean GetModified () {
 
 define boolean HandleIPPClientSupport (string interface, boolean enable) {
     // "interface" is here only for the compatibility with other "Handle" functions
-    string port = "631";
+    string port = "ipp";
     list<string> broadcast = splitstring(SuSEFirewall::settings["FW_ALLOW_FW_BROADCAST"]:"", " ");
     
     // adding port "port" to allowed broadcasted ports
