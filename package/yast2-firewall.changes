@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Mar  4 10:57:00 CET 2005 - locilka@suse.cz
+
+- fixed bug #67335
+  Fixed unnecessary warning aborting the unchanged configuration
+- merged proofed texts
+
+-------------------------------------------------------------------
 Mon Feb 21 16:14:46 CET 2005 - locilka@suse.cz
 
 - added shortcuts for UI widgets

@@ -53,6 +53,8 @@ if(func == "MakeProposal") {
     SuSEFirewallProposal::Propose();
     // setting start-firewall to the same value as enable-firewall
     SuSEFirewall::SetStartService(SuSEFirewall::GetEnableService());
+    // reseting modified-flag, until called Write
+    SuSEFirewall::ResetModified();
 
     string warning = nil;
     symbol warning_level = nil;
@@ -122,6 +124,7 @@ else if(func == "Description") {
 }
 /* write the proposal */
 else if(func == "Write") {
+    // Allways modified
     SuSEFirewall::SetModified();
     SuSEFirewall::Write();
 }
