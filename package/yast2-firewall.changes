@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Sep 10 12:30:33 CEST 2004 - locilka@suse.cz
+
+- fixed bug #44966, forgot text in CWMFirewall marked for
+  translation.
+
+-------------------------------------------------------------------
 Tue Sep  7 12:43:01 CEST 2004 - locilka@suse.cz
 
 - fixed bug #44759 because of chaned defaults, firewall wasn't

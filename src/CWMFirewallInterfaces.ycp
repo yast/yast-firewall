@@ -638,8 +638,8 @@ set <b>%1</b>.<br>");
 click <b>%2</b>.<br>");
     }
     // help text for firewall settings widget 3/3,
-    help = help + "This option is available only if the firewall
-is enabled.</p>";
+    help = help + _("This option is available only if the firewall
+is enabled.</p>");
     return help;
 }
 
