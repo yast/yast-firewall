@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Feb 20 02:12:09 CET 2003 - nashif@suse.de
+
+- bug #23887: Finish installation after configuration is written
+- Using common text: Finish instead of Quit.
+- 2.7.4
+
+-------------------------------------------------------------------
 Mon Feb 17 16:39:05 CET 2003 - nashif@suse.de
 
 - Read configuration if firewall is activated
