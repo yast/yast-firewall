@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Wed Mar  2 10:40:40 CET 2005 - locilka@suse.cz
+
+- fixed bug #66119
+  Profile Exported for AutoYaST had been lowercased.
+  Profile Imported from AutoYaST had been uppercased.
+
+-------------------------------------------------------------------
 Mon Feb 21 16:14:46 CET 2005 - locilka@suse.cz
 
 - added shortcuts for UI widgets
