@@ -7,6 +7,8 @@ Requires:	yast2 yast2-network SuSEfirewall2
 
 Provides:	yast2-config-firewall
 Obsoletes:	yast2-config-firewall
+Provides:	yast2-trans-firewall
+Obsoletes:	yast2-trans-firewall
 
 BuildArchitectures:	noarch
 
