@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Jul 12 16:35:48 CEST 2002 - arvin@suse.de
+
+- use proper namespace for Args and CallFunction (#16776)
+
+-------------------------------------------------------------------
 Thu Jul 11 14:53:29 CEST 2002 - lnussel@suse.de
 
 - re-insert proof read texts
