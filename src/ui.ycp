@@ -401,7 +401,7 @@ have an internal network.
 		UI::MessagePopup(_("Select an external interface."));
 		continue;
 	    }
-	    change(firewall_settings,"FW_DEV_EXT",FW_DEV_EXT);
+	    SuSEFirewall::settings["FW_DEV_EXT"] = FW_DEV_EXT;
 	    FW_DEV_INT = UI::QueryWidget(`id("intinterface"),`Value);
 	    if( FW_DEV_INT != none )
 	    {
