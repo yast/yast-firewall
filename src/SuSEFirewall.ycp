@@ -17,14 +17,14 @@
     import "Summary";
     import "Mode";
 
-    
+
     /* global settings map */
     global map settings = $[];
 
 
     global boolean personal_firewall_is_active = false;
 
-    
+
     /**
      * Write only, used during autoinstallation.
      * Don't run services and SuSEconfig, it's all done at one place.
@@ -56,7 +56,7 @@
     }
 
 
-    
+
     /**
      * Get all firewall settings from the first parameter
      * (For use by autoinstallation.)
@@ -73,8 +73,8 @@
      * (For use by autoinstallation.)
      * @return map Dumped settings (later acceptable by Import ())
      */
-    global define map Export () ``{	
-	
+    global define map Export () ``{
+
 	return settings;
     }
 
@@ -84,8 +84,28 @@
      * @return summary of the current configuration
      */
     global define list Summary() ``{
-	// TODO FIXME: your code here...
-	return [ _("Configuration summary ..."), [] ];
+
+	string summary = "";
+	summary = Summary::AddHeader(summary, _("External Device"));
+	summary = Summary::AddLine(summary, (settings["FW_DEV_EXT"]:"" != "") ?
+				   settings["FW_DEV_EXT"]:"" : Summary::NotConfigured());
+
+	summary = Summary::AddHeader(summary, _("Internal Device"));
+	summary = Summary::AddLine(summary, (settings["FW_DEV_INT"]:"" != "") ?
+				   settings["FW_DEV_INT"]:"" : Summary::NotConfigured());
+
+	summary = Summary::AddHeader(summary, _("Protect from internal"));
+	summary = Summary::AddLine(summary, (settings["FW_PROTECT_FROM_INTERNAL"]:"" != "") ?
+				   settings["FW_PROTECT_FROM_INTERNAL"]:"" : Summary::NotConfigured());
+
+	summary = Summary::AddHeader(summary, _("External TCP services"));
+	summary = Summary::AddLine(summary, (settings["FW_SERVICES_EXT_TCP"]:"" != "") ?
+				   settings["FW_SERVICES_EXT_TCP"]:"" : Summary::NotConfigured());
+
+	summary = Summary::AddLine(summary, _("(Start the configuration to view more options)"));
+
+	return [ summary, [] ];
+
     }
 
 
@@ -95,7 +115,7 @@
      * @return map all firewall settings
      */
     global define boolean Read() ``{
-    
+
 //  <AUTOCODE READ>
 	string FW_LOG_ACCEPT_ALL = SCR::Read(.sysconfig.SuSEfirewall2.FW_LOG_ACCEPT_ALL);
 	if( FW_LOG_ACCEPT_ALL == nil ) FW_LOG_ACCEPT_ALL = "no";
@@ -174,8 +194,8 @@
 	    }
 	});
 
-	settings["network_devices"]:devices;
-    
+	settings["network_devices"] = devices;
+
 	return true;
     }
 
@@ -188,7 +208,7 @@
     global define boolean Write() ``{
 	boolean ret = false;
 
-	
+
 //  <AUTOCODE WRITE>
 	string FW_LOG_ACCEPT_ALL = settings["FW_LOG_ACCEPT_ALL"]:"no";
 	ret = SCR::Write(.sysconfig.SuSEfirewall2.FW_LOG_ACCEPT_ALL, FW_LOG_ACCEPT_ALL);
@@ -268,11 +288,11 @@
 			if( return_map != nil )
 			{
 			    Report::Error( whatfailedmsg );
-			}		
+			}
 		    }
 		}
 	    });
-	    	    
+
 	}
 	return ret;
     }

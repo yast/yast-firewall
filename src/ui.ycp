@@ -432,7 +432,7 @@ Choose your internal network interface.</p>
     string none = _("(none)");
     string caption = _("Firewall Configuration (Step 1 of 4):  Basic Settings");
     list default_devices = ["eth0","ppp0","ippp0"];
-    list intdevices = sort(union(lookup(firewall_settings,"network devices",[]),[none]));
+    list intdevices = sort(union(lookup(firewall_settings,"network_devices",[]),[none]));
     list devices = sort(union(intdevices,default_devices));
 
     string FW_DEV_EXT = lookup(firewall_settings,"FW_DEV_EXT","");
