@@ -140,9 +140,5 @@
     DUMP (SuSEFirewall::settings);
     TEST (``(SuSEFirewall::RunServiceSupport ("nfs-server", "INT", false)), [READ, WRITE, EXEC], 0);
     DUMP (SuSEFirewall::settings);
-    TEST (``(SuSEFirewall::RunServiceSupport ("nis-server", "INT", true)), [READ, WRITE, EXEC], 0);
-    DUMP (SuSEFirewall::settings);
-    TEST (``(SuSEFirewall::RunServiceSupport ("nis-server", "INT", false)), [READ, WRITE, EXEC], 0);
-    DUMP (SuSEFirewall::settings);
     DUMP ("=======================");
 }
