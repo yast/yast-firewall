@@ -1,0 +1,50 @@
+#
+# spec file for package @RPMNAME@
+#
+# Copyright  (c)  2000  SuSE AG Nuernberg, Germany.
+#
+# please send bugfixes or comments to @MAINTAINER@
+#
+
+# neededforbuild  autoconf automake ycpdoc yast2-testsuite dejagnu expect tcl yast2-base libycp liby2 libyui libscr yast2-core-wfm yast2-core-scr yast2-agent-system libycp-devel yast2-devtools
+
+Vendor:		SuSE GmbH, Nuernberg, Germany
+Distribution:	SuSE Linux 8.0 (i386)
+Name:		@RPMNAME@
+Release:	1
+Copyright:	(c) 2000 SuSE GmbH
+Group:		System Environment/YaST
+Requires:	yast2 yast2-trans-firewall yast2-lib-wizard yast2-lib-sequencer SuSEfirewall2
+BuildArchitectures:	noarch
+
+Packager:	@MAINTAINER@
+
+Summary:	Configuration of firewall
+Version:	@VERSION@
+Source0:	@RPMNAME@-@VERSION@.tar.bz2
+
+BuildRoot:	%{_tmppath}/%{name}-root
+
+%description
+-
+
+%prep
+%setup -n @RPMNAME@-@VERSION@
+
+%build
+./configure
+make
+
+%install
+make DESTDIR=$RPM_BUILD_ROOT install
+make check
+%{?suse_check}
+
+%files
+%defattr(-,root,root)
+%dir @YAST2DIR@/include/firewall
+@YAST2DIR@/include/firewall/*
+@YAST2DIR@/clients/firewall*
+@YAST2DIR@/menuentries/*
+@YAST2DIR@/scrconf/*
+%doc @DOCDIR@

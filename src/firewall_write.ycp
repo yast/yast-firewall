@@ -1,0 +1,49 @@
+/**
+ * File:
+ *   firewall_write.ycp
+ *
+ * Module:
+ *   Configuration of firewall
+ *
+ * Summary:
+ *   Writing only client
+ *
+ * Authors:
+ *   Michael Hager <mike@suse.de>
+ *
+ * $Id$
+ *
+ * This is a write-only client. It takes its arguments and just
+ * write the settings.
+ */
+
+/**
+ * @param first a map of firewall settings
+ * @return boolean success of operation
+ * @example map mm = $[ "FAIL_DELAY" : "77" ];
+ * @example any ret = CallModule("firewall_write",[mm]);
+ */
+
+{
+
+textdomain "firewall";
+include "firewall/io.ycp";
+
+list args = Args();
+
+if(size(args)<=0) {
+    y2error("NOT writing, probably some mistake...");
+    return false;
+}
+
+if(!is(Args(0),map)) {
+    y2error("Bad argument for firewall write: %1", Args(0));
+    return false;
+}
+
+map settings = select(args,0, $[]);
+y2milestone("Only writing... (%1)",settings);
+
+return FirewallWrite(settings);
+
+} /* EOF */

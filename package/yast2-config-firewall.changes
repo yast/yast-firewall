@@ -1,0 +1,49 @@
+-------------------------------------------------------------------
+Fri Mar  8 13:55:47 CET 2002 - lnussel@suse.de
+
+- fix error dialog to display stdout and stderr, add TERM=raw to the
+  environment of the initscript to avoid escape sequences (#14695)
+
+-------------------------------------------------------------------
+Thu Feb 28 19:46:14 CET 2002 - mike@suse.de
+
+- undo "insert proofreaded texts" because the translation are based on
+  not proofreaded texts
+  approved by tom
+
+
+-------------------------------------------------------------------
+Thu Feb 21 11:58:04 CET 2002 - lnussel@suse.de
+
+- marked two more strings for translation
+
+-------------------------------------------------------------------
+Thu Feb 21 11:40:55 CET 2002 - lnussel@suse.de
+
+- dialogs for stopping the firewall
+
+-------------------------------------------------------------------
+Tue Feb 19 15:49:09 CET 2002 - lnussel@suse.de
+
+- use /etc/sysconfig/personal-firewall
+- minor fixes
+
+-------------------------------------------------------------------
+Mon Feb 18 16:08:18 CET 2002 - mike@suse.de
+
+- first working version
+
+-------------------------------------------------------------------
+Tue Feb 12 12:03:26 MET 2002 - tom@suse.de
+
+- Renamed menuentry_firewall.y2cc ---> menuentry_firewall2.y2cc (conflict)
+
+-------------------------------------------------------------------
+Fri Feb  8 20:40:48 MET 2002 - tom@suse.de
+
+- Now checked into STABLE
+
+-------------------------------------------------------------------
+Fri Feb  8 15:59:22 2002 - mike@suse.de
+
+- initial version
