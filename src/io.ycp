@@ -182,7 +182,7 @@ global define FirewallWrite(map settings) ``{
 
     if(ret == false)
     {
-	UI::Messagepopup(_("Writing Settings failed"));
+	UI::Messagepopup(_("Writing settings failed"));
     }
     return ret;
 }

@@ -194,8 +194,9 @@ global define ReadDialog() ``{
     if (lookup(firewall_settings,"personal_firewall_is_active",false)==true)
     {
 	if(UI::ContinueCancelHeadlinePopup(_("Personal Firewall is active"),
-	    _("Seems like you have activated the Personal Firewall.
-If you continue, it will be turned off and replaced by SuSEfirewall2"))!=true)
+	    _("The Personal Firewall is activated.
+If you continue, it will be turned off and replaced by SuSEfirewall2.
+"))!=true)
 	{
 	    return `abort;
 	}
@@ -242,17 +243,17 @@ global define WriteDialog() ``{
     UI::ChangeWidget(`id(`next),`Label, _("Quit"));
 
     Progress::New (
-        _("Firewall configuration - saving settings"),
+        _("Firewall configuration -- saving settings"),
         _("Preparing ..."),
         3,
-        [ _("stop Firewall"), _("save settings"), _("start Firewall") ],
-        [ _("stopping Firewall"), _("saving settings"), _("starting Firewall"), _("Finished, press Quit") ],
+        [ _("stop firewall"), _("save settings"), _("start firewall") ],
+        [ _("stopping firewall"), _("saving settings"), _("starting firewall"), _("Finished, press Quit") ],
         help
         );
 
     Progress::NextStage();
 
-    whatfailedmsg = _("Stopping the Firewall failed");
+    whatfailedmsg = _("Stopping the firewall failed");
 
     retry=true;
     while(retry)
@@ -297,7 +298,7 @@ global define WriteDialog() ``{
 		    "/etc/init.d/SuSEfirewall2_final start"
 		    ];
 
-    whatfailedmsg = _("Starting the Firewall failed");
+    whatfailedmsg = _("Starting the firewall failed");
 
     foreach(`cmd,cmds,
     ``{
@@ -355,15 +356,15 @@ global define WriteDialog() ``{
  */
 global define DevDialog() ``{
 
-    string help = _("<br><p><b>General:</b><br>This tools aims to be an easy to use configuration frontend for the Linux
-packet filter engine. The configuration items in the following menues are
+    string help = _("<br><p><b>General:</b><br>This tools aims to be an easy to use configuration front-end for the Linux
+packet filter engine. The configuration items in the following menus are
 a collection of the most important functionalities of the SuSEfirewall2
-package. Please take a few moments to go through all menues and select the
+package. Take a few moments to go through all menues and select the
 options carefully.</p>
 <p>
 <br>
 <b>External interface:</b><br>
-Choose the interface connected to the internet for which you want to configure the firewall.
+Choose the interface connected to the Internet for which to configure the firewall.
 </p>
 <p>
 <b>Internal interface:</b><br>
@@ -374,7 +375,7 @@ Choose your internal network interface.</p>
     string warning = _("<p><b>Warning:</b></p><p><ul><li>DSL with PPP over Ethernet uses ppp0 (ppp1, ppp2, ...) as the external interface. Your ethernet interface is not the external interface in this case.</li></ul></p>");
 
     string none = _("(none)");
-    string caption = _("Firewall configuration (step 1 of 4):  Basic settings");
+    string caption = _("Firewall Configuration (Step 1 of 4):  Basic Settings");
     list default_devices = ["eth0","ppp0","ippp0"];
     list intdevices = sort(union(lookup(firewall_settings,"network devices",[]),[none]));
     list devices = sort(union(intdevices,default_devices));
@@ -398,16 +399,18 @@ Choose your internal network interface.</p>
  // to translater: please keep width and newlines. Use more lines if neccessary
 _("eth0 (eth1, eth2 ...) is typically
 used for ethernet cards, ippp0 for
-ISDN and ppp0 for Modem and ADSL
-connections")))))
+ISDN, and ppp0 for modem and ADSL
+connections
+")))))
 							   ),
 						    `VSpacing (0),
 						    `HBox ( `HWeight(20,`Top(`ComboBox (`id ("intinterface"),`opt(`hstretch, `editable), _("Internal interface: "), intdevices ))),
 							   `HSpacing(3),
 							   `HWeight(40,`Top( `Left( `Label (
    // to translater: please keep width and newlines. Use more lines if neccessary
-_("leave this empty if you do not
-have an internal network")))))
+_("Leave this empty if you do not
+have an internal network.
+")))))
 							    ),
 						    `VSpacing (1)
 						    )
@@ -446,7 +449,7 @@ have an internal network")))))
 	    FW_DEV_EXT = UI::QueryWidget(`id("interface"),`Value);
 	    if( ret == `next && FW_DEV_EXT == none )
 	    {
-		UI::MessagePopup(_("You have to select an external interface"));
+		UI::MessagePopup(_("Select an external interface."));
 		continue;
 	    }
 	    change(firewall_settings,"FW_DEV_EXT",FW_DEV_EXT);
@@ -472,33 +475,32 @@ have an internal network")))))
  * uses and changes FW_SERVICES_EXT_TCP inside firewall_settings, abuses checkbox widget id as service name
  */
 global define ServicesDialog() ``{
-    string help = _("<p>Choose the <b>services</b> that should be available from the internet.
-</p><p><b>If you are not running a server of some kind, then you shouldn't need any of the services.</b></p>
+    string help = _("<p>Choose the <b>services</b> that should be available from the Internet.
+</p><p><b>If you are not running a server of some kind, you should not need any of the services.</b></p>
 <br>
-<p><b>Attention:</b><br>Please keep in mind that even correctly configured packet filtering rules
+<p><b>Attention:</b><br>Even correctly configured packet filtering rules
 cannot save you from vulnerabilities that may be present in the services
-that you allow access to from the internet. Use YOU (YaST2 Online Update)
+to which you allow access from the Internet. Use YOU (YaST2 Online Update)
 to keep your system up-to-date with the latest update packages from the
-SuSE ftp servers.</p>
+SuSE FTP servers.</p>
 <br>
-<p><b>http:</b><br>Service to run a webserver such as Apache</p>
-<p><b>smtp</b><br>Service is used by mailservers that accept incoming email, such as sendmail</p>
-<p><b>pop3</b> and <b>imap:</b><br>Protocols that are for fetching emails from your host</p>
+<p><b>http:</b><br>Service to run a web server, such as Apache</p>
+<p><b>smtp</b><br>Service is used by mail servers that accept incoming e-mail, such as sendmail</p>
+<p><b>pop3</b> and <b>imap:</b><br>Protocols for fetching e-mails from your host</p>
 <p><b>telnet:</b><br>An obsolete method for remotely logging in to your
-computer.</p><p><b>ssh:</b><br>ssh supercedes telnet in both security and features and should
-be prefered</p>
-<p><b>rsync:</b><br>Rsync can be used as a replacement for insecure filetransfers via
-ftp, it is optimized for slow links and quite easy to configure</p>
-<p>Please note that just enabling a service here is most likely not enough to
-provide server services, you also have to start the appropriate daemons</p>
+computer.</p><p><b>ssh:</b><br>ssh is preferred over telnet for both security and features</p>
+<p><b>rsync:</b><br>Rsync can be used as a replacement for insecure file transfers via
+FTP. It is optimized for slow links and quite easy to configure</p>
+<p>Just enabling a service here is most likely not enough to
+provide server services. You also have to start the appropriate daemons</p>
 ");
 
-    string caption = _("Firewall configuration (step 2 of 4):  Services");
+    string caption = _("Firewall Configuration (Step 2 of 4):  Services");
 
-    string advanced_helptext = _( "<p>Enter any number of ports, known portnames (from
-/etc/services) and port ranges seperated by a space.</p>
-<p>Port ranges are seperated by a colon. E.g. to allow port 21 to 23 write \"21:23\"
-");
+    string advanced_helptext = _("<p>Enter any number of ports, known port names (from
+/etc/services), and port ranges, separated by a space.</p>
+<p>Port ranges are separated by a colon. For example, to allow port 21 to 23 write \"21:23\"
+</p>");
 
     term contents =
 `VBox (
@@ -641,23 +643,23 @@ provide server services, you also have to start the appropriate daemons</p>
 global define FeatureDialog() ``{
     string help = _("
 <p><b>Allow traceroute</b> means that ICMP time-to-live-exceeded messages are
-allowed to be send from your firewall. This is used for traceroutes <u>to</u>
+allowed to be sent from your firewall. This is used for traceroutes <u>to</u>
 your firewall (or traceroute like tools).</p>
 <p><b>Forward traffic and do masquerading</b> means that all your
-internal machines which use services on
-the internet seem to come from your firewall. Please note that it is more secure to
-communicate via proxies to the internet than to use masquerading.</p>
-<p><b>Protect all running services</b> means that all network access to services TCP and UDP on this machine
-will be prevented except to those which you explicitly allowed in the previous dialog</p>
+internal machines that use services on
+the Internet seem to come from your firewall. It is more secure to
+communicate via proxies to the Internet than to use masquerading.</p>
+<p><b>Protect all running services</b> means that all network access to services, TCP, and UDP on this machine
+will be prevented except for those to which you explicitly allowed access in the previous dialog.</p>
 <p><b>Protect from internal network</b> means that <u>internal</u> machines may
-only access services on the machine you explicitly allow. They will be also
-affected from the FW_AUTOPROTECT_SERVICES option. However, specifying services
-that sould be available from the internal network is beyond the scope of this
-workflow. So if you want your machine to be accessible from the internal
-network you better <u>unset</u> this option.</p>
+only access explicitly allowed services on the machine. They will be also
+effected by the FW_AUTOPROTECT_SERVICES option. However, specifying services
+that should be available from the internal network is beyond the scope of this
+workflow. If you want your machine to be accessible from the internal
+network, <u>unset</u> this option.</p>
 ");
 
-    string caption = _("Firewall configuration (step 3 of 4): Features");
+    string caption = _("Firewall Configuration (Step 3 of 4): Features");
     term contents = `VBox (
 			   `HBox (
 				  `HSpacing (8),
@@ -766,13 +768,14 @@ network you better <u>unset</u> this option.</p>
 	    if( FW_PROTECT_FROM_INTERNAL == "yes" && FW_ROUTE == "yes" )
 	    {
 		boolean choice = UI::ContinueCancelPopup(
-		    _("It usually doesn't make sense to activate both,
+		    _("It usually does not make sense to activate both
 \"Forward traffic and do masquerading\" and
-\"Protect from internal network\",
-as your computer wouldn't accept any packets
+\"Protect from internal network\"
+as your computer would not accept any packets
 from the internal network.
 
-Do you really want to proceed with this setup?"));
+Do you really want to proceed with this setup?
+"));
 		if ( choice == false )
 		{
 		    continue;
@@ -805,10 +808,10 @@ global define LoggingDialog() ``{
     string help = _("
 <p>Choose which packets should be logged</p>
 <p>With <b>Log critical dropped/accepted packets</b>, only packets arriving on
-critical ports which were dropped (respectively accepted) are beeing
-logged.</p> <p><b>Log all dropped packets</b> logs every dropped packets</p>
+critical ports that were dropped or accepted, as specified, are 
+logged.</p> <p><b>Log all dropped packets</b> logs all dropped packets</p>
 <p><b>Log all accepted packets</b> logs all accepted packets. Attention: This
-option is dangerous, your logfile will grow very quicky if you activate this</p>
+option is dangerous as your log file will grow very quicky if you activate this.</p>
 ");
     string caption = _("Firewall configuration (step 4 of 4): Logging options");
 
@@ -836,7 +839,7 @@ option is dangerous, your logfile will grow very quicky if you activate this</p>
 			//Lable for Checkbox
 			`Left(`Label(_("Debug options "))),
 			//Helplable for Checkbox
-			`Left(`Label(_("This option causes very large amount of output"))),
+			`Left(`Label(_("This option causes a large amount of output"))),
 			// Checkbox option
 			`Left(`CheckBox (`id ("drop_all"), _("Log all dropped packets"), FW_LOG_DROP_ALL=="yes")),
 			// Checkbox option
@@ -1020,7 +1023,7 @@ when you boot your system.</p>
 	}
 	else if( ret==`next)
 	{
-	    string whatfailedmsg = _("Stopping the Firewall failed");
+	    string whatfailedmsg = _("Stopping the firewall failed");
 
 	    boolean retry=true;
 	    while(retry)
