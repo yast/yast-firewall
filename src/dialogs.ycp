@@ -16,6 +16,7 @@
     import "CWMServiceStart";
     import "DialogTree";
     import "Label";
+    import "Mode";
 
     include "firewall/subdialogs.ycp";
     include "firewall/uifunctions.ycp";
@@ -129,7 +130,8 @@
 	    "contents"		: `VBox (
 		"auto_start_up",
 		`VSpacing (1),
-		"start_stop",
+		// disabling start/stop buttons when it doesn't make sense
+		(Mode::normal() ? "start_stop" : `Empty()),
 		`VStretch ()
 	    ),
 	    // TRANSLATORS: part of dialog caption
@@ -223,7 +225,10 @@
 	    "widget_descr"	: widgets_handling,
 	    "back_button"	: "",
 	    "abort_button"	: Label::AbortButton(),
-	    "next_button"	: Label::NextButton(),
+	    // if 'normal' or 'installation', [Next] button, else [Accept]
+	    "next_button"	: (Mode::normal() ?
+		Label::NextButton () : Label::AcceptButton ()
+	    ),
 	    "functions"		: functions,
 	]);
     }

@@ -18,10 +18,17 @@
     textdomain "firewall";
 
     import "SuSEFirewall";
+    import "Mode";
 
     include "firewall/wizards.ycp";
 
-    any ret = FirewallSequence();
+    any ret = nil;
+    // installation has other sequence
+    if (Mode::installation()) {
+	ret = FirewallInstallationSequence();
+    } else {
+	ret = FirewallSequence();
+    }
     y2debug("ret=%1",ret);
 
     y2milestone("Firewall module finished");

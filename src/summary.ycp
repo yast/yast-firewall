@@ -16,6 +16,7 @@
 
     import "SuSEFirewall";
     import "SuSEFirewallServices";
+    import "Mode";
 
     map protocol_type_names = $[
 	// TRANSLATORS: Summary item label
@@ -167,7 +168,7 @@
 	return ret_message;
     }
 
-    void InitBoxSummary () {
+    string InitBoxSummary () {
 	string summary = SummaryFirewallStart();
 
 	foreach (string zone_id, SuSEFirewall::GetKnownFirewallZones(), {
@@ -176,7 +177,11 @@
 		+ SummaryZoneBody(zone_id);
 	});
 
-	UI::ChangeWidget(`id("box_summary_richtext"), `Value, summary);
+	if (Mode::normal()) {
+	    UI::ChangeWidget(`id("box_summary_richtext"), `Value, summary);
+	}
+
+	return summary;
     }
 
 /* EOF */

@@ -3,7 +3,9 @@
 yncludedir = @yncludedir@/firewall
 
 client_DATA =		\
-	firewall.ycp
+	firewall.ycp	\
+	firewall_auto.ycp	\
+	firewall_proposal.ycp
 
 ynclude_DATA =		\
 	complex.ycp	\

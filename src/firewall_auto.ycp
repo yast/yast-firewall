@@ -3,6 +3,7 @@
  * Package:	SuSE firewall configuration
  * Summary:	Client for autoinstallation
  * Authors:	Anas Nashif <nashif@suse.de>
+ *		Lukas Ocilka <locilka@suse.cz>
  *
  * $Id$
  *
@@ -30,6 +31,7 @@ import "Map";
 import "SuSEFirewall";
 
 include "firewall/wizards.ycp";
+include "firewall/summary.ycp";
 
 any ret = nil;
 string func = "";
@@ -45,52 +47,50 @@ y2debug("func=%1", func);
 y2debug("param=%1", param);
 
 /* Create a summary*/
-if(func == "Summary") {
-    ret = select(SuSEFirewall::Summary(), 0, "");
+if (func == "Summary") {
+    ret = InitBoxSummary();
 }
 /* Reset configuration */
 else if (func == "Reset") {
     SuSEFirewall::Import($[]);
-    SuSEFirewall::modified = false;
     ret = $[];
-    SuSEFirewall::enable_firewall = SuSEFirewall::start;
+    SuSEFirewall::SetEnableService(SuSEFirewall::GetStartService());
 }
 /* Return required packages for module to operate */
 else if (func == "Packages") {
     ret = $[];
 }
-/* Change configuration (run AutoSequence) */
+/* Change configuration (run FirewallAutoSequence) */
 else if (func == "Change") {
     ret = FirewallAutoSequence();
-    SuSEFirewall::start = SuSEFirewall::enable_firewall;
+    SuSEFirewall::SetStartService(SuSEFirewall::GetEnableService());
 }
 /* Import configuration */
 else if (func == "Import") {
-    ret = SuSEFirewall::Import(Map::KeysToUpper((map<string,any>)param));
-    SuSEFirewall::enable_firewall = SuSEFirewall::start;
+    map <string,any> modf_param = (map<string,any>) Map::KeysToUpper((map<string,any>) param);
+    ret = SuSEFirewall::Import(modf_param);
 }
 /* Read firewall data */
 else if (func == "Read") {
     ret = SuSEFirewall::Read();
-    SuSEFirewall::enable_firewall = SuSEFirewall::start;
+    SuSEFirewall::SetEnableService(SuSEFirewall::GetStartService());
 }
 /* Return actual state */
 else if (func == "Export") {
-    ret = Map::KeysToLower((map<string,any>)SuSEFirewall::Export());
+    ret = Map::KeysToLower((map<string,any>) SuSEFirewall::Export());
 }
 /* Return actual state */
 else if (func == "GetModified") {
     ret = SuSEFirewall::GetModified();
 }
 else if (func == "SetModified") {
-    ret = SuSEFirewall::SetModified();
+    SuSEFirewall::SetModified();
     ret = true;
 }
-/* Write givven settings */
+/* Write given settings */
 else if (func == "Write") {
     import "Progress";
     Progress::off();
-    SuSEFirewall::write_only = true;
     ret = SuSEFirewall::Write();
     Progress::on();
 }

@@ -79,5 +79,61 @@
 	return ret;
     }
 
+    /**
+     * Whole configuration of firewall
+     *
+     * @return any returned value from Sequencer::Run() call
+     */
+    define any FirewallAutoSequence() {
+	map aliases = $[
+	    "main"  	:   ``( MainSequence() ),
+	    "summary"	:   ``( BoxSummaryDialog() ),
+	];
+
+	map sequence = $[
+	    "ws_start" : "main",
+	    "main" : $[
+		`abort      : `abort,
+		`next       : `next
+	    ],
+	];
+
+	Wizard::CreateDialog();
+	Wizard::SetDesktopIcon("firewall");
+
+	any ret = Sequencer::Run(aliases, sequence);
+
+	UI::CloseDialog();
+	return ret;
+    }
+
+    /**
+     * Whole configuration of firewall
+     *
+     * @return any returned value from Sequencer::Run() call
+     */
+    define any FirewallInstallationSequence() {
+	map aliases = $[
+	    "main"  	:   ``( MainSequence() ),
+	    "summary"	:   ``( BoxSummaryDialog() ),
+	];
+
+	map sequence = $[
+	    "ws_start" : "main",
+	    "main" : $[
+		`abort      : `abort,
+		`next       : `next
+	    ],
+	];
+
+	Wizard::CreateDialog();
+	Wizard::SetDesktopIcon("firewall");
+
+	any ret = Sequencer::Run(aliases, sequence);
+
+	UI::CloseDialog();
+	return ret;
+    }
+
 /* EOF */
 }
