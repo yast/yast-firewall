@@ -48,7 +48,8 @@ if(func == "MakeProposal") {
 else if(func == "AskUser") {
     map stored = SuSEFirewall::Export();
     symbol result = (symbol) WFM::CallFunction("firewall", [.propose]);
-    if(result != `next) SuSEFirewall::Import(stored);
+    if(result != `next)	SuSEFirewall::Import(stored);
+    else SuSEFirewall::proposal_changed_by_user = true;
     y2debug("stored=%1", stored);
     y2debug("result=%1", result);
     ret = $[ "workflow_sequence" : result ];

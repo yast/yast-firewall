@@ -740,6 +740,7 @@ very quicky.</p>");
 	    firewall_settings["FW_LOG_ACCEPT_ALL"] = FW_LOG_ACCEPT_ALL;
 	    SuSEFirewall::settings = firewall_settings;
 	    SuSEFirewall::start = true;
+	    SuSEFirewall::proposal_changed_by_user = true;
 	    break;
 	}
     };
