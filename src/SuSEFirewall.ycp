@@ -352,7 +352,7 @@ global define boolean Write() ``{
  */
 define boolean AddServiceToConfig( string set, string service ) ``{
     
-    y2error( "Before adding services: %1" , settings[set]:"");
+    y2debug( "Before adding services: %1" , settings[set]:"");
     
     list servs = splitstring(settings[set]:"", " ");
     if(servs == nil) servs = [];
@@ -362,7 +362,7 @@ define boolean AddServiceToConfig( string set, string service ) ``{
     if(servs == nil) return false;
     settings[ set ] = sers;
 
-    y2error( "After adding services: %1" , settings[set]:"");
+    y2debug( "After adding services: %1" , settings[set]:"");
     
     return true;
 }
@@ -398,16 +398,16 @@ define boolean RemoveServiceFromConfig( string set, string service ) ``{
 global define boolean AddService(string service, string proto, string interface) ``{
 
     if( proto != "UDP" && proto != "TCP" ) {
-	y2error( "Unknown protocol: %1", proto );
+	y2debug( "Unknown protocol: %1", proto );
 	return false;
     }
     
     if( interface == "all" ) {
-	y2error( "Adding to all %1", service );
+	y2debug( "Adding to all %1", service );
 	AddServiceToConfig ( "FW_SERVICES_EXT_"+proto, service );
 	AddServiceToConfig ( "FW_SERVICES_INT_"+proto, service );
 	AddServiceToConfig ( "FW_SERVICES_DMZ_"+proto, service );
-	y2error( "FW_SERVICES_EXT: ", settings["FW_SERVICES_EXT_TCP"]:nil );
+	y2debug( "FW_SERVICES_EXT: ", settings["FW_SERVICES_EXT_TCP"]:nil );
     } else {
 	// find out where is the interface
 	if( IsExtInterface( interface ) ) {
@@ -446,11 +446,11 @@ global define boolean RemoveService(string service, string proto, string interfa
     }
     
     if( interface == "all" ) {
-	y2error( "Removing from all %1", service );
+	y2debug( "Removing from all %1", service );
 	RemoveServiceFromConfig ( "FW_SERVICES_EXT_"+proto, service );
 	RemoveServiceFromConfig ( "FW_SERVICES_INT_"+proto, service );
 	RemoveServiceFromConfig ( "FW_SERVICES_DMZ_"+proto, service );
-	y2error( "FW_SERVICES_EXT: ", settings["FW_SERVICES_EXT_TCP"]:nil );
+	y2debug( "FW_SERVICES_EXT: ", settings["FW_SERVICES_EXT_TCP"]:nil );
     } else {
 	// find out where is the interface
 	if( IsExtInterface( interface ) ) {
