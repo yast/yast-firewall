@@ -22,22 +22,24 @@
     // GLOBAL UI CONFIGURATION
     term all_popup_definition = `opt(`decorated,`centered);
 
-    // FIXME: remove them ASAP
     // EXAMPLE FUNCTIONS
-    void ExampleInit(string key) {
-	y2milestone("Example Init");
-    }
-
-    symbol ExampleHandle(string key, map event) {
-	any ret = event["ID"]:nil;
-	y2milestone("Example Handle");
-	return nil;
-    }
-
-    void ExampleStore(string key, map event) {
-	any ret = event["ID"]:nil;
-	y2milestone("Example Store");
-    }
+/**
+ *    void ExampleInit(string key) {
+ *	y2milestone("Example Init");
+ *    }
+ *
+ *    symbol ExampleHandle(string key, map event) {
+ *	any ret = event["ID"]:nil;
+ *	y2milestone("Example Handle");
+ *	return nil;
+ *    }
+ *
+ *    void ExampleStore(string key, map event) {
+ *	any ret = event["ID"]:nil;
+ *	y2milestone("Example Store");
+ *    }
+ *
+ */
 
     // UI Functions
 
@@ -77,7 +79,8 @@
 	    string zone_name = SuSEFirewall::GetZoneFullName(zone);
 	    foreach (string special, specials, {
 		table_items = add (table_items, `item( `id("special-" + special),
-		    _("User Defined String"),
+		    // TRANSLATORS: table item, "User defined string" instead of Device_name
+		    _("User defined string"),
 		    special,
 		    zone_name
 		));
@@ -244,8 +247,10 @@
 	    if (regexpmatch(port, "^[0-9]+$")) return;
 	    if (! PortAliases::IsKnownPortName(port)) {
 		checked = Popup::ContinueCancelHeadline(
+		    // TRANSLATORS: popup headline
 		    _("Uknown Port Name"),
 		    sformat(
+			// TRANSLATORS: popup message, %1 is a port-name
 			_("Port name '%1' is uknown in your current system.
 It probably would not work at all.
 Do you really want to use this port?"),
@@ -365,6 +370,7 @@ Do you really want to use this port?"),
 
 	UI::ChangeWidget(`id("table_allowed_services"), `Items, allowed_services);
 	UI::ReplaceWidget(`id("allow_service_names_replacepoint"),
+	    // TRANSLATORS: select box
 	    `ComboBox(`id("allow_service_names"), _("Service To Allow"), not_allowed_services)
 	);
 
@@ -480,6 +486,7 @@ Do you really want to use this port?"),
 
 	    UI::ReplaceWidget(`id("replacepoint_masquerade_information"),
 		(!IsThisExpertConfiguration() ?
+		    // TRANSLATORS: informative label
 		    `Left(`Label(_("Masquerading needs at least one external interface and one another.")))
 		    :
 		    `Left(`Label("FIXME: missing functionality for expert configuration"))
@@ -493,7 +500,8 @@ Do you really want to use this port?"),
     boolean CheckExistency(string ui_id) {
 	if (UI::QueryWidget(`id(ui_id), `Value) == "") {
 	    UI::SetFocus(`id(ui_id));
-	    Popup::Error(_("This entry have to be filled."));
+	    // TRANSLATORS: popup message
+	    Popup::Error(_("This entry has to be filled."));
 	    return false;
 	}
 	return true;
@@ -509,6 +517,7 @@ Do you really want to use this port?"),
 	if (!PortAliases::IsAllowedPortName(port)) {
 	    UI::SetFocus(`id(ui_id));
 	    Popup::Error(
+		// TRANSLATORS: popup message, right port definition is two lines below this message
 		_("Wrong port definition.")
 		+ "\n\n" +
 		PortAliases::AllowedPortNameOrNumber()
@@ -527,6 +536,7 @@ Do you really want to use this port?"),
 	if (!Address::Check4(ip)) {
 	    UI::SetFocus(`id(ui_id));
 	    Popup::Error(
+		// TRANSLATORS: popup message, right definition is two lines belos this message
 		_("Wrong IP definition.")
 		+ "\n\n" +
 		Address::Valid4()
@@ -684,5 +694,44 @@ Do you really want to use this port?"),
 	    (string) UI::QueryWidget(`id("logging_ACCEPT"), `Value));
 	SuSEFirewall::SetLoggingSettings("DROP",
 	    (string) UI::QueryWidget(`id("logging_DROP"),   `Value));
+    }
+
+    void InitBroadcastConfigurationSimple (string key) {
+	term replace_dialog = `VBox();
+
+	map <string, list <string> > allowed_bcast_ports = SuSEFirewall::GetBroadcastAllowedPorts ();
+
+	foreach (string zone, SuSEFirewall::GetKnownFirewallZones(), {
+	    string zone_name = SuSEFirewall::GetZoneFullName(zone);
+	    string ports_for_zone = mergestring(allowed_bcast_ports[zone]:[], " ");
+	    boolean log_packets = (SuSEFirewall::GetIgnoreLoggingBroadcast(zone) == "no");
+	    replace_dialog = add(replace_dialog,
+		`HBox(
+		    `TextEntry(`id("bcast_ports_" + zone), zone_name, ports_for_zone),
+		    `VBox (
+			`Label(""),
+			// TRANSLATORS: check box
+			`CheckBox(`id("bcast_log_" + zone), _("Log Disallowed Broadcast Packets"), log_packets)
+		    )
+		)
+	    );
+	});
+
+	UI::ReplaceWidget(`id("replace_point_bcast"), replace_dialog);
+    }
+
+    // FIXME: should check for PortAliases::IsKnownPortName() in future
+    void StoreBroadcastConfigurationSimple (string key, map event) {
+	map <string, list <string> > allowed_bcast_ports = $[];
+
+	foreach (string zone, SuSEFirewall::GetKnownFirewallZones(), {
+	    list <string> allowed_ports = splitstring((string) UI::QueryWidget(`id("bcast_ports_" + zone), `Value), " ");
+	    boolean log_packets = (boolean) UI::QueryWidget(`id("bcast_log_" + zone), `Value);
+
+	    allowed_bcast_ports[zone] = allowed_ports;
+	    SuSEFirewall::SetIgnoreLoggingBroadcast(zone, (log_packets ? "no":"yes"));
+	});
+
+	SuSEFirewall::SetBroadcastAllowedPorts(allowed_bcast_ports);
     }
 }

@@ -18,10 +18,13 @@
     import "SuSEFirewallServices";
 
     map protocol_type_names = $[
-	// FIXME: TRANSLATORS: .... 4x Label?
+	// TRANSLATORS: Summary item label
 	"TCP" : _("TCP Ports"),
+	// TRANSLATORS: Summary item label
 	"UDP" : _("UDP Ports"),
+	// TRANSLATORS: Summary item label
 	"RPC" : _("RPC Services"),
+	// TRANSLATORS: Summary item label
 	"IP"  : _("IP Protocols"),
     ];
 
@@ -38,14 +41,17 @@
 	if (spec_interface == "any") {
 	    if (zone == "EXT") {
 		ret_val = OKMark + " '" + spec_interface + "' "
-		+ _("Any other interface will be assigned to this zone.");
+		// TRANSLATORS: an informative text
+		+ _("Any unassigned interface will be assigned to this zone.");
 	    } else {
 		// FIXME: really?
 		ret_val = ErrMark + " '" + spec_interface + "' "
-		    + _("Currently supported only in External Zone");
+		    // TRANSLATORS: informative text
+		    + _("Currently supported only in External Zone.");
 	    }
 	} else {
-	    ret_val = ErrMark + " '" + spec_interface + "' " + _("Unknown network interface");
+	    // TRANSLATORS: informative text
+	    ret_val = ErrMark + " '" + spec_interface + "' " + _("Unknown network interface.");
 	}
 
 	return ret_val;
@@ -65,6 +71,7 @@
 
 	if (size(interfaces_in_zone)>0 || size(special_interfaces)>0) {
 	    ret_summary = ret_summary +
+		// TRANSLATORS: Summary item label
 		"<h3>" + _("Interfaces") + "</h3>\n";
 
 	    ret_summary = ret_summary + "<ul>\n";
@@ -83,6 +90,7 @@
 	    });
 	    ret_summary = ret_summary + "</ul>\n";
 	} else {
+	    // TRANSLATORS: informative text
 	    ret_summary = "<li>" + _("No interfaces assigned to this zone.") + "</li>\n";
 	}
 
@@ -97,9 +105,11 @@
 
 	// any interface must be assigned
 	if (size(interfaces_in_zone)>0 || size(special_interfaces)>0) {
+	    // TRANSLATORS: summary item label
 	    ret_val = "<h3>" + _("Open Services, Ports and Protocols") + "</h3>\n";
 	    // internal zone and unprotected
 	    if (zone_id == "INT" && SuSEFirewall::GetProtectFromInternalZone()) {
+		// TRANSLATORS: informative text
 		ret_val = _("Internal zone is unprotected, all ports are open.");
 	    } else {
 		string open_services = "";
@@ -125,6 +135,7 @@
 		ret_val = ret_val + "<ul>" + (open_services != "" ?
 		    open_services
 		    :
+		    // TRANSLATORS: informative text
 		    _("Zone has no open ports.")
 		) + "</ul>";
 	    }

@@ -22,70 +22,42 @@
     include "firewall/helps.ycp";
     include "firewall/summary.ycp";
 
-    // FIXME: comment all _("strings")
-
-    // FIXME: replace or remove all 'fake' functions
-
-    void FakeStore(string key, map event) {
-	y2milestone("Fake Store");
-    }
-
-    symbol FakeHandle(string key, map event) {
-	y2milestone("Fake Handle");
-	return nil;
-    }
-
-    void FakeInit(string key) {
-	y2milestone("Fake Init");
-    }
-
-    boolean FakeFunction () {
-	y2milestone("Fake function");
-	return true;
-    }
-
-    boolean Fake_GetStartService () {
-	return true;
-    }
-    
-    boolean Fake_SetStartService (boolean set_service) {
-	return true;
-    }
-
     map<string,map<string,any> > widgets_handling = $[
 	// FIXME: test after jsrain's fix
 	"auto_start_up" : CWMServiceStart::CreateAutoStartWidget ($[
 	    "get_service_auto_start"	: SuSEFirewall::GetEnableService,
 	    "set_service_auto_start"	: SuSEFirewall::SetEnableService,
+	    // TRANSLATORS: Radio selection
 	    "start_auto_button"		: _("Start Firewall When &Booting"),
+	    // TRANSLATORS: Radio selection
 	    "start_manual_button"	: _("Start Firewall &Manually"),
 	    "help"			: sformat(CWMServiceStart::AutoStartHelpTemplate (),
-		// part of help text - radio button label, NO SHORTCUT!!!
+		// TRANSLATORS: part of help text - radio button label, NO SHORTCUT!!!
 		_("Start Firewall when Booting"),
-		// part of help text - radio button label, NO SHORTCUT!!!
+		// TRANSLATORS: part of help text - radio button label, NO SHORTCUT!!!
 		_("Start Firewall Manually")
 	    )
 	]),
 	// FIXME: test after jsrain's enhancement
 	"start_stop" : CWMServiceStart::CreateStartStopWidget ($[
 	    "service_id"		: "SuSEfirewall2_final",
-					  // Informating label
+					  // TRANSLATORS: Informating label
 	    "service_running_label"	: _("Firewall is running"),
-					  // Informating label
+					  // TRANSLATORS: Informating label
 	    "service_not_running_label"	: _("Firewall is not running"),
-					  // Push button
+					  // TRANSLATORS: Push button
 	    "start_now_button"		: _("&Start Firewall Now"),
-					  // Push button
+					  // TRANSLATORS: Push button
 	    "stop_now_button"		: _("S&top Firewall Now"),
 	    "save_now_action"		: SaveAndRestart,
-					  // Push button
+					  // TRANSLATORS: Push button
 	    "save_now_button"		: _("Save Settings and Restart Firewall &Now"),
 	    "help"			: sformat (CWMServiceStart::StartStopHelpTemplate (true),
-		// part of help text - push button label, NO SHORTCUT!!!
+		// TRANSLATORS: part of help text - push button label, NO SHORTCUT!!!
 		_("Start Firewall Now"),
-		// part of help text - push button label, NO SHORTCUT!!!
+		// TRANSLATORS: part of help text - push button label, NO SHORTCUT!!!
 		_("Stop Firewall Now"),
-		// part of help text - push button label, NO SHORTCUT!!!
+		// TRANSLATORS: part of help text - push button label, NO SHORTCUT!!!
 		_("Save Settings and Restart Firewall Now")
 	    )
 	]),
@@ -94,7 +66,7 @@
 	    "custom_widget"	: `VBox(),
 	    "init"		: InitFirewallInterfaces,
 	    "handle"		: HandleFirewallInterfaces,
-	    "store"		: FakeStore,
+	    //"store"		: NoStoreNeeded,
 	    "help"		: HelpForDialog("firewall-interfaces"),
 	],
 	"AllowedServices" : $[
@@ -102,7 +74,7 @@
 	    "custom_widget"	: `VBox(),
 	    "init"		: InitAllowedServices,
 	    "handle"		: HandleAllowedServices,
-	    "store"		: FakeStore,
+	    //"store"		: NoStoreNeeded,
 	    "help"		: HelpForDialog("allowed-services"),
 	],
 	"Masquerading"		: $[
@@ -110,15 +82,15 @@
 	    "custom_widget"	: `VBox(),
 	    "init"		: InitMasquerading,
 	    "handle"		: HandleMasquerading,
-	    "store"		: FakeStore,
+	    //"store"		: NoStoreNeeded,
 	    "help"		: HelpForDialog("base-masquerading"),
 	],
 	"BroadcastConfigurationSimple": $[
 	    "widget"		: `custom,
 	    "custom_widget"	: `VBox(),
-	    "init"		: FakeInit,
-	    "handle"		: FakeHandle,
-	    "store"		: FakeStore,
+	    "init"		: InitBroadcastConfigurationSimple,
+	    //"handle"		: NoHandlingNeeded,
+	    "store"		: StoreBroadcastConfigurationSimple,
 	    "help"		: HelpForDialog("simple-broadcast-configuration"),
 	],
 	"IPsecSupport"		: $[
@@ -142,10 +114,13 @@
 	    "custom_widget"	: `VBox(),
 	    "init"		: InitRedirectToMasqueradedIP,
 	    "handle"		: HandleRedirectToMasqueradedIP,
-	    "store"		: FakeStore,
+	    //"store"		: NoStoreNeeded,
 	    "help"		: HelpForDialog("masquerade-redirect-table"),
 	],
     ];
+
+    // TRANSLATORS: Part of dialog caption
+    string firewall_caption = _("Firewall Configuration");
 
     map<string, map<string, any> > tabs = $[
 	"start_up"		: $[
@@ -155,7 +130,9 @@
 		"start_stop",
 		`VStretch ()
 	    ),
-	    "caption"		: _("Firewall Configuration") + " - " + _("Start-Up"),
+	    // TRANSLATORS: part of dialog caption
+	    "caption"		: firewall_caption + " - " + _("Start-Up"),
+	    // TRANSLATORS: tree menu item
 	    "tree_item_label"	: _("Start-Up"),
 	    "widget_names"	: [ "auto_start_up", "start_stop" ]
 	],
@@ -164,7 +141,9 @@
 		FirewallInterfaces(),
 		`VSpacing (1)
 	    ),
-	    "caption"		: _("Firewall Configuration") + " - " + _("Interfaces"),
+	    // TRANSLATORS: part of dialog caption
+	    "caption"		: firewall_caption + " - " + _("Interfaces"),
+	    // TRANSLATORS: tree menu item
 	    "tree_item_label"	: _("Interfaces"),
 	    "widget_names"	: [ "FirewallInterfaces" ]
 	],
@@ -173,7 +152,9 @@
 		AllowedServices(),
 		`VSpacing (1)
 	    ),
-	    "caption"		: _("Firewall Configuration") + " - " + _("Allowed Services"),
+	    // TRANSLATORS: part of dialog caption
+	    "caption"		: firewall_caption + " - " + _("Allowed Services"),
+	    // TRANSLATORS: tree menu item
 	    "tree_item_label"	: _("Allowed Services"),
 	    "widget_names"	: [ "AllowedServices" ]
 	],
@@ -184,7 +165,9 @@
 		RedirectToMasqueradedIP(),
 		`VSpacing (1)
 	    ),
-	    "caption"		: _("Firewall Configuration") + " - " + _("Network Masquerading"),
+	    // TRANSLATORS: part of dialog caption
+	    "caption"		: firewall_caption + " - " + _("Network Masquerading"),
+	    // TRANSLATORS: tree menu item
 	    "tree_item_label"	: _("Masquerading"),
 	    "widget_names"	: [ "Masquerading", "RedirectToMasqueradedIP" ]
 	],
@@ -193,16 +176,20 @@
 		BroadcastConfigurationSimple(),
 		`VStretch ()
 	    ),
-	    "caption"		: _("Firewall Configuration") + " - " + _("Broadcast Configuration"),
+	    // TRANSLATORS: part of dialog caption
+	    "caption"		: firewall_caption + " - " + _("Broadcast Configuration"),
+	    // TRANSLATORS: tree menu item
 	    "tree_item_label"	: _("Broadcast"),
-	    "widget_names"	: [ "BroadcastConfiguration" ]
+	    "widget_names"	: [ "BroadcastConfigurationSimple" ]
 	],
 	"ipsec_support"		: $[
 	    "contents"		: `VBox (
 		IPsecSupport(),
 		`VStretch ()
 	    ),
-	    "caption"		: _("Firewall Configuration") + " - " + _("IPsec Support"),
+	    // TRANSLATORS: part of dialog caption
+	    "caption"		: firewall_caption + " - " + _("IPsec Support"),
+	    // TRANSLATORS: tree menu item
 	    "tree_item_label"	: _("IPsec Support"),
 	    "widget_names"	: [ "IPsecSupport" ]
 	],
@@ -211,14 +198,16 @@
 		LoggingLevel(),
 		`VStretch ()
 	    ),
-	    "caption"		: _("Firewall Configuration") + " - " + _("Logging Level"),
+	    // TRANSLATORS: part of dialog caption
+	    "caption"		: firewall_caption + " - " + _("Logging Level"),
+	    // TRANSLATORS: tree menu item
 	    "tree_item_label"	: _("Logging Level"),
 	    "widget_names"	: [ "LoggingLevel" ]
 	],
     ];
 
     map<symbol,any> functions = $[
-	`abort : FakeFunction,
+	`abort : AbortDialog,
     ];
 
     symbol RunFirewallDialogs () {
@@ -239,10 +228,11 @@
 
     symbol BoxSummaryDialog () {
 	Wizard::SetContentsButtons (
-	    _("Firewall Configuration") + " - " + _("Summary"),
+	    // TRANSLATORS: part of dialog caption
+	    firewall_caption + " - " + _("Summary"),
 	    BoxSummary(),
 	    HelpForDialog("box-summary"),
-	    Label::BackButton (), Label::FinishButton ()
+	    Label::BackButton (), Label::AcceptButton ()
 	);
 
 	InitBoxSummary();
@@ -251,7 +241,9 @@
 	while (true) {
 	    ret = (symbol) UI::UserInput();
 
-	    if (ret == `back || ret == `abort) break;
+	    if (ret == `back || ret == `next) break;
+
+	    if (ret == `abort && AbortDialog() == true) break;
 	}
 
 	return ret;
