@@ -148,6 +148,28 @@ define boolean HandlePortmapSupport (boolean enable) {
 	    "tcp_ports" : [ "tftp" ],
 	    "udp_ports" : [ ],
 	],
+	// Internet Printing Protocol as a Server
+	"ipp-tcp" : $[
+	    "tcp_ports" : [ "ipp" ],
+	    "udp_ports" : [ ],
+	],
+	// Internet Printing Protocol as a Client
+	"ipp-udp" : $[
+	    "tcp_ports" : [ ],
+	    "udp_ports" : [ "ipp" ],
+	],
+	"tftp" : $[
+	    "tcp_ports" : [ "tftp" ],
+	    "udp_ports" : [ ],
+	],
+	"ldap" : $[
+	    "tcp_ports" : [ "ldap" ],
+	    "udp_ports" : [ ],
+	],
+	"ldaps" : $[
+	    "tcp_ports" : [ "ldaps" ],
+	    "udp_ports" : [ ],
+	],
     ];
 
 
@@ -1039,7 +1061,7 @@ global define boolean RunServiceSupport (string service_id, boolean new_service_
     if (function == nil) {
 	return true;
     }
-    y2milestone("Setting service '%1' -> '%2'", service_id, new_service_state);
+    y2milestone("Setting special service support for '%1' to '%2'", service_id, new_service_state);
     return function(new_service_state);
 }
 

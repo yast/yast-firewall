@@ -434,20 +434,25 @@ services. Also start the appropriate daemons.</p>");
     list<string> additional_services_tcp = [];
     list<string> additional_services_udp = [];
 
+    // services which have checkbox in dialog, any other are only for expert settings
     list<string> selectable_services = [];
     foreach (string service, map<string, any> value, services_definition, {
-	selectable_services = add(selectable_services, service);
+	if (UI::WidgetExists(`id(service))==true)
+	    selectable_services = add(selectable_services, service);
     });
 
     /**
      * Helper function for switching service-checkboxes on/off
      */
-    define void SwitchServices () {
+    define void SwitchServices ( boolean changed_by_user ) {
 	// function for switching on/off the checkboxes if services should be on or off
 	additional_services_tcp = services_list_tcp;
 	additional_services_udp = services_list_udp;
 
 	foreach (string service_name, map<string, any> required_ports, services_definition, {
+	    // skipping all services without checkboxes present
+	    if (contains(selectable_services, service_name)==false) continue;
+
 	    boolean current_service_status = (boolean) UI::QueryWidget(`id(service_name), `Value);
 	    boolean service_supported = true;
 
@@ -469,13 +474,19 @@ services. Also start the appropriate daemons.</p>");
 		service_supported = false;
 	    }
 
-	    // service support was added using expert settings
+	    // added or removed using expert settings
+	    if (service_supported != current_service_status) {
+		// changed_by_user means that this is not the initial redraw of services
+		if (changed_by_user == true) {
+		    // Additional special function for service
+		    SuSEFirewall::RunServiceSupport(service_name, service_supported);
+		}
+		
+		UI::ChangeWidget(`id(service_name), `Value, service_supported);
+	    }
+
+	    // service is supported
 	    if (service_supported == true) {
-		// Additional special function for service
-		SuSEFirewall::RunServiceSupport(service_name,true);
-
-		UI::ChangeWidget(`id(service_name), `Value, true);
-
 		// removing all services hiddable under checkboxes
 		foreach (string tcp, required_tcp, {
 		    additional_services_tcp = filter(string remove_tcp, additional_services_tcp, ``(remove_tcp != tcp));
@@ -483,9 +494,6 @@ services. Also start the appropriate daemons.</p>");
 		foreach (string udp, required_udp, {
 		    additional_services_udp = filter(string remove_udp, additional_services_udp, ``(remove_udp != udp));
 		});
-	    // service support removed ... how?
-	    } else {
-		UI::ChangeWidget(`id(service_name), `Value, false);
 	    }
 	});
     
@@ -539,7 +547,7 @@ services. Also start the appropriate daemons.</p>");
 	}
     }
 
-    SwitchServices();
+    SwitchServices(false);
 
     any ret = nil;
     while(true) {
@@ -564,7 +572,7 @@ services. Also start the appropriate daemons.</p>");
 		if (select_portmap == true) {	// Portmap was disabled, now is enabled
 		    UI::ChangeWidget(`id("portmap"),`Value, true);
 		    HandleService("portmap");
-		    SwitchServices();
+		    SwitchServices(true);
 		}
 	    }
 	    // --> Exceptions
@@ -583,13 +591,13 @@ services. Also start the appropriate daemons.</p>");
 	    if (additional_services != nil) {
 		services_list_tcp = (list<string>) union(services_list_tcp, splitstring(additional_services["tcp"]:"", " "));
 		services_list_udp = (list<string>) union(services_list_udp, splitstring(additional_services["udp"]:"", " "));
-		SwitchServices();
+		SwitchServices(true);
 	    }
 	}
 	else if(is(ret, string) && contains(selectable_services, (string)ret))
 	{
 	    HandleService((string) ret);
-	    SwitchServices();
+	    SwitchServices(true);
 	}
     }
 
