@@ -24,13 +24,11 @@ define string ExpertServicePopup( string text ) ``{
 
     /* Services dialog advanced help 1/2 */
     string advanced_helptext = _("<p>Enter any number of ports, known port names
-(from /etc/services), and port ranges, separated by spaces.</p>
-") +
+(from /etc/services), and port ranges, separated by spaces.</p>") +
 
     /* Services dialog advanced help 2/2 */
     _("<p>Port ranges are separated by a colon. For example, to allow port 21
-to 23, write \"21:23\"</p>
-");
+to 23, write \"21:23\"</p>");
 
     string headline = _("Edit additional services");
     string tcpstext =  _("&Additional TCP Services");
@@ -133,8 +131,7 @@ define any DevicesDialog() ``{
 front-end for the Linux packet filter engine. The configuration items in
 the following menus are a collection of the most important functions
 of the SuSEfirewall2 package. Take a few moments to go through all menus
-and select the options carefully.</p>
-") +
+and select the options carefully.</p>") +
 
     /* Devices dialog help 2/4 */
     _("<p><b>External Interface:</b><br>
@@ -155,8 +152,7 @@ entering their names separated by spaces, for example: <i>eth0 eth1</i>.</p>");
     /* Warning RichText 2/2 */
     _("<p><ul><li>DSL with PPP over Ethernet uses ppp0 (ppp1, ppp2, etc.)
 as the external interface. Your ethernet interface is not the external
-interface in this case.</li></ul></p>
-");
+interface in this case.</li></ul></p>");
 
     // fetch list of network devices
     NetworkDevices::Read();
@@ -308,8 +304,7 @@ transfers via FTP. It is optimized for slow links and quite easy to configure.</
 
     /* Services dialog help 10/10 */
     _("<p>Just enabling a service here is most likely not enough to provide
-services. Also start the appropriate daemons.</p>
-");
+services. Also start the appropriate daemons.</p>");
 
     term contents = `Top( `VBox(
 	/* Label text */
@@ -478,8 +473,8 @@ to which you explicitly allowed access in the previous dialog.</p>") +
 
     /* Features dialog help 5/5 */
     _("<p><b>Treat IPsec Traffic as Interal</b> means that encrypted IPsec
-    packets that were successfully decrypted are treated the same as packets
-    originating from your internal network.</p>");
+packets that were successfully decrypted are treated the same as packets
+originating from your internal network.</p>");
 
     /* Features dialog caption */
     term contents = `VBox(`HBox(
@@ -505,7 +500,7 @@ to which you explicitly allowed access in the previous dialog.</p>") +
 		    `Left(`CheckBox(`id("traceroute"), _("Allow &Traceroute"), false)),
 		    `VSpacing(1),
 		    /* CheckBox label */
-		    `Left(`CheckBox(`id("ipsec"), _("Treat IPsec Traffic as Internal"), false))
+		    `Left(`CheckBox(`id("ipsec"), _("Treat IP&sec Traffic as Internal"), false))
 		),
 		`HSpacing(0)
 	    ),
@@ -676,8 +671,7 @@ logged.</p>") +
     /* Loggin dialog help 4/4 */
     _("<p><b>Log All Accepted Packets</b> logs all accepted packets.
 Attention: This option is dangerous as it causes your log file to grow 
-very quicky.</p>
-");
+very quicky.</p>");
 
     map<string,any> firewall_settings = SuSEFirewall::settings;
     string FW_LOG_DROP_CRIT = firewall_settings["FW_LOG_DROP_CRIT"]:"yes";
@@ -772,8 +766,7 @@ Change the firewall settings and restart the firewall with the new settings.</p>
     _("<p><b>Stop:</b><br>
 Stop any running SuSE Firewall2 and remove it from the boot process.
 In this case, the firewall will no longer be activated
-when you boot your system.</p>
-");
+when you boot your system.</p>");
 
     term contents = `VBox(
 	`VSpacing(4.5),
