@@ -1,0 +1,122 @@
+/**
+ * File:        firewall/dialogs.ycp
+ * Package:     Configuration YaST2 Firewall
+ * Summary:     Configuration dialogs handling functions
+ * Authors:     Lukas Ocilka <locilka@suse.cz>
+ *
+ * $Id$
+ *
+ * Configuration dialogs handling.
+ * Both Expert and Simple.
+ */
+{
+    textdomain "firewall";
+
+    import "Confirm";
+
+    // GLOBAL UI CONFIGURATION
+    term all_popup_definition = `opt(`decorated,`centered);
+
+    // FIXME: remove them ASAP
+    // EXAMPLE FUNCTIONS
+    void ExampleInit(string key) {
+	y2milestone("Example Init");
+    }
+
+    symbol ExampleHandle(string key, map event) {
+	any ret = event["ID"]:nil;
+	y2milestone("Example Handle");
+	return nil;
+    }
+
+    void ExampleStore(string key, map event) {
+	any ret = event["ID"]:nil;
+	y2milestone("Example Store");
+    }
+
+    // UI Functions
+
+    void HandlePopupSetFirewallInterfaceIntoZone () {
+	UI::OpenDialog(all_popup_definition, SetFirewallInterfaceIntoZone());
+	UI::WaitForEvent();
+	UI::CloseDialog();
+    }
+
+    void HandlePopupAdditionalSettingsForZones () {
+	UI::OpenDialog(all_popup_definition, AdditionalSettingsForZones());
+	UI::WaitForEvent();
+	UI::CloseDialog();
+    }
+
+    symbol HandleFirewallInterfaces (string key, map event) {
+	any ret = event["ID"]:nil;
+
+	if (ret == "change_firewall_interface") {
+	    HandlePopupSetFirewallInterfaceIntoZone();
+	} else if (ret == "user_defined_firewall_interface") {
+	    HandlePopupAdditionalSettingsForZones();
+	} else {
+	    y2error("Undefined return value: %1", ret);
+	}
+
+	return nil;
+    }
+
+    void HandlePopupAdditionalServices () {
+	// FIXME: real selected zone
+	string zone = "EXT";
+	string zone_name = "External";
+
+	UI::OpenDialog(all_popup_definition, AdditionalServices(zone_name));
+	UI::WaitForEvent();
+	UI::CloseDialog();
+    }
+
+    symbol HandleAllowedServices (string key, map event) {
+	any ret = event["ID"]:nil;
+
+	if (ret == "advanced_allowed_service") {
+	    HandlePopupAdditionalServices();
+	} else {
+	    y2error("Undefined return value: %1", ret);
+	}
+
+	return nil;
+    }
+
+    void HandlePopupIPsecTrustAsZone () {
+	UI::OpenDialog(all_popup_definition, IPsecTrustAsZone());
+	UI::WaitForEvent();
+	UI::CloseDialog();
+    }
+
+    symbol HandleIPsecSupport (string key, map event) {
+	any ret = event["ID"]:nil;
+
+	if (ret == "ipsec_details") {
+	    HandlePopupIPsecTrustAsZone();
+	} else {
+	    y2error("Undefined return value: %1", ret);
+	}
+
+	return nil;
+    }
+
+    void HandlePopupAddRedirectToMasqueradedIPRule () {
+	UI::OpenDialog(all_popup_definition, AddRedirectToMasqueradedIPRule());
+	UI::WaitForEvent();
+	UI::CloseDialog();
+    }
+
+    symbol HandleRedirectToMasqueradedIP (string key, map event) {
+	any ret = event["ID"]:nil;
+
+	if (ret == "add_redirect_to_masquerade") {
+	    HandlePopupAddRedirectToMasqueradedIPRule();
+	} else {
+	    y2error("Undefined return value: %1", ret);
+	}
+
+	return nil;
+    }
+}

@@ -1,0 +1,865 @@
+/**
+ * File:        firewall/dialogs.ycp
+ * Package:     Configuration YaST2 Firewall
+ * Summary:     Configuration screens
+ * Authors:     Lukas Ocilka <locilka@suse.cz>
+ *
+ * $Id$
+ *
+ * Configuration dialogs divided into smaller logic groups.
+ * Both Expert and Simple.
+ */
+{
+    textdomain "firewall";
+
+    import "Label";
+    import "ProductFeatures";
+
+    // UI VARIABLES
+    boolean expert_ui = (ProductFeatures::ui_mode == "expert");
+
+    // FAKE FUNCTIONS FOR RETURNING LISTS OF ITEMS
+
+    // FIXME: should be global value of the module SuSEfirewall2
+    list<map <string, string> > possible_firewall_zones = [
+	$[ "EXT" : "External" ],
+	$[ "INT" : "Internal" ],
+	$[ "DMZ" : "Demilitarized" ],
+    ];
+
+    // function return list of `items for `ComboBox
+    list<term> GetFirewallZonesList() {
+	list<term> firewall_zones = [];
+	foreach (map<string, string> zone, possible_firewall_zones, {
+	    foreach (string id, string name, zone, {
+		firewall_zones = add(firewall_zones, `item(`id(id), name));
+	    });
+	});
+
+	return firewall_zones;
+    }
+
+    list<term> GetDefinedServicesList() {
+	list<term> services_list = [];
+	// FIXME: real services should be here
+	services_list = add (services_list, `item(`id("dns-server"),	_("DNS Server")));
+	services_list = add (services_list, `item(`id("http"),		_("HTTP Server")));
+	services_list = add (services_list, `item(`id("imap"),		_("IMAP Server")));
+	services_list = add (services_list, `item(`id("nfs-server"),	_("NFS Server")));
+	services_list = add (services_list, `item(`id("pop3"),		_("POP3 Server")));
+	services_list = add (services_list, `item(`id("samba-server"),	_("Samba Server")));
+	services_list = add (services_list, `item(`id("smtp"),		_("SMTP Server")));
+	services_list = add (services_list, `item(`id("ssh"),		_("SSH")));
+
+	return services_list;
+    }
+
+    // TERM FUNCTIONS, WHOLE DIALOGS OR FRAMES
+
+    term FirewallInterfaces () {
+	term dialog = `Frame (
+	    _("Firewall Interfaces"),
+	    `VBox (
+		`Table (
+		    `header (
+			_("Device"),
+			_("Interface"),
+			_("Configured as")
+	    	    ),
+		    [
+			`item(`id("eth-00-15-24-dd-de-80"), "RTL-8139", "eth-00-15-24-dd-de-80", "Internal"),
+			`item(`id("modem0"), "Askey 815C", "modem0", "External"),
+			`item(`id(":-user-defined-:"), "", "any", "External"),
+			`item(`id(":-user-defined-:"), "", "not-configured-yet-00", "Internal")
+		    ]
+		),
+		`HBox (
+		    `PushButton(`id("change_firewall_interface"), _("Change")),
+		    `PushButton(`id("user_defined_firewall_interface"), _("User Defined"))
+		)
+	    )
+	);
+
+	return dialog;
+    }
+
+    term SetFirewallInterfaceIntoZone () {
+	term dialog = `Frame (
+	    _("Select Zone For Network Interface"),
+	    `VBox (
+		`HBox (
+		    `VBox (
+			// FIXME: this label should show an interface name got as parameter
+			`Left ( `Label("RTL-8139") ),
+			`Left ( `Label("eth-00-15-24-dd-de-80") )
+		    ),
+		    `ComboBox (`id("zone_for_interface"), `opt(`hstretch),
+			_("Interface Zone"),
+			add(GetFirewallZonesList(), `item(`id(""), ""))
+		    )
+		),
+		`VSpacing(1),
+		`HBox (
+		    `PushButton(`id("ok"), Label::OKButton()),
+		    `PushButton(`id("cancel"), Label::CancelButton())
+		)
+	    )
+	);
+	
+	return dialog;
+    }
+
+    term AdditionalSettingsForZones () {
+	term user_defined_zones = `VBox();
+	foreach (map<string, string> zone, possible_firewall_zones, {
+	    foreach (string id, string name, zone, {
+		user_defined_zones = add(user_defined_zones, `TextEntry(`id(id), name));
+	    });
+	});
+
+	term dialog = `Frame (
+	    _("Additional Interface Settings For Zones"),
+	    `VBox (
+		`HStretch(),
+		`VSpacing(1),
+		user_defined_zones,
+		`VSpacing(1),
+		`VSpacing(1),
+		`HBox (
+		    `PushButton(`id("ok"), Label::OKButton()),
+		    `PushButton(`id("cancel"), Label::CancelButton())
+		)
+	    )
+	);
+	
+	return dialog;
+    }
+
+    term Masquerading () {
+	term dialog = `Frame (
+	    _("Masquerading"),
+	    `VBox (
+		`Left( `CheckBox(`id("masquerade_networks"),
+		    _("Masquerade Networks"))
+		),
+		(expert_ui ?
+		    `Left( `ComboBox(`id("masquerade_outer_zone"), _("Outer Masqueraded Zone"), GetFirewallZonesList() ) )
+		    :
+		    nil
+		)
+	    )
+	);
+	
+	return dialog;
+    }
+
+    term AllowedServices () {
+	term dialog = `VBox(
+	    `Left( `ComboBox(`id("allowed_services_zone"),
+		_("Allowed Services For Selected Zone"), GetFirewallZonesList() )
+	    ),
+	    `VSquash (
+		`HBox (
+		    `HWeight ( 9,
+			`Bottom ( `Left( `ComboBox(`id("allowed_service_name"), _("Service To Allow"), GetDefinedServicesList()) ))
+		    ),
+		    `HWeight ( 2,
+			`Bottom ( `PushButton ( `id ( "add_allowed_service" ), `opt ( `hstretch ), Label::AddButton() ) )
+		    )
+		)
+	    ),
+	    `HBox (
+		`HWeight ( 9,
+		    `VBox (
+			`Table (
+			    `header (
+				_("Allowed Service")
+	    		    ),
+			    // FIXME: Fake items
+			    [
+				`item(`id("https"), "HTTPS Server"),
+				`item(`id("ldaps"), "LDAPS Server"),
+				`item(`id("tftp"),  "TFTP Server"),
+				`item(`id("vnc"),   "VNC")
+			    ]
+			),
+			`VSpacing(1),
+			`Left( `CheckBox(`id("protect_from_internal"),
+			    _("Protect from Internal Zone"))
+			)
+		    )
+		),
+		`HWeight ( 2,
+		    `VBox (
+			`Top ( `PushButton ( `id ( "remove_allowed_service" ), `opt ( `hstretch ), Label::RemoveButton() ) ),
+			`HStretch(),
+			`Bottom ( `PushButton ( `id ( "advanced_allowed_service" ), `opt ( `hstretch ), _("Advanced") ) )
+		    )
+		)
+	    )
+	);
+
+	return dialog;
+    }
+
+    term AdditionalServices (string zone_name) {
+	term dialog = `Frame (
+	    _("Additional Allowed Ports"),
+	    `VBox (
+		`HSpacing(45),
+		`VSpacing(1),
+		`Left ( `Label(sformat(_("Settings for Zone: %1"), zone_name)) ),
+		`TextEntry(`id("additional_tcp"), _("TCP Ports")),
+		`TextEntry(`id("additional_upd"), _("UDP Ports")),
+		`TextEntry(`id("additional_rpc"), _("RPC Ports")),
+		`TextEntry(`id("additional_ip"),  _("IP Protocols")),
+		`VSpacing(1),
+		`HBox (
+		    `PushButton(`id("ok"), Label::OKButton()),
+		    `PushButton(`id("cancel"), Label::CancelButton())
+		)
+	    )
+	);
+
+	return dialog;
+    }
+
+    term MasqueradeNetworks () {
+	term dialog = `Frame (
+	    _("Allowed Network Masquerading"),
+	    `VBox (
+		`Table (
+		    `header (
+			_("Local Network"),
+			_("Destination Network"),
+			_("Protocol"),
+			_("Port")
+		    ),
+		    // FIXME: fake items
+		    [
+			`item(`id("1"), "10.0.0.0/24", "0/0", "", ""),
+			`item(`id("2"), "192.168.0.0/20", "0/0", "tcp", "80")
+		    ]
+		),
+		`VSquash (
+		    `HBox (
+			`PushButton(`id("add_masquerade_network"), Label::AddButton()),
+			`PushButton(`id("remove_masquerade_network"), Label::RemoveButton())
+		    )
+		)
+	    )
+	);
+	
+	return dialog;
+    }
+
+    term AddNetworkMasqueradeRule () {
+	term dialog = `Frame (
+	    _("Add New Allowed Masquerading Rule"),
+	    `VBox (
+		`HBox (
+		    `HWeight ( 50,
+		    `VBox (
+			`ComboBox (`id("add_source_network"), `opt(`editable,`hstretch), _("Source Network"), [
+			    `item( `id("0/0"), "0/0")
+			]),
+			// FIXME: another protocols?
+			`ComboBox (`id("add_protocol"), `opt(`editable,`hstretch), _("Protocol"), [
+			    `item( `id(""), ""),
+			    `item( `id("tcp"), "tcp"),
+			    `item( `id("tcp"), "udp")
+			])
+		    )),
+		    `HWeight ( 50,
+		    `VBox (
+			`ComboBox (`id("add_destination_network"), `opt(`editable,`hstretch), _("Destination Network"), [
+			    `item( `id("0/0"), "0/0")
+			]),
+			`TextEntry (`id("add_destination_port"), _("Port"))
+		    ))
+		),
+		`VSpacing(1),
+		`HBox (
+		    `PushButton(`id("ok"), Label::AddButton()),
+		    `PushButton(`id("cancel"), Label::CancelButton())
+		)
+	    )
+	);
+	
+	return dialog;
+    }
+
+    term RedirectToMasqueradedIP () {
+	term dialog = `Frame (
+	    _("Redirect Requests To Masqueraded IP"),
+	    `VBox (
+		`Table (
+		    `header (
+			_("Source Network"),
+			_("Protocol"),
+			_("Requested Port"),
+			"",
+			_("Redirect To IP"),
+			_("Redirect To Port")
+		    ),
+		    // FIXME: fake items
+		    [
+			`item(`id("1"), "0/0", "tcp", "25", UI::Glyph(`BulletArrowRight), "10.0.1.1", "30025"),
+			`item(`id("2"), "0/0", "tcp", "http", UI::Glyph(`BulletArrowRight), "10.0.1.1", "http")
+		    ]
+		),
+		`VSquash (
+		    `HBox (
+			`PushButton(`id("add_redirect_to_masquerade"), Label::AddButton()),
+			`PushButton(`id("remove_redirect_to_masquerade"), Label::RemoveButton())
+		    )
+		)
+	    )
+	);
+	
+	return dialog;
+    }
+
+    term AddRedirectToMasqueradedIPRule () {
+	term dialog = `Frame (
+	    _("Add Masqueraded Redirect Rule"),
+	    `VBox (
+		`VSpacing(1),
+		`Left ( `Label(_("Redirect Matching Rule:")) ),
+		`HBox (
+		    `VBox (
+			`ComboBox (`id("add_source_network"), `opt(`editable,`hstretch), _("Source Network"), [
+			    `item( `id("0/0"), "0/0")
+			]),
+			`TextEntry (`id("add_requested_ip"), _("Requested IP"))
+		    ),
+		    `VBox (
+			// FIXME: another protocols allowed?
+			`ComboBox (`id("add_protocol"), `opt(`hstretch), _("Protocol"), [
+			    `item( `id("tcp"), "tcp"),
+			    `item( `id("udp"), "udp")
+			]),
+			`TextEntry (`id("add_requested_port"), _("Requested Port"))
+		    )
+		),
+		`VSpacing(1),
+		`Left( `Label(_("Redirection:")) ),
+		`HBox (
+		    `TextEntry (`id("add_redirectto_ip"), _("Redirect To Masqueraded IP")),
+		    `TextEntry (`id("add_redirectto_port"), _("Redirect To Port"))
+		),
+		`VSpacing(1),
+		`HBox (
+		    `PushButton(`id("ok"), Label::AddButton()),
+		    `PushButton(`id("cancel"), Label::CancelButton())
+		)
+	    )
+	);
+	
+	return dialog;
+    }
+
+    term TransparentLocalRedirection () {
+	term dialog = `Frame (
+	    _("Transparent Local Redirection"),
+	    `VBox (
+		`Left( `Label (_("Attention: Packets are transparently redirected to '127.0.0.1'."))),
+		`Table (
+		    `header (
+			_("Source Network"),
+			_("Destination Network"),
+			_("Protocol"),
+			_("Requested Port"),
+			"",
+			_("Local Port")
+		    ),
+		    // FIXME: fake items
+		    [
+			`item(`id("1"), "10.0.0.0/24", "0/0", "tcp", "http", UI::Glyph(`BulletArrowRight), "3128"),
+			`item(`id("2"), "10.0.0.0/24", "0/0", "tcp", "smtp", UI::Glyph(`BulletArrowRight), "smtp"),
+		    ]
+		),
+		`VSquash (
+		    `HBox (
+			`PushButton(`id("add_transparent_redirection"), Label::AddButton()),
+			`PushButton(`id("remove_transparent_redirection"), Label::RemoveButton())
+		    )
+		)
+	    )
+	);
+	
+	return dialog;
+    }
+
+    term AddTransparentLocalRedirectionRule () {
+	term dialog = `Frame (
+	    _("Add New Transparent Local Redirection"),
+	    `VBox (
+		`VSpacing(1),
+		`Left ( `Label(_("Transparent Redirection Matching Rule:")) ),
+		`HBox (
+		    `HWeight ( 10,
+			`ComboBox (`id("add_source_network"), `opt(`editable,`hstretch), _("Source Network"), [
+			    `item( `id("0/0"), "0/0")
+			])
+		    ),
+		    `HWeight ( 10,
+			`ComboBox (`id("add_destination_network"), `opt(`editable,`hstretch), _("Destination Network"), [
+			    `item( `id("0/0"), "0/0")
+			])
+		    )
+		),
+		`HBox (
+		    `HWeight ( 10,
+			// FIXME: another protocols?
+			`ComboBox (`id("add_protocol"), `opt(`hstretch), _("Protocol"), [
+			    `item( `id("tcp"), "tcp"),
+			    `item( `id("tcp"), "udp")
+			])
+		    ),
+		    `HWeight ( 10,
+			`TextEntry (`id("add_destination_port"), _("Requested Port"))
+		    )
+		),
+		`VSpacing(1),
+		`Left ( `Label(_("Transparently Redirect To:")) ),
+		`TextEntry (`id("add_localredirect_port"), _("Local Port On 127.0.0.1")),
+		`VSpacing(1),
+		`HBox (
+		    `PushButton(`id("ok"), Label::AddButton()),
+		    `PushButton(`id("cancel"), Label::CancelButton())
+		)
+	    )
+	);
+
+	return dialog;
+    }
+
+    term ForwardNetworks () {
+	term dialog = `Frame (
+	    _("Forwarding Networks"),
+	    `VBox (
+		`Left( `Label(_("Atention: These networks are forwarder without any firewall filtering."))),
+		`Table (
+		    `header (
+			_("Source Network"),
+			_("Destination Network"),
+			_("Protocol"),
+			_("Port"),
+			_("Flags")
+		    ),
+		    // FIXME: fake items
+		    [
+			`item(`id("1"), "0/0", "147.42.95.2", "tcp", "http", ""),
+			`item(`id("1"), "0/0", "147.42.95.2", "tcp", "smtp", "")
+		    ]
+		),
+		`VSquash (
+		    `HBox (
+			`PushButton(`id("add_forward_network"), Label::AddButton()),
+			`PushButton(`id("remove_forward_network"), Label::RemoveButton())
+		    )
+		)
+	    )
+	);
+	
+	return dialog;
+    }    
+
+    term AddForwardNetworkRule () {
+	term dialog = `Frame (
+	    _("Add New Forward Rule"),
+	    `VBox (
+		`VSpacing(1),
+		`Left ( `Label(_("Allow Forwarding Matching This Rule:")) ),
+		`HBox (
+		    `HWeight ( 10,
+			`ComboBox (`id("add_source_network"), `opt(`editable,`hstretch), _("Source Network"), [
+			    `item( `id("0/0"), "0/0")
+			])
+		    ),
+		    `HWeight ( 10,
+			`ComboBox (`id("add_destination_network"), `opt(`editable,`hstretch), _("Destination Network"), [
+			    `item( `id("0/0"), "0/0")
+			])
+		    )
+		),
+		`HBox (
+		    `HWeight ( 10,
+			// FIXME: another protocols?
+			`ComboBox (`id("add_protocol"), `opt(`hstretch), _("Protocol"), [
+			    `item( `id("tcp"), "tcp"),
+			    `item( `id("tcp"), "udp"),
+			    `item( `id("icmp"), "icmp"),
+			    `item( `id("icmp"), "esp (IPsec)"),
+			    `item( `id(""), ""),
+			])
+		    ),
+		    `HWeight ( 10,
+			`TextEntry (`id("add_port"), _("Port"))
+		    )
+		),
+		`VSpacing(1),
+		`HBox (
+		    `PushButton(`id("ok"), Label::AddButton()),
+		    `PushButton(`id("cancel"), Label::CancelButton())
+		)
+	    )
+	);
+
+	return dialog;
+    }
+
+    term RoutingInZones () {
+	term dialog = `Frame (
+	    _("Routing In Zones"),
+	    `Left (
+		// Allow Same-Class Routing
+		`CheckBox (`id("same_class_routing"),
+		    _("Allow Routing Between Interfaces in The Same Zone")
+		)
+	    )
+	);
+	
+	return dialog;
+    }
+
+    term LoggingTuning () {
+	term dialog = `Frame (
+	    _("Logging Tuning"),
+	    `VBox (
+		`Left (
+		    `HBox (
+			// FIXME: fake frequency
+			`HVSquash ( `TextEntry (`id("frequency"), _("Frequency"), "3")),
+			`VBox ( `Label(""), `Label ("/") ),
+			`ComboBox (`id("unit"),	 _("Unit"), [
+			    `item(`id("second"), _("Second")),
+			    `item(`id("minute"), _("Minute")),
+			    `item(`id("hour"),   _("Hour")),
+			    `item(`id("day"),    _("Day"))
+			])
+		    )
+		),
+		`Left (
+		    `HBox (
+			// FIXME: fake log file
+			`TextEntry (`id("file_name"), Label::FileName(), "/var/log/SuSEfirewall2"),
+			`VBox ( `Label(""), `PushButton (`id("browse_logfile"), Label::BrowseButton()) )
+		    )
+		)
+	    )
+	);
+	
+	return dialog;
+    }
+
+    term LoggingLevel () {
+	list<term> logging_options = [
+	    `item(`id("all"), _("Log All")),
+	    `item(`id("critical"), _("Log Only Critical")),
+	    `item(`id("none"), _("Do Not Log Any"))
+	];
+
+	term dialog = `VBox (
+	    `Frame (
+		_("Logging Level"),
+		`VBox (
+		    `Left (
+			`ComboBox (`id("log_allowed"), _("Logging Allowed Packets"), logging_options)
+		    ),
+		    `Left (
+			`ComboBox (`id("log_disallowed"), _("Logging Disallowed Packets"), logging_options)
+		    )
+		)
+	    )
+	);
+
+	return dialog;
+    }
+
+    term BroadcastConfigurationExpert () {
+	term dialog = `Frame (
+	    _("Broadcast Configuration"),
+	    `VBox (
+		`RadioButtonGroup (`id("broadcast_configuration"),
+		    `VBox (
+			`Left ( `RadioButton (`id("drop_incoming"), _("Drop Incoming Broadcast")) ),
+			`Left( `RadioButton (`id("allow_incoming"), _("Allow Incoming Broadcast")) )
+		    )
+		),
+		`HBox (
+		    `HWeight( 4,
+			`Empty()
+		    ),
+		    `HWeight( 50,
+			`MultiSelectionBox (`id("accept_broadcast_packets"),
+			    _("Firewall Zones Allowing Broadcast Packets"),
+			    GetFirewallZonesList()
+			)
+		    )
+		),
+		`Left (
+		    `CheckBox (`id("dropped_packets"), _("Log Disallowed Broadcast Packets"))
+		)
+	    )
+	);
+	
+	return dialog;
+    }
+
+    term BroadcastConfigurationSimple () {
+	term dialog = `Frame (
+	    _("Broadcast Configuration"),
+	    `VBox (
+		`Left (
+		    `ComboBox (`id("broadcast_configuration"), _("Incoming Broadcast Configuration"), [
+			`item(`id("drop_incoming"), _("Drop All Incoming Broadcast")),
+			`item(`id("allow_int_incoming"), _("Allow Incoming Broadcast from Internal Zone")),
+			`item(`id("allow_all_incoming"), _("Allow All Incoming Broadcast"))
+		    ])
+		),
+		`Left (
+		    `CheckBox (`id("dropped_packets"), _("Log Disallowed Broadcast Packets"))
+		)
+	    )
+	);
+	
+	return dialog;
+    }
+
+    term HierarchicalTokenBucket () {
+	term dialog = `Frame (
+	    _("Hierarchical Token Bucket"),
+	    `VBox (
+		`Left ( `Label (_("Adjust upstream limit for selected interface")) ),
+		`HBox (
+		    `HWeight ( 3,
+			`ComboBox (`id("htb_interface"), _("Interface"), [
+			    // FIXME: fake items
+			    `item(`id(1), "RTL-8139 / eth-aa-bb-cc-dd-ee"),
+			    `item(`id(1), "Askey 815C / modem0")
+			])
+		    ),
+		    `HWeight ( 1,
+			`TextEntry (`id("htb_unit"), `opt(`hsquash), _("kbit/sec."))
+		    )
+		)
+	    )
+	);
+	
+	return dialog;
+    }
+
+    term AdvancedSecuritySettings () {
+	term dialog = `Frame (
+	    _("Advanced Security Settings"),
+	    `VBox (
+		`Left( `ComboBox (`id("disallowed_packets"), _("Disallowed Packets"), [
+		    `item(`id("drop"), _("Drop")),
+		    `item(`id("drop"), _("Reject"))
+		])),
+		`Left ( `CheckBox (`id("block_new_connections"), _("Block New Connections from This Host")) ),
+		`Left ( `CheckBox (`id("allow_ping"), _("Allow to Ping This Host")) ),
+		`Left ( `CheckBox (`id("allow_traceroute"), _("Allow Traceroute through This Host")) )
+	    )
+	);
+	
+	return dialog;
+    }
+
+    term IPsecSupport () {
+	term dialog = `Frame (
+	    _("IPsec Support"),
+	    `HBox (
+		`Left ( `CheckBox (`id("ispsec_support"), _("IPsec Support Enabled")) ),
+		`HStretch (),
+		`Right ( `PushButton(`id("ipsec_details"), _("Details")) )
+	    )
+	);
+
+	return dialog;
+    }
+
+    term IPsecTrustAsZone () {
+	list<term> trust_zones = add(GetFirewallZonesList(), `item(`id("no"),
+	    _("The Same Zone as The Packet Came")));
+
+	term dialog = `Frame (
+	    _("IPsec Zone"),
+	    `VBox (
+		`VSpacing(1),
+		`Left (
+		    `ComboBox (`id("trust_ipsec_as"),
+			_("Trust IPsec As"),
+			trust_zones
+		    )
+		),
+		`VSpacing(1),
+		`HBox (
+		    `PushButton(`id("ok"), Label::OKButton()),
+		    `PushButton(`id("cancel"), Label::CancelButton())
+		)
+	    )
+	);
+
+	return dialog;
+    }
+
+    term IPv6Support () {
+	term dialog = `Frame (
+	    _("IPv6 Support"),
+	    `VBox (
+		`Label ("H I C   S U N T   L E O N E S")
+	    )
+	);
+
+	return dialog;
+    }
+
+    term CustomFirewallRules () {
+	term dialog = `Frame (
+	    _("Custom Allowed Rules"),
+	    `VBox (
+		`Table (
+		    `header (
+			_("Source Network"),
+			_("Protocol"),
+			_("Port")
+		    ),
+		    // FIXME: fake items
+		    [
+			`item(`id("1"), "189.12.35.0/24", "tcp", "ssh"),
+			`item(`id("2"), "147.25.136.9", "tcp", "ssh"),
+			`item(`id("3"), "145.8.0.0/20", "tcp", "domain"),
+			`item(`id("3"), "145.8.0.0/20", "udp", "domain")
+		    ]
+		),
+		`VSquash (
+		    `HBox (
+			`PushButton(`id("add_custom_rule"), Label::AddButton()),
+			`PushButton(`id("remove_custom_rule"), Label::RemoveButton())
+		    )
+		)
+	    )
+	);
+	
+	return dialog;
+    }
+
+    term AddCustomFirewallRule () {
+	term dialog = `Frame (
+	    _("Add New Allowing Rule"),
+	    `VBox (
+		`HBox (
+		    `TextEntry(`id("add_source_network"), _("Source Network")),
+		    `HSquash (
+			`ComboBox (`id("add_protocol"), _("Protocol"), [
+			    `item( `id("tcp"),  "tcp"),
+			    `item( `id("udp"),  "udp"),
+			    `item( `id("icmp"), "icmp"),
+			])
+		    ),
+		    `HSquash (
+			`TextEntry (`id("add_destination_port"), _("Port"))
+		    )
+		),
+		`VSpacing(1),
+		`HBox (
+		    `PushButton(`id("ok"), Label::AddButton()),
+		    `PushButton(`id("cancel"), Label::CancelButton())
+		)
+	    )
+	);
+	
+	return dialog;
+    }
+
+    // local helper function for Summary
+    string HTMLWrong (string emphasize_string) {
+	return sformat ("<font color='#993300'>%1</font>", emphasize_string);
+    }
+
+    term BoxSummary () {
+	string is_ok  = "<font color='#339900'>" + UI::Glyph(`CheckMark) + "</font>";
+	string not_ok = "<font color='#993300'>" + UI::Glyph(`BulletArrowRight) + "</font>";
+
+	string summary =
+	    "<h2>Internal Zone</h2>" +
+	    "	<ul>" +
+	    "	<h3>Interfaces</h3>" +
+	    "		<ul>" +
+	    "		<li>" + is_ok + " RTL-8139  / eth-00:15:24:dd:de:80</li>" +
+	    "		<li>" + is_ok + " any (any lasting interface not mentioned in configuration)<br />currently: no interface assigned</li>" +
+	    "		</ul>" +
+	    "	<h3>Open Services, Ports and Protocols</h3>" +
+	    "		<ul>" +
+	    "		<li>HTTPS Server</li>" +
+	    "		<li>LDAPS Server</li>" +
+	    "		<li>SSH</li>" +
+	    "		<li>TFTP Server</li>" +
+	    "		<li>VNC</li>" +
+	    "		<li>TCP Ports: 10245 12500:19500</li>" +
+	    "		<li>UDP Ports: 53</li>" +
+	    "		<li>RPC Ports: ypbind</li>" +
+	    "		</ul>" +
+	    "	</ul>" +
+	    "<h2>External Zone</h2>" +
+	    "	<ul>" +
+	    "	<h3>Interfaces</h3>" +
+	    "		<ul>" +
+	    "		<li>" + is_ok + " Askey 815C / modem0</li>" +
+	    "		<li>" + not_ok + " " + HTMLWrong("not-configured-yet-00") + " (Unknown interface, Unknown setting)" +
+	    "		</ul>" +
+	    "	<h3>Open Services, Ports and Protocols</h3>" +
+	    "		<ul>" +
+	    "		<li>DNS Server</li>" +
+	    "		<li>SSH</li>" +
+	    "		<li>Protocols: esp</li>" +
+	    "		</ul>" +
+	    "	</ul>";
+
+	term dialog = `HBox (
+	    `RichText(summary)
+	);
+
+	return dialog;
+    }
+
+    term ProposeConfiguration () {
+	term dialog = `Frame (
+	    _("Simple Configuration Proposal"),
+	    `Left ( `PushButton(`id("propose_box_configuration"), _("Propose Configuration")) )
+	);
+	
+	return dialog;
+    }
+
+/**
+    // FAKE CODE FOR RUNNING SCREENS
+
+    list<term> dialogs = [FirewallInterfaces(), SetFirewallInterfaceIntoZone(),
+	AdditionalSettingsForZones(), Masquerading(),
+	AllowedServices(), AdditionalServices(), MasqueradeNetworks(),
+	AddNetworkMasqueradeRule(), RedirectToMasqueradedIP(),
+	AddRedirectToMasqueradedIPRule(), TransparentLocalRedirection(),
+	AddTransparentLocalRedirectionRule(),
+	ForwardNetworks(), AddForwardNetworkRule(),
+	RoutingInZones(), LoggingTuning(), LoggingLevel(), BroadcastConfiguration(),
+	HierarchicalTokenBucket(), AdvancedSecuritySettings(), IPsecSupport(),
+	IPv6Support(), CustomFirewallRules(),
+	AddCustomFirewallRule()];
+
+    dialogs = [AddCustomFirewallRule()];
+
+    integer counter = 0;
+    foreach (term dialog, dialogs, {
+	counter = counter + 1;
+	UI::OpenDialog(dialog);
+	UI::UserInput ();
+	// UI::MakeScreenShot ("screenshot" + ((size(tostring(counter))<=1) ? "0" : "") + tostring(counter) + ".png");
+	UI::CloseDialog();
+    });
+
+*/
+}

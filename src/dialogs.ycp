@@ -1,1451 +1,266 @@
 /**
- * File:	include/firewall/dialogs.ycp
- * Package:	Firewall configuration
- * Summary:	Dialogs definitions
- * Authors:	Michal Svec <msvec@suse.cz>
- *		Lukas Ocilka <locilka@suse.cz>
+ * File:        firewall/dialogs.ycp
+ * Package:     Configuration YaST2 Firewall
+ * Summary:     Configuration dialogs and workflow
+ * Authors:     Lukas Ocilka <locilka@suse.cz>
  *
  * $Id$
+ *
+ * Configuration dialogs and workflow.
+ * Both Expert and Simple.
  */
-
 {
+    textdomain "firewall";
 
-textdomain "firewall";
+    import "CWM";
+    import "CWMServiceStart";
+    import "DialogTree";
+    import "Label";
 
-import "Label";
-import "Mode";
-import "NetworkDevices";
-import "Popup";
-import "Progress";
-import "Service";
-import "SuSEFirewall";
-import "Wizard";
-import "ISDN";
+    // FIXME: remove
+    import "Wizard";
 
-list<string> firewall_services_selected = [ ];
+    include "./subdialogs.ycp";
+    include "./uifunctions.ycp";
 
-define map<string,string> ExpertServicePopup( map<string,string> additional_services ) ``{
-
-    /* Services dialog advanced help 1/2 */
-    string advanced_helptext = _("<p>Enter any number of ports, known port names
-(from /etc/services), and port ranges, separated by spaces.</p>") +
-
-    /* Services dialog advanced help 2/2 */
-    _("<p>Port ranges are separated by a colon. For example, to allow port 21
-to 23, write \"21:23\"</p>");
-
-    string headline = _("Edit additional services");
-    string tcpstext = _("Additional &TCP Services");
-    string udpstext = _("Additional &UDP Services");
-
-    UI::OpenDialog(`opt(`decorated), `VBox(
-	`VSpacing(0.5),
-	`Heading(headline),
-	`VSpacing(0.5),
-	`HBox(
-	    `VSpacing(9),
-	    `HSpacing(1),
-	    `HWeight(50, `RichText(advanced_helptext)),
-	    `HSpacing(1),
-	    `HWeight(50, `VBox (
-		`VSpacing(1),
-		`TextEntry(`id(`textwidget_tcp), tcpstext, additional_services["tcp"]:""),
-		`VSpacing(1),
-		`TextEntry(`id(`textwidget_udp), udpstext, additional_services["udp"]:""),
-		`VStretch()
-	    )),
-	    `HSpacing(1)
-	),
-	`VSpacing(1),
-	`HBox(
-	    `PushButton(`id(`ok), `opt(`default), Label::OKButton()),
-	    `PushButton(`id(`cancel), Label::CancelButton())
-	),
-	`VSpacing(0.2)
-    ));
-
-    UI::SetFocus(`id(`textwidget_tcp));
-
-    any ret = UI::UserInput();
-    additional_services["tcp"] = (string) UI::QueryWidget(`id(`textwidget_tcp), `Value);
-    additional_services["udp"] = (string) UI::QueryWidget(`id(`textwidget_udp), `Value);
-
-    UI::CloseDialog();
-
-    if(ret != `ok) return nil;
-    return additional_services;
-}
-
-define boolean SelectPortmapDialog () {
-    return (boolean) Popup::YesNo(
-_("You have selected for an NFS server to be supported on this server,
-but you have not selected Portmapper, which is needed for NFS servers.
-Should the Portmapper also be selected?"));
-}
-
-define void StdOutStdErrLog( string whatfailedmsg, string stdout, string stderr) ``{
-    UI::OpenDialog(`opt(`decorated), `HBox(
-	`VSpacing(10),
-	`VBox(
-	    `HSpacing(50),
-	    `Left(`Heading(whatfailedmsg)),
-	    `VSpacing(0.2),
-	    `LogView(`id(`log), _("\nCommand output:"), 10, 100),
-	    `PushButton(`id(`ok), `opt(`default), Label::OKButton())
-	)
-    ));
-
-    UI::ChangeWidget(`id(`log), `Value,
-	    "*** stdout: ***\n\n" + stdout +
-	    "\n\n*** stderr: ***\n\n" + stderr);
-    UI::UserInput();
-    UI::CloseDialog();
-}
-
-define string bool2string(boolean tf) ``{
-    if(tf==true)
-	return "yes";
-    else if(tf==false)
-	return "no";
-    else return "";
-}
-
-/**
- * Write settings dialog
- */
-define symbol PreWriteDialog() ``{
-    // Translator: please keep layout
-    string text = _("- configure the firewall boot scripts
-- stop the firewall, if its currently running
-- save your settings to /etc/sysconfig/SuSEfirewall2
-- start the firewall with your new settings
-
-");
-
-    boolean continuecancel = Popup::ContinueCancelHeadline(_("Save settings and activate firewall"),text);
-
-    if(continuecancel == true) {
-	SuSEFirewall::start = true;
-	return `next;
+    void FakeStore(string key, map event) {
+	y2milestone("Fake Store");
     }
 
-    return `back;
-}
-
-/**
- * Device Dialog
- */
-define any DevicesDialog() ``{
-
-    map firewall_settings = SuSEFirewall::settings;
-
-y2debug("SETTINGS: %1", firewall_settings);
-
-    /* Devices dialog caption */
-    string caption = _("Firewall Configuration: Basic Settings");
-
-    /* Devices dialog help 1/4 */
-    string help = _("<p>This tool aims to be an easy-to-use configuration
-front-end for the Linux packet filter engine. The configuration items in
-the following menus are a collection of the most important functions
-of the SuSEfirewall2 package. Take a few moments to go through all menus
-and select the options carefully.</p>") +
-
-    /* Devices dialog help 2/4 */
-    _("<p><b>External Interface:</b><br>
-Choose the interface connected to the Internet for which to configure
-the firewall.</p>") +
-
-    /* Devices dialog help 3/4 */
-    _("<p><b>Internal Interface:</b><br>
-Choose your internal network interface.</p>") +
-
-    /* Devices dialog help 4/4 */
-    _("<p>It is possible to specify more external or internal interfaces by
-entering their names separated by spaces, for example: <i>modem0 dsl1</i>.</p>");
-
-// DLS has not ppp0 interface anymore, but dls0
-//    /* Warning RichText 1/2 */
-//    string warning = _("<p><b>Warning:</b></p>") +
-//
-//    /* Warning RichText 2/2 */
-//    _("<p><ul><li>DSL with PPP over Ethernet uses ppp0 (ppp1, ppp2, etc.)
-//as the external interface. Your ethernet interface is not the external
-//interface in this case.</li></ul></p>");
-
-    // fetch list of network devices in normal configuration
-    if (Mode::config ()==false && Mode::normal ()==true) {
-	NetworkDevices::Read();
-    }
-    list<string> netdevices = NetworkDevices::List("");
-    if (Mode::installation ()==true) {
-	netdevices = (list<string>) toset(union(netdevices, ISDN::NetDeviceList()));
-    }
-    netdevices = filter(string dev, netdevices, ``{
-	return dev != "" && !issubstring(dev, "lo") && !issubstring(dev, "sit");
-    });
-
-    /* ComboBox item (No network device selected) */
-    string none = _("(none)");
-    list default_devices = []; //["eth0","ppp0","ippp0"];
-    list intdevices = sort(union(netdevices, [none]));
-    list devices = sort(union(intdevices,default_devices));
-
-    string FW_DEV_EXT = firewall_settings["FW_DEV_EXT"]:"";
-    string FW_DEV_INT = firewall_settings["FW_DEV_INT"]:"";
-
-    term contents = `VBox(
-       `VSpacing(1.5),
-       `HBox (`HSpacing (3),
-	      `Frame( _("Select interfaces to protect"),
-		      `HBox(
-			    `HSpacing (3),
-			    `VBox (`VWeight (80,
-					     `VBox (
-						    `VSpacing (1),
-						    `HBox ( `HWeight(25,`Top(`ComboBox (`id ("interface"),`opt(`hstretch, `editable), _("&External Interface:"), devices ))),
-							   `HSpacing(3),
-							   `HWeight(35,`Top( `Left( `Label (
- // to translater: please keep width and newlines. Use more lines if neccessary
-_("eth-id-AA:BB:CC:DD:EE:FF is typically
-used for ethernet cards, ippp0 for
-ISDN, modem0 for modem and dsl0 for
-DSL connections
-")))))
-							   ),
-						    `VSpacing (1),
-						    `HBox ( `HWeight(25,`Top(`ComboBox (`id ("intinterface"),`opt(`hstretch, `editable), _("&Internal Interface:"), intdevices ))),
-							   `HSpacing(3),
-							   `HWeight(35,`Top( `Left( `Label (
-   // to translater: please keep width and newlines. Use more lines if neccessary
-_("Leave this empty if you do not
-have an internal network.
-")))))
-							    ),
-						    `VSpacing (1)
-						    )
-					     )
-				   //There's no warning anymore
-				   //`HBox (`VSpacing(6), `RichText (warning)),
-				   //`VSpacing (1.5)
-				   ),
-			    `HSpacing (3)
-			    )
-		      ),
-	      `HSpacing (3)),
-       `VSpacing(2)
-       );
-
-
-    Wizard::SetContentsButtons(caption,contents,help,Label::BackButton(),Label::NextButton());
-    if (!Mode::installation ()) Wizard::DisableBackButton();
-
-    if( FW_DEV_EXT != "" )
-    {
-	UI::ChangeWidget(`id("interface"), `Value, FW_DEV_EXT);
-    }
-    if( FW_DEV_INT != "" )
-    {
-	UI::ChangeWidget(`id("intinterface"), `Value, FW_DEV_INT);
+    symbol FakeHandle(string key, map event) {
+	y2milestone("Fake Handle");
+	return nil;
     }
 
-    any ret = nil;
-    while(true) {
-	ret = UI::UserInput();
-	if(ret == `abort) {
-	    if(Popup::ReallyAbort(true)) break;
-	    else continue;
-	}
-	else {
-	    FW_DEV_EXT = (string) UI::QueryWidget(`id("interface"),`Value);
-	    if( ret == `next && ( FW_DEV_EXT == none || FW_DEV_EXT == "" ))
-	    {
-		Popup::Message(_("Select an external interface."));
-		UI::SetFocus(`id("interface"));
-		continue;
-	    }
-	    SuSEFirewall::settings["FW_DEV_EXT"] = FW_DEV_EXT;
-	    FW_DEV_INT = (string) UI::QueryWidget(`id("intinterface"),`Value);
-	    if( FW_DEV_INT != none )
-	    {
-		SuSEFirewall::settings["FW_DEV_INT"] = FW_DEV_INT;
-	    }
-	    else
-	    {
-		SuSEFirewall::settings["FW_DEV_INT"] = "";
-	    }
-	    break;
-	}
-    };
+    void FakeInit(string key) {
+	y2milestone("Fake Init");
+    }
 
-    return ret;
-}
+    boolean FakeFunction () {
+	y2milestone("Fake function");
+	return true;
+    }
 
+    boolean Fake_GetStartService () {
+	return true;
+    }
+    
+    boolean Fake_SetStartService (boolean set_service) {
+	return true;
+    }
 
+    void Fake_SaveAndRestart () {
+	boolean amazing = true;
+    }
 
-/**
- * uses and changes FW_SERVICES_EXT_TCP inside firewall_settings, abuses checkbox widget id as service name
- */
-define any ServicesDialog() ``{
-
-    map firewall_settings = SuSEFirewall::settings;
-
-    map <string, boolean> special_check_boxes = $[
-	"nfs-server" : SuSEFirewall::IsServiceSupportedInGroup("nfs-server","EXT"),
+    map<string,map<string,any> > widgets_handling = $[
+	"auto_start_up" : CWMServiceStart::CreateAutoStartWidget ($[
+	    "get_service_auto_start"	: Fake_GetStartService,
+	    "set_service_auto_start"	: Fake_SetStartService,
+	    "start_auto_button"		: _("Start Firewall When &Booting"),
+	    "start_manual_button"	: _("Start Firewall &Manually"),
+	    "help"			: sformat(CWMServiceStart::AutoStartHelpTemplate (),
+		// part of help text - radio button label, NO SHORTCUT!!!
+		_("Start Firewall when Booting"),
+		// part of help text - radio button label, NO SHORTCUT!!!
+		_("Start Firewall Manually")
+	    )
+	]),
+	"start_stop" : CWMServiceStart::CreateStartStopWidget ($[
+	    "service_id"		: "SuSEfirewall2_final",
+					  // Informating label
+	    "service_running_label"	: _("Firewall is running"),
+					  // Informating label
+	    "service_not_running_label"	: _("Firewall is not running"),
+					  // Push button
+	    "start_now_button"		: _("&Start Firewall Now"),
+					  // Push button
+	    "stop_now_button"		: _("S&top Firewall Now"),
+	    "save_now_action"		: Fake_SaveAndRestart,
+					  // Push button
+	    "save_now_button"		: _("Save Settings and Restart Firewall &Now"),
+	    "help"			: sformat (CWMServiceStart::StartStopHelpTemplate (true),
+		// part of help text - push button label, NO SHORTCUT!!!
+		_("Start Firewall Now"),
+		// part of help text - push button label, NO SHORTCUT!!!
+		_("Stop Firewall Now"),
+		// part of help text - push button label, NO SHORTCUT!!!
+		_("Save Settings and Restart Firewall Now")
+	    )
+	]),
+	"ProposeConfiguration" : $[
+	    "widget"		: `custom,
+	    "custom_widget"	: `VBox(),
+	    "init"		: FakeInit,
+	    "handle"		: FakeHandle,
+	    "store"		: FakeStore,
+	    "help"		: "<p>Fake Help - Propose Configuration</p>",
+	],
+	"FirewallInterfaces" : $[
+	    "widget"		: `custom,
+	    "custom_widget"	: `VBox(),
+	    "init"		: FakeInit,
+	    "handle"		: HandleFirewallInterfaces,
+	    "store"		: FakeStore,
+	    "help"		: "Fake Help - Firewall Interfaces",
+	],
+	"AllowedServices" : $[
+	    "widget"		: `custom,
+	    "custom_widget"	: `VBox(),
+	    "init"		: FakeInit,
+	    "handle"		: HandleAllowedServices,
+	    "store"		: FakeStore,
+	    "help"		: "Fake Help - Allowed Services",
+	],
+	"Masquerading"		: $[
+	    "widget"		: `custom,
+	    "custom_widget"	: `VBox(),
+	    "init"		: FakeInit,
+	    "handle"		: FakeHandle,
+	    "store"		: FakeStore,
+	    "help"		: "Fake Help - BBB",
+	],
+	"BroadcastConfigurationSimple": $[
+	    "widget"		: `custom,
+	    "custom_widget"	: `VBox(),
+	    "init"		: FakeInit,
+	    "handle"		: FakeHandle,
+	    "store"		: FakeStore,
+	    "help"		: "Fake Help - CCC",
+	],
+	"IPsecSupport"		: $[
+	    "widget"		: `custom,
+	    "custom_widget"	: `VBox(),
+	    "init"		: FakeInit,
+	    "handle"		: HandleIPsecSupport,
+	    "store"		: FakeStore,
+	    "help"		: "Fake Help - DDD",
+	],
+	"LoggingLevel"		: $[
+	    "widget"		: `custom,
+	    "custom_widget"	: `VBox(),
+	    "init"		: FakeInit,
+	    "handle"		: FakeHandle,
+	    "store"		: FakeStore,
+	    "help"		: "Fake Help - EEE",
+	],
+	"RedirectToMasqueradedIP" : $[
+	    "widget"		: `custom,
+	    "custom_widget"	: `VBox(),
+	    "init"		: FakeInit,
+	    "handle"		: HandleRedirectToMasqueradedIP,
+	    "store"		: FakeStore,
+	    "help"		: "Fake Help - FFF",
+	],
     ];
 
-    /* Services dialog caption */
-    string caption = _("Firewall Configuration: Services");
-
-    /* Services dialog help 1/16 */
-    string help = _("<p>Choose the <b>services</b> that should be available from
-the Internet.</p>") +
-
-    /* Services dialog help 2/16 */
-    _("<p><b>If you are not running a server of some kind, you should not need
-any of the services.</b></p>") +
-
-    /* Services dialog help 3/16 */
-    _("<p><b>Attention:</b><br>Even correctly configured packet filtering rules
-cannot save you from vulnerabilities that may be present in the services
-to which you allow access from the Internet. Use YOU (YaST2 Online Update)
-to keep your system up-to-date with the latest update packages from the
-SUSE FTP servers.</p>") +
-
-    /* Services dialog help 4/16 */
-    _("<p><b>HTTP</b><br>Service to run a web server, such as Apache.</p>") +
-
-    /* Services dialog help 5/16 */
-    _("<p><b>SMTP</b><br>Service used by mail servers that accept incoming e-mail, such as sendmail.</p>") +
-
-    /* Services dialog help 6/16 */
-    _("<p><b>POP3</b> and <b>IMAP</b><br>Protocols for fetching e-mails from your host.</p>") +
-
-    /* Services dialog help 7/16 */
-    _("<p><b>Samba Server</b><br> is an emulation of Windows file servers.</p>") +
-
-    /* Services dialog help 8/16 */
-    _("<p><b>NFS Server</b><br> is a UNIX network file system.</p>") +
-
-    /* Services dialog help 9/16 */
-    _("<p><b>Remote Synchronization (rsync)</b><br> is an insecure protocol for data synchronizations.
-A more secure option is to use rsync over SSH.</p>") +
-
-    /* Services dialog help 10/16 */
-    _("<p><b>TFTP Server</b><br> is a trivial file transfer protocol, tinny FTP server.</p>") +
-
-    /* Services dialog help 11/16 */
-    _("<p><b>Secure Shell (ssh)</b><br> is the preferred remote shell for both security and features.</p>") +
-
-    /* Services dialog help 12/16 */
-    _("<p><b>Remote Administration (VNC)</b><br> allows remote clients to connect to the local X server using the VNC protocol.</p>") +
-
-//    /* Services dialog help 13/16 */
-//    _("<p><b>Portmapper</b><br> is an RPC (Remote Procedure Call) support for servers like NFS or NIS (Network Information System).</p>") +
-
-    /* Services dialog help 14/16 */
-    _("<p><b>DHCP Server</b><br> is a protocol for the dynamic host configuration.</p>") +
-
-    /* Services dialog help 15/16 */
-    _("<p><b>DNS Server</b><br> is a domain name system. It provides transformation between IPs and names.</p>") +
-
-    /* Services dialog help 16/16 */
-    _("<p>Just enabling a service here is most likely not enough to provide
-services. Also start the appropriate daemons.</p>");
-
-    term contents = `VBox(
-	/* Label text */
-	`Left(`Label(_("Configure the services that should be available on your server"))),
-	`HBox(
-	    `HWeight(3, `Empty()),
-	    `HWeight(46,
-		`Top(
-		    `VBox(
-			/* Label text */
-			`Left (`Label( _("Web Services") )),
-			/* CheckBox label */
-			`Left (`CheckBox (`id ("http"),`opt(`notify), _("&HTTP"), false)),
-			/* CheckBox label */
-			`Left (`CheckBox (`id ("https"),`opt(`notify), _("HTT&P with SSL (https)"), false)),
-			`VSpacing (0.3),
-			/* Label text */
-			`Left (`Label( _("Mail Services") )),
-			/* CheckBox label */
-			`Left (`CheckBox (`id ("smtp"),`opt(`notify), _("S&MTP"), false)),
-			/* CheckBox label */
-			`Left (`CheckBox (`id ("pop3"),`opt(`notify), _("POP&3"), false)),
-			/* CheckBox label */
-			`Left (`CheckBox (`id ("pop3s"),`opt(`notify), _("P&OP3 with SSL (POP3s)"), false)),
-			/* CheckBox label */
-			`Left (`CheckBox (`id ("imap"),`opt(`notify), _("&IMAP"), false)),
-			/* CheckBox label */
-			`Left (`CheckBox (`id ("imaps"),`opt(`notify), _("IM&AP with SSL (IMAPs)"), false))
-		    )
-		)
+    map<string, map<string, any> > tabs = $[
+	"start_up"		: $[
+	    "contents"		: `VBox (
+		"auto_start_up",
+		//ProposeConfiguration(),
+		"start_stop",
+		`VStretch ()
 	    ),
-	    `HWeight(1, `Empty()),
-	    `HWeight(47,
-		`Top (
-		    `VBox(
-			/* Label text */
-			`Left (`Label( _("File Services") )),
-			/* CheckBox label */
-			`Left (`CheckBox (`id ("samba-server"),`opt(`notify), _("Samba Server"), false)),
-			/* CheckBox label */
-			`Left (`CheckBox (`id ("nfs-server"),`opt(`notify), _("NFS Server"), false)),
-			/* CheckBox label */
-			`Left (`CheckBox (`id ("rsync"),`opt(`notify), _("Remote S&ynchronization (rsync)"), false)),
-			/* CheckBox label */
-			`Left (`CheckBox (`id ("tftp"),`opt(`notify), _("TFTP Server"), false)),
-			`VSpacing (0.3),
-			/* Label text */
-			`Left (`Label( _("Login Services") )),
-			/* CheckBox label */
-			`Left (`CheckBox (`id ("ssh"),`opt(`notify), _("&Secure Shell (ssh)"), false)),
-			/* CheckBox label */
-			`Left (`CheckBox (`id ("vnc"),`opt(`notify), _("Remote Administration (VNC)"), false)),
-//			/* CheckBox label */
-//			`Left (`CheckBox (`id ("portmap"),`opt(`notify), _("Portmapper (NFS, NIS, etc.)"), false)),
-			`VSpacing (0.3),
-			/* Label text */
-			`Left (`Label( _("Other") )),
-			/* CheckBox label */
-			`Left (`CheckBox (`id ("dhcp-server"),`opt(`notify), _("DHCP Server"), false)),
-			/* CheckBox label */
-			`Left (`CheckBox (`id ("dns-server"),`opt(`notify), _("DNS Server"), false))
-		    )
-		)
+	    "caption"		: _("Firewall Configuration") + " - " + _("Start-Up"),
+	    "tree_item_label"	: _("Start-Up"),
+	    "widget_names"	: [ "auto_start_up", "start_stop" ]
+	],
+	"interfaces"		: $[
+	    "contents"		: `VBox (
+		FirewallInterfaces(),
+		`VStretch ()
 	    ),
-	    `HWeight(2, `Empty())
-	),
-	`VBox (
-	    /* Label text */
-	    `Left(`Label (_("Additional Services:"))),
-	    `HBox(
+	    "caption"		: _("Firewall Configuration") + " - " + _("Interfaces"),
+	    "tree_item_label"	: _("Interfaces"),
+	    "widget_names"	: [ "FirewallInterfaces" ]
+	],
+	"allowed_services"	: $[
+	    "contents"		: `VBox (
+		AllowedServices(),
+		`VStretch ()
+	    ),
+	    "caption"		: _("Firewall Configuration") + " - " + _("Allowed Services"),
+	    "tree_item_label"	: _("Allowed Services"),
+	    "widget_names"	: [ "AllowedServices" ]
+	],
+	"masquerading"		: $[
+	    "contents"		: `VBox (
+		Masquerading(),
+		`VSpacing(1),
+		RedirectToMasqueradedIP(),
+		`VStretch ()
+	    ),
+	    "caption"		: _("Firewall Configuration") + " - " + _("Network Masquerading"),
+	    "tree_item_label"	: _("Masquerading"),
+	    "widget_names"	: [ "Masquerading", "RedirectToMasqueradedIP" ]
+	],
+	"broadcast_simple"	: $[
+	    "contents"		: `VBox (
+		BroadcastConfigurationSimple(),
+		`VStretch ()
+	    ),
+	    "caption"		: _("Firewall Configuration") + " - " + _("Broadcast Configuration"),
+	    "tree_item_label"	: _("Broadcast"),
+	    "widget_names"	: [ "BroadcastConfiguration" ]
+	],
+	"ipsec_support"		: $[
+	    "contents"		: `VBox (
+		IPsecSupport(),
+		`VStretch ()
+	    ),
+	    "caption"		: _("Firewall Configuration") + " - " + _("IPsec Support"),
+	    "tree_item_label"	: _("IPsec Support"),
+	    "widget_names"	: [ "IPsecSupport" ]
+	],
+	"logging_level"		: $[
+	    "contents"		: `VBox (
+		LoggingLevel(),
+		`VStretch ()
+	    ),
+	    "caption"		: _("Firewall Configuration") + " - " + _("Logging Level"),
+	    "tree_item_label"	: _("Logging Level"),
+	    "widget_names"	: [ "LoggingLevel" ]
+	],
+    ];
 
-		`Label(`id(`status), `opt(`outputField, `hstretch), ""),
-		/* PushButton label */
-		`PushButton(`id(`edit), _("&Expert..."))
-	    )
-	)
-    );
+    map<symbol,any> functions = $[
+	`abort : FakeFunction,
+    ];
 
-    map<string, map<string, any> > services_definition = SuSEFirewall::firewall_services_definition;
+    symbol RunFirewallDialogs () {
+	list<string> simple_dialogs = [ "start_up", "interfaces", "allowed_services",
+	    "masquerading", "broadcast_simple", "ipsec_support", "logging_level" ];
 
-    Wizard::SetContentsButtons(caption, contents, help,
-	    Label::BackButton(), Label::NextButton());
-
-    string services_string_tcp = firewall_settings["FW_SERVICES_EXT_TCP"]:"";
-    string services_string_udp = firewall_settings["FW_SERVICES_EXT_UDP"]:"";
-
-    // all services selected to open the firewall
-    list<string> services_list_tcp = toset(splitstring(services_string_tcp, " "));
-    list<string> services_list_udp = toset(splitstring(services_string_udp, " "));
-
-    // services which are not hiddable under checkboxes
-    list<string> additional_services_tcp = [];
-    list<string> additional_services_udp = [];
-
-    // services which have checkbox in dialog, any other are only for expert settings
-    list<string> selectable_services = [];
-    foreach (string service, map<string, any> value, services_definition, {
-	if (UI::WidgetExists(`id(service))==true)
-	    selectable_services = add(selectable_services, service);
-    });
-
-    /**
-     * Helper function for switching service-checkboxes on/off
-     */
-    define void SwitchServices ( boolean changed_by_user ) {
-	// function for switching on/off the checkboxes if services should be on or off
-	additional_services_tcp = services_list_tcp;
-	additional_services_udp = services_list_udp;
-
-	foreach (string service_name, map<string, any> required_ports, services_definition, {
-	    // skipping all services without checkboxes present
-	    if (contains(selectable_services, service_name)==false) continue;
-
-	    boolean current_service_status = (boolean) UI::QueryWidget(`id(service_name), `Value);
-	    boolean service_supported = true;
-	    any service_special_get_support = SuSEFirewall::firewall_services_definition[service_name,"special_get_support"]:nil;
-
-	    list<string> required_tcp = (list<string>) required_ports["tcp_ports"]:[];
-	    list<string> required_udp = (list<string>) required_ports["udp_ports"]:[];
-
-	    // if any ports are defined to control
-	    if ((size(required_tcp)>0) || (size(required_udp)>0) || (service_special_get_support!=nil)) {
-		// controlling all TCP ports if they are supported
-		foreach (string tcp, required_tcp, {
-		    if (!contains(services_list_tcp, tcp)) service_supported = false;
-		});
-		// controlling all UDP port if they are supported
-		foreach (string udp, required_udp, {
-		    if (!contains(services_list_udp, udp)) service_supported = false;
-		});
-		if (service_special_get_support!=nil) {
-		    if (special_check_boxes[service_name]:nil!=nil) {
-			service_supported = special_check_boxes[service_name]:false;
-		    }
-		}
-	    // else the service is not supported by firewall
-	    } else {
-		service_supported = false;
-	    }
-
-	    // added or removed using expert settings
-	    if (service_supported != current_service_status) {
-		// changed_by_user means that this is not the initial redraw of services
-		if (changed_by_user == true) {
-		    // Additional special function for service
-		    SuSEFirewall::RunServiceSupport(service_name, "EXT", service_supported);
-		}
-		
-		UI::ChangeWidget(`id(service_name), `Value, service_supported);
-	    }
-
-	    // service is supported
-	    if (service_supported == true) {
-		// removing all services hiddable under checkboxes
-		foreach (string tcp, required_tcp, {
-		    additional_services_tcp = filter(string remove_tcp, additional_services_tcp, ``(remove_tcp != tcp));
-		});
-		foreach (string udp, required_udp, {
-		    additional_services_udp = filter(string remove_udp, additional_services_udp, ``(remove_udp != udp));
-		});
-	    }
-	});
-    
-	string show_tcp = ((size(additional_services_tcp)>0) ?
-		// Text for filling TextEntry, %1 = list of TCP services
-		sformat(_("TCP: %1"), mergestring((list<string>)additional_services_tcp, " "))
-		:
-		""
-	    );
-	string show_udp = ((size(additional_services_udp)>0) ?
-		// Text for filling TextEntry, %1 = list of UDP services
-		sformat(_("UDP: %1"), mergestring((list<string>)additional_services_udp, " "))
-		:
-		""
-	    );
-
-	string additional_services_show =
-	    ((show_tcp != "") ? show_tcp : "")
-	    + (((show_tcp != "") && (show_udp != "")) ? ", " : "")
-	    + ((show_udp != "") ? show_udp : "");
-
-	UI::ChangeWidget(`id(`status), `Value, additional_services_show);
+	return DialogTree::ShowAndRun ($[
+	    "ids_order"		: simple_dialogs,
+	    "initial_screen"	: "start_up",
+	    "screens"		: tabs,
+	    "widget_descr"	: widgets_handling,
+	    "back_button"	: "",
+	    "abort_button"	: Label::AbortButton(),
+	    "next_button"	: Label::NextButton(),
+	    "functions"		: functions,
+	]);
     }
-
-    /**
-     * Helper function if checkbox status changed
-     */
-    define void HandleService (string service_checkbox) {
-	boolean state = (boolean) UI::QueryWidget(`id(service_checkbox),`Value);
-
-	// required TCP and UDP ports for the service
-	map<string, any> required_ports = services_definition[(string) service_checkbox]:$[ "tcp_ports":[], "udp_ports":[] ];
-	list<string> required_tcp = (list<string>) required_ports["tcp_ports"]:[];
-	list<string> required_udp = (list<string>) required_ports["udp_ports"]:[];
-
-	// Additional special function for service
-	SuSEFirewall::RunServiceSupport(service_checkbox, "EXT", state);
-	if (special_check_boxes[service_checkbox]:nil!=nil) {
-	    special_check_boxes[service_checkbox] = state;
-	}
-
-	if (state == true) {
-	// service was selected
-	    services_list_tcp = (list<string>) union(services_list_tcp,required_tcp);
-	    services_list_udp = (list<string>) union(services_list_udp,required_udp);
-	} else {
-	// service was unselected
-	    foreach (string remove_tcp, required_tcp, {
-		services_list_tcp = filter(string r, services_list_tcp,``(r!=remove_tcp));
-	    });
-	    foreach (string remove_udp, required_udp, {
-		services_list_udp = filter(string r, services_list_udp,``(r!=remove_udp));
-	    });
-	}
-    }
-
-    SwitchServices(false);
 
     any ret = nil;
-    while(true) {
-	ret = UI::UserInput();
-	if(ret == `abort) {
-	    if(Popup::ReallyAbort(true)) break;
-	    else continue;
-	}
-	else if ( ret == `back )
-	{
-	    break;
-	}
-	else if ( ret == `next )
-	{
-//	    // <-- Exceptions
-//	    boolean nfs_state     = (boolean) UI::QueryWidget(`id("nfs-server"),`Value);
-//	    boolean portmap_state = (boolean) UI::QueryWidget(`id("portmap"),`Value);
-//
-//	    // Portmap is unselected && NFS Server is selected
-//	    if (portmap_state == false && nfs_state == true) {
-//		boolean select_portmap = SelectPortmapDialog();
-//		if (select_portmap == true) {	// Portmap was disabled, now is enabled
-//		    UI::ChangeWidget(`id("portmap"),`Value, true);
-//		    HandleService("portmap");
-//		    SwitchServices(true);
-//		}
-//	    }
-//	    // --> Exceptions
-
-	    if (contains(services_list_tcp, "ssh") || contains(services_list_tcp, "22")) {
-		SuSEFirewall::open_ssh_port = true;
-	    } else {
-		SuSEFirewall::open_ssh_port = false;
-	    }
-
-	    SuSEFirewall::settings["FW_SERVICES_EXT_TCP"] = mergestring(services_list_tcp, " ");
-	    SuSEFirewall::settings["FW_SERVICES_EXT_UDP"] = mergestring(services_list_udp, " ");
-	    break;
-	}
-	else if ( ret == `edit )
-	{
-	    // only services selected by checkboxes
-	    list<string> selected_services_list_tcp = services_list_tcp;
-	    list<string> selected_services_list_udp = services_list_udp;
-	    
-	    foreach (string one_additional_tcp, (list<string>) additional_services_tcp, {
-		selected_services_list_tcp = (list<string>) filter(string remove_this_tcp, selected_services_list_tcp, {
-		    return (one_additional_tcp != remove_this_tcp);
-		});
-	    });
-	    foreach (string one_additional_udp, (list<string>) additional_services_udp, {
-		selected_services_list_udp = (list<string>) filter(string remove_this_udp, selected_services_list_udp, {
-		    return (one_additional_udp != remove_this_udp);
-		});
-	    });
-
-	    // returns additional services or nil if cancelled
-	    map<string,string> additional_services = ExpertServicePopup($[
-		"tcp" : mergestring((list<string>)additional_services_tcp, " "),
-		"udp" : mergestring((list<string>)additional_services_udp, " "),
-	    ]);
-
-	    // unioning additional services with currently selected services
-	    if (additional_services != nil) {
-		services_list_tcp = (list<string>) union(selected_services_list_tcp, splitstring(additional_services["tcp"]:"", " "));
-		services_list_udp = (list<string>) union(selected_services_list_udp, splitstring(additional_services["udp"]:"", " "));
-		SwitchServices(true);
-	    } else {
-	    // if cancelled, unioning old additional services with currently selected
-		services_list_tcp = (list<string>) union(selected_services_list_tcp, additional_services_tcp);
-		services_list_udp = (list<string>) union(selected_services_list_udp, additional_services_udp);
-	    }
-	}
-	else if(is(ret, string) && contains(selectable_services, (string)ret))
-	{
-	    HandleService((string) ret);
-	    SwitchServices(true);
-	}
-    }
-
-    y2milestone("settings=%1", SuSEFirewall::settings);
-    return ret;
-}
-
-
-/**
- * Features dialog
- * @return dialog result
- */
-define symbol FeatureDialog() ``{
-
-    /* Features dialog caption */
-    string caption = _("Firewall Configuration: Features");
-
-    string help =
-
-    /* Features dialog help 1/5 */
-    _("<p><b>Forward Traffic and Do Masquerading</b> means that external machines
-see all usage of services on the Internet coming from the firewall rather than
-internal machines. Set this option if you have only one IP address but want to
-grant Internet access to multiple machines. It is more secure to communicate
-via proxies to the Internet than to use masquerading.</p>") +
-
-    /* Features dialog help 2/5 */
-    _("<p><b>Protect from Internal Network</b> means that <i>internal</i>
-machines may only access explicitly allowed services on the machine.
-They will also be affected by the FW_AUTOPROTECT_SERVICES option. However,
-specifying services that should be available from the internal network is
-beyond the scope of this workflow. For your machine to be accessible from
-the internal network, <i>unset</i> this option.</p>") +
-
-
-    /* Features dialog help 3/5 */
-    _("<p><b>Allow Traceroute</b> means that ICMP time-to-live exceeded
-messages are allowed to be sent <i>through</i> your firewall. This is not used for
-traceroutes <i>to</i> your firewall.</p> ") +
-
-    /* Features dialog help 4/5 */
-    _("<p><b>Protect All Running Services</b> means that all network access
-to services, TCP, and UDP on this machine will be prevented except for those
-to which you explicitly allowed access in the previous dialog.</p>") +
-
-    /* Features dialog help 5/5 */
-    _("<p><b>Treat IPsec Traffic as Interal</b> means that encrypted IPsec
-packets that were successfully decrypted are treated the same as packets
-originating from your internal network.</p>");
-
-    /* Features dialog caption */
-    term contents = `VBox(`HBox(
-	`HSpacing(8),
-	`VBox(
-	    `VSpacing(2),
-	    /* Frame label */
-	    `Frame(_("Routing Features:"), `VBox(
-	    `VSpacing(1),
-	    `HBox(
-		`HSpacing(1),
-		/* CheckBox label */
-		`Left(`CheckBox(`id("masquerade"), _("&Forward Traffic and Do Masquerading"), false)),
-		`HSpacing(0)
-	    ),
-	    `VSpacing(1)
-	    )),
-	    `VSpacing(1),
-	    /* Frame label */
-	    `Frame(_("Firewall Features:"), `VBox(
-	    `VSpacing(1),
-	    `HBox(
-		`HSpacing(1),
-		`VBox(
-		    /* CheckBox label */
-		    `Left(`CheckBox(`id("protect_int"), _("Protect from &Internal Network"), false)),
-		    `VSpacing(1),
-		    /* CheckBox label */
-		    `Left(`CheckBox(`id("protect"), _("&Protect All Running Services"), false)),
-		    `VSpacing(1),
-		    /* CheckBox label */
-		    `Left(`CheckBox(`id("traceroute"), _("Allow &Traceroute"), false)),
-		    `VSpacing(1),
-		    /* CheckBox label */
-		    `Left(`CheckBox(`id("ipsec"), _("Treat IP&sec Traffic as Internal"), false))
-		),
-		`HSpacing(0)
-	    ),
-	    `VSpacing(1)
-	    )),
-	    `VSpacing(2),
-	    `VStretch()
-	),
-	`HSpacing(5)
-    ));
-
-    string FW_ALLOW_FW_TRACEROUTE	= SuSEFirewall::settings["FW_ALLOW_FW_TRACEROUTE"]:"no";
-    string FW_MASQUERADE		= SuSEFirewall::settings["FW_MASQUERADE"]:"no";
-    string FW_ROUTE			= SuSEFirewall::settings["FW_ROUTE"]:"no";
-    string FW_MASQ_NETS			= SuSEFirewall::settings["FW_MASQ_NETS"]:"";
-    string FW_AUTOPROTECT_SERVICES	= SuSEFirewall::settings["FW_AUTOPROTECT_SERVICES"]:"no";
-    string FW_PROTECT_FROM_INTERNAL	= SuSEFirewall::settings["FW_PROTECT_FROM_INTERNAL"]:"yes";
-    Wizard::SetContentsButtons(caption, contents, help,
-	    Label::BackButton(), Label::NextButton());
-
-    if( FW_ALLOW_FW_TRACEROUTE == "yes" )
-    {
-	UI::ChangeWidget(`id("traceroute"), `Value, true);
-    }
-
-    if( FW_MASQUERADE == "yes" && FW_ROUTE == "yes" )
-    {
-	UI::ChangeWidget(`id("masquerade"), `Value, true);
-    }
-    else if( FW_MASQUERADE == "no" && FW_ROUTE == "no" )
-    {
-	UI::ChangeWidget(`id("masquerade"), `Value, false);
-    }
-    else
-    {
-	UI::ChangeWidget(`id("masquerade"), `Value, nil );
-    }
-
-    if( FW_AUTOPROTECT_SERVICES == "yes" )
-    {
-	UI::ChangeWidget(`id("protect"), `Value, true);
-    }
-
-    if( FW_PROTECT_FROM_INTERNAL == "yes" )
-    {
-	UI::ChangeWidget(`id("protect_int"), `Value, true);
-    }
-
-    UI::ChangeWidget(`id("ipsec"), `Value, SuSEFirewall::IsIPsecAllowed());
-
-    any ret = nil;
-    while(true) {
-	ret = UI::UserInput();
-	if(ret == `abort) {
-	    if(Popup::ReallyAbort(true)) break;
-	    else continue;
-	}
-	else {
-	    if( UI::QueryWidget(`id("traceroute"),`Value) == true )
-	    {
-		FW_ALLOW_FW_TRACEROUTE = "yes";
-	    }
-	    else
-	    {
-		FW_ALLOW_FW_TRACEROUTE = "no";
-	    }
-
-	    if( UI::QueryWidget(`id("masquerade"),`Value) == true )
-	    {
-		FW_MASQUERADE = "yes";
-		FW_ROUTE = "yes";
-		FW_MASQ_NETS = "0/0";
-	    }
-	    else if( UI::QueryWidget(`id("masquerade"),`Value) == false )
-	    {
-		FW_MASQUERADE = "no";
-		FW_ROUTE = "no";
-		// don't touch
-		// FW_MASQ_NETS = "0/0";
-	    }
-
-	    if( UI::QueryWidget(`id("protect"),`Value) == true )
-	    {
-		FW_AUTOPROTECT_SERVICES = "yes";
-	    }
-	    else
-	    {
-		FW_AUTOPROTECT_SERVICES = "no";
-	    }
-
-	    FW_PROTECT_FROM_INTERNAL = bool2string((boolean) UI::QueryWidget(`id("protect_int"),`Value));
-
-	    if( FW_PROTECT_FROM_INTERNAL == "yes" && FW_ROUTE == "yes" )
-	    {
-		boolean choice = Popup::ContinueCancel(
-		    _("It usually does not make sense to activate both
-\"Forward Traffic and Do Masquerading\" and
-\"Protect from Internal Network\"
-as your computer would not accept any packets
-from the internal network.
-
-Proceed with this setup?
-"));
-		if ( choice == false )
-		{
-		    continue;
-		}
-
-	    }
-
-	    // nil is valid, don't check for it!
-	    boolean allowipsec = (boolean)UI::QueryWidget(`id("ipsec"),`Value);
-
-	    if( FW_PROTECT_FROM_INTERNAL == "yes" && allowipsec == true )
-	    {
-		boolean choice = Popup::ContinueCancel(
-		    _("It usually does not make sense to activate both
-\"Treat IPsec Packets as Internal\" and
-\"Protect from Internal Network\"
-as your computer would not accept any packets
-from the internal network.
-
-Proceed with this setup?
-"));
-		if ( choice == false )
-		{
-		    continue;
-		}
-	    }
-
-	    SuSEFirewall::AllowIPsec( allowipsec );
-
-	    SuSEFirewall::settings["FW_ALLOW_FW_TRACEROUTE"] = FW_ALLOW_FW_TRACEROUTE;
-	    SuSEFirewall::settings["FW_MASQUERADE"] = FW_MASQUERADE;
-	    SuSEFirewall::settings["FW_ROUTE"] = FW_ROUTE;
-	    SuSEFirewall::settings["FW_MASQ_NETS"] = FW_MASQ_NETS;
-	    SuSEFirewall::settings["FW_AUTOPROTECT_SERVICES"] = FW_AUTOPROTECT_SERVICES;
-	    SuSEFirewall::settings["FW_PROTECT_FROM_INTERNAL"] = FW_PROTECT_FROM_INTERNAL;
-
-	    y2debug("settings %1", SuSEFirewall::settings);
-	    break;
-	}
-    }
-
-    return (symbol) ret;
-}
-
-/**
- * Logging Dialog
- * @return dialog result
- */
-define symbol LoggingDialog() ``{
-
-    /* Loggin dialog caption */
-    string caption = _("Firewall Configuration: Logging Options");
-
-    /* Loggin dialog help 1/4 */
-    string help = _("<p>Choose which packets should be logged.</p>") +
-
-    /* Loggin dialog help 2/4 */
-    _("<p>With <b>Log Critical Dropped and Accepted Packets</b>, only packets
-arriving on critical ports that were dropped or accepted, as specified, are 
-logged.</p>") +
-
-    /* Loggin dialog help 3/4 */
-    _("<p><b>Log All Dropped Packets</b> logs all dropped packets.</p>") +
-
-    /* Loggin dialog help 4/4 */
-    _("<p><b>Log All Accepted Packets</b> logs all accepted packets.
-Attention: This option is dangerous as it causes your log file /var/log/messages
-to grow very quicky.</p>");
-
-    map<string,any> firewall_settings = SuSEFirewall::settings;
-    string FW_LOG_DROP_CRIT = firewall_settings["FW_LOG_DROP_CRIT"]:"yes";
-    string FW_LOG_DROP_ALL = firewall_settings["FW_LOG_DROP_ALL"]:"no";
-    string FW_LOG_ACCEPT_CRIT = firewall_settings["FW_LOG_ACCEPT_CRIT"]:"yes";
-    string FW_LOG_ACCEPT_ALL = firewall_settings["FW_LOG_ACCEPT_ALL"]:"no";
-
-    /* Loggin dialog contents */
-    term contents = `VBox(
-	`VSpacing(3),
-	    `HBox(`HSpacing(3),
-		/* Frame label */
-		`Frame(`opt(`vstretch), _("Logging Options"), `HBox(
-		    `HSpacing(2),
-		    `VBox(
-			`VSpacing(0.5),
-			/* Label */
-			`Left(`Label(_("Standard Options"))),
-			/* CheckBox label */
-			`Left(`CheckBox(`id("drop_crit"), _("Log &Critical Dropped Packets"), FW_LOG_DROP_CRIT=="yes")),
-			/* CheckBox label */
-			`Left(`CheckBox(`id("accept_crit"), _("Log Critical Acce&pted Packets"), FW_LOG_ACCEPT_CRIT=="yes")),
-			`VSpacing(1),
-			/* Label */
-			`Left(`Label(_("Debug Options"))),
-			/* CheckBox label */
-			`Left(`Label(_("These options cause a large amount of output."))),
-			/* CheckBox label */
-			`Left(`CheckBox(`id("drop_all"), _("Log All &Dropped Packets"), FW_LOG_DROP_ALL=="yes")),
-			/* CheckBox label */
-			`Left(`CheckBox(`id("accept_all"), _("Log All &Accepted Packets"), FW_LOG_ACCEPT_ALL=="yes")),
-			`VSpacing(1.5)
-		    ),
-		    `HSpacing(2)
-		)),
-	    `HSpacing(3)
-	    ),
-	`HVStretch()
-    );
-
-    Wizard::SetContentsButtons(caption,contents,help,Label::BackButton(),Label::NextButton());
-    Wizard::SetNextButton(`next, Label::FinishButton());
-
-    any ret = nil;
-    while(true) {
-	ret = UI::UserInput();
-	if(ret == `abort)
-	{
-	    if(Popup::ReallyAbort(true)) break;
-	    else continue;
-	}
-	else
-	{
-	    FW_LOG_DROP_CRIT = bool2string((boolean) UI::QueryWidget(`id("drop_crit"),`Value));
-	    FW_LOG_DROP_ALL = bool2string((boolean) UI::QueryWidget(`id("drop_all"),`Value));
-	    FW_LOG_ACCEPT_CRIT = bool2string((boolean) UI::QueryWidget(`id("accept_crit"),`Value));
-	    FW_LOG_ACCEPT_ALL = bool2string((boolean) UI::QueryWidget(`id("accept_all"),`Value));
-
-	    firewall_settings["FW_LOG_DROP_CRIT"] = FW_LOG_DROP_CRIT;
-	    firewall_settings["FW_LOG_DROP_ALL"] = FW_LOG_DROP_ALL;
-	    firewall_settings["FW_LOG_ACCEPT_CRIT"] = FW_LOG_ACCEPT_CRIT;
-	    firewall_settings["FW_LOG_ACCEPT_ALL"] = FW_LOG_ACCEPT_ALL;
-	    SuSEFirewall::settings = firewall_settings;
-	    SuSEFirewall::start = true;
-	    if (ret == `next) SuSEFirewall::proposal_changed_by_user = true;
-	    break;
-	}
-    };
-
-    return (symbol) ret;
-}
-/**
- * Ask user if he want to reconfigure the firewall or remove the runlevel links
- */
-define any AskStopDialog() ``{
-
-    /* Ask dialog caption */
-    string caption = _("SuSE Firewall2 configuration");
-
-    /* Ask dialog help 1/4 */
-    string help = _("<p>It seems like a SuSE Firewall2 is already running.</p>") +
-
-    /* Ask dialog help 2/4 */
-    _("<p>Select an action:</p>") +
-
-    /* Ask dialog help 3/4 */
-    _("<p><b>Reconfigure:</b><br>
-Change the firewall settings and restart the firewall with the new settings.</p>") +
-
-    /* Ask dialog help 4/4 */
-    _("<p><b>Stop:</b><br>
-Stop any running SuSE Firewall2 and remove it from the boot process.
-In this case, the firewall will no longer be activated
-when you boot your system.</p>");
-
-    term contents = `VBox(
-	`VSpacing(4.5),
-	`HBox (`HSpacing (5),
-	    `Frame( `opt(`vstretch), _("Please select"),
-		`RadioButtonGroup(`id("radios"),
-		    `HBox(
-			`HSpacing (4),
-			`VBox(
-			    `VSpacing(2),
-			    //Lable for Checkbox
-//			    `Left(`Label(_("It seems that SuSEfirewall2 is already activate"))),
-			    // Checkbox option
-			    `Left(`RadioButton (`id ("reconfig"), _("Reconfigure Firewall Settings"),true)),
-			    `VSpacing(0.5),
-
-			    // Checkbox option
-			    `Left(`RadioButton (`id ("stopit"), _("Stop Firewall and Remove from Boot Process"))),
-			    `VSpacing(2)
-			),
-			`HSpacing (2)
-		    )
-		)
-	    ),
-	    `HSpacing (5)
-	),
-	`HVStretch()
-    );
-
-    boolean firewallpresent = false;
-    // this is possible because only one is enough
-    firewallpresent = Service::Enabled ("SuSEfirewall2_init")
-			|| Service::Enabled ("SuSEfirewall2_setup")
-			|| Service::Enabled ("SuSEfirewall2_final");
-    if(firewallpresent == false )
-    {
-	return `config;
-    }
-
-    Wizard::SetContentsButtons(caption,contents,help,Label::BackButton(),Label::NextButton());
-
-    any ret = nil;
-    while(true) {
-	ret = UI::UserInput();
-	if(ret == `abort) {
-	    if(Popup::ReallyAbort(true)) break;
-	    else continue;
-	}
-	else if( ret==`next)
-	{
-	    string current = (string) UI::QueryWidget(`id("radios"), `CurrentButton);
-	    if(current == "stopit")
-	    {
-		ret=`stop;
-	    }
-	    else
-	    {
-		ret=`config;
-	    }
-	    break;
-	}
-	else
-	{
-	    break;
-	}
-    };
-
-    return ret;
-}
-
-/**
- * Summary what will be done for stopping the firewall
- */
-define symbol StopDialog() ``{
-
-    /* Stop dialog caption */
-    string caption = _("Firewall Configuration: Deactivate Firewall");
-
-    /* Stop dialog help 1/2 */
-    string help = _("<p><b>Attention:</b><br>
-If you deactivate the firewall, your system will no longer be protected.</p>") +
-
-    /* Stop dialog help 2/2 */
-    _("<p><b>Action:</b><br>
-Stop any running SuSE Firewall2 and remove it from the boot process.
-In this case, the firewall will no longer be activated
-when you boot your system.</p>");
-
-    // Translator: please keep layout
-    string text = _("To deactivate the firewall, the following actions will be taken:
-- stop the firewall
-- remove the firewall boot scripts");
-
-    term contents = `VBox(
-	`VSpacing(4.5),
-	`HBox (`HSpacing (5),
-	    `Frame( `opt(`vstretch), _("Deactivate firewall"),
-		`RadioButtonGroup(`id("radios"),
-		    `HBox(
-			`HSpacing (4),
-			`VBox(
-			    `VSpacing(2),
-			    `Left(`Label(_("To deactivate the firewall, the following actions will be taken:"))),
-			    `VSpacing(0.5),
-			    `Left(`Label(_("- stop the firewall"))),
-			    `VSpacing(0.5),
-			    `Left(`Label(_("- remove the firewall boot scripts"))),
-			    `VSpacing(2)
-			),
-			`HSpacing (2)
-		    )
-		)
-	    ),
-	    `HSpacing (5)
-	),
-	`HVStretch()
-    );
-
-    Wizard::SetContentsButtons(caption, contents, help,
-	    Label::BackButton(), Label::NextButton());
-    Wizard::DisableBackButton();
-
-    boolean firewallstopped = true;
-    any ret = nil;
-    while(true)
-    {
-
-	ret = UI::UserInput();
-
-	if(ret == `abort)
-	{
-	    if(Popup::ReallyAbort(true)) break;
-	    else continue;
-	}
-	else if( ret==`next)
-	{
-	    string whatfailedmsg = _("Stopping the firewall failed");
-
-	    boolean retry=true;
-	    while(retry)
-	    {
-		retry = false;
-		map firewall_stop_map = (map) SCR::Execute (.target.bash_output, "/etc/init.d/SuSEfirewall2_setup stop",$["TERM":"raw"]);
-
-		if(firewall_stop_map == nil || firewall_stop_map["exit"]:0>0)
-		{
-		    if( firewall_stop_map != nil )
-		    {
-			StdOutStdErrLog( whatfailedmsg,firewall_stop_map["stdout"]:"", firewall_stop_map["stderr"]:"");
-			firewallstopped = false;
-		    }
-
-		    symbol ret = Popup::AnyQuestion3( whatfailedmsg, "", _("Continue"), _("Abort"), _("Retry"), `focus_yes );
-		    if(ret==`retry)
-		    {
-			retry=true;
-		    }
-		    else if(ret==`no)
-		    {
-			return `next;
-		    }
-
-		}
-	    }
-
-	    boolean linksremoved = true;
-	    // can't write this in one line, because every command needs to be executed
-	    linksremoved = Service::Disable ("SuSEfirewall2_final") && linksremoved;
-	    linksremoved = Service::Disable ("SuSEfirewall2_setup") && linksremoved;
-	    linksremoved = Service::Disable ("SuSEfirewall2_init") && linksremoved;
-	    if( linksremoved && firewallstopped )
-	    {
-		Popup::Message(_("The firewall is now turned off"));
-		SuSEFirewall::start = false;
-	    }
-	    else if( linksremoved == false )
-	    {
-		// Translator: roughly keep width
-		string errmsg = _("There has been some error while removing the
-firewall bootscripts, please use the runlevel
-editor to manually remove them");
-		Popup::Message(errmsg + "\n" + Service::Error());
-	    }
-	    break;
-	}
-	else {
-	    break;
-	}
-    };
-
-    return (symbol) ret;
-}
-
-/**
- * Helper function to set Next button as "Next" or "Finish"
- * @param string firewall status ("firewall_status_disable" or any other)
- */
-define void SetNextButtonByStatus(string status) ``{
-    if (status == "firewall_status_disable") {
-	Wizard::SetNextButton(`finish, Label::FinishButton());
-    } else {
-	Wizard::SetNextButton(`next, Label::NextButton());
-    }
-}
-
-/**
- * Use or do not use firewall
- * @return dialog result
- */
-define symbol FigureFirewallDialog() ``{
-    // TRANSLATORS: help text for enabling/disabling firewall in network proposal
-    string help = _("Firewall Service</b><br>
-If you want to use SuSEfirewall2 to protect your system, select
-<b>Enable Firewall</b> and click <b>Next</b> to configure it.
-If you do not want to use it, select <b>Disable Firewall</b> and click <b>Finish</b>.
-</p>");
-
-    // TRANSLATORS: dialog caption, main dialog for enabling/disablig firewall
-    string caption = _("Firewall Service");
-
-    term contents = `HBox(
-	`HStretch(),
-	`HSquash(
-	    `Frame(_("Service"),
-		`RadioButtonGroup(`id("firewall_status"),
-		    `VBox(
-			// TRANSLATORS: radio button
-			`Left(`RadioButton(`id("firewall_status_enable"), `opt(`notify), _("&Enable Firewall"))),
-			// TRANSLATORS: radio button
-			`Left(`RadioButton(`id("firewall_status_disable"), `opt(`notify), _("&Disable Firewall")))
-		    )
-		)
-	    )
-	),
-	`HStretch()
-    );
-
-    Wizard::SetContentsButtons(caption, contents, help,
-	    Label::BackButton(), Label::NextButton());
-    Wizard::DisableBackButton();
-
-    any ret = nil;
-
-    if (SuSEFirewall::enable_firewall==true) {
-	UI::ChangeWidget (`id ("firewall_status"), `CurrentButton, "firewall_status_enable");
-    } else {
-	UI::ChangeWidget (`id ("firewall_status"), `CurrentButton, "firewall_status_disable");
-    }
-    SetNextButtonByStatus((string)UI::QueryWidget(`id("firewall_status"),`CurrentButton));
-
-    while(true) {
-
-	ret = UI::UserInput();
-
+    while (true) {
+	ret = RunFirewallDialogs();
 	if (ret == `next) {
-	    SuSEFirewall::enable_firewall = true;
-	    break;
-	} else if (ret == `finish) {
-	    SuSEFirewall::proposal_changed_by_user = true;
-	    SuSEFirewall::enable_firewall = false;
-	    break;
-	} else if (ret == `abort) {
-	    if(Popup::ReallyAbort(true)) break;
-	    else continue;
-	} else if (ret == "firewall_status_enable" || ret == "firewall_status_disable") {
-	    SetNextButtonByStatus((string) ret);
-	} else {
-	    y2error("unknown retcode: %1", ret);
-	    continue;
+	    Wizard::CreateDialog();
+	    Wizard::SetDesktopIcon("firewall");
+	    string caption = _("Firewall Configuration") + " - " + _("Summary");
+	    term contents  = BoxSummary();
+	    Wizard::SetContentsButtons(caption, contents, "Configuration Summary Help",
+		Label::BackButton(), Label::NextButton());
+	    Wizard::SetNextButton(`finish, Label::FinishButton());
+	    ret = UI::UserInput();
+	    y2milestone("Pressed %1", ret);
+	    UI::CloseDialog();
+	    if (ret == `finish) {
+		break;
+	    }
 	}
-
     }
-    return (symbol) ret;
-}
-
-/**
- * uses and changes FW_SERVICES_EXT_TCP inside firewall_settings, abuses checkbox widget id as service name
- */
-///**
-//*define any ServicesDialog_OBSOLETE() ``{
-//*
-//*    map firewall_settings = SuSEFirewall::settings;
-//*
-//*    /* Services dialog caption */
-//*    string caption = _("Firewall Configuration: Services");
-//*
-//*    /* Services dialog help 1/10 */
-//*    string help = _("<p>Choose the <b>services</b> that should be available from
-//*the Internet.</p>") +
-//*
-//*    /* Services dialog help 2/10 */
-//*    _("<p><b>If you are not running a server of some kind, you should not need
-//*any of the services.</b></p>") +
-//*
-//*    /* Services dialog help 3/10 */
-//*    _("<p><b>Attention:</b><br>Even correctly configured packet filtering rules
-//*cannot save you from vulnerabilities that may be present in the services
-//*to which you allow access from the Internet. Use YOU (YaST2 Online Update)
-//*to keep your system up-to-date with the latest update packages from the
-//*SuSE FTP servers.</p>") +
-//*
-//*    /* Services dialog help 4/10 */
-//*    _("<p><b>HTTP</b><br>Service to run a web server, such as Apache.</p>") +
-//*
-//*    /* Services dialog help 5/10 */
-//*    _("<p><b>SMTP</b><br>Service used by mail servers that accept incoming e-mail, such as sendmail.</p>") +
-//*
-//*    /* Services dialog help 6/10 */
-//*    _("<p><b>POP3</b> and <b>IMAP</b><br>Protocols for fetching e-mails from your host.</p>") +
-//*
-//*    /* Services dialog help 8/10 */
-//*    _("<p><b>ssh</b><br>ssh is preferred over telnet for both security and features.</p>") +
-//*
-//*    /* Services dialog help 7/10 */
-//*    _("<p><b>telnet</b><br>An obsolete method for remotely logging in to your computer.</p>") +
-//*
-//*    /* Services dialog help 9/10 */
-//*    _("<p><b>rsync</b><br>rsync can be used as a replacement for insecure file
-//*transfers via FTP. It is optimized for slow links and quite easy to configure.</p>") +
-//*
-//*    /* Services dialog help 10/10 */
-//*    _("<p>Just enabling a service here is most likely not enough to provide
-//*services. Also start the appropriate daemons.</p>");
-//*
-//*    term contents = `Top( `VBox(
-//*	/* Label text */
-//*	`Left(`Label(_("Configure the services that should be available on your server"))),
-//*	`HBox(
-//*	    `HWeight(10, `Empty()),
-//*	    `HWeight(90, `VBox(
-//*		/* Label text */
-//*		`Left (`Label( _("Web Server") )),
-//*		/* CheckBox label */
-//*		`Left (`CheckBox (`id ("http"),`opt(`notify), _("&HTTP"), false)),
-//*		/* CheckBox label */
-//*		`Left (`CheckBox (`id ("https"),`opt(`notify), _("HTT&P with SSL (https)"), false)),
-//*		`VSpacing (0.3),
-//*		/* Label text */
-//*		`Left (`Label( _("Mail Server") )),
-//*		/* CheckBox label */
-//*		`Left (`CheckBox (`id ("smtp"),`opt(`notify), _("S&MTP"), false)),
-//*		/* CheckBox label */
-//*		`Left (`CheckBox (`id ("pop3"),`opt(`notify), _("POP&3"), false)),
-//*		/* CheckBox label */
-//*		`Left (`CheckBox (`id ("pop3s"),`opt(`notify), _("P&OP3 with SSL (POP3s)"), false)),
-//*		/* CheckBox label */
-//*		`Left (`CheckBox (`id ("imap"),`opt(`notify), _("&IMAP"), false)),
-//*		/* CheckBox label */
-//*		`Left (`CheckBox (`id ("imaps"),`opt(`notify), _("IM&AP with SSL (IMAPs)"), false)),
-//*		`VSpacing (0.3),
-//*		/* Label text */
-//*		`Left (`Label( _("Other Services") )),
-//*		/* CheckBox label */
-//*		`Left (`CheckBox (`id ("ssh"),`opt(`notify), _("&Secure Shell (ssh)"), false)),
-//*		/* CheckBox label */
-//*		`Left (`CheckBox (`id ("telnet"),`opt(`notify), _("&telnet"), false)),
-//*		/* CheckBox label */
-//*		`Left (`CheckBox (`id ("rsync"),`opt(`notify), _("Remote S&ynchronization (rsync)"), false)),
-//*		`VSpacing (0.3),
-//*		/* Label text */
-//*		`Left(`Label (_("Additional Services:"))),
-//*		`HBox(
-//*		    `Label(`id(`status), `opt(`outputField, `hstretch), ""),
-//*		    /* PushButton label */
-//*		    `PushButton(`id(`edit), _("&Expert..."))
-//*		)
-//*	    ))
-//*	)
-//*    ));
-//*
-//*    list<string> selectable_services = [ "telnet", "ssh", "http", "https", "smtp",
-//*	    "pop3", "pop3s", "imap", "imaps", "rsync" ];
-//*
-//*    string services_string = firewall_settings["FW_SERVICES_EXT_TCP"]:"";
-//*    list<string> additional_services = [];
-//*    list<string> services_list = sort(splitstring(services_string, " "));
-//*    additional_services = filter(string s, services_list,``(s!="" && !contains(selectable_services, s)));
-//*    services_list = filter(string s, services_list,``(s!="" && contains(selectable_services, s)));
-//*
-//*    Wizard::SetContentsButtons(caption, contents, help,
-//*	    Label::BackButton(), Label::NextButton());
-//*
-//*//    services_string = mergestring(services_list," ");
-//*
-//*    define void activate_checkboxes_for_services() ``{
-//*	// activate all selected services
-//*	foreach(string service, selectable_services, ``{
-//*	    if(contains(services_list, service))
-//*		UI::ChangeWidget(`id(service), `Value, true);
-//*	    else
-//*		UI::ChangeWidget(`id(service), `Value, false);
-//*	});
-//*    }
-//*
-//*    activate_checkboxes_for_services();
-//*
-//*    UI::ChangeWidget(`id(`status), `Value, mergestring((list<string>)additional_services," "));
-//*
-//*    any ret = nil;
-//*    while(true) {
-//*	ret = UI::UserInput();
-//*	if(ret == `abort) {
-//*	    if(Popup::ReallyAbort(true)) break;
-//*	    else continue;
-//*	}
-//*	else if ( ret == `back )
-//*	{
-//*	    break;
-//*	}
-//*	else if ( ret == `next )
-//*	{
-//*	    SuSEFirewall::settings["FW_SERVICES_EXT_TCP"] = mergestring((list<string>) sort(union(services_list, additional_services))," ");
-//*	    break;
-//*	}
-//*	else if ( ret == `edit )
-//*	{
-//*	    string serv = ExpertServicePopup(mergestring((list<string>)additional_services," "));
-//*
-//*	    if ( serv != nil )
-//*	    {
-//*		additional_services = sort(splitstring(serv," "));
-//*		services_list = sort((list<string>)union(filter(string s,additional_services,``(s!="" && contains(selectable_services,s))), services_list));
-//*		additional_services =filter(string s,additional_services,``(s!="" && !contains(selectable_services,s)));
-//*	        activate_checkboxes_for_services();
-//*		UI::ChangeWidget(`id(`status), `Value, mergestring((list<string>)additional_services," "));
-//*	    }
-//*	}
-//*	else if(is(ret, string) && contains(selectable_services, (string)ret))
-//*	{
-//*	    boolean state = (boolean) UI::QueryWidget(`id(ret),`Value);
-//*	    if(state == true)
-//*	    {
-//*		if(!contains(services_list,(string)ret))
-//*		{
-//*		    services_list=add(services_list,(string)ret);
-//*		}
-//*	    }
-//*	    if(state == false)
-//*	    {
-//*		services_list=filter(string v,services_list,``(v!=ret));
-//*	    }
-//*	    services_list=sort(services_list);
-//*//	    services_string = mergestring(services_list," ");
-//*//	    UI::ChangeWidget(`id(`status), `Value, services_string);
-//*	}
-//*    }
-//*
-//*    y2milestone("settings=%1", SuSEFirewall::settings);
-//*    return ret;
-//*}
-//*/
-
-/* EOF */
 }
