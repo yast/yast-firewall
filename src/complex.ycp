@@ -9,60 +9,63 @@
 
 {
 
-textdomain "firewall";
+    textdomain "firewall";
 
-import "Label";
-import "Popup";
-import "SuSEFirewall";
-import "Wizard";
+    import "Popup";
+    import "SuSEFirewall";
+    import "Wizard";
 
-/**
- * Read settings dialog
- * @return `next if success, else `abort
- */
-define symbol ReadDialog() ``{
+    include "firewall/helps.ycp";
 
-    /* Read dialog help */
-    Wizard::RestoreHelp(_("<p><b><big>Reading Firewall Configuration</big></b>
-Please wait...</p>"));
-
-    // Wizard::RestoreHelp(HELPS["read"]:"");
-    // Firewall::AbortFunction = ``{return PollAbort();};
-    boolean ret = SuSEFirewall::Read();
-
-    /* FIXME:
-     * - possible more reads
-     * - progress bar
-     * - UI::UserInput `abort handling
+    /**
+     * Read settings dialog.
+     *
+     * @return `next if success, else `abort
      */
-    if (SuSEFirewall::personal_firewall_is_active ) {
-	/* Popup text */
-	if(Popup::ContinueCancelHeadline(_("Personal Firewall is active"),
-	    _("The Personal Firewall is activated.
-If you continue, it will be turned off and replaced by SuSEfirewall2.
+    define symbol ReadDialog() {
+
+	Wizard::RestoreHelp(HelpForDialog("reading_configuration"));
+
+	// reading firewall settings
+	boolean ret = SuSEFirewall::Read();
+
+	// testing for other firewall running
+	if (SuSEFirewall::IsOtherFirewallRunning()) {
+	    // TRANSLATORS: Popup headline
+	    if(Popup::ContinueCancelHeadline(_("Another firewall is active"),
+		// TRANSLATORS: Popup text
+		_("Another kind of firewall is active in your system.
+
+If you continue, SuSEfirewall2 may produce undefined errors.
+It would be better to remove the other firewall before
+configuring SuSEfirewall2.
+
+Continue with configuration?
 ")) != true)
 	    return `abort;
+	}
+
+	// hidding finished progress
+	Wizard::SetContentsButtons ("", `Empty(), "", "", "");
+
+	/* FIXME: handle possible read errors */
+	return ret ? `next : `abort;
     }
 
-    /* FIXME: handle possible read errors */
-    return ret ? `next : `abort;
-}
+    /**
+     * Write settings dialog
+     * @return `next if success, else `abort
+     */
+    define symbol WriteDialog() ``{
 
-/**
- * Write settings dialog
- * @return `next if success, else `abort
- */
-define symbol WriteDialog() ``{
+	Wizard::RestoreHelp(HelpForDialog("saving_configuration"));
 
-    /* Write dialog help */
-    Wizard::RestoreHelp(_("<p><b><big>Saving Firewall Configuration</big></b>
-<br>Please wait...</p>"));
+	boolean ret = SuSEFirewall::Write();
+	return ret ? `next : `abort;
 
-    // Wizard::RestoreHelp(HELPS["write"]:"");
-    // Firewall::AbortFunction = ``{return PollAbort();};
-    boolean ret = SuSEFirewall::Write();
-    return ret ? `next : `abort;
-}
+	// hidding finished progress
+	Wizard::SetContentsButtons ("", `Empty(), "", "", "");
+    }
 
 /* EOF */
 }

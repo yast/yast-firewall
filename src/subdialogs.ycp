@@ -1,5 +1,5 @@
 /**
- * File:        firewall/dialogs.ycp
+ * File:        include/firewall/dialogs.ycp
  * Package:     Configuration YaST2 Firewall
  * Summary:     Configuration screens
  * Authors:     Lukas Ocilka <locilka@suse.cz>
@@ -14,44 +14,35 @@
 
     import "Label";
     import "ProductFeatures";
+    import "SuSEFirewallServices";
+    import "SuSEFirewall";
 
-    // UI VARIABLES
+    // UI VARIABLES AND FUNCTIONS
     boolean expert_ui = (ProductFeatures::ui_mode == "expert");
 
-    // FAKE FUNCTIONS FOR RETURNING LISTS OF ITEMS
-
-    // FIXME: should be global value of the module SuSEfirewall2
-    list<map <string, string> > possible_firewall_zones = [
-	$[ "EXT" : "External" ],
-	$[ "INT" : "Internal" ],
-	$[ "DMZ" : "Demilitarized" ],
-    ];
-
-    // function return list of `items for `ComboBox
-    list<term> GetFirewallZonesList() {
-	list<term> firewall_zones = [];
-	foreach (map<string, string> zone, possible_firewall_zones, {
-	    foreach (string id, string name, zone, {
-		firewall_zones = add(firewall_zones, `item(`id(id), name));
-	    });
-	});
-
-	return firewall_zones;
+    /**
+     * Function returns if this UI is an Expert UI.
+     *
+     * @return	boolean if is expert or not
+     */
+    boolean IsThisExpertConfiguration() {
+	return expert_ui;
     }
 
-    list<term> GetDefinedServicesList() {
-	list<term> services_list = [];
-	// FIXME: real services should be here
-	services_list = add (services_list, `item(`id("dns-server"),	_("DNS Server")));
-	services_list = add (services_list, `item(`id("http"),		_("HTTP Server")));
-	services_list = add (services_list, `item(`id("imap"),		_("IMAP Server")));
-	services_list = add (services_list, `item(`id("nfs-server"),	_("NFS Server")));
-	services_list = add (services_list, `item(`id("pop3"),		_("POP3 Server")));
-	services_list = add (services_list, `item(`id("samba-server"),	_("Samba Server")));
-	services_list = add (services_list, `item(`id("smtp"),		_("SMTP Server")));
-	services_list = add (services_list, `item(`id("ssh"),		_("SSH")));
+    list <term> GetZonesListedItems () {
+	list <term> items = [];
 
-	return services_list;
+	map <string, string> zone_names_to_zones = $[];
+	
+	foreach (string zone_id, SuSEFirewall::GetKnownFirewallZones(), {
+	    zone_names_to_zones[SuSEFirewall::GetZoneFullName(zone_id)] = zone_id;
+	});
+
+	foreach (string zone_name, string zone_id, zone_names_to_zones, {
+	    items = add (items, `item(`id(zone_id), zone_name));
+	});
+
+	return items;
     }
 
     // TERM FUNCTIONS, WHOLE DIALOGS OR FRAMES
@@ -61,17 +52,12 @@
 	    _("Firewall Interfaces"),
 	    `VBox (
 		`Table (
+		    `id("table_firewall_interfaces"),
 		    `header (
 			_("Device"),
-			_("Interface"),
-			_("Configured as")
-	    	    ),
-		    [
-			`item(`id("eth-00-15-24-dd-de-80"), "RTL-8139", "eth-00-15-24-dd-de-80", "Internal"),
-			`item(`id("modem0"), "Askey 815C", "modem0", "External"),
-			`item(`id(":-user-defined-:"), "", "any", "External"),
-			`item(`id(":-user-defined-:"), "", "not-configured-yet-00", "Internal")
-		    ]
+			_("Interface / String"),
+			_("Configured In")
+	    	    ), []
 		),
 		`HBox (
 		    `PushButton(`id("change_firewall_interface"), _("Change")),
@@ -83,19 +69,18 @@
 	return dialog;
     }
 
-    term SetFirewallInterfaceIntoZone () {
+    term SetFirewallInterfaceIntoZone (string device, string interface, list <term> zones) {
 	term dialog = `Frame (
 	    _("Select Zone For Network Interface"),
 	    `VBox (
 		`HBox (
 		    `VBox (
 			// FIXME: this label should show an interface name got as parameter
-			`Left ( `Label("RTL-8139") ),
-			`Left ( `Label("eth-00-15-24-dd-de-80") )
+			`Left ( `Label(device) ),
+			`Left ( `Label(interface) )
 		    ),
 		    `ComboBox (`id("zone_for_interface"), `opt(`hstretch),
-			_("Interface Zone"),
-			add(GetFirewallZonesList(), `item(`id(""), ""))
+			_("Interface Zone"), zones
 		    )
 		),
 		`VSpacing(1),
@@ -109,12 +94,16 @@
 	return dialog;
     }
 
-    term AdditionalSettingsForZones () {
+    /**
+     * Function returns dialog for additional zone strings (like 'any', 'auto'...)
+     */
+    term AdditionalSettingsForZones (map <string, map <string, string> > zones_additons) {
 	term user_defined_zones = `VBox();
-	foreach (map<string, string> zone, possible_firewall_zones, {
-	    foreach (string id, string name, zone, {
-		user_defined_zones = add(user_defined_zones, `TextEntry(`id(id), name));
-	    });
+
+	foreach (string zone_id, map <string, string> zone_attributes, zones_additons, {
+	    user_defined_zones = add(user_defined_zones,
+		`TextEntry(`id("zone_additions_" + zone_id), zone_attributes["name"]:"", zone_attributes["items"]:"")
+	    );
 	});
 
 	term dialog = `Frame (
@@ -139,11 +128,12 @@
 	term dialog = `Frame (
 	    _("Masquerading"),
 	    `VBox (
-		`Left( `CheckBox(`id("masquerade_networks"),
+		`ReplacePoint( `id("replacepoint_masquerade_information"), `Empty() ),
+		`Left( `CheckBox(`id("masquerade_networks"), `opt(`notify),
 		    _("Masquerade Networks"))
 		),
-		(expert_ui ?
-		    `Left( `ComboBox(`id("masquerade_outer_zone"), _("Outer Masqueraded Zone"), GetFirewallZonesList() ) )
+		(IsThisExpertConfiguration() ?
+		    `Left( `ComboBox(`id("masquerade_outer_zone"), _("Outer Masqueraded Zone"), GetZonesListedItems() ) )
 		    :
 		    nil
 		)
@@ -153,15 +143,39 @@
 	return dialog;
     }
 
+    list <term> GetDefinedServicesListedItems() {
+	list <term> services_list = [];
+
+	// sorted by service_name instead of service_id
+	map <string, string> translations_to_service_ids = $[];
+
+	foreach (string service_id, string service_name, SuSEFirewallServices::GetSupportedServices(), {
+	    // checking for yet defined name...
+	    if (translations_to_service_ids[service_name]:nil != nil) {
+		y2error("More services with the same translation: %1", service_name);
+	    }
+	    translations_to_service_ids[service_name] = service_id;
+	});
+
+	foreach (string service_name, string service_id, translations_to_service_ids, {
+	    services_list = add (services_list, `item( `id(service_id), service_name));
+	});
+
+	return services_list;
+    }
+
     term AllowedServices () {
 	term dialog = `VBox(
-	    `Left( `ComboBox(`id("allowed_services_zone"),
-		_("Allowed Services For Selected Zone"), GetFirewallZonesList() )
+	    `Left( `ComboBox(`id("allowed_services_zone"), `opt(`notify),
+		_("Allowed Services For Selected Zone"), GetZonesListedItems() )
 	    ),
 	    `VSquash (
 		`HBox (
 		    `HWeight ( 9,
-			`Bottom ( `Left( `ComboBox(`id("allowed_service_name"), _("Service To Allow"), GetDefinedServicesList()) ))
+			`Bottom ( `Left( `ReplacePoint( `id("allow_service_names_replacepoint"),
+			    // items handled by replacepoint
+			    `ComboBox(`id("allow_service_names"), _("Service To Allow"),[])
+			)))
 		    ),
 		    `HWeight ( 2,
 			`Bottom ( `PushButton ( `id ( "add_allowed_service" ), `opt ( `hstretch ), Label::AddButton() ) )
@@ -172,19 +186,13 @@
 		`HWeight ( 9,
 		    `VBox (
 			`Table (
+			    `id("table_allowed_services"),
 			    `header (
 				_("Allowed Service")
-	    		    ),
-			    // FIXME: Fake items
-			    [
-				`item(`id("https"), "HTTPS Server"),
-				`item(`id("ldaps"), "LDAPS Server"),
-				`item(`id("tftp"),  "TFTP Server"),
-				`item(`id("vnc"),   "VNC")
-			    ]
+	    		    ), []
 			),
 			`VSpacing(1),
-			`Left( `CheckBox(`id("protect_from_internal"),
+			`Left( `CheckBox(`id("protect_from_internal"), `opt(`notify),
 			    _("Protect from Internal Zone"))
 			)
 		    )
@@ -210,7 +218,7 @@
 		`VSpacing(1),
 		`Left ( `Label(sformat(_("Settings for Zone: %1"), zone_name)) ),
 		`TextEntry(`id("additional_tcp"), _("TCP Ports")),
-		`TextEntry(`id("additional_upd"), _("UDP Ports")),
+		`TextEntry(`id("additional_udp"), _("UDP Ports")),
 		`TextEntry(`id("additional_rpc"), _("RPC Ports")),
 		`TextEntry(`id("additional_ip"),  _("IP Protocols")),
 		`VSpacing(1),
@@ -234,12 +242,7 @@
 			_("Destination Network"),
 			_("Protocol"),
 			_("Port")
-		    ),
-		    // FIXME: fake items
-		    [
-			`item(`id("1"), "10.0.0.0/24", "0/0", "", ""),
-			`item(`id("2"), "192.168.0.0/20", "0/0", "tcp", "80")
-		    ]
+		    ), []
 		),
 		`VSquash (
 		    `HBox (
@@ -294,19 +297,18 @@
 	    _("Redirect Requests To Masqueraded IP"),
 	    `VBox (
 		`Table (
+		    `id("table_redirect_masq"),
 		    `header (
 			_("Source Network"),
 			_("Protocol"),
-			_("Requested Port"),
+			// Req. == Requested
+			_("Req. IP"),
+			_("Req. Port"),
 			"",
-			_("Redirect To IP"),
-			_("Redirect To Port")
-		    ),
-		    // FIXME: fake items
-		    [
-			`item(`id("1"), "0/0", "tcp", "25", UI::Glyph(`BulletArrowRight), "10.0.1.1", "30025"),
-			`item(`id("2"), "0/0", "tcp", "http", UI::Glyph(`BulletArrowRight), "10.0.1.1", "http")
-		    ]
+			// Redir == Redirect
+			_("Redir. To IP"),
+			_("Redir. To Port")
+		    ), []
 		),
 		`VSquash (
 		    `HBox (
@@ -334,10 +336,9 @@
 			`TextEntry (`id("add_requested_ip"), _("Requested IP"))
 		    ),
 		    `VBox (
-			// FIXME: another protocols allowed?
 			`ComboBox (`id("add_protocol"), `opt(`hstretch), _("Protocol"), [
-			    `item( `id("tcp"), "tcp"),
-			    `item( `id("udp"), "udp")
+			    `item( `id("tcp"), "TCP"),
+			    `item( `id("udp"), "UDP")
 			]),
 			`TextEntry (`id("add_requested_port"), _("Requested Port"))
 		    )
@@ -556,9 +557,9 @@
 
     term LoggingLevel () {
 	list<term> logging_options = [
-	    `item(`id("all"), _("Log All")),
-	    `item(`id("critical"), _("Log Only Critical")),
-	    `item(`id("none"), _("Do Not Log Any"))
+	    `item(`id("ALL"), _("Log All")),
+	    `item(`id("CRIT"), _("Log Only Critical")),
+	    `item(`id("NONE"), _("Do Not Log Any"))
 	];
 
 	term dialog = `VBox (
@@ -566,10 +567,10 @@
 		_("Logging Level"),
 		`VBox (
 		    `Left (
-			`ComboBox (`id("log_allowed"), _("Logging Allowed Packets"), logging_options)
+			`ComboBox (`id("logging_ACCEPT"), _("Logging Allowed Packets"), logging_options)
 		    ),
 		    `Left (
-			`ComboBox (`id("log_disallowed"), _("Logging Disallowed Packets"), logging_options)
+			`ComboBox (`id("logging_DROP"), _("Logging Disallowed Packets"), logging_options)
 		    )
 		)
 	    )
@@ -595,7 +596,7 @@
 		    `HWeight( 50,
 			`MultiSelectionBox (`id("accept_broadcast_packets"),
 			    _("Firewall Zones Allowing Broadcast Packets"),
-			    GetFirewallZonesList()
+			    GetZonesListedItems()
 			)
 		    )
 		),
@@ -682,7 +683,7 @@
     }
 
     term IPsecTrustAsZone () {
-	list<term> trust_zones = add(GetFirewallZonesList(), `item(`id("no"),
+	list<term> trust_zones = add(GetZonesListedItems(), `item(`id("no"),
 	    _("The Same Zone as The Packet Came")));
 
 	term dialog = `Frame (
@@ -781,46 +782,47 @@
     }
 
     term BoxSummary () {
-	string is_ok  = "<font color='#339900'>" + UI::Glyph(`CheckMark) + "</font>";
-	string not_ok = "<font color='#993300'>" + UI::Glyph(`BulletArrowRight) + "</font>";
-
-	string summary =
-	    "<h2>Internal Zone</h2>" +
-	    "	<ul>" +
-	    "	<h3>Interfaces</h3>" +
-	    "		<ul>" +
-	    "		<li>" + is_ok + " RTL-8139  / eth-00:15:24:dd:de:80</li>" +
-	    "		<li>" + is_ok + " any (any lasting interface not mentioned in configuration)<br />currently: no interface assigned</li>" +
-	    "		</ul>" +
-	    "	<h3>Open Services, Ports and Protocols</h3>" +
-	    "		<ul>" +
-	    "		<li>HTTPS Server</li>" +
-	    "		<li>LDAPS Server</li>" +
-	    "		<li>SSH</li>" +
-	    "		<li>TFTP Server</li>" +
-	    "		<li>VNC</li>" +
-	    "		<li>TCP Ports: 10245 12500:19500</li>" +
-	    "		<li>UDP Ports: 53</li>" +
-	    "		<li>RPC Ports: ypbind</li>" +
-	    "		</ul>" +
-	    "	</ul>" +
-	    "<h2>External Zone</h2>" +
-	    "	<ul>" +
-	    "	<h3>Interfaces</h3>" +
-	    "		<ul>" +
-	    "		<li>" + is_ok + " Askey 815C / modem0</li>" +
-	    "		<li>" + not_ok + " " + HTMLWrong("not-configured-yet-00") + " (Unknown interface, Unknown setting)" +
-	    "		</ul>" +
-	    "	<h3>Open Services, Ports and Protocols</h3>" +
-	    "		<ul>" +
-	    "		<li>DNS Server</li>" +
-	    "		<li>SSH</li>" +
-	    "		<li>Protocols: esp</li>" +
-	    "		</ul>" +
-	    "	</ul>";
-
+/**	string is_ok  = "<font color='#339900'>" + UI::Glyph(`CheckMark) + "</font>";
+*	string not_ok = "<font color='#993300'>" + UI::Glyph(`BulletArrowRight) + "</font>";
+*
+*
+*	string summary =
+*	    "<h2>Internal Zone</h2>" +
+*	    "	<ul>" +
+*	    "	<h3>Interfaces</h3>" +
+*	    "		<ul>" +
+*	    "		<li>" + is_ok + " RTL-8139  / eth-00:15:24:dd:de:80</li>" +
+*	    "		<li>" + is_ok + " any (any lasting interface not mentioned in configuration)<br />currently: no interface assigned</li>" +
+*	    "		</ul>" +
+*	    "	<h3>Open Services, Ports and Protocols</h3>" +
+*	    "		<ul>" +
+*	    "		<li>HTTPS Server</li>" +
+*	    "		<li>LDAPS Server</li>" +
+*	    "		<li>SSH</li>" +
+*	    "		<li>TFTP Server</li>" +
+*	    "		<li>VNC</li>" +
+*	    "		<li>TCP Ports: 10245 12500:19500</li>" +
+*	    "		<li>UDP Ports: 53</li>" +
+*	    "		<li>RPC Ports: ypbind</li>" +
+*	    "		</ul>" +
+*	    "	</ul>" +
+*	    "<h2>External Zone</h2>" +
+*	    "	<ul>" +
+*	    "	<h3>Interfaces</h3>" +
+*	    "		<ul>" +
+*	    "		<li>" + is_ok + " Askey 815C / modem0</li>" +
+*	    "		<li>" + not_ok + " " + HTMLWrong("not-configured-yet-00") + " (Unknown interface, Unknown setting)" +
+*	    "		</ul>" +
+*	    "	<h3>Open Services, Ports and Protocols</h3>" +
+*	    "		<ul>" +
+*	    "		<li>DNS Server</li>" +
+*	    "		<li>SSH</li>" +
+*	    "		<li>Protocols: esp</li>" +
+*	    "		</ul>" +
+*	    "	</ul>";
+*/
 	term dialog = `HBox (
-	    `RichText(summary)
+	    `RichText(`id("box_summary_richtext"), _("Creating summary, please wait..."))
 	);
 
 	return dialog;
@@ -834,32 +836,4 @@
 	
 	return dialog;
     }
-
-/**
-    // FAKE CODE FOR RUNNING SCREENS
-
-    list<term> dialogs = [FirewallInterfaces(), SetFirewallInterfaceIntoZone(),
-	AdditionalSettingsForZones(), Masquerading(),
-	AllowedServices(), AdditionalServices(), MasqueradeNetworks(),
-	AddNetworkMasqueradeRule(), RedirectToMasqueradedIP(),
-	AddRedirectToMasqueradedIPRule(), TransparentLocalRedirection(),
-	AddTransparentLocalRedirectionRule(),
-	ForwardNetworks(), AddForwardNetworkRule(),
-	RoutingInZones(), LoggingTuning(), LoggingLevel(), BroadcastConfiguration(),
-	HierarchicalTokenBucket(), AdvancedSecuritySettings(), IPsecSupport(),
-	IPv6Support(), CustomFirewallRules(),
-	AddCustomFirewallRule()];
-
-    dialogs = [AddCustomFirewallRule()];
-
-    integer counter = 0;
-    foreach (term dialog, dialogs, {
-	counter = counter + 1;
-	UI::OpenDialog(dialog);
-	UI::UserInput ();
-	// UI::MakeScreenShot ("screenshot" + ((size(tostring(counter))<=1) ? "0" : "") + tostring(counter) + ".png");
-	UI::CloseDialog();
-    });
-
-*/
 }

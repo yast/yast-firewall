@@ -2,10 +2,6 @@
 
 yncludedir = @yncludedir@/firewall
 
-module_DATA =		\
-	SuSEFirewall.ycp\
-	CWMFirewallInterfaces.ycp
-
 client_DATA =		\
 	firewall.ycp	\
 	firewall_auto.ycp	\
@@ -14,16 +10,15 @@ client_DATA =		\
 ynclude_DATA =		\
 	complex.ycp	\
 	dialogs.ycp	\
-	wizards.ycp
+	wizards.ycp	\
+	subdialogs.ycp	\
+	uifunctions.ycp	\
+	helps.ycp	\
+	summary.ycp
 
 desktop_DATA = firewall.desktop
 
 
-EXTRA_DIST = $(client_DATA) $(ynclude_DATA) $(module_DATA) $(desktop_DATA)
-
-autocode: liste liste2ycp.pl
-	cp -a SuSEFirewall.ycp SuSEFirewall.ycp.tmp
-	./liste2ycp.pl < SuSEFirewall.ycp.tmp > SuSEFirewall.ycp
-	rm SuSEFirewall.ycp.tmp
+EXTRA_DIST = $(client_DATA) $(ynclude_DATA) $(desktop_DATA)
 
 include $(top_srcdir)/Makefile.am.common

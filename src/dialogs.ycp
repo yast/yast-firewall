@@ -17,11 +17,14 @@
     import "DialogTree";
     import "Label";
 
-    // FIXME: remove
-    import "Wizard";
+    include "firewall/subdialogs.ycp";
+    include "firewall/uifunctions.ycp";
+    include "firewall/helps.ycp";
+    include "firewall/summary.ycp";
 
-    include "./subdialogs.ycp";
-    include "./uifunctions.ycp";
+    // FIXME: comment all _("strings")
+
+    // FIXME: replace or remove all 'fake' functions
 
     void FakeStore(string key, map event) {
 	y2milestone("Fake Store");
@@ -49,14 +52,11 @@
 	return true;
     }
 
-    void Fake_SaveAndRestart () {
-	boolean amazing = true;
-    }
-
     map<string,map<string,any> > widgets_handling = $[
+	// FIXME: test after jsrain's fix
 	"auto_start_up" : CWMServiceStart::CreateAutoStartWidget ($[
-	    "get_service_auto_start"	: Fake_GetStartService,
-	    "set_service_auto_start"	: Fake_SetStartService,
+	    "get_service_auto_start"	: SuSEFirewall::GetEnableService,
+	    "set_service_auto_start"	: SuSEFirewall::SetEnableService,
 	    "start_auto_button"		: _("Start Firewall When &Booting"),
 	    "start_manual_button"	: _("Start Firewall &Manually"),
 	    "help"			: sformat(CWMServiceStart::AutoStartHelpTemplate (),
@@ -66,6 +66,7 @@
 		_("Start Firewall Manually")
 	    )
 	]),
+	// FIXME: test after jsrain's enhancement
 	"start_stop" : CWMServiceStart::CreateStartStopWidget ($[
 	    "service_id"		: "SuSEfirewall2_final",
 					  // Informating label
@@ -76,7 +77,7 @@
 	    "start_now_button"		: _("&Start Firewall Now"),
 					  // Push button
 	    "stop_now_button"		: _("S&top Firewall Now"),
-	    "save_now_action"		: Fake_SaveAndRestart,
+	    "save_now_action"		: SaveAndRestart,
 					  // Push button
 	    "save_now_button"		: _("Save Settings and Restart Firewall &Now"),
 	    "help"			: sformat (CWMServiceStart::StartStopHelpTemplate (true),
@@ -88,37 +89,29 @@
 		_("Save Settings and Restart Firewall Now")
 	    )
 	]),
-	"ProposeConfiguration" : $[
-	    "widget"		: `custom,
-	    "custom_widget"	: `VBox(),
-	    "init"		: FakeInit,
-	    "handle"		: FakeHandle,
-	    "store"		: FakeStore,
-	    "help"		: "<p>Fake Help - Propose Configuration</p>",
-	],
 	"FirewallInterfaces" : $[
 	    "widget"		: `custom,
 	    "custom_widget"	: `VBox(),
-	    "init"		: FakeInit,
+	    "init"		: InitFirewallInterfaces,
 	    "handle"		: HandleFirewallInterfaces,
 	    "store"		: FakeStore,
-	    "help"		: "Fake Help - Firewall Interfaces",
+	    "help"		: HelpForDialog("firewall-interfaces"),
 	],
 	"AllowedServices" : $[
 	    "widget"		: `custom,
 	    "custom_widget"	: `VBox(),
-	    "init"		: FakeInit,
+	    "init"		: InitAllowedServices,
 	    "handle"		: HandleAllowedServices,
 	    "store"		: FakeStore,
-	    "help"		: "Fake Help - Allowed Services",
+	    "help"		: HelpForDialog("allowed-services"),
 	],
 	"Masquerading"		: $[
 	    "widget"		: `custom,
 	    "custom_widget"	: `VBox(),
-	    "init"		: FakeInit,
-	    "handle"		: FakeHandle,
+	    "init"		: InitMasquerading,
+	    "handle"		: HandleMasquerading,
 	    "store"		: FakeStore,
-	    "help"		: "Fake Help - BBB",
+	    "help"		: HelpForDialog("base-masquerading"),
 	],
 	"BroadcastConfigurationSimple": $[
 	    "widget"		: `custom,
@@ -126,7 +119,7 @@
 	    "init"		: FakeInit,
 	    "handle"		: FakeHandle,
 	    "store"		: FakeStore,
-	    "help"		: "Fake Help - CCC",
+	    "help"		: HelpForDialog("simple-broadcast-configuration"),
 	],
 	"IPsecSupport"		: $[
 	    "widget"		: `custom,
@@ -134,23 +127,23 @@
 	    "init"		: FakeInit,
 	    "handle"		: HandleIPsecSupport,
 	    "store"		: FakeStore,
-	    "help"		: "Fake Help - DDD",
+	    "help"		: HelpForDialog("base-ipsec-support"),
 	],
 	"LoggingLevel"		: $[
 	    "widget"		: `custom,
 	    "custom_widget"	: `VBox(),
-	    "init"		: FakeInit,
-	    "handle"		: FakeHandle,
-	    "store"		: FakeStore,
-	    "help"		: "Fake Help - EEE",
+	    "init"		: InitLoggingLevel,
+	    //"handle"		: NoHandlingNeeded,
+	    "store"		: StoreLoggingLevel,
+	    "help"		: HelpForDialog("base-logging"),
 	],
 	"RedirectToMasqueradedIP" : $[
 	    "widget"		: `custom,
 	    "custom_widget"	: `VBox(),
-	    "init"		: FakeInit,
+	    "init"		: InitRedirectToMasqueradedIP,
 	    "handle"		: HandleRedirectToMasqueradedIP,
 	    "store"		: FakeStore,
-	    "help"		: "Fake Help - FFF",
+	    "help"		: HelpForDialog("masquerade-redirect-table"),
 	],
     ];
 
@@ -158,7 +151,7 @@
 	"start_up"		: $[
 	    "contents"		: `VBox (
 		"auto_start_up",
-		//ProposeConfiguration(),
+		`VSpacing (1),
 		"start_stop",
 		`VStretch ()
 	    ),
@@ -169,7 +162,7 @@
 	"interfaces"		: $[
 	    "contents"		: `VBox (
 		FirewallInterfaces(),
-		`VStretch ()
+		`VSpacing (1)
 	    ),
 	    "caption"		: _("Firewall Configuration") + " - " + _("Interfaces"),
 	    "tree_item_label"	: _("Interfaces"),
@@ -178,7 +171,7 @@
 	"allowed_services"	: $[
 	    "contents"		: `VBox (
 		AllowedServices(),
-		`VStretch ()
+		`VSpacing (1)
 	    ),
 	    "caption"		: _("Firewall Configuration") + " - " + _("Allowed Services"),
 	    "tree_item_label"	: _("Allowed Services"),
@@ -189,7 +182,7 @@
 		Masquerading(),
 		`VSpacing(1),
 		RedirectToMasqueradedIP(),
-		`VStretch ()
+		`VSpacing (1)
 	    ),
 	    "caption"		: _("Firewall Configuration") + " - " + _("Network Masquerading"),
 	    "tree_item_label"	: _("Masquerading"),
@@ -244,23 +237,23 @@
 	]);
     }
 
-    any ret = nil;
-    while (true) {
-	ret = RunFirewallDialogs();
-	if (ret == `next) {
-	    Wizard::CreateDialog();
-	    Wizard::SetDesktopIcon("firewall");
-	    string caption = _("Firewall Configuration") + " - " + _("Summary");
-	    term contents  = BoxSummary();
-	    Wizard::SetContentsButtons(caption, contents, "Configuration Summary Help",
-		Label::BackButton(), Label::NextButton());
-	    Wizard::SetNextButton(`finish, Label::FinishButton());
-	    ret = UI::UserInput();
-	    y2milestone("Pressed %1", ret);
-	    UI::CloseDialog();
-	    if (ret == `finish) {
-		break;
-	    }
+    symbol BoxSummaryDialog () {
+	Wizard::SetContentsButtons (
+	    _("Firewall Configuration") + " - " + _("Summary"),
+	    BoxSummary(),
+	    HelpForDialog("box-summary"),
+	    Label::BackButton (), Label::FinishButton ()
+	);
+
+	InitBoxSummary();
+
+	symbol ret = nil;
+	while (true) {
+	    ret = (symbol) UI::UserInput();
+
+	    if (ret == `back || ret == `abort) break;
 	}
+
+	return ret;
     }
 }

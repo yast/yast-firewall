@@ -1,0 +1,140 @@
+/**
+ * Copyright 2004, Novell, Inc.  All rights reserved.
+ *
+ * File:	firewall/summary.ycp
+ * Package:	Firewall configuration
+ * Summary:	Firewall configuration summary
+ * Authors:	Lukas Ocilka <locilka@suse.cz>
+ *
+ * $Id$
+ *
+ * Summary functions.
+ */
+
+{
+    textdomain "firewall";
+
+    import "SuSEFirewall";
+
+    string SummaryZoneHeader (string zone_id) {
+	return "<h2>" + SuSEFirewall::GetZoneFullName(zone_id) + "</h2>\n";
+    }
+
+    string OKMark = "<font color='#339900'>"  + UI::Glyph(`CheckMark)        + "</font>";
+    string ErrMark = "<font color='#993300'>" + UI::Glyph(`BulletArrowRight) + "</font>"; 
+
+    string SummaryCheckSpecInterface (string spec_interface, string zone) {
+	string ret_val = "";
+
+	if (spec_interface == "any") {
+	    if (zone == "EXT") {
+		ret_val = OKMark + " '" + spec_interface + "' "
+		+ _("Any other interface will be assigned to this zone.");
+	    } else {
+		// FIXME: really?
+		ret_val = ErrMark + " '" + spec_interface + "' "
+		    + _("Currently supported only in External Zone");
+	    }
+	} else {
+	    ret_val = ErrMark + " '" + spec_interface + "' " + _("Unknown network interface");
+	}
+
+	return ret_val;
+    }
+
+    string SummaryInterfacesInZone (string zone_id) {
+	string ret_summary = "";
+
+	list <map <string, string> > interfaces = SuSEFirewall::GetAllKnownInterfaces();
+	map <string, string> interface_id_to_name = $[];
+	foreach (map <string, string> interface, interfaces, {
+	    interface_id_to_name[interface["id"]:""] = interface["name"]:"";
+	});
+
+	list <string> interfaces_in_zone = SuSEFirewall::GetInterfacesInZone(zone_id);
+	list <string> special_interfaces = SuSEFirewall::GetSpecialInterfacesInZone(zone_id);
+
+	if (size(interfaces_in_zone)>0 || size(special_interfaces)>0) {
+	    ret_summary = ret_summary +
+		"<h3>" + _("Interfaces") + "</h3>\n";
+
+	    ret_summary = ret_summary + "<ul>\n";
+	    foreach (string interface_id, interfaces_in_zone, {
+		ret_summary = ret_summary +
+		    "<li>" + OKMark + " " +
+		    (interface_id_to_name[interface_id]:"" != "" ?
+			interface_id_to_name[interface_id]:"" + " / "
+			:
+			""
+		    ) + interface_id + "</li>\n";
+	    });
+	    foreach (string spec_interface, special_interfaces, {
+		ret_summary = ret_summary +
+		    "<li>" + SummaryCheckSpecInterface(spec_interface,zone_id) + "</li>\n";
+	    });
+	    ret_summary = ret_summary + "</ul>\n";
+	} else {
+	    ret_summary = "<li>" + _("No interfaces assigned to this zone.") + "</li>\n";
+	}
+
+	return ret_summary;
+    }
+
+    string SummaryOpenServicesInZone(string zone_id) {
+	string ret_val = "";
+
+	list <string> interfaces_in_zone = SuSEFirewall::GetInterfacesInZone(zone_id);
+	list <string> special_interfaces = SuSEFirewall::GetSpecialInterfacesInZone(zone_id);
+
+	// any interface must be assigned
+	if (size(interfaces_in_zone)>0 || size(special_interfaces)>0) {
+	    ret_val = "<h3>" + _("Open Services, Ports and Protocols") + "</h3>\n";
+	    // internal zone and unprotected
+	    if (zone_id == "INT" && SuSEFirewall::GetProtectFromInternalZone()) {
+		ret_val = _("Internal zone is unprotected, all ports are open.");
+	    } else {
+		string open_services = "";
+
+		map <string, string> translations_to_service_ids = $[];
+		foreach (string service_id, string service_name, SuSEFirewallServices::GetSupportedServices(), {
+		    translations_to_service_ids[service_name] = service_id;
+		});
+		foreach (string service_name, string service_id, translations_to_service_ids, {
+		    if (SuSEFirewall::IsServiceSupportedInZone(service_id, zone_id)) {
+			open_services = open_services + "<li>" + service_name + "</li>";
+		    }
+		});
+
+		ret_val = ret_val + "<ul>" + (open_services != "" ?
+		    open_services
+		    :
+		    _("Zone has no open ports.")
+		) + "</ul>";
+	    }
+	}
+
+	return ret_val;
+    }
+
+    string SummaryZoneBody (string zone_id) {
+	return
+	    "<ul>\n" +
+	    SummaryInterfacesInZone(zone_id) +
+	    SummaryOpenServicesInZone(zone_id) +
+	    "</ul>\n";
+    }
+
+    void InitBoxSummary () {
+	string summary = "";
+
+	foreach (string zone_id, SuSEFirewall::GetKnownFirewallZones(), {
+	    summary = summary
+		+ SummaryZoneHeader(zone_id)
+		+ SummaryZoneBody(zone_id);
+	});
+
+	UI::ChangeWidget(`id("box_summary_richtext"), `Value, summary);
+    }
+
+/* EOF */
+}

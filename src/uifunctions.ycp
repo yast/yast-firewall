@@ -13,6 +13,11 @@
     textdomain "firewall";
 
     import "Confirm";
+    import "SuSEFirewall";
+    import "SuSEFirewallServices";
+    import "PortAliases";
+    import "Popup";
+    import "Address";
 
     // GLOBAL UI CONFIGURATION
     term all_popup_definition = `opt(`decorated,`centered);
@@ -36,52 +41,603 @@
 
     // UI Functions
 
-    void HandlePopupSetFirewallInterfaceIntoZone () {
-	UI::OpenDialog(all_popup_definition, SetFirewallInterfaceIntoZone());
-	UI::WaitForEvent();
-	UI::CloseDialog();
+    /**
+     * Function saves configuration and restarts firewall
+     */
+    boolean SaveAndRestart () {
+	Wizard::CreateDialog ();
+	Wizard::RestoreHelp (HelpForDialog("saving_configuration"));
+	boolean success = SuSEFirewall::SaveAndRestartService ();
+	sleep(1000);
+	UI::CloseDialog ();
+	return success;
     }
 
+    /**
+     * Function redraws Interfaces Table
+     */
+    void RedrawFirewallInterfaces() {
+	list <term> table_items = [];
+
+	// firstly listing all known interfaces
+	foreach (map <string, string> interface, SuSEFirewall::GetAllKnownInterfaces(), {
+	    string zone_name = "";
+	    if (interface["zone"]:nil != nil)
+		zone_name = SuSEFirewall::GetZoneFullName(interface["zone"]:nil);
+
+	    table_items = add (table_items, `item( `id("known-" + interface["id"]:nil),
+		interface["name"]:nil,
+		interface["id"]:nil,
+		zone_name
+	    ));
+	});
+
+	foreach (string zone, SuSEFirewall::GetKnownFirewallZones(), {
+	    list <string> specials = SuSEFirewall::GetSpecialInterfacesInZone(zone);
+	    string zone_name = SuSEFirewall::GetZoneFullName(zone);
+	    foreach (string special, specials, {
+		table_items = add (table_items, `item( `id("special-" + special),
+		    _("User Defined String"),
+		    special,
+		    zone_name
+		));
+	    });
+	});
+
+	UI::ChangeWidget ( `id("table_firewall_interfaces"), `Items, table_items);
+    }
+
+    // map of device names
+    map <string, string> known_device_names = $[];
+
+    /**
+     * Function initializes Interfaces table and known_device_names
+     */
+    void InitFirewallInterfaces (string key) {
+
+	// initializing names of interfaces
+	known_device_names = $[];
+	foreach (map <string, string> known_interface, SuSEFirewall::GetAllKnownInterfaces(), {
+	    known_device_names[known_interface["id"]:""] = known_interface["name"]:"";
+	});
+
+	// known interfaces/string have ID: "known-" + interface
+	// uknown strings have          ID: "special-" + string
+
+	RedrawFirewallInterfaces();
+    }
+
+    /**
+     * Function handles popup dialog witch setting Interface into Zone
+     */
+    void HandlePopupSetFirewallInterfaceIntoZone (string interface) {
+	// interface could be unassigned
+	list <term> zones = [ `item(`id(""), "") ];
+	// current zone of interface
+	string current_zone = SuSEFirewall::GetZoneOfInterface (interface);
+	foreach (string zone_shortname, SuSEFirewall::GetKnownFirewallZones(), {
+	    zones = add (zones, `item(
+		`id(zone_shortname), SuSEFirewall::GetZoneFullName(zone_shortname),
+		(zone_shortname == current_zone ? true:false)
+	    ));
+	});
+
+	// opening popup
+	UI::OpenDialog(all_popup_definition, SetFirewallInterfaceIntoZone(
+	    known_device_names[interface]:"",
+	    interface,
+	    zones
+	));
+
+	string ret = (string) UI::UserInput();
+
+	boolean changed = false;
+	if (ret == "ok") {
+	    string new_zone = (string) UI::QueryWidget(`id("zone_for_interface"), `Value);
+	    if (new_zone != current_zone) {
+		changed = true;
+		SuSEFirewall::AddInterfaceIntoZone(interface, new_zone);
+	    }
+	}
+
+	UI::CloseDialog();
+
+	if (changed) RedrawFirewallInterfaces();
+    }
+
+    /**
+     * Function handles popup with additional settings in zones
+     */
     void HandlePopupAdditionalSettingsForZones () {
-	UI::OpenDialog(all_popup_definition, AdditionalSettingsForZones());
-	UI::WaitForEvent();
+	map <string, list <string> > starting_additionals = $[]; 
+	map <string, map <string, string> > zones_additons = $[];
+
+	foreach (string zone_shortname, SuSEFirewall::GetKnownFirewallZones(), {
+	    list <string> specials = SuSEFirewall::GetSpecialInterfacesInZone(zone_shortname);
+	    starting_additionals[zone_shortname] = specials;
+	    zones_additons[zone_shortname] = $[
+		"name" : SuSEFirewall::GetZoneFullName(zone_shortname),
+		"items" : mergestring(specials, " "),
+	    ];
+	});
+
+	UI::OpenDialog(all_popup_definition, AdditionalSettingsForZones(zones_additons));
+
+	string ret = (string) UI::UserInput();
+
+	boolean changed = false;
+	if (ret == "ok") {
+	    list <list <string> > events_remove = [];
+	    list <list <string> > events_add    = [];
+	    foreach (string zone_shortname, SuSEFirewall::GetKnownFirewallZones(), {
+		list <string> new_additions = splitstring((string) UI::QueryWidget(`id("zone_additions_" + zone_shortname), `Value), " ");
+
+		// checking for new additions
+		foreach (string new_addition_item, new_additions, {
+		    if (new_addition_item != "" && !contains(starting_additionals[zone_shortname]:[], new_addition_item)) {
+			changed = true;
+			events_add = add (events_add, [ new_addition_item, zone_shortname ]);
+		    }
+		});
+
+		// checking for removed additions
+		foreach (string old_addition_item, starting_additionals[zone_shortname]:[], {
+		    if (old_addition_item != "" && !contains(new_additions, old_addition_item)) {
+			changed = true;
+			events_remove = add (events_remove, [ old_addition_item, zone_shortname ]);
+		    }
+		});
+
+	    });
+	    foreach (list <string> adding, events_add, {
+		SuSEFirewall::AddSpecialInterfaceIntoZone(adding[0]:"", adding[1]:"");
+	    });
+	    foreach (list <string> removing, events_remove, {
+		SuSEFirewall::RemoveSpecialInterfaceFromZone(removing[0]:"", removing[1]:"");
+	    });
+	}
+
 	UI::CloseDialog();
+
+	if (changed) RedrawFirewallInterfaces();
     }
 
+    /**
+     * Function handles whole firewall-interfaces dialg
+     */
     symbol HandleFirewallInterfaces (string key, map event) {
 	any ret = event["ID"]:nil;
 
+	string current_item = (string) UI::QueryWidget(
+	    `id ("table_firewall_interfaces"), `CurrentItem);
+
+	// "change" can handle both interfaces and special strings
 	if (ret == "change_firewall_interface") {
-	    HandlePopupSetFirewallInterfaceIntoZone();
+	    // handling interfaces
+	    if (regexpmatch(current_item, "^known-")) {
+		HandlePopupSetFirewallInterfaceIntoZone(
+		    regexpsub(current_item, "^known-(.*)", "\\1")
+		);
+	    // handling special strings
+	    } else if (regexpmatch(current_item, "^special-")) {
+		HandlePopupAdditionalSettingsForZones();
+	    } else {
+		y2error("Uknown interfaces_item '%1'", current_item);
+	    }
+	// "user-defined" can only handle special strings
 	} else if (ret == "user_defined_firewall_interface") {
 	    HandlePopupAdditionalSettingsForZones();
-	} else {
-	    y2error("Undefined return value: %1", ret);
 	}
 
 	return nil;
     }
 
-    void HandlePopupAdditionalServices () {
-	// FIXME: real selected zone
-	string zone = "EXT";
-	string zone_name = "External";
+    /**
+     * Function checks list of ports if they exist (are known).
+     *
+     */
+    boolean CheckIfTheyAreAllKnownPorts(string ui_id, list <string> ports) {
+	boolean checked = true;
+
+	foreach (string port, ports, {
+	    if (port == "") return;
+	    if (regexpmatch(port, "^[0-9]+$")) return;
+	    if (! PortAliases::IsKnownPortName(port)) {
+		checked = Popup::ContinueCancelHeadline(
+		    _("Uknown Port Name"),
+		    sformat(
+			_("Port name '%1' is uknown in your current system.
+It probably would not work at all.
+Do you really want to use this port?"),
+			port
+		    )
+		);
+		// if agreed, check the next one, else set UI focus
+		if (!checked) {
+		    UI::SetFocus(`id(ui_id));
+		    break;
+		}
+	    }
+	});
+
+	return checked;
+    }
+
+    void HandlePopupAdditionalServices (string zone) {
+	string zone_name = SuSEFirewall::GetZoneFullName(zone);
 
 	UI::OpenDialog(all_popup_definition, AdditionalServices(zone_name));
-	UI::WaitForEvent();
+
+	// getting additional services
+	list <string> additional_tcp = toset(SuSEFirewall::GetAdditionalServices("TCP", zone));
+	list <string> additional_udp = toset(SuSEFirewall::GetAdditionalServices("UDP", zone));
+	list <string> additional_rpc = toset(SuSEFirewall::GetAdditionalServices("RPC", zone));
+	list <string> additional_ip  = toset(SuSEFirewall::GetAdditionalServices("IP",  zone));
+
+	// filling up popup dialog
+	UI::ChangeWidget(`id("additional_tcp"), `Value, mergestring(additional_tcp, " "));
+	UI::ChangeWidget(`id("additional_udp"), `Value, mergestring(additional_udp, " "));
+	UI::ChangeWidget(`id("additional_rpc"), `Value, mergestring(additional_rpc, " "));
+	UI::ChangeWidget(`id("additional_ip"),  `Value, mergestring(additional_ip,  " "));
+
+	any ret = nil;
+	while (true) {
+	    ret = UI::UserInput();
+
+	    if (ret == "ok") {
+		list <string> new_additional_tcp = toset(splitstring(
+		    (string) UI::QueryWidget(`id("additional_tcp"), `Value), " "));
+		list <string> new_additional_udp = toset(splitstring(
+		    (string) UI::QueryWidget(`id("additional_udp"), `Value), " "));
+		list <string> new_additional_rpc = toset(splitstring(
+		    (string) UI::QueryWidget(`id("additional_rpc"), `Value), " "));
+		list <string> new_additional_ip  = toset(splitstring(
+		    (string) UI::QueryWidget(`id("additional_ip"),  `Value), " "));
+
+		// checking for known TCP and UDP port names
+		if (!CheckIfTheyAreAllKnownPorts("additional_tcp", new_additional_tcp)) continue;
+		if (!CheckIfTheyAreAllKnownPorts("additional_udp", new_additional_udp)) continue;
+
+		SuSEFirewall::SetAdditionalServices("TCP", zone, new_additional_tcp);
+		SuSEFirewall::SetAdditionalServices("UDP", zone, new_additional_udp);
+		SuSEFirewall::SetAdditionalServices("RPC", zone, new_additional_rpc);
+		SuSEFirewall::SetAdditionalServices("IP",  zone, new_additional_ip );
+		
+		break;
+	    } else if (ret == "cancel") {
+		break;
+	    }
+	}
+
 	UI::CloseDialog();
+    }
+
+    void RedrawAllowedServicesDialog (string current_zone) {
+	if (SuSEFirewall::GetProtectFromInternalZone() == false && current_zone == "INT") {
+	    UI::ChangeWidget(`id("allow_service_names"), `Enabled, false);
+	    UI::ChangeWidget(`id("add_allowed_service"), `Enabled, false);
+	    UI::ChangeWidget(`id("table_allowed_services"), `Enabled, false);
+	    UI::ChangeWidget(`id("remove_allowed_service"), `Enabled, false);
+	    UI::ChangeWidget(`id("advanced_allowed_service"), `Enabled, false);
+	} else {
+	    UI::ChangeWidget(`id("allow_service_names"), `Enabled, true);
+	    UI::ChangeWidget(`id("add_allowed_service"), `Enabled, true);
+	    UI::ChangeWidget(`id("table_allowed_services"), `Enabled, true);
+	    UI::ChangeWidget(`id("remove_allowed_service"), `Enabled, true);
+	    UI::ChangeWidget(`id("advanced_allowed_service"), `Enabled, true);
+	}
+    }
+
+    void RedrawAllowedServices(string current_zone) {
+	if (! contains(SuSEFirewall::GetKnownFirewallZones(), current_zone)) {
+	    y2error("Unknown zone '%1'", current_zone);
+	    return nil;
+	}
+
+	// FIXME: protect from internal, disabling table, etc...
+
+	list <term> allowed_services = [];
+	// sorted by translated service_name
+	map <string, string> translations_to_service_ids = $[];
+
+	foreach (string service_id, string service_name, SuSEFirewallServices::GetSupportedServices(), {
+	    translations_to_service_ids[service_name] = service_id;
+	});
+
+	list <term> all_known_services = GetDefinedServicesListedItems();
+	list <term> not_allowed_services = [];
+
+	// not protected, all services are allowed
+	if (current_zone == "INT" && !SuSEFirewall::GetProtectFromInternalZone()) {
+	    foreach (string service_name, string service_id, translations_to_service_ids, {
+		allowed_services = add (allowed_services, `item(`id(service_id), service_name));
+	    });
+	// protected, only allowed services
+	} else {
+	    foreach (string service_name, string service_id, translations_to_service_ids, {
+		if (SuSEFirewall::IsServiceSupportedInZone(service_id, current_zone)) {
+		    allowed_services = add (allowed_services, `item(`id(service_id), service_name));
+		} else {
+		    not_allowed_services = add (not_allowed_services, `item(`id(service_id), service_name));
+		}
+	    });
+	}
+
+	UI::ChangeWidget(`id("table_allowed_services"), `Items, allowed_services);
+	UI::ReplaceWidget(`id("allow_service_names_replacepoint"),
+	    `ComboBox(`id("allow_service_names"), _("Service To Allow"), not_allowed_services)
+	);
+
+	// disable or enable buttons, selectboxes, table
+	RedrawAllowedServicesDialog(current_zone);
+    }
+
+    void InitAllowedServices (string key) {
+	if (SuSEFirewall::GetProtectFromInternalZone()) {
+	    UI::ChangeWidget(`id("protect_from_internal"), `Value, true);
+	} else {
+	    UI::ChangeWidget(`id("protect_from_internal"), `Value, false);
+	}
+
+	// FIXME: hardcoded, should work with zones and interfaces included
+	RedrawAllowedServices("EXT");
+	UI::ChangeWidget(`id("allowed_services_zone"), `Value, "current_zone_EXT");
     }
 
     symbol HandleAllowedServices (string key, map event) {
 	any ret = event["ID"]:nil;
 
-	if (ret == "advanced_allowed_service") {
-	    HandlePopupAdditionalServices();
-	} else {
-	    y2error("Undefined return value: %1", ret);
+	y2milestone("EVENT: %1", ret);
+
+	string current_zone = (string) UI::QueryWidget(`id("allowed_services_zone"), `Value);
+	current_zone = regexpsub(current_zone, "^current_zone_(.*)", "\\1");
+
+	// changing zone
+	if (ret == "allowed_services_zone") {
+	    RedrawAllowedServices (current_zone);
+	} else if (ret == "protect_from_internal") {
+	    boolean protect_from_internal = (boolean) UI::QueryWidget(`id("protect_from_internal"), `Value);
+	    SuSEFirewall::SetProtectFromInternalZone(protect_from_internal);
+	    RedrawAllowedServices (current_zone);
+	} else if (ret == "add_allowed_service") {
+	    string add_service = (string) UI::QueryWidget(`id("allow_service_names"), `Value);
+	    SuSEFirewall::SetServicesForZones([add_service], [current_zone], true);
+	    RedrawAllowedServices (current_zone);
+	} else if (ret == "remove_allowed_service") {
+	    string remove_service = (string) UI::QueryWidget(`id("table_allowed_services"), `CurrentItem);
+	    SuSEFirewall::SetServicesForZones([remove_service], [current_zone], false);
+	    RedrawAllowedServices (current_zone);
+	} else if (ret == "advanced_allowed_service") {
+	    if (HandlePopupAdditionalServices(current_zone) == "ok") {
+		RedrawAllowedServices (current_zone);
+	    }
 	}
 
 	return nil;
+    }
+
+    /**
+     * Function sets UI for Masquerade Table (and buttons) enabled or disabled
+     *
+     * @param	boolean enable
+     */
+    void SetMasqueradeTableUsable (boolean usable) {
+	UI::ChangeWidget(`id("table_redirect_masq"), `Enabled, usable);
+	UI::ChangeWidget(`id("add_redirect_to_masquerade"), `Enabled, usable);
+	UI::ChangeWidget(`id("remove_redirect_to_masquerade"), `Enabled, usable);
+    }
+
+    /**
+     * Function returns if masquerading is possible.
+     * Masquerading needs at least two interfaces in two different firewall zones.
+     * One of them has to be External.
+     *
+     * @return	boolean if possible.
+     */
+    boolean IsMasqueradingPossible () {
+	// FIXME: for Expert configuration, there is possible to set the masqueraded zone
+	//        it is EXT for Simple configuration as default
+	boolean possible = false;
+
+	if (!IsThisExpertConfiguration()) {
+	    // needs to have any external and any other interface
+	    boolean has_external = false;
+	    boolean has_other    = false;
+
+	    foreach (string zone, SuSEFirewall::GetKnownFirewallZones(), {
+		// no interfaces in zone
+		if ( size( union(
+		    SuSEFirewall::GetInterfacesInZone(zone),
+		    SuSEFirewall::GetSpecialInterfacesInZone(zone)
+		)) == 0) return;
+
+		if (zone == "EXT") has_external = true;
+		else		   has_other    = true;
+	    });
+	    
+	    possible = (has_external && has_other);
+	} else {
+	    y2error("FIXME: missing functionality for expert configuration");
+	}
+
+	return possible;
+    }
+
+    void InitMasquerading (string key) {
+	boolean masquerade = SuSEFirewall::GetMasquerade();
+	boolean masquerade_possible = IsMasqueradingPossible();
+
+	// setting checkbox
+	UI::ChangeWidget(`id("masquerade_networks"), `Value, masquerade);
+
+	// enabling or disabling masquerade redirect table when masquerading is enabled
+	// and also possible
+	if (!IsThisExpertConfiguration()) {
+	    SetMasqueradeTableUsable(masquerade && masquerade_possible);
+	}
+
+	// impossible masquerading, user gets information why
+	if (!masquerade_possible) {
+	    // disabling checkbox
+	    UI::ChangeWidget(`id("masquerade_networks"), `Enabled, false);
+
+	    UI::ReplaceWidget(`id("replacepoint_masquerade_information"),
+		(!IsThisExpertConfiguration() ?
+		    `Left(`Label(_("Masquerading needs at least one external interface and one another.")))
+		    :
+		    `Left(`Label("FIXME: missing functionality for expert configuration"))
+		)
+	    );
+	}
+
+	return nil;
+    }
+
+    boolean CheckExistency(string ui_id) {
+	if (UI::QueryWidget(`id(ui_id), `Value) == "") {
+	    UI::SetFocus(`id(ui_id));
+	    Popup::Error(_("This entry have to be filled."));
+	    return false;
+	}
+	return true;
+    }
+
+    boolean CheckPort(string ui_id) {
+	string port  = (string) UI::QueryWidget(`id(ui_id), `Value);
+	
+	// no port can be allowed
+	if (port == "") return true;
+	
+	// checking for port-name rightness
+	if (!PortAliases::IsAllowedPortName(port)) {
+	    UI::SetFocus(`id(ui_id));
+	    Popup::Error(
+		_("Wrong port definition.")
+		+ "\n\n" +
+		PortAliases::AllowedPortNameOrNumber()
+	    );
+	    return false;
+	}
+
+	// checking for known TCP and UDP port names
+	if (!CheckIfTheyAreAllKnownPorts(ui_id, [port])) return false;
+
+	return true;
+    }
+
+    boolean CheckIP(string ui_id) {
+	string ip = (string) UI::QueryWidget(`id(ui_id), `Value);
+	if (!Address::Check4(ip)) {
+	    UI::SetFocus(`id(ui_id));
+	    Popup::Error(
+		_("Wrong IP definition.")
+		+ "\n\n" +
+		Address::Valid4()
+	    );
+	    return false;
+	}
+	return true;
+    }
+
+    void RedrawRedirectToMasqueradedIPTable() {
+	list <term> items = [];
+
+	integer row_id = 0;
+	foreach (map <string, string> rule, SuSEFirewall::GetListOfForwardsIntoMasquerade(), {
+	    // FIXME: requested IP is missing in table
+	    items = add (items,
+		`item(`id(row_id),
+		    rule["source_net"]:"",
+		    rule["protocol"]:"",
+		    rule["req_ip"]:"",
+		    rule["req_port"]:"",
+		    UI::Glyph(`BulletArrowRight),
+		    rule["forward_to"]:"",
+		    rule["to_port"]:""
+		)
+	    );
+	    row_id = row_id + 1;
+	});
+
+	UI::ChangeWidget(`id("table_redirect_masq"), `Items, items);
+    }
+
+    void HandlePopupAddRedirectToMasqueradedIPRule () {
+	UI::OpenDialog(all_popup_definition, AddRedirectToMasqueradedIPRule());
+
+	boolean ret_value = false;
+
+	while (true) {
+	    any ret = UI::UserInput();
+
+	    if (ret == "cancel") {
+		break;
+	    } else if (ret == "ok") {
+
+		if (!CheckExistency("add_requested_port"))  continue;
+		if (!CheckExistency("add_source_network"))  continue;
+		if (!CheckExistency("add_redirectto_ip"))   continue;
+		
+		if (!CheckPort("add_requested_port"))	continue;
+		if (!CheckPort("add_redirectto_port"))	continue;
+		if (!CheckIP("add_redirectto_ip"))	continue;
+
+		// FIXME: checking for spaces in sttrings
+		//        removing space from start or end of the string
+		
+		string add_source_network  = (string) UI::QueryWidget(`id("add_source_network"),  `Value);
+		string add_requested_ip    = (string) UI::QueryWidget(`id("add_requested_ip"),    `Value);
+		string add_protocol        = (string) UI::QueryWidget(`id("add_protocol"),        `Value);
+		string add_requested_port  = (string) UI::QueryWidget(`id("add_requested_port"),  `Value);
+		string add_redirectto_ip   = (string) UI::QueryWidget(`id("add_redirectto_ip"),   `Value);
+		string add_redirectto_port = (string) UI::QueryWidget(`id("add_redirectto_port"), `Value);
+
+		SuSEFirewall::AddForwardIntoMasqueradeRule (add_source_network, add_redirectto_ip, add_protocol,
+		    add_requested_port, add_redirectto_port, add_requested_ip);
+
+		ret_value = true;
+		break;
+	    }
+	}
+
+	UI::CloseDialog();
+
+	if (ret_value) RedrawRedirectToMasqueradedIPTable();
+    }
+
+    symbol HandleMasquerading (string key, map event) {
+	any ret = event["ID"]:nil;
+
+	y2milestone("RET: %1", ret);
+
+	if (ret == "masquerade_networks") {
+	    boolean masquerade = (boolean) UI::QueryWidget(`id("masquerade_networks"), `Value);
+	    SuSEFirewall::SetMasquerade(masquerade);
+	    // enabling or disabling masquerade redirect table when masquerade enabled
+	    if (!IsThisExpertConfiguration()) {
+		SetMasqueradeTableUsable(masquerade);
+	    }
+	}
+
+	return nil;
+    }
+
+    symbol HandleRedirectToMasqueradedIP (string key, map event) {
+	any ret = event["ID"]:nil;
+	
+	y2milestone("RET: %1", ret);
+
+	if (ret == "add_redirect_to_masquerade") {
+	    HandlePopupAddRedirectToMasqueradedIPRule();
+	} else if (ret == "remove_redirect_to_masquerade") {
+	    integer current_item = (integer) UI::QueryWidget(`id("table_redirect_masq"), `CurrentItem);
+	    SuSEFirewall::RemoveForwardIntoMasqueradeRule(current_item);
+	    RedrawRedirectToMasqueradedIPTable();
+	}
+    }
+
+    void InitRedirectToMasqueradedIP (string key) {
+	RedrawRedirectToMasqueradedIPTable();
     }
 
     void HandlePopupIPsecTrustAsZone () {
@@ -102,21 +658,15 @@
 	return nil;
     }
 
-    void HandlePopupAddRedirectToMasqueradedIPRule () {
-	UI::OpenDialog(all_popup_definition, AddRedirectToMasqueradedIPRule());
-	UI::WaitForEvent();
-	UI::CloseDialog();
+    void InitLoggingLevel (string key) {
+	UI::ChangeWidget(`id("logging_ACCEPT"), `Value, SuSEFirewall::GetLoggingSettings("ACCEPT"));
+	UI::ChangeWidget(`id("logging_DROP"),   `Value, SuSEFirewall::GetLoggingSettings("DROP"));
     }
 
-    symbol HandleRedirectToMasqueradedIP (string key, map event) {
-	any ret = event["ID"]:nil;
-
-	if (ret == "add_redirect_to_masquerade") {
-	    HandlePopupAddRedirectToMasqueradedIPRule();
-	} else {
-	    y2error("Undefined return value: %1", ret);
-	}
-
-	return nil;
+    void StoreLoggingLevel (string key, map event) {
+	SuSEFirewall::SetLoggingSettings("ACCEPT",
+	    (string) UI::QueryWidget(`id("logging_ACCEPT"), `Value));
+	SuSEFirewall::SetLoggingSettings("DROP",
+	    (string) UI::QueryWidget(`id("logging_DROP"),   `Value));
     }
 }

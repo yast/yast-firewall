@@ -1,51 +1,33 @@
 /**
+ * Copyright 2004, Novell, Inc.  All rights reserved.
+ *
  * File:	clients/firewall.ycp
- * Package:	SuSE firewall configuration
- * Summary:	Main file
- * Authors:	Michael Hager <mike@suse.de>
+ * Package:	Firewall configuration
+ * Summary:	Firewall configuration dialogs
+ * Authors:	Lukas Ocilka <locilka@suse.cz>
  *
  * $Id$
+ *
+ * File includes helps for yast2-firewall dialogs.
  */
 
 {
+    y2milestone("----------------------------------------");
+    y2milestone("Firewall module started");
 
-/***
- * <h3>SuSE Firewall2 Configuration</h3>
- */
+    textdomain "firewall";
 
-textdomain "firewall";
+    import "SuSEFirewall";
 
-/* The main() */
-y2milestone("----------------------------------------");
-y2milestone("Firewall module started");
+    include "firewall/wizards.ycp";
 
-import "SuSEFirewall";
-include "firewall/wizards.ycp";
+    any ret = FirewallSequence();
+    y2debug("ret=%1",ret);
 
-SuSEFirewall::SetModified();
+    y2milestone("Firewall module finished");
+    y2milestone("----------------------------------------");
 
-boolean propose = false;
-list args = WFM::Args();
-if(size(args) > 0) {
-    if(is(WFM::Args(0), path) && WFM::Args(0) == .propose) {
-	y2milestone("Using PROPOSE mode");
-	propose = true;
-    }
-    else
-	y2error("Bad argument for firewall: %1", WFM::Args(0));
-}
-/* main ui function */
-any ret = nil;
-
-if(propose) ret = FirewallProposalSequence();
-else ret = Firewall();
-y2debug("ret=%1",ret);
-
-/* Finish */
-y2milestone("Firewall module finished");
-y2milestone("----------------------------------------");
-
-return ret;
+    return ret;
 
 /* EOF */
 }

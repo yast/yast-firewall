@@ -1,278 +1,83 @@
 /**
- * File:	include/firewall/wizards.ycp
+ * Copyright 2004, Novell, Inc.  All rights reserved.
+ *
+ * File:	firewall/wizards.ycp
  * Package:	Firewall configuration
- * Summary:	Wizards definitions
- * Authors:	Michal Svec <msvec@suse.cz>
+ * Summary:	Wizards definition
+ * Authors:	Lukas Ocilka <locilka@suse.cz>
  *
  * $Id$
  */
 
 {
+    import "Wizard";
+    import "Sequencer";
 
-textdomain "firewall";
+    include "firewall/complex.ycp";
+    include "firewall/dialogs.ycp";
 
-import "Label";
-import "Wizard";
-import "Sequencer";
+    /**
+     * Main workflow of the firewall configuration
+     *
+     * @return any returned value from Sequencer::Run() call
+     */
+    define any MainSequence() {
+	map aliases = $[
+	    "configuration" : ``(RunFirewallDialogs()),
+	];
 
-include "firewall/complex.ycp";
-include "firewall/dialogs.ycp";
+	map sequence = $[
+	    "ws_start" : "configuration",
+	    "configuration" : $[
+		`abort	: `abort,
+		`next	: `next,
+	    ],
+	];
 
-/**
- * Main workflow of the firewall configuration
- * @return any Returned value from Sequencer::Run() call
- */
-define any MainSequence() ``{
+	return Sequencer::Run(aliases, sequence);
+    }
 
-    map aliases = $[
-        "stop"		: ``(StopDialog()),
-        "devices"	: ``(DevicesDialog()),
-        "services"	: ``(ServicesDialog()),
-        "features"	: ``(FeatureDialog()),
-        "logging"	: ``(LoggingDialog()),
-    ];
+    /**
+     * Whole configuration of firewall
+     *
+     * @return any returned value from Sequencer::Run() call
+     */
+    define any FirewallSequence() {
+	map aliases = $[
+	    "read"  	: [ ``( ReadDialog() ), true ],
+	    "main"  	:   ``( MainSequence() ),
+	    "summary"	:   ``( BoxSummaryDialog() ),
+	    "write" 	: [ ``( WriteDialog() ), true ]
+	];
 
-    map sequence = $[
-        "ws_start" : "step1",
-        "devices" : $[
-	    `abort: `abort,
-            `next: "services"
-        ],
-        "services" : $[
-	    `abort: `abort,
-            `next: "features"
-        ],
-        "features" : $[
-	    `abort: `abort,
-            `next: "logging"
-        ],
-        "logging" : $[
-	    `abort: `abort,
-            `next: `next
-        ]
-    ];
+	map sequence = $[
+	    "ws_start" : "read",
+	    "read" : $[
+		`abort      : `abort,
+		`next       : "main"
+	    ],
+	    "main" : $[
+		`abort      : `abort,
+		`next       : "summary"
+	    ],
+	    "summary" : $[
+		`abort      : `abort,
+		`next       : "write"
+	    ],
+	    "write" : $[
+		`abort      : `abort,
+		`next       : `next
+	    ],
+	];
 
-    any ret = Sequencer::Run(aliases, sequence);
+	Wizard::CreateDialog();
+	Wizard::SetDesktopIcon("firewall");
 
-    return ret;
-}
+	any ret = Sequencer::Run(aliases, sequence);
 
-/**
- * Whole configuration of firewall
- * @return any Returned value from Sequencer::Run() call
- */
-define any FirewallSequence() ``{
-
-    map aliases = $[
-	"read"	: [ ``( ReadDialog() ), true ],
-	"main"	:   ``( MainSequence() ),
-	"write"	: [ ``( WriteDialog() ), true ]
-    ];
-
-    map sequence = $[
-	"ws_start" : "read",
-	"read" : $[
-	    `abort	: `abort,
-	    `next	: "main"
-	],
-	"main" : $[
-	    `abort	: `abort,
-	    `next	: "write"
-	],
-	"write" : $[
-	    `abort	: `abort,
-	    `next	: `next
-	]
-    ];
-
-    Wizard::CreateDialog();
-    Wizard::SetDesktopIcon("firewall");
-
-    any ret = Sequencer::Run(aliases, sequence);
-
-    UI::CloseDialog();
-    return ret;
-}
-
-/**
- * Main interface function
- */
-define any Firewall() ``{
-    map aliases = $[
-	"config_or_stop": [ ``(AskStopDialog()), true ],
-	"stop"		: ``(StopDialog()),
-	"read"		: [ ``(ReadDialog()), true ],
-	"devices"	: ``(DevicesDialog()),
-	"services"	: ``(ServicesDialog()),
-	"features"	: ``(FeatureDialog()),
-	"logging"	: ``(LoggingDialog()),
-	"prewrite"	: [ ``(PreWriteDialog()), true ],
-	"write"		: [ ``(WriteDialog()), true ]
-    ];
-
-    map sequence = $[
-        "ws_start" : "config_or_stop",
-        "config_or_stop" : $[
-	    `abort: `abort,
-            `config: "read",
-	    `stop: "stop"
-        ],
-        "stop" : $[
-	    `abort: `abort,
-            `next: `next
-        ],
-        "read" : $[
-	    `abort: `abort,
-            `next: "devices"
-        ],
-        "devices" : $[
-	    `abort: `abort,
-            `next: "services"
-        ],
-        "services" : $[
-	    `abort: `abort,
-            `next: "features"
-        ],
-        "features" : $[
-	    `abort: `abort,
-            `next: "logging"
-        ],
-        "logging" : $[
-	    `abort: `abort,
-            `next: "prewrite"
-        ],
-        "prewrite" : $[
-	    `abort: `abort,
-            `next: "write"
-        ],
-        "write" : $[
-			`abort: `abort,
-            `next: `ws_finish
-        ]
-    ];
-
-    string help = "";
-    string caption = _("Firewall configuration");
-    term contents = `Label(_("Initializing ..."));
-
-    Wizard::CreateDialog();
-    Wizard::SetDesktopIcon("firewall");
-    Wizard::SetContentsButtons(caption,contents,help,Label::BackButton(),Label::NextButton());
-
-    any ret = Sequencer::Run(aliases, sequence);
-    UI::CloseDialog();
-    return ret;
-}
-
-/**
- * Main interface function
- */
-define any FirewallAutoSequence() ``{
-    map aliases = $[
-	"figurefw"	: ``(FigureFirewallDialog()),
-	"devices"	: ``(DevicesDialog()),
-	"services"	: ``(ServicesDialog()),
-	"features"	: ``(FeatureDialog()),
-	"logging"	: ``(LoggingDialog())
-    ];
-
-    map sequence = $[
-        "ws_start" : "figurefw",
-	"figurefw" : $[
-	    `abort: `abort,
-	    `next: "devices",
-	    `finish: `next
-	],
-        "devices" : $[
-	    `abort: `abort,
-            `next: "services"
-        ],
-        "services" : $[
-	    `abort: `abort,
-            `next: "features"
-        ],
-        "features" : $[
-	    `abort: `abort,
-            `next: "logging"
-        ],
-        "logging" : $[
-	    `abort: `abort,
-            `next: `next
-        ]
-    ];
-
-    string help = "";
-
-    /* Read dialog caption */
-    string caption = _("Firewall configuration");
-
-    /* Read dialog contents */
-    term contents = `Label(_("Initializing ..."));
-
-    Wizard::CreateDialog();
-    Wizard::SetDesktopIcon("firewall");
-    Wizard::SetContentsButtons(caption, contents, help,
-	    Label::BackButton(), Label::NextButton());
-
-    any ret = Sequencer::Run(aliases, sequence);
-    UI::CloseDialog();
-    return ret;
-}
-
-/**
- * Main interface function
- */
-define any FirewallProposalSequence() ``{
-    map aliases = $[
-	"figurefw"	: ``(FigureFirewallDialog()),
-	"devices"	: ``(DevicesDialog()),
-	"services"	: ``(ServicesDialog()),
-	"features"	: ``(FeatureDialog()),
-	"logging"	: ``(LoggingDialog())
-    ];
-
-    map sequence = $[
-        "ws_start" : "figurefw",
-	"figurefw" : $[
-	    `abort: `abort,
-	    `next: "devices",
-	    `finish: `next
-	],
-        "devices" : $[
-	    `abort: `abort,
-            `next: "services"
-        ],
-        "services" : $[
-	    `abort: `abort,
-            `next: "features"
-        ],
-        "features" : $[
-	    `abort: `abort,
-            `next: "logging"
-        ],
-        "logging" : $[
-	    `abort: `abort,
-            `next: `next
-        ]
-    ];
-
-    string help = "";
-
-    /* Read dialog caption */
-    string caption = _("Firewall configuration");
-
-    /* Read dialog contents */
-    term contents = `Label(_("Initializing ..."));
-
-    Wizard::CreateDialog();
-    Wizard::SetDesktopIcon("firewall");
-    Wizard::SetContentsButtons(caption, contents, help,
-	    Label::BackButton(), Label::NextButton());
-
-    any ret = Sequencer::Run(aliases, sequence);
-    UI::CloseDialog();
-    return ret;
-}
+	UI::CloseDialog();
+	return ret;
+    }
 
 /* EOF */
 }
