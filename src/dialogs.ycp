@@ -113,7 +113,7 @@ global define any DevicesDialog() ``{
     /* Devices dialog caption */
     string caption = _("Firewall Configuration (Step 1 of 4): Basic Settings");
 
-    /* Devices dialog help 1/3 */
+    /* Devices dialog help 1/4 */
     string help = _("<p>This tool aims to be an easy-to-use configuration
 front-end for the Linux packet filter engine. The configuration items in
 the following menus are a collection of the most important functions
@@ -121,14 +121,18 @@ of the SuSEfirewall2 package. Take a few moments to go through all menus
 and select the options carefully.</p>
 ") +
 
-    /* Devices dialog help 2/3 */
+    /* Devices dialog help 2/4 */
     _("<p><b>External Interface:</b><br>
 Choose the interface connected to the Internet for which to configure
 the firewall.</p>") +
 
-    /* Devices dialog help 3/3 */
+    /* Devices dialog help 3/4 */
     _("<p><b>Internal Interface:</b><br>
-Choose your internal network interface.</p>");
+Choose your internal network interface.</p>") +
+
+    /* Devices dialog help 4/4 */
+    _("<p>It is possible to specify more external or internal interfaces by
+entering their names separated by spaces, for example: <i>eth0 eth1</i>.</p>");
 
     /* Warning RichText 1/2 */
     string warning = _("<p><b>Warning:</b></p>") +
