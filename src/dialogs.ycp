@@ -384,6 +384,10 @@ services. Also start the appropriate daemons.</p>
 	    if(Popup::ReallyAbort(true)) break;
 	    else continue;
 	}
+	else if ( ret == `back )
+	{
+	    break;
+	}
 	else if ( ret == `next )
 	{
 	    SuSEFirewall::settings["FW_SERVICES_EXT_TCP"] = mergestring((list<string>) sort(union(services_list, additional_services))," ");
@@ -421,8 +425,8 @@ services. Also start the appropriate daemons.</p>
 //	    UI::ChangeWidget(`id(`status), `Value, services_string);
 	}
     }
-    y2milestone("settings=%1", SuSEFirewall::settings);
 
+    y2milestone("settings=%1", SuSEFirewall::settings);
     return ret;
 }
 
