@@ -33,6 +33,4 @@ AM_CONDITIONAL(ISPPC, [case $host_cpu in powerpc*) true;; *) false;; esac])
 AC_OUTPUT(Makefile
 	package/yast2-config-firewall.spec:yast2-config-firewall.spec.in
 	src/Makefile
-	doc/Makefile
-	doc/autodocs/Makefile
-	testsuite/Makefile)
+	doc/Makefile)
