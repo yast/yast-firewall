@@ -155,8 +155,7 @@ list<string> Selected2Opened (list<string> ifaces) {
     new_ifaces = filter (string i, new_ifaces, {
 	return i != nil;
     });
-    ifaces = (list<string>)toset (merge (ifaces, new_ifaces));
-    return ifaces;
+    return toset (new_ifaces);
 }
 
 /**
@@ -208,12 +207,13 @@ global void StoreAllowedInterfaces (list<string> services) {
     // do not save anything if configuration didn't change
     if (! configuration_changed)
 	return;
-    list<string> forbidden_ifaces = filter (string i, all_interfaces, {
+    list<string> forbidden_interfaces = filter (string i, all_interfaces, {
 	return ! contains (allowed_interfaces, i);
     });
-    if (size (forbidden_ifaces) > 0)
+
+    if (size (forbidden_interfaces) > 0)
     {
-	SuSEFirewall::SetServices (services, forbidden_ifaces, false);
+	SuSEFirewall::SetServices (services, forbidden_interfaces, false);
     }
     if (size (allowed_interfaces) > 0)
     {
@@ -302,17 +302,35 @@ Continue?")))
 	    return false;
 	}
     }
-    list<string> firewall_ifaces = Selected2Opened (ifaces);
-    if (size (firewall_ifaces) != size (ifaces))
+    list<string> firewall_ifaces = toset (Selected2Opened (ifaces));
+    list<string> added_ifaces = filter (string i, firewall_ifaces, {
+	return ! contains (ifaces, i);
+    });
+    list<string> removed_ifaces = filter (string i, ifaces, {
+	return ! contains (firewall_ifaces, i);
+    });
+    if (size (added_ifaces) > 0)
     {
-	// todo difflist
-	firewall_ifaces = filter (string i, firewall_ifaces, {
-	    return ! contains (ifaces, i);
-	});
-	string ifaces_list = mergestring (firewall_ifaces, ", ");
+	string ifaces_list = mergestring (added_ifaces, "\n");
 	if (! Popup::YesNo (sformat (
+	    // yes-no popup
 	    _("Because of SuSE Firewall settings, the port
 on folowing interfaces will be additionally open:
+%1
+
+Continue?"),
+	    ifaces_list)))
+	{
+	    return false;
+	}
+    }
+    if (size (removed_ifaces) > 0)
+    {
+	string ifaces_list = mergestring (removed_ifaces, "\n");
+	if (! Popup::YesNo (sformat (
+	    // yes-no popup
+	    _("Because of SuSE Firewall settings, the port
+on folowing interfaces cannot be opened:
 %1
 
 Continue?"),
