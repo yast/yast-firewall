@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Aug 30 13:33:00 CEST 2004 - jsrain@suse.cz
+
+- added CWMFirewallInterfaces::Modified () function (#44106)
+
+-------------------------------------------------------------------
 Fri Aug 27 16:50:39 CEST 2004 - locilka@suse.cz
 
 - added allowing broadcast messages into ipp-client service

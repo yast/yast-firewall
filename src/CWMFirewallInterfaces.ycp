@@ -709,6 +709,14 @@ global map<string,any> CreateOpenFirewallWidget (map<string,any> settings) {
     return ret;
 }
 
+/**
+ * Check if settings were modified by the user
+ * @return boolean true if settings were modified
+ */
+global boolean Modified () {
+    return SuSEFirewall::GetModified ();
+}
+
 
 // EOF
 }
