@@ -279,7 +279,7 @@ global define map<string,any> CreateWidget (map<string,any> settings) {
  * Display the firewall interfaces selection as a popup
  * @return symbol return value of the dialog
  */
-global symbol DisplayFirewallDetailsPopup (map<string,any> settings) {
+global symbol DisplayPopup (map<string,any> settings) {
     list<map <string, any> > w = CWM::CreateWidgets (
 	["firewall_ifaces"],
 	$[
