@@ -24,6 +24,6 @@
 .sysconfig.SuSEfirewall2
 
 `ag_ini(
-    SysConfigFile("/etc/sysconfig/SuSEfirewall2")
+    SCR::SysConfigFile("/etc/sysconfig/SuSEfirewall2")
 )
 
