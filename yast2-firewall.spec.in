@@ -1,8 +1,8 @@
 @HEADER-COMMENT@
-# neededforbuild yast2-devel-packages yast2-network yast2-country yast2-installation
+# neededforbuild yast2-devel-packages yast2-installation
 
 @HEADER@
-Requires:	yast2 yast2-network SuSEfirewall2
+Requires:	yast2 SuSEfirewall2
 
 Provides:	yast2-config-firewall
 Obsoletes:	yast2-config-firewall
