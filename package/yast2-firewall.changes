@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Jan 11 16:13:20 CET 2005 - locilka@suse.cz
+
+- Added CommandLine support
+
+-------------------------------------------------------------------
 Mon Jan  3 10:23:53 CET 2005 - locilka@suse.cz
 
 - Adjusted start/stop dialog for new CWM functionality (own
