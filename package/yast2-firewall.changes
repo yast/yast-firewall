@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Feb  3 08:31:47 CET 2003 - nashif@suse.de
+
+- use SuSEFirewall module
+- added autoinstallation support
+- removed obsolete _write client
+
+-------------------------------------------------------------------
 Thu Jan 30 18:08:59 CET 2003 - lnussel@suse.de
 
 - apply proof read texts
