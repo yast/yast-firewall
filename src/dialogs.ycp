@@ -52,6 +52,8 @@
 	    "save_now_action"		: SaveAndRestart,
 					  // TRANSLATORS: Push button
 	    "save_now_button"		: _("Save Settings and Restart Firewall &Now"),
+	    "start_now_action"		: SuSEFirewall::StartServices,
+	    "stop_now_action"		: SuSEFirewall::StopServices,
 	    "help"			: sformat (CWMServiceStart::StartStopHelpTemplate (true),
 		// TRANSLATORS: part of help text - push button label, NO SHORTCUT!!!
 		_("Start Firewall Now"),

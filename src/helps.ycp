@@ -91,6 +91,39 @@ like for instace internet. This dialog opens IPsec for External zone using the
 
 <p><b>Details</b> allows to configure how are trusted and handled successfully decypted
 IPsec packets.</p>"),
+
+	// TRANSLATORS: Base Logging configuration dialog help
+	"base-logging" : _("<p><b><big>Logging Level</big></b>
+<br>This is a base configuration dialog for IP packets logging settings. Here you only
+configure inbound connection packets, outbound ones are not logged at all.</p>
+
+<p>There are two groups of logged IP packets: <b>Allowed Packets</b> and <b>Disallowed Packets</b>.
+You can choose from three levels of logging for each group: <b>Log All</b> for logging every
+packet, <b>Log Only Critical</b> for log only interesting ones, <b>Do Not Log Any</b>
+for no logging.</p>
+
+<p>You should log critical allowed packets at least.</p>"),
+
+	// TRANSLATORS: Base Summary dialog help
+	"box-summary" : _("<p><b><big>Summary</big></b>
+<br>Here you can find a summary of your configuration settings.
+This summary is divided into general configuration and parts for each firewall zone.
+Every existing zone is summarized here.</p>
+
+<p><b>Firewall Starting</b> shows information if the firewall is started in the
+<b>boot process</b> or only <b>manually</b>.</p>
+
+<p>Firewall zones must have any network interface assigned to list these items in
+summarization:</p>
+
+<p><b>Interfaces</b> - all interfaces are listed using their configuration name and device name.
+If the name is right, you see green mark-check on the left; If it is not right, you see red arrow
+on the left.</p>
+
+<p><b>Open Services, Ports and Protocols</b> - Here are listed all open network services, additional
+TCP (Transmission Control Protocol), UDP (User Datagram Protocol) and RPC (Remote Procedure Call)
+ports and IP (Internet Protocol) protocols.</p>"),
+
     ];
 
     string HelpForDialog (string identification) {

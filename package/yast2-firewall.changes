@@ -1,4 +1,14 @@
 -------------------------------------------------------------------
+Mon Jan  3 10:23:53 CET 2005 - locilka@suse.cz
+
+- Adjusted start/stop dialog for new CWM functionality (own
+  functions for starting and stopping)
+- More informative Summarization
+- Support for new SuSEfirewall2's broadcast implementation
+- Added help texts
+- 2.11.4 
+
+-------------------------------------------------------------------
 Tue Dec 21 09:09:09 CET 2004 - locilka@suse.cz
 
 - New implementation of yast2-firewall UI (in progress)

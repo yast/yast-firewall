@@ -152,8 +152,23 @@
 	    "</ul>\n";
     }
 
+    string SummaryFirewallStart () {
+	// TRANSLATORS: Summary header item
+	string ret_message = "<h2>" + _("Firewall Starting") + "</h2>";
+
+	if (SuSEFirewall::GetEnableService()) {
+	    // TRANSLATORS: Summary text item
+	    ret_message = ret_message + "<ul><li>" + _("Start firewall when booting") + "</li></ul>";
+	} else {
+	    // TRANSLATORS: Summary text item
+	    ret_message = ret_message + "<ul><li>" + _("Start firewall manually") + "</li></ul>";
+	}
+
+	return ret_message;
+    }
+
     void InitBoxSummary () {
-	string summary = "";
+	string summary = SummaryFirewallStart();
 
 	foreach (string zone_id, SuSEFirewall::GetKnownFirewallZones(), {
 	    summary = summary
