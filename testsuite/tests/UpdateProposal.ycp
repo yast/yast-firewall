@@ -64,6 +64,7 @@
 		"REJECT_ALL_INCOMING_CONNECTIONS":""
 	    ],
 	],
+	"target" : $[ "size" : 1, ],
 	"network" : $[
 	    "section" : $[
 		"eth-id-00:c0:df:22:c6:a8" : nil,
