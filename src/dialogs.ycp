@@ -435,7 +435,9 @@ services. Also start the appropriate daemons.</p>");
     list<string> additional_services_udp = [];
 
     list<string> selectable_services = [];
-
+    foreach (string service, map<string, any> value, services_definition, {
+	selectable_services = add(selectable_services, service);
+    });
 
     /**
      * Helper function for switching service-checkboxes on/off
@@ -446,8 +448,6 @@ services. Also start the appropriate daemons.</p>");
 	additional_services_udp = services_list_udp;
 
 	foreach (string service_name, map<string, any> required_ports, services_definition, {
-	    selectable_services = add(selectable_services, service_name);
-
 	    boolean current_service_status = (boolean) UI::QueryWidget(`id(service_name), `Value);
 	    boolean service_supported = true;
 
@@ -470,7 +470,7 @@ services. Also start the appropriate daemons.</p>");
 	    }
 
 	    // service support was added using expert settings
-	    if ((service_supported == true) && (current_service_status == false)) {
+	    if (service_supported == true) {
 		// Additional special function for service
 		SuSEFirewall::RunServiceSupport(service_name,true);
 
@@ -484,7 +484,7 @@ services. Also start the appropriate daemons.</p>");
 		    additional_services_udp = filter(string remove_udp, additional_services_udp, ``(remove_udp != udp));
 		});
 	    // service support removed ... how?
-	    } else if ((service_supported == false) && (current_service_status == true)) {
+	    } else {
 		UI::ChangeWidget(`id(service_name), `Value, false);
 	    }
 	});
