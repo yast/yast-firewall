@@ -428,7 +428,10 @@ global define void SuSEFirewall () {
  */
 global define boolean Import(map s) {
     settings = (map<string,any>)s;
-    start = settings["start_firewall"]:true;
+    y2debug("settings: %1", settings );
+    start = settings["START_FIREWALL"]:true;
+
+    y2debug("start: %1", start);
     return true;
 }
 
@@ -908,7 +911,7 @@ global define boolean ActivateConfiguration () {
 global define boolean Write() {
     // indicates that the firewall settings weren't modified
     // usable for external use in other modules
-    if (GetModified()==false) {
+    if (GetModified()==false && !Mode::autoinst) {
 	y2milestone("Firewall wasn't modified");
 	return true;
     }
@@ -921,7 +924,7 @@ global define boolean Write() {
 //    }
 
     if (Mode::config==true || Mode::autoinst==true) {
-	if (!start && !write_only) {
+	if (!start ) {
 	    y2milestone("Firewall should not start and should not be written");
 	    return false;
 	}

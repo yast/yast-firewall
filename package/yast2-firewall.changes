@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Sun Oct  3 01:53:28 CEST 2004 - nashif@suse.de
+
+- #46262: Firewall is always enabled
+- Firewall settings not written during autoinstall
+
+-------------------------------------------------------------------
 Fri Sep 24 17:19:14 CEST 2004 - locilka@suse.cz
 
 - fixed bug #46043
