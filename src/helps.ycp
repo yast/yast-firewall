@@ -118,9 +118,7 @@ Every existing zone is summarized here.</p>
 
 <p>Firewall zones must have a network interface assigned to list the following items in the summary:</p>
 
-<p><b>Interfaces</b>: All interfaces are listed using their configuration name and device name.
-If the configuration is complete and the interface exists, see a green check mark on the left. If there is a problem, see a red arrow
-on the left.</p>
+<p><b>Interfaces</b>: All interfaces are listed using their configuration name and device name.</p>
 
 <p><b>Open Services, Ports, and Protocols</b>: This lists all allowed network services, additional
 TCP (Transmission Control Protocol), UDP (User Datagram Protocol), and RPC (Remote Procedure Call)
