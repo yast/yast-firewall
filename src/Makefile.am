@@ -4,23 +4,19 @@
 # $Id$
 #
 
-clientsdir = $(YAST2DIR)/clients
-includedir = $(YAST2DIR)/include/firewall
-menudir = $(YAST2DIR)/menuentries
+yncludedir = @yncludedir@/firewall
 
-clients_DATA =		\
+client_DATA =		\
 	firewall.ycp	\
 	firewall_write.ycp
 
-include_DATA =		\
+ynclude_DATA =		\
 	io.ycp		\
 	ui.ycp
 
-menu_DATA = menuentry_firewall2.y2cc
-
-scrconfdir = $(YAST2DIR)/scrconf
+config_DATA = firewall.y2cc
 
 scrconf_DATA = firewall2.scr personal-firewall.scr
 
 
-EXTRA_DIST = $(clients_DATA) $(include_DATA) $(menu_DATA) $(scrconf_DATA)
+EXTRA_DIST = $(client_DATA) $(ynclude_DATA) $(config_DATA) $(scrconf_DATA)

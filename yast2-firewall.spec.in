@@ -1,0 +1,32 @@
+@HEADER-COMMENT@
+# neededforbuild yast2-devel-packages
+
+@HEADER@
+Requires:	yast2 SuSEfirewall2
+
+Provides:	yast2-config-firewall
+Obsoletes:	yast2-config-firewall
+
+BuildArchitectures:	noarch
+
+Summary:	Configuration of firewall
+
+%description
+-
+
+@PREP@
+
+@BUILD-YCP@
+
+@INSTALL-YCP@
+
+@CLEAN@
+
+%files
+%defattr(-,root,root)
+%dir @yncludedir@/firewall
+@yncludedir@/firewall/*
+@clientdir@/firewall*
+@configdir@/firewall.y2cc
+@scrconfdir@/*.scr
+%doc @docdir@
