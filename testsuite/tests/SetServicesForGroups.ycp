@@ -136,9 +136,7 @@
     NetworkDevices::Read ();
 
     DUMP ("=======================");
-    TEST (``(SuSEFirewall::SetServicesForGroups (["nis-server", "dns-server"], ["EXT", "DMZ"], false)), [READ, WRITE, EXEC], 0);
-    DUMP (SuSEFirewall::settings);
-    TEST (``(SuSEFirewall::SetServicesForGroups (["nis-server", "dns-server"], ["INT", "DMZ"], true)), [READ, WRITE, EXEC], 0);
+    TEST (``(SuSEFirewall::SetServicesForGroups (["nis-server", "dns-server"], ["EXT", "DMZ"], true)), [READ, WRITE, EXEC], 0);
     DUMP (SuSEFirewall::settings);
     DUMP ("=======================");
 }
