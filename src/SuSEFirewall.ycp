@@ -38,6 +38,8 @@ global boolean proposal_changed_by_user = false;
 
 /* default value for firewall enabled/disabled */
 global boolean enable_firewall = true;
+global boolean enable_firewall_init_default = enable_firewall;
+global boolean firewall_proposal_initialized = false;
 
 /* default value for open_ssh in proposal */
 global boolean open_ssh_port = true;
@@ -673,7 +675,8 @@ global define void Propose () ``{
 	return;
     // Devices were added, firewall would be enabled now
     } else if (size(known_devices_in_previous_run)==0) {
-	SuSEFirewall::enable_firewall = true;
+	// initializing to the default value
+	SuSEFirewall::enable_firewall = SuSEFirewall::enable_firewall_init_default;
     }
 
     // if no dialup devices, all of them are proposed to be external

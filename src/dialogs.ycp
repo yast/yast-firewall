@@ -161,15 +161,16 @@ Choose your internal network interface.</p>") +
 
     /* Devices dialog help 4/4 */
     _("<p>It is possible to specify more external or internal interfaces by
-entering their names separated by spaces, for example: <i>eth0 eth1</i>.</p>");
+entering their names separated by spaces, for example: <i>modem0 dsl1</i>.</p>");
 
-    /* Warning RichText 1/2 */
-    string warning = _("<p><b>Warning:</b></p>") +
-
-    /* Warning RichText 2/2 */
-    _("<p><ul><li>DSL with PPP over Ethernet uses ppp0 (ppp1, ppp2, etc.)
-as the external interface. Your ethernet interface is not the external
-interface in this case.</li></ul></p>");
+// DLS has not ppp0 interface anymore, but dls0
+//    /* Warning RichText 1/2 */
+//    string warning = _("<p><b>Warning:</b></p>") +
+//
+//    /* Warning RichText 2/2 */
+//    _("<p><ul><li>DSL with PPP over Ethernet uses ppp0 (ppp1, ppp2, etc.)
+//as the external interface. Your ethernet interface is not the external
+//interface in this case.</li></ul></p>");
 
     // fetch list of network devices in normal configuration
     if (Mode::config==false && Mode::normal==true) {
@@ -202,10 +203,10 @@ interface in this case.</li></ul></p>");
 							   `HSpacing(3),
 							   `HWeight(35,`Top( `Left( `Label (
  // to translater: please keep width and newlines. Use more lines if neccessary
-_("eth0 (eth1, eth2 ...) is typically
+_("eth-id-AA:BB:CC:DD:EE:FF is typically
 used for ethernet cards, ippp0 for
-ISDN, and ppp0 for modem and ADSL
-connections
+ISDN, modem0 for modem and dsl0 for
+DSL connections
 ")))))
 							   ),
 						    `VSpacing (1),
@@ -219,9 +220,10 @@ have an internal network.
 							    ),
 						    `VSpacing (1)
 						    )
-					     ),
-				   `HBox (`VSpacing(6), `RichText (warning)),
-				   `VSpacing (1.5)
+					     )
+				   //There's no warning anymore
+				   //`HBox (`VSpacing(6), `RichText (warning)),
+				   //`VSpacing (1.5)
 				   ),
 			    `HSpacing (3)
 			    )

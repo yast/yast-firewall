@@ -19,9 +19,22 @@ y2milestone("Arguments: %1", WFM::Args());
 import "SuSEFirewall";
 import "Popup";
 import "Progress";
+import "ProductFeatures";
 
 SuSEFirewall::SetModified();
 
+// run this only once
+if (SuSEFirewall::firewall_proposal_initialized==false) {
+    ProductFeatures::ProductFeatures();
+    // variables from control file
+    y2milestone("Default firewall values: enable_firewall=%1, enable_ssh=%2",
+        ProductFeatures::enable_firewall, ProductFeatures::firewall_enable_ssh);
+    SuSEFirewall::enable_firewall = ProductFeatures::enable_firewall;
+    SuSEFirewall::enable_firewall_init_default = ProductFeatures::enable_firewall;
+    SuSEFirewall::open_ssh_port = ProductFeatures::firewall_enable_ssh;
+
+    SuSEFirewall::firewall_proposal_initialized = true;
+}
 string func = (string) WFM::Args(0);
 map param = (map) WFM::Args(1);
 map ret = $[];

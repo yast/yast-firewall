@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Tue Sep 14 12:37:30 CEST 2004 - locilka@suse.cz
+
+- default values enable_firewall and open_ssh were moved into the
+  control file #45240
+- fixed texts to be matching the actual state of the naming of
+  network interfaces #45209
+
+-------------------------------------------------------------------
 Mon Sep 13 09:08:37 CEST 2004 - locilka@suse.cz
 
 - fixed SuSEfirewall2 defaults to be the same as in the SFW2
