@@ -48,7 +48,7 @@ y2debug("param=%1", param);
 
 /* Create a summary*/
 if (func == "Summary") {
-    ret = InitBoxSummary();
+    ret = InitBoxSummary(SuSEFirewall::GetKnownFirewallZones());
 }
 /* Reset configuration */
 else if (func == "Reset") {
