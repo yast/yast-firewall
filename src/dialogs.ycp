@@ -418,74 +418,7 @@ services. Also start the appropriate daemons.</p>");
 	)
     );
 
-    # list firewall_services_selected
-
-    map<string, map<string, list> > services_definition = $[
-	"http" : $[
-	    "tcp_ports" : [ "http" ],
-	    "udp_ports" : [ ],
-	],
-	"https" : $[
-	    "tcp_ports" : [ "https" ],
-	    "udp_ports" : [ ],
-	],
-	"smtp" : $[
-	    "tcp_ports" : [ "smtp" ],
-	    "udp_ports" : [ ],
-	],
-	"pop3" : $[
-	    "tcp_ports" : [ "pop3" ],
-	    "udp_ports" : [ ],
-	],
-	"pop3s" : $[
-	    "tcp_ports" : [ "pop3s" ],
-	    "udp_ports" : [ ],
-	],
-	"imap" : $[
-	    "tcp_ports" : [ "imap" ],
-	    "udp_ports" : [ ],
-	],
-	"imaps" : $[
-	    "tcp_ports" : [ "imaps" ],
-	    "udp_ports" : [ ],
-	],
-	"samba-server" : $[
-	    "tcp_ports" : [ "netbios-ns", "netbios-dgm", "netbios-ssn", "microsoft-ds" ],
-	    "udp_ports" : [ ],
-	],
-	"ssh" : $[
-	    "tcp_ports" : [ "ssh" ],
-	    "udp_ports" : [ ],
-	],
-	"rsync" : $[
-	    "tcp_ports" : [ "rsync" ],
-	    "udp_ports" : [ ],
-	],
-	"dhcp-server" : $[
-	    "tcp_ports" : [ "bootpc" ],
-	    "udp_ports" : [ ],
-	],
-	"dns-server" : $[
-	    "tcp_ports" : [ "domain" ],
-	    "udp_ports" : [ "domain" ],
-	],
-	"portmap" : $[
-	    "tcp_ports" : [ "sunrpc" ],
-	    "udp_ports" : [ "sunrpc" ],
-	],
-	"nfs-server" : $[
-	    "tcp_ports" : [ "nfs" ],
-	    "udp_ports" : [ ],
-	],
-	"vnc" : $[
-	    "tcp_ports" : [ "5801", "5901" ],
-	    "udp_ports" : [ ],
-	],
-	"tftp" : $[
-	    "tcp_ports" : [ "tftp" ],
-	    "udp_ports" : [ ],
-	],
-    ];
+    map<string, map<string, any> > services_definition = SuSEFirewall::firewall_services_definition;
 
     Wizard::SetContentsButtons(caption, contents, help,
 	    Label::BackButton(), Label::NextButton());
@@ -503,81 +436,95 @@ services. Also start the appropriate daemons.</p>");
 
     list<string> selectable_services = [];
 
+
+    /**
+     * Helper function for switching service-checkboxes on/off
+     */
     define void SwitchServices () {
-    // function for switching on/off the checkboxes if services should be on or off
-    additional_services_tcp = services_list_tcp;
-    additional_services_udp = services_list_udp;
-    foreach (string service_name, map<string, list> required_ports, services_definition, {
-	selectable_services = add(selectable_services, service_name);
+	// function for switching on/off the checkboxes if services should be on or off
+	additional_services_tcp = services_list_tcp;
+	additional_services_udp = services_list_udp;
 
-	boolean service_supported = true;
-	list<string> required_tcp = (list<string>) required_ports["tcp_ports"]:[];
-	list<string> required_udp = (list<string>) required_ports["udp_ports"]:[];
+	foreach (string service_name, map<string, any> required_ports, services_definition, {
+	    selectable_services = add(selectable_services, service_name);
 
-	// if any ports are defined to control
-	if ((size(required_tcp)>0) || (size(required_udp)>0)) {
-	    // controlling all TCP ports if they are supported
-	    foreach (string tcp, required_tcp, {
-		if (!contains(services_list_tcp, tcp)) {
-		    service_supported = false;
-		}
-	    });
-	    // controlling all UDP port if they are supported
-	    foreach (string udp, required_udp, {
-		if (!contains(services_list_udp, udp)) {
-		    service_supported = false;
-		}
-	    });
-	} else {
-	// else the service is not supported by firewall
-	    service_supported = false;
-	}
+	    boolean current_service_status = (boolean) UI::QueryWidget(`id(service_name), `Value);
+	    boolean service_supported = true;
 
-	if (service_supported) {
-	    UI::ChangeWidget(`id(service_name), `Value, true);
-	    // removing all services hiddable under checkboxes
-	    foreach (string tcp, required_tcp, {
-		additional_services_tcp = filter(string remove_tcp, additional_services_tcp, ``(remove_tcp != tcp));
-	    });
-	    foreach (string udp, required_udp, {
-		additional_services_udp = filter(string remove_udp, additional_services_udp, ``(remove_udp != udp));
-	    });
-	} else {
-	    UI::ChangeWidget(`id(service_name), `Value, false);
-	}
-    });
+	    list<string> required_tcp = (list<string>) required_ports["tcp_ports"]:[];
+	    list<string> required_udp = (list<string>) required_ports["udp_ports"]:[];
+
+	    // if any ports are defined to control
+	    if ((size(required_tcp)>0) || (size(required_udp)>0)) {
+		// controlling all TCP ports if they are supported
+		foreach (string tcp, required_tcp, {
+		    if (!contains(services_list_tcp, tcp)) service_supported = false;
+		});
+		// controlling all UDP port if they are supported
+		foreach (string udp, required_udp, {
+		    if (!contains(services_list_udp, udp)) service_supported = false;
+		});
+	    // else the service is not supported by firewall
+	    } else {
+		service_supported = false;
+	    }
+
+	    // service support was added using expert settings
+	    if ((service_supported == true) && (current_service_status == false)) {
+		// Additional special function for service
+		SuSEFirewall::RunServiceSupport(service_name,true);
+
+		UI::ChangeWidget(`id(service_name), `Value, true);
+
+		// removing all services hiddable under checkboxes
+		foreach (string tcp, required_tcp, {
+		    additional_services_tcp = filter(string remove_tcp, additional_services_tcp, ``(remove_tcp != tcp));
+		});
+		foreach (string udp, required_udp, {
+		    additional_services_udp = filter(string remove_udp, additional_services_udp, ``(remove_udp != udp));
+		});
+	    // service support removed ... how?
+	    } else if ((service_supported == false) && (current_service_status == true)) {
+		UI::ChangeWidget(`id(service_name), `Value, false);
+	    }
+	});
     
-    string show_tcp = ((size(additional_services_tcp)>0) ?
-	    // Text for filling TextEntry, %1 = list of services
-	    sformat(_("TCP: %1"), mergestring((list<string>)additional_services_tcp, " "))
-	    :
-	    ""
-	);
-    string show_udp = ((size(additional_services_udp)>0) ?
-	    // Text for filling TextEntry, %1 = list of services
-	    sformat(_("UDP: %1"), mergestring((list<string>)additional_services_udp, " "))
-	    :
-	    ""
-	);
+	string show_tcp = ((size(additional_services_tcp)>0) ?
+		// Text for filling TextEntry, %1 = list of TCP services
+		sformat(_("TCP: %1"), mergestring((list<string>)additional_services_tcp, " "))
+		:
+		""
+	    );
+	string show_udp = ((size(additional_services_udp)>0) ?
+		// Text for filling TextEntry, %1 = list of UDP services
+		sformat(_("UDP: %1"), mergestring((list<string>)additional_services_udp, " "))
+		:
+		""
+	    );
 
-    string additional_services_show =
-	((show_tcp != "") ? show_tcp : "")
-	+ (((show_tcp != "") && (show_udp != "")) ? ", " : "")
-	+ ((show_udp != "") ? show_udp : "");
+	string additional_services_show =
+	    ((show_tcp != "") ? show_tcp : "")
+	    + (((show_tcp != "") && (show_udp != "")) ? ", " : "")
+	    + ((show_udp != "") ? show_udp : "");
 
-
-    UI::ChangeWidget(`id(`status), `Value, additional_services_show);
+	UI::ChangeWidget(`id(`status), `Value, additional_services_show);
     }
 
+    /**
+     * Helper function if checkbox status changed
+     */
     define void HandleService (string service_checkbox) {
 	boolean state = (boolean) UI::QueryWidget(`id(service_checkbox),`Value);
 
 	// required TCP and UDP ports for the service
-	map<string, list> required_ports = services_definition[(string) service_checkbox]:$[ "tcp_ports":[], "udp_ports":[] ];
+	map<string, any> required_ports = services_definition[(string) service_checkbox]:$[ "tcp_ports":[], "udp_ports":[] ];
 	list<string> required_tcp = (list<string>) required_ports["tcp_ports"]:[];
 	list<string> required_udp = (list<string>) required_ports["udp_ports"]:[];
 
-	if(state == true) {
+	// Additional special function for service
+	SuSEFirewall::RunServiceSupport(service_checkbox, state);
+
+	if (state == true) {
 	// service was selected
 	    services_list_tcp = (list<string>) union(services_list_tcp,required_tcp);
 	    services_list_udp = (list<string>) union(services_list_udp,required_udp);
@@ -610,24 +557,14 @@ services. Also start the appropriate daemons.</p>");
 	    // <-- Exceptions
 	    boolean nfs_state     = (boolean) UI::QueryWidget(`id("nfs-server"),`Value);
 	    boolean portmap_state = (boolean) UI::QueryWidget(`id("portmap"),`Value);
-	    if (portmap_state == true) {	// Portmap is selected
-		list<string> ext_rpc = splitstring(SuSEFirewall::settings["FW_SERVICES_EXT_RPC"]:"", " ");
-		// adding needed services
-		ext_rpc = (list<string>) union (ext_rpc, [
-		    // adding NFS support
-		    "nlockmgr", "status", "nfs", "nfs_acl", "mountd",
-		    // adding NIS support
-		    "ypserv", "fypxfrd", "ypbind"
-		]);
-		SuSEFirewall::settings["FW_SERVICES_EXT_RPC"] = mergestring(ext_rpc, " ");
-	    } else {				// Portmap is unselected
-		if (nfs_state == true) {	// NFS Server is selected
-		    boolean select_portmap = SelectPortmapDialog();
-		    if (select_portmap == true) {
-			UI::ChangeWidget(`id("portmap"),`Value, true);
-			HandleService("portmap");
-			SwitchServices();
-		    }
+
+	    // Portmap is unselected && NFS Server is selected
+	    if (portmap_state == false && nfs_state == true) {
+		boolean select_portmap = SelectPortmapDialog();
+		if (select_portmap == true) {	// Portmap was disabled, now is enabled
+		    UI::ChangeWidget(`id("portmap"),`Value, true);
+		    HandleService("portmap");
+		    SwitchServices();
 		}
 	    }
 	    // --> Exceptions

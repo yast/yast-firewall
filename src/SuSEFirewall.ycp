@@ -5,6 +5,7 @@
  * Authors:	Anas Nashif <nashif@suse.de>
  *		Michal Svec <msvec@suse.cz>
  *		Michael Hager <mike@suse.de>
+ *		Lukas Ocilka <locilka@suse.cz>
  *
  * $Id$
  */
@@ -42,6 +43,113 @@ global boolean enable_firewall = true;
 global boolean write_only = false;
 
 global boolean start = false;
+
+/**
+ * Private function for handling the Portmapper support
+ *
+ * @param boolean	enable or disable the support
+ */
+define boolean HandlePortmapSupport (boolean enable) {
+    list<string> ext_rpc = splitstring(SuSEFirewall::settings["FW_SERVICES_EXT_RPC"]:"", " ");
+
+    // All needed services for Portmapper
+    list<string> rpc_services = [
+	// NFS support
+	"nlockmgr", "status", "nfs", "nfs_acl", "mountd",
+	// NIS support
+	"ypserv", "fypxfrd", "ypbind", "ypasswdd",
+    ];
+    if (enable == true) {
+	// adding needed rpc services
+	ext_rpc = (list<string>) union (ext_rpc, rpc_services);
+    } else {
+	// removing all rpc services
+	foreach ( string remove_this, rpc_services, {
+	    ext_rpc = filter (string service, ext_rpc, ``{
+		return service != remove_this;
+	    });
+	});
+    }
+
+    SuSEFirewall::settings["FW_SERVICES_EXT_RPC"] = mergestring(ext_rpc, " ");
+}
+
+    /* Definition of the TCP and UDP ports needed for services
+     *
+     * "service_id" : $[
+     *    "tcp_ports" : [ "list", "of", "ports" ],
+     *    "udp_ports" : [ "list", "of", "ports" ],
+     *    "special"   : LocalFunctionForHandlingSpecialNeeds,
+     * ]
+     */
+    global map<string, map<string, any> > firewall_services_definition = $[
+	"http" : $[
+	    "tcp_ports" : [ "http" ],
+	    "udp_ports" : [ ],
+	],
+	"https" : $[
+	    "tcp_ports" : [ "https" ],
+	    "udp_ports" : [ ],
+	],
+	"smtp" : $[
+	    "tcp_ports" : [ "smtp" ],
+	    "udp_ports" : [ ],
+	],
+	"pop3" : $[
+	    "tcp_ports" : [ "pop3" ],
+	    "udp_ports" : [ ],
+	],
+	"pop3s" : $[
+	    "tcp_ports" : [ "pop3s" ],
+	    "udp_ports" : [ ],
+	],
+	"imap" : $[
+	    "tcp_ports" : [ "imap" ],
+	    "udp_ports" : [ ],
+	],
+	"imaps" : $[
+	    "tcp_ports" : [ "imaps" ],
+	    "udp_ports" : [ ],
+	],
+	"samba-server" : $[
+	    "tcp_ports" : [ "netbios-ns", "netbios-dgm", "netbios-ssn", "microsoft-ds" ],
+	    "udp_ports" : [ ],
+	],
+	"ssh" : $[
+	    "tcp_ports" : [ "ssh" ],
+	    "udp_ports" : [ ],
+	],
+	"rsync" : $[
+	    "tcp_ports" : [ "rsync" ],
+	    "udp_ports" : [ ],
+	],
+	"dhcp-server" : $[
+	    "tcp_ports" : [ "bootpc" ],
+	    "udp_ports" : [ ],
+	],
+	"dns-server" : $[
+	    "tcp_ports" : [ "domain" ],
+	    "udp_ports" : [ "domain" ],
+	],
+	"portmap" : $[
+	    "tcp_ports" : [ "sunrpc" ],
+	    "udp_ports" : [ "sunrpc" ],
+	    "special"	: HandlePortmapSupport,
+	],
+	"nfs-server" : $[
+	    "tcp_ports" : [ "nfs" ],
+	    "udp_ports" : [ ],
+	],
+	"vnc" : $[
+	    "tcp_ports" : [ "5801", "5901" ],
+	    "udp_ports" : [ ],
+	],
+	"tftp" : $[
+	    "tcp_ports" : [ "tftp" ],
+	    "udp_ports" : [ ],
+	],
+    ];
+
 
 /**
  * Constructor
@@ -581,6 +689,64 @@ global define boolean IsDmzInterface( string interface ) {
 }
 
 /**
+ * In which group of interfaces is the interface presented.
+ * Returns nil if the interface is not presented anywhere.
+ *
+ * @param string interface		the name of the interface
+ * @return string interface_group	"INT", "DMZ", "EXT", nil
+ */
+global define string GetInterfaceGroup ( string interface ) {
+    list interface_group = [];
+    foreach ( string group, (list<string>) [ "INT", "DMZ", "EXT" ], {
+	if (group == "INT") {
+	    if (IsIntInterface(interface)) interface_group = add (interface_group, group);
+	} else if (group == "DMZ") {
+	    if (IsDmzInterface(interface)) interface_group = add (interface_group, group);
+	} else if (group == "EXT") {
+	    if (IsExtInterface(interface)) interface_group = add (interface_group, group);
+	}
+    });
+
+    if (size(interface_group)>1) {
+	// Error message, %1 = interface name (eth0)
+	Report::Error(sformat(_("Interface %1 is presented in more groups of interfaces.\n
+Continuing with configuration can produce errors.\n
+Please, leave the configuration and repair it manually in\n
+file '/etc/sysconfig/SuSEfirewall2'."), interface));
+    }
+
+    // return the first existence of interface in groups
+    // if it is not presented, nil is returned
+    string ret = nil;
+    if (size(interface_group)>0) {
+	ret = interface_group[0]:"";
+    }
+
+    return ret;
+}
+
+/**
+ * Which interfaces are in interface_group
+ *
+ * @param string interface_group	the name of the group "INT", "DMZ", "EXT"
+ * @return list<string> interface	the list of inetrfaces in interface_group
+ */
+global define list<string> GetInterfacesInGroup ( string interface_group ) {
+    list<string> ret = [];
+    if (interface_group == "INT") {
+	ret = (list<string>) splitstring(settings[ "FW_DEV_INT" ]:"", " ");
+    } else if (interface_group == "DMZ") {
+	ret = (list<string>) splitstring(settings[ "FW_DEV_DMZ" ]:"", " ");
+    } else if (interface_group == "EXT") {
+	ret = (list<string>) splitstring(settings[ "FW_DEV_EXT" ]:"", " ");
+    } else {
+	ret = nil;
+	y2error("Unknow interface group '%1', known are only 'INT', 'DMZ', 'EXT'");
+    }
+    return ret;
+}
+
+/**
  *  Add service into a given setting variable. Low-level manipulation.
  *
  *  @param set		the name of the sysconfig variable to be modified
@@ -825,6 +991,113 @@ global define void AllowIPsec(boolean yes)
 	SuSEFirewall::RemoveService("esp", "IP", "INT");
 	settings["FW_IPSEC_TRUST"] = "no";
     }
+}
+
+/**
+ * Function for handling needed support for services in SuSEfirewall2
+ * For example: "portmap" fills some strings in FW_SERVICES_EXT_RPC
+ * 
+ * @param string	service to change it's state
+ * @param boolean	new service state
+ * @return boolean	true is successful
+ */
+global define boolean RunServiceSupport (string service_id, boolean new_service_state) {
+    boolean(boolean) function = (boolean(boolean)) firewall_services_definition[service_id,"special"]:nil;
+    if (function == nil) {
+	return true;
+    }
+    y2milestone("Setting service '%1' -> '%2'", service_id, new_service_state);
+    return function(new_service_state);
+}
+
+global define boolean SetPortForGroup (string port_name, string protocol, string device_group, boolean new_state) {
+    if (device_group != "INT" && device_group != "DMZ" && device_group != "EXT") {
+	y2error("Not allowed device group '%1'", device_group);
+	return false;
+    }
+    if (protocol != "TCP" && protocol != "UDP") {
+	y2error("Not allowed protocol '%1'", protocol);
+	return false;
+    }
+
+    string setting_ident = (string) ("FW_SERVICES_" + device_group + "_" + protocol);
+
+    // enabling support
+    if (new_state == true) {
+	settings[setting_ident] =
+	    mergestring(
+		toset(
+		    splitstring((settings[setting_ident]:"" + port_name), " ")
+		), " "
+	    );
+    // disabling support
+    } else {
+	settings[setting_ident] =
+	    mergestring(
+		(filter ( string service_in_fw, ( toset(
+			splitstring( settings[setting_ident]:"", " " )
+		    ) ), ``{
+			return service_in_fw != port_name;
+		    }
+		)), " "
+	    );
+    }
+}
+
+global define boolean SetServiceForGroups (list<string> services_id, list<string> device_groups, boolean new_status) {
+    list<string> allowed_device_groups = ["INT", "EXT", "DMZ"];
+
+    // no groups == all groups
+    if (size(device_groups)==0) device_groups = allowed_device_groups;
+
+    // setting for each service
+    foreach (string service_id, services_id, {
+
+	list<string> service_tcp_ports = (list<string>) firewall_services_definition[service_id,"tcp_ports"]:[];
+	list<string> service_udp_ports = (list<string>) firewall_services_definition[service_id,"udp_ports"]:[];
+
+	// controling if service is defined
+	if ((size(service_tcp_ports)==0) && (size(service_udp_ports)==0)) {
+	    y2error("Service '%1' has no TCP or UDP ports defined for Firewall support", service_id);
+	    continue;
+	}
+
+	// setting in all device groups
+	foreach (string device_group, device_groups, {
+	    // current device group is not allowed
+	    if (contains(allowed_device_groups, device_group) == false) {
+		y2error("Device group '%1' is not allowed, allowed are %2", device_group, allowed_device_groups);
+		continue;
+	    }
+
+
+	});
+    });
+}
+
+global boolean SetService (list<string> services_id, list<string> devices, boolean new_status) {
+    return true;
+}
+
+global map<string, map<string, boolean> > GetServicesInGroups (list<string> services) {
+    return $[
+	"service" : $[
+	    "INT" : true,
+	    "DMZ" : true,
+	    "EXT" : false,
+	],
+    ];
+}
+
+global map<string, map<string, boolean> > GetServices (list<string> services) {
+    return $[
+	"service" : $[
+	    "device0" : true,
+	    "device1" : true,
+	    "device2" : false,
+	    "device3" : false,
+	],
+    ];
 }
 
 /* EOF */
