@@ -25,6 +25,7 @@ import "Service";
 import "Summary";
 import "NetworkDevices";
 import "String";
+import "Message";
 
 /* global settings map */
 global map<string,any> settings = $[];
@@ -1074,19 +1075,31 @@ global define boolean Write() {
 	"SuSEfirewall2_final",
     ];
 
-    foreach(string service, services, {
-
-	y2milestone("Enabling service %1", service);
-	if(!Service::Enable(service))
-	    /* Popup text */
-	    Report::Error(_("Starting the firewall failed"));
-
-    });
+    if (start==true) {
+	foreach(string service, services, {
+	    y2milestone("Enabling service %1", service);
+	    if(!Service::Enable(service)) {
+		/* Popup text */
+		Report::Error(_("Starting the firewall failed"));
+	    }
+	});
+    } else {
+	foreach(string service, services, {
+	    y2milestone("Disabling service %1", service);
+	    if(!Service::Disable(service)) {
+		// FIXME: added after the text freeze, should report something in 9.3
+		y2milestone("Unable to disable service %1", service);
+	    }
+	});
+    }
 
     Progress::NextStage();
 
-    if(!write_only)
-	ActivateConfiguration();
+    if (start) {
+	if(!write_only) {
+	    ActivateConfiguration();
+	}
+    }
 
     Progress::Finish();
 
