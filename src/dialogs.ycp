@@ -479,7 +479,7 @@ services. Also start the appropriate daemons.</p>");
 		// changed_by_user means that this is not the initial redraw of services
 		if (changed_by_user == true) {
 		    // Additional special function for service
-		    SuSEFirewall::RunServiceSupport(service_name, service_supported);
+		    SuSEFirewall::RunServiceSupport(service_name, "EXT", service_supported);
 		}
 		
 		UI::ChangeWidget(`id(service_name), `Value, service_supported);
@@ -530,7 +530,7 @@ services. Also start the appropriate daemons.</p>");
 	list<string> required_udp = (list<string>) required_ports["udp_ports"]:[];
 
 	// Additional special function for service
-	SuSEFirewall::RunServiceSupport(service_checkbox, state);
+	SuSEFirewall::RunServiceSupport(service_checkbox, "EXT", state);
 
 	if (state == true) {
 	// service was selected

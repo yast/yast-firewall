@@ -1,0 +1,6 @@
+Read	.sysconfig.personal-firewall.REJECT_ALL_INCOMING_CONNECTIONS ""
+Dump	=======================
+Return	nil
+Return	nil
+Return	$["FW_ALLOW_FW_TRACEROUTE":"yes", "FW_AUTOPROTECT_SERVICES":"yes", "FW_DEV_DMZ":"", "FW_DEV_EXT":"eth-id-00:c0:df:22:c6:a8 modem0 modem1", "FW_DEV_INT":"eth-id-00:50:fc:74:b5:6f slp0 slp1", "FW_IPSEC_TRUST":"no", "FW_LOG_ACCEPT_ALL":"no", "FW_LOG_ACCEPT_CRIT":"yes", "FW_LOG_DROP_ALL":"no", "FW_LOG_DROP_CRIT":"yes", "FW_MASQUERADE":"no", "FW_MASQ_NETS":"", "FW_PROTECT_FROM_INTERNAL":"yes", "FW_ROUTE":"no", "FW_SERVICES_DMZ_IP":"", "FW_SERVICES_DMZ_TCP":"", "FW_SERVICES_DMZ_UDP":"", "FW_SERVICES_EXT_IP":"", "FW_SERVICES_EXT_RPC":"nlockmgr status nfs nfs_acl mountd ypserv fypxfrd ypbind yppasswdd", "FW_SERVICES_EXT_TCP":"domain ssh sunrpc 5801 5901 http nfs 32768 netbios-ns netbios-dgm netbios-ssn microsoft-ds", "FW_SERVICES_EXT_UDP":"domain sunrpc 32768 tftp", "FW_SERVICES_INT_IP":"", "FW_SERVICES_INT_TCP":" http", "FW_SERVICES_INT_UDP":" ntp", "start_firewall":false]
+Dump	=======================

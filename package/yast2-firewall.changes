@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Aug 26 12:48:38 CEST 2004 - locilka@suse.cz
+
+- changed RunServiceSupport() to support all groups of interfaces
+- created testsuites for all global functions
+
+-------------------------------------------------------------------
 Tue Aug 24 15:13:23 CEST 2004 - locilka@suse.cz
 
 - removed "SSH open by default" from the Instalation Proposal

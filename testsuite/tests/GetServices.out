@@ -1,0 +1,4 @@
+Read	.sysconfig.personal-firewall.REJECT_ALL_INCOMING_CONNECTIONS ""
+Dump	=======================
+Return	$["dns-server":$["eth-id-00:50:fc:74:b5:6f":false, "eth-id-00:c0:df:22:c6:a8":true, "modem0":true, "modem1":true, "slp0":false, "slp1":false], "ldaps":$["eth-id-00:50:fc:74:b5:6f":false, "eth-id-00:c0:df:22:c6:a8":false, "modem0":false, "modem1":false, "slp0":false, "slp1":false], "samba-server":$["eth-id-00:50:fc:74:b5:6f":false, "eth-id-00:c0:df:22:c6:a8":true, "modem0":true, "modem1":true, "slp0":false, "slp1":false]]
+Dump	=======================

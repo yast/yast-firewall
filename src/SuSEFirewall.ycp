@@ -42,7 +42,7 @@ global boolean enable_firewall = true;
  */
 global boolean write_only = false;
 
-global boolean start = false;
+global boolean start = true;
 
 /* default value for firewall settings modified */
 global boolean modified = false;
@@ -75,8 +75,13 @@ global define boolean GetModified () {
  *
  * @param boolean	enable or disable the support
  */
-define boolean HandlePortmapSupport (boolean enable) {
-    list<string> ext_rpc = splitstring(SuSEFirewall::settings["FW_SERVICES_EXT_RPC"]:"", " ");
+define boolean HandlePortmapSupport (string interface, boolean enable) {
+    if (interface != "EXT" && interface != "INT" && interface != "DMZ") {
+	y2error("Interface must be one of EXT|INT|DMZ, not %1", interface);
+	return false;
+    }
+    string ident = "FW_SERVICES_" + interface + "_RPC";
+    list<string> ext_rpc = splitstring(SuSEFirewall::settings[ident]:"", " ");
 
     // All needed services for Portmapper
     list<string> rpc_services = [
@@ -97,7 +102,7 @@ define boolean HandlePortmapSupport (boolean enable) {
 	});
     }
 
-    SuSEFirewall::settings["FW_SERVICES_EXT_RPC"] = mergestring(ext_rpc, " ");
+    SuSEFirewall::settings[ident] = mergestring(ext_rpc, " ");
 }
 
     /* Definition of the TCP and UDP ports needed for services
@@ -241,7 +246,7 @@ global define void SuSEFirewall () {
  */
 global define boolean Import(map s) {
     settings = (map<string,any>)s;
-    start = settings["start_firewall"]:false;
+    start = settings["start_firewall"]:true;
     return true;
 }
 
@@ -1176,15 +1181,20 @@ global define void AllowIPsec(boolean yes)
  * @param boolean	new service state
  * @return boolean	true is successful
  */
-global define boolean RunServiceSupport (string service_id, boolean new_service_state) {
+global define boolean RunServiceSupport (string service_id, string interface, boolean new_service_state) {
+    if (interface != "EXT" && interface != "INT" && interface != "DMZ") {
+	y2error("Interface must be one of EXT|INT|DMZ, not %1", interface);
+	return false;
+    }
+
     SetModified();
 
-    boolean(boolean) function = (boolean(boolean)) firewall_services_definition[service_id,"special"]:nil;
+    boolean(string, boolean) function = (boolean(string, boolean)) firewall_services_definition[service_id,"special"]:nil;
     if (function == nil) {
 	return true;
     }
-    y2milestone("Setting special service support for '%1' to '%2'", service_id, new_service_state);
-    return function(new_service_state);
+    y2milestone("Setting special service support for '%1' to '%2' on '%3'", service_id, new_service_state, interface);
+    return function(interface, new_service_state);
 }
 
 /**
@@ -1275,6 +1285,8 @@ global define boolean SetServicesForGroups (list<string> services_id, list<strin
 	    foreach (string udp_port, service_udp_ports, ``{
 		SetPortForGroup(udp_port, "UDP", device_group, new_status);
 	    });
+	    // setting service support
+	    RunServiceSupport(service_id, device_group, new_status);
 	});
     });
 

@@ -1,0 +1,139 @@
+/**
+ * File:        Read.ycp
+ * Package:     Configuration of firewall
+ * Summary:     Testsuite for reading configuration
+ * Authors:     Lukas Ocilka <locilka@suse.cz>
+ * Copyright:   Copyright 2004, Novell, Inc.  All rights reserved.
+ *
+ * $Id$
+ *
+ * Testsuite for reading configuration of SuSEFirewall2
+ */
+{
+
+    include "testsuite.ycp";
+    // testedfiles: SuSEFirewall.ycp
+
+    map READ = $[
+	"probe" : $[
+	    "architecture" : "i386",
+	    "has_apm" : true,
+	    "has_pcmcia" : false,
+	    "has_smp" : false,
+	    "system" : [],
+	    "memory" : [],
+	    "cpu" : [],
+	    "is_uml" : false,
+	],
+	"product" : $[
+	    "features" : $[
+		"USE_DESKTOP_SCHEDULER" : "0",
+		"IO_SCHEDULER" : "cfg",
+		"UI_MODE" : "expert",
+		"ENABLE_AUTOLOGIN" : "0",
+		"EVMS_CONFIG" : "0",
+	    ],
+	],
+	"init" : $[
+	    "scripts" : $[
+		"exists" : true,
+		"runlevel" : $[
+		    "SuSEfirewall2_init":$[
+			"start":["2", "3", "4", "5"],
+			"stop":["2", "3", "4", "5"]
+		    ],
+		    "SuSEfirewall2_setup":$[
+			"start":["3", "4", "5"],
+			"stop":["3", "4", "5"]
+		    ],
+		    "SuSEfirewall2_final":$[
+			"start":["3", "4", "5"],
+			"stop":["3", "4", "5"]
+		    ],
+		],
+		"comment" : $[
+		    "SuSEfirewall2_init":$["defstart":["2", "3", "4", "5"], "defstop":["0", "1", "2", "6"], "description":"SuSEfirewall2_init does some basic setup and is the phase 1 of 3 of the SuSEfirewall initialization", "provides":["SuSEfirewall2_init"], "reqstart":[], "reqstop":[], "shortdescription":"SuSEfirewall2 phase 1", "shouldstart":["setserial"], "shouldstop":["$network"]],
+		    "SuSEfirewall2_setup":$["defstart":["3", "4", "5"], "defstop":["0", "1", "2", "6"], "description":"SuSEfirewall2_setup does some basic setup and is the phase 2 of 3 of the SuSEfirewall initialization.", "provides":["SuSEfirewall2_setup"], "reqstart":["SuSEfirewall2_init", "$network", "$local_fs"], "reqstop":["$local_fs"], "shortdescription":"SuSEfirewall2 phase 2", "shouldstart":["route", "dhclient", "named"], "shouldstop":[]],
+		    "SuSEfirewall2_final":$["defstart":["3", "4", "5"], "defstop":[], "description":"SuSEfirewall2_final does finally set all the firewalling rules. Phase 3 of 3 of SuSEfirewall setup.", "provides":["SuSEfirewall2_final"], "reqstart":["SuSEfirewall2_setup"], "reqstop":["SuSEfirewall2_setup"], "shortdescription":"SuSEfirewall2 phase 3", "shouldstart":["$ALL", "$portmap", "ipsec", "named", "dhcpd"], "shouldstop":["$ALL"]],
+		],
+	    ],
+	],
+	"sysconfig" : $[
+	    "SuSEfirewall2" : $[],
+	    "personal-firewall" : $[
+		"REJECT_ALL_INCOMING_CONNECTIONS":""
+	    ],
+	],
+	"network" : $[
+	    "section" : $[
+		"eth-id-00:c0:df:22:c6:a8" : nil,
+		"modem0" : nil,
+		"modem1" : nil,
+		"eth-id-00:50:fc:74:b5:6f" : nil,
+		"slp0" : nil,
+		"slp1" : nil,
+	    ],
+	    "values" : $[
+		"eth-id-00:c0:df:22:c6:a8" : $["BOOTPROTO":"static", "IPADDR":"1.2.3.4", "STARTMODE" : "onboot"],
+		"modem0" : $["BOOTPROTO":"dhcp", "STARTMODE":"manual"],
+		"modem1" : $["BOOTPROTO":"dhcp", "STARTMODE":"manual"],
+		"eth-id-00:50:fc:74:b5:6f" : $["BOOTPROTO":"dhcp", "STARTMODE":"onboot"],
+		"slp0" : $["BOOTPROTO":"dhcp", "STARTMODE":"hotplug"],
+		"slp1" : $["BOOTPROTO":"dhcp", "STARTMODE":"hotplug"],
+	    ],
+	],
+    ];
+
+    map EXEC = $[
+	"target" : $[
+	    "bash_output" : $["exit" : 0, "stdout" : "", "stderr" : ""],
+	    "bash" : 0,
+	],
+    ];
+    map WRITE = $[];
+
+    TESTSUITE_INIT ([READ, WRITE, EXEC], nil);
+    
+    import "Progress";
+    import "SuSEFirewall";
+    import "Mode";
+    import "NetworkDevices";
+
+    // variable in SuSEFirewall to store the settings
+    SuSEFirewall::settings = $[
+		"FW_ALLOW_FW_TRACEROUTE":"yes",
+		"FW_AUTOPROTECT_SERVICES":"yes",
+		"FW_DEV_DMZ":"",
+		"FW_DEV_EXT":"eth-id-00:c0:df:22:c6:a8 modem0 modem1",
+		"FW_DEV_INT":"eth-id-00:50:fc:74:b5:6f slp0 slp1",
+		"FW_IPSEC_TRUST":"no",
+		"FW_LOG_ACCEPT_ALL":"no",
+		"FW_LOG_ACCEPT_CRIT":"yes",
+		"FW_LOG_DROP_ALL":"no",
+		"FW_LOG_DROP_CRIT":"yes",
+		"FW_MASQUERADE":"no",
+		"FW_MASQ_NETS":"",
+		"FW_PROTECT_FROM_INTERNAL":"yes",
+		"FW_ROUTE":"no",
+		"FW_SERVICES_DMZ_IP":"",
+		"FW_SERVICES_DMZ_TCP":"",
+		"FW_SERVICES_DMZ_UDP":"",
+		"FW_SERVICES_EXT_IP":"",
+		"FW_SERVICES_EXT_RPC":"nlockmgr status nfs nfs_acl mountd ypserv fypxfrd ypbind yppasswdd",
+		"FW_SERVICES_EXT_TCP":"domain ssh sunrpc 5801 5901 http nfs 32768 netbios-ns netbios-dgm netbios-ssn microsoft-ds",
+		"FW_SERVICES_EXT_UDP":"domain sunrpc 32768 tftp",
+		"FW_SERVICES_INT_IP":"",
+		"FW_SERVICES_INT_TCP":"",
+		"FW_SERVICES_INT_UDP":""
+	    ];
+
+    READ[ "sysconfig", "SuSEfirewall2" ] = SuSEFirewall::settings;
+
+    Mode::test = true;
+    Progress::off ();
+    NetworkDevices::Read ();
+
+    DUMP ("=======================");
+    TEST (``(SuSEFirewall::GetServicesInGroups (["tftp", "dhcp-server", "samba-server", "dns-server"])), [READ, WRITE, EXEC], 0);
+    DUMP ("=======================");
+}

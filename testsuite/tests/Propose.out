@@ -1,0 +1,11 @@
+Read	.sysconfig.personal-firewall.REJECT_ALL_INCOMING_CONNECTIONS ""
+Dump	=======================
+Return	nil
+Return	$["out":"<ul><li>Firewall is disabled</li></ul>", "warning":""]
+Return	nil
+Return	$["out":"<ul><li>Firewall is enabled</li><li>Open TCP Ports: none</li><li>Open UDP Ports: none</li></ul>", "warning":""]
+Return	nil
+Return	$["out":"<ul><li>Firewall is enabled</li><li>Open TCP Ports: ssh</li><li>Open UDP Ports: none</li></ul>", "warning":""]
+Return	nil
+Return	$["out":"<ul><li>Firewall is enabled</li><li>Open TCP Ports: VNC(5801 5901) ssh</li><li>Open UDP Ports: none</li></ul>", "warning":""]
+Dump	=======================

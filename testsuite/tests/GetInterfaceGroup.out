@@ -1,0 +1,6 @@
+Read	.sysconfig.personal-firewall.REJECT_ALL_INCOMING_CONNECTIONS ""
+Dump	=======================
+Return	EXT
+Return	INT
+Return	nil
+Dump	=======================

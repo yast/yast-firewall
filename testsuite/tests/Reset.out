@@ -1,0 +1,6 @@
+Read	.sysconfig.personal-firewall.REJECT_ALL_INCOMING_CONNECTIONS ""
+Dump	=======================
+Return	$["out":"<ul><li>Firewall is enabled</li><li>Open TCP Ports: domain ssh sunrpc VNC(5801 5901) http nfs 32768 netbios-ns netbios-dgm netbios-ssn microsoft-ds</li><li>Open UDP Ports: domain sunrpc 32768 tftp</li></ul>", "warning":""]
+Return	nil
+Return	$["out":"<ul><li>Firewall is enabled</li><li>Open TCP Ports: none</li><li>Open UDP Ports: none</li></ul>", "warning":""]
+Dump	=======================

@@ -1,0 +1,6 @@
+Read	.sysconfig.personal-firewall.REJECT_ALL_INCOMING_CONNECTIONS ""
+Dump	=======================
+Return	["eth-id-00:c0:df:22:c6:a8", "modem0", "modem1"]
+Return	["eth-id-00:50:fc:74:b5:6f", "slp0", "slp1"]
+Return	[]
+Dump	=======================

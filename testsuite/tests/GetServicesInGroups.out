@@ -1,0 +1,4 @@
+Read	.sysconfig.personal-firewall.REJECT_ALL_INCOMING_CONNECTIONS ""
+Dump	=======================
+Return	$["dhcp-server":$["DMZ":false, "EXT":false, "INT":false], "dns-server":$["DMZ":false, "EXT":true, "INT":false], "samba-server":$["DMZ":false, "EXT":true, "INT":false], "tftp":$["DMZ":false, "EXT":false, "INT":false]]
+Dump	=======================
