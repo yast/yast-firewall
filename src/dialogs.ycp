@@ -114,11 +114,12 @@ global define DevicesDialog() ``{
     string caption = _("Firewall Configuration (Step 1 of 4): Basic Settings");
 
     /* Devices dialog help 1/3 */
-    string help = _("<p>This tools aims to be an easy to use configuration
+    string help = _("<p>This tool aims to be an easy-to-use configuration
 front-end for the Linux packet filter engine. The configuration items in
-the following menus are a collection of the most important functionalities
+the following menus are a collection of the most important functions
 of the SuSEfirewall2 package. Take a few moments to go through all menus
-and select the options carefully.</p>") +
+and select the options carefully.</p>
+") +
 
     /* Devices dialog help 2/3 */
     _("<p><b>External Interface:</b><br>
@@ -133,9 +134,10 @@ Choose your internal network interface.</p>");
     string warning = _("<p><b>Warning:</b></p>") +
 
     /* Warning RichText 2/2 */
-    _("<p><ul><li>DSL with PPP over Ethernet uses ppp0 (ppp1, ppp2, ...)
+    _("<p><ul><li>DSL with PPP over Ethernet uses ppp0 (ppp1, ppp2, etc.)
 as the external interface. Your ethernet interface is not the external
-interface in this case.</li></ul></p>");
+interface in this case.</li></ul></p>
+");
 
     /* ComboBox item (No network device selected) */
     string none = _("(none)");
@@ -280,15 +282,18 @@ transfers via FTP. It is optimized for slow links and quite easy to configure.</
 
     /* Services dialog help 10/10 */
     _("<p>Just enabling a service here is most likely not enough to provide
-server services. You also have to start the appropriate daemons.</p>");
+services. Also start the appropriate daemons.</p>
+");
 
     /* Services dialog advanced help 1/2 */
     string advanced_helptext = _("<p>Enter any number of ports, known port names
-(from /etc/services), and port ranges, separated by a space.</p>") +
+(from /etc/services), and port ranges, separated by spaces.</p>
+") +
 
     /* Services dialog advanced help 2/2 */
     _("<p>Port ranges are separated by a colon. For example, to allow port 21
-to 23 write \"21:23\"</p>");
+to 23, write \"21:23\"</p>
+");
 
     term contents = `Top( `VBox(
 	/* Label text */
@@ -428,7 +433,8 @@ global define symbol FeatureDialog() ``{
     string help = _("<p><b>Allow Traceroute</b> means that ICMP
 time-to-live-exceeded messages are allowed to be sent from your firewall.
 This is used for traceroutes <i>to</i> your firewall
-(or traceroute like tools).</p>") +
+(or traceroute-like tools).</p>
+") +
 
     /* Features dialog help 2/4 */
     _("<p><b>Forward Traffic and Do Masquerading</b> means that all your
@@ -620,8 +626,9 @@ logged.</p>") +
 
     /* Loggin dialog help 4/4 */
     _("<p><b>Log All Accepted Packets</b> logs all accepted packets.
-Attention: This option is dangerous as your log file will grow very quicky
-if you activate this.</p>");
+Attention: This option is dangerous as it causes your log file to grow 
+very quicky.</p>
+");
 
     map firewall_settings = SuSEFirewall::settings;
     string FW_LOG_DROP_CRIT = firewall_settings["FW_LOG_DROP_CRIT"]:"yes";
@@ -703,10 +710,10 @@ global define AskStopDialog() ``{
     string caption = _("SuSE Firewall2 configuration");
 
     /* Ask dialog help 1/4 */
-    string help = _("<p>It seems like you already have a SuSE Firewall2 is running</p>") +
+    string help = _("<p>It seems like a SuSE Firewall2 is already running.</p>") +
 
     /* Ask dialog help 2/4 */
-    _("<p>Please choose what to do:</p>") +
+    _("<p>Select an action:</p>") +
 
     /* Ask dialog help 3/4 */
     _("<p><b>Reconfigure:</b><br>
@@ -715,8 +722,9 @@ Change the firewall settings and restart the firewall with the new settings.</p>
     /* Ask dialog help 4/4 */
     _("<p><b>Stop:</b><br>
 Stop any running SuSE Firewall2 and remove it from the boot process.
-In this case the firewall will no longer be activated
-when you boot your system.</p>");
+In this case, the firewall will no longer be activated
+when you boot your system.</p>
+");
 
     term contents = `VBox(
 	`VSpacing(4.5),
@@ -734,7 +742,7 @@ when you boot your system.</p>");
 			    `VSpacing(0.5),
 
 			    // Checkbox option
-			    `Left(`RadioButton (`id ("stopit"), _("Stop Firewall and Remove It From Boot Process"))),
+			    `Left(`RadioButton (`id ("stopit"), _("Stop Firewall and Remove from Boot Process"))),
 			    `VSpacing(2)
 			),
 			`HSpacing (2)

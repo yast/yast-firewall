@@ -24,7 +24,8 @@ global define symbol ReadDialog() ``{
 
     /* Read dialog help */
     Wizard::RestoreHelp(_("<p><b><big>Reading Firewall Configuration</big></b>
-Please wait ...</p>"));
+Please wait...</p>
+"));
 
     // Wizard::RestoreHelp(HELPS["read"]:"");
     // Firewall::AbortFunction = ``{return PollAbort();};

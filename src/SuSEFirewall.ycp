@@ -371,7 +371,7 @@ global define boolean Write() ``{
 	y2milestone("Enabling service %1", service);
 	if(!Runlevel::ServiceAdjust(service , "enable"))
 	    /* Popup text */
-	    Report::Error(_("Starting of the firewall failed"));
+	    Report::Error(_("Starting the firewall failed"));
 
     });
 
