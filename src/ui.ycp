@@ -394,7 +394,7 @@ Choose your internal network interface.</p>
 			    `VBox (`VWeight (80,
 					     `VBox (
 						    `VSpacing (2),
-						    `HBox ( `HWeight(20,`Top(`ComboBox (`id ("interface"),`opt(`hstretch, `editable), _("&External interface: "), devices ))),
+						    `HBox ( `HWeight(20,`Top(`ComboBox (`id ("interface"),`opt(`hstretch, `editable), _("&External Interface: "), devices ))),
 							   `HSpacing(3),
 							   `HWeight(40,`Top( `Left( `Label (
  // to translater: please keep width and newlines. Use more lines if neccessary
@@ -405,7 +405,7 @@ connections
 ")))))
 							   ),
 						    `VSpacing (0),
-						    `HBox ( `HWeight(20,`Top(`ComboBox (`id ("intinterface"),`opt(`hstretch, `editable), _("&Internal interface: "), intdevices ))),
+						    `HBox ( `HWeight(20,`Top(`ComboBox (`id ("intinterface"),`opt(`hstretch, `editable), _("&Internal Interface: "), intdevices ))),
 							   `HSpacing(3),
 							   `HWeight(40,`Top( `Left( `Label (
    // to translater: please keep width and newlines. Use more lines if neccessary
@@ -537,11 +537,11 @@ provide server services. You also have to start the appropriate daemons.</p>
 						   // Label for checkboxoption
 						   `Left (`Label( _("Other services") )),
 						   // checkbox option
-						   `Left (`CheckBox (`id ("ssh"),`opt(`notify), _("&Secure shell (ssh)"), false)),
+						   `Left (`CheckBox (`id ("ssh"),`opt(`notify), _("&Secure Shell (ssh)"), false)),
 						   // checkbox option
 						   `Left (`CheckBox (`id ("telnet"),`opt(`notify), _("&telnet"), false)),
 						   // checkbox option
-						   `Left (`CheckBox (`id ("rsync"),`opt(`notify), _("Remote s&ynchronization (rsync)"), false))
+						   `Left (`CheckBox (`id ("rsync"),`opt(`notify), _("Remote S&ynchronization (rsync)"), false))
 						   ),
 					    `HSpacing (0)
 //					      `VBox(`VSpacing (0.5),
@@ -554,7 +554,7 @@ provide server services. You also have to start the appropriate daemons.</p>
 			    `Left(`Label (_("Additional services:"))),
 			    `HBox(
 				 `Label(`id(`status),`opt(`outputField,`hstretch),""),
-				 `PushButton(`id(`edit),_("&Expert ...")))
+				 `PushButton(`id(`edit),_("&Expert...")))
 			    ),
 		     `VStretch ()),
 	      `HSpacing (5)));
@@ -599,7 +599,7 @@ provide server services. You also have to start the appropriate daemons.</p>
 	}
 	else if ( ret == `edit )
 	{
-	    string serv = UI::TextEntryPopup( _("Edit additional services"), advanced_helptext, _("&Additional services"),
+	    string serv = UI::TextEntryPopup( _("Edit additional services"), advanced_helptext, _("&Additional Services"),
 		mergestring(additional_services," "));
 
 	    if ( serv != nil )

@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Thu Jan 30 18:08:59 CET 2003 - lnussel@suse.de
+
+- apply proof read texts
+
+-------------------------------------------------------------------
 Mon Sep  2 13:52:48 CEST 2002 - mvidner@suse.cz
 
 - Fixed firewall deactivation (broken by stricter insserv) (#18735).
