@@ -63,6 +63,7 @@ global define void SuSEFirewall () ``{
  */
 global define boolean Import(map s) ``{
     settings = s;
+	start = settings["start_firewall"]:false;
     return true;
 }
 
@@ -221,7 +222,7 @@ global define boolean Read() ``{
  */
 global define boolean Write() ``{
 
-    if(!start)
+    if(!start && !write_only)
 	return false;
 
     Progress::New(
