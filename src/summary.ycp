@@ -139,7 +139,7 @@
 		("<h3>" + _("Open Services, Ports, and Protocols") + "</h3>")
 	    ) + "\n";
 	    // internal zone and unprotected
-	    if (zone_id == "INT" && SuSEFirewall::GetProtectFromInternalZone()) {
+	    if (zone_id == "INT" && !SuSEFirewall::GetProtectFromInternalZone()) {
 		// TRANSLATORS: informative text
 		ret_val = ret_val + ul_start + li_start + _("Internal zone is unprotected.  All ports are open.") + li_end + ul_end + "\n";
 	    } else {
@@ -230,9 +230,12 @@
 	    _("No network traffic is permitted through these interfaces.");
 	foreach (map <string, string> interface, SuSEFirewall::GetAllKnownInterfaces(), {
 	    if (interface["zone"]:nil==nil) {
-		ret_message = ret_message + li_start + " " + sformat(
-		    "%1 / %2", interface["name"]:"", interface["id"]:""
-		)
+		ret_message = ret_message + li_start + " " +
+		    ((interface["name"]:nil == nil || interface["name"]:nil == "") ?
+			interface["id"]:""
+			:
+			sformat ("%1 / %2", interface["name"]:"", interface["id"]:"")
+		    )
 		+ li_end + "\n";
 		interfaces_unassigned = interfaces_unassigned + 1;
 	    }
