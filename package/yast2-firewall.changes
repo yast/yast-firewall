@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Fri Feb 20 11:53:17 CET 2004 - lnussel@suse.de
+
+- fix warnings about useless global
+- move masquerading setting to top so users find it easier
+- state that the expert service config configures TCP services
+- 2.9.4
+
+-------------------------------------------------------------------
 Sat Feb  7 18:32:01 CET 2004 - msvec@suse.cz
 
 - fixed testsuite output
