@@ -119,7 +119,7 @@ global define any MainSequence() ``{
 /**
  * Main interface function
  */
-global define Firewall() ``{
+global define any Firewall() ``{
     map aliases = $[
 	"config_or_stop": [ ``(AskStopDialog()), true ],
 	"stop"		: ``(StopDialog()),
@@ -185,12 +185,10 @@ global define Firewall() ``{
     return ret;
 }
 
-
-
 /**
  * Main interface function
  */
-global define FirewallAutoSequence() ``{
+global define any FirewallAutoSequence() ``{
     map aliases = $[
 	"devices"	: ``(DevicesDialog()),
 	"services"	: ``(ServicesDialog()),
@@ -234,8 +232,6 @@ global define FirewallAutoSequence() ``{
     UI::CloseDialog();
     return ret;
 }
-
-
 
 /* EOF */
 }

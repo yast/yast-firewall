@@ -46,8 +46,8 @@ global define string TextEntryPopup( string headline, string richtext, string te
 
     UI::SetFocus(`id(`textwidget));
 
-    symbol ret = UI::UserInput();
-    string text = UI::QueryWidget(`id(`textwidget), `Value);
+    any ret = UI::UserInput();
+    string text = (string) UI::QueryWidget(`id(`textwidget), `Value);
     UI::CloseDialog();
 
     if(ret != `ok) return nil;
@@ -84,7 +84,7 @@ global define string bool2string(boolean tf) ``{
 /**
  * Write settings dialog
  */
-global define PreWriteDialog() ``{
+global define symbol PreWriteDialog() ``{
     // Translator: please keep layout
     string text = _("- configure the firewall boot scripts
 - stop the firewall, if its currently running

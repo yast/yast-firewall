@@ -42,7 +42,7 @@ global define void SuSEFirewall () ``{
 
     if (!Mode::config) {
 
-	string REJECT_ALL_INCOMING_CONNECTIONS = SCR::Read(.sysconfig.personal-firewall.REJECT_ALL_INCOMING_CONNECTIONS);
+	string REJECT_ALL_INCOMING_CONNECTIONS = (string) SCR::Read(.sysconfig.personal-firewall.REJECT_ALL_INCOMING_CONNECTIONS);
 	if( REJECT_ALL_INCOMING_CONNECTIONS == nil ) REJECT_ALL_INCOMING_CONNECTIONS = "";
 	if( REJECT_ALL_INCOMING_CONNECTIONS != "" &&  REJECT_ALL_INCOMING_CONNECTIONS != "no")
 	{
@@ -116,99 +116,95 @@ global define boolean Read() ``{
     // Check if firewall running
     start = Runlevel::ServiceEnabled("SuSEfirewall2_init");
 
-
 //  <AUTOCODE READ>
-    string FW_LOG_ACCEPT_ALL = SCR::Read(.sysconfig.SuSEfirewall2.FW_LOG_ACCEPT_ALL);
+    string FW_LOG_ACCEPT_ALL = (string) SCR::Read(.sysconfig.SuSEfirewall2.FW_LOG_ACCEPT_ALL);
     if( FW_LOG_ACCEPT_ALL == nil ) FW_LOG_ACCEPT_ALL = "no";
     settings["FW_LOG_ACCEPT_ALL"] = FW_LOG_ACCEPT_ALL;
 
-    string FW_LOG_ACCEPT_CRIT = SCR::Read(.sysconfig.SuSEfirewall2.FW_LOG_ACCEPT_CRIT);
+    string FW_LOG_ACCEPT_CRIT = (string) SCR::Read(.sysconfig.SuSEfirewall2.FW_LOG_ACCEPT_CRIT);
     if( FW_LOG_ACCEPT_CRIT == nil ) FW_LOG_ACCEPT_CRIT = "yes";
     settings["FW_LOG_ACCEPT_CRIT"] = FW_LOG_ACCEPT_CRIT;
 
-    string FW_LOG_DROP_ALL = SCR::Read(.sysconfig.SuSEfirewall2.FW_LOG_DROP_ALL);
+    string FW_LOG_DROP_ALL = (string) SCR::Read(.sysconfig.SuSEfirewall2.FW_LOG_DROP_ALL);
     if( FW_LOG_DROP_ALL == nil ) FW_LOG_DROP_ALL = "no";
     settings["FW_LOG_DROP_ALL"] = FW_LOG_DROP_ALL;
 
-    string FW_LOG_DROP_CRIT = SCR::Read(.sysconfig.SuSEfirewall2.FW_LOG_DROP_CRIT);
+    string FW_LOG_DROP_CRIT = (string) SCR::Read(.sysconfig.SuSEfirewall2.FW_LOG_DROP_CRIT);
     if( FW_LOG_DROP_CRIT == nil ) FW_LOG_DROP_CRIT = "yes";
     settings["FW_LOG_DROP_CRIT"] = FW_LOG_DROP_CRIT;
 
-    string FW_PROTECT_FROM_INTERNAL = SCR::Read(.sysconfig.SuSEfirewall2.FW_PROTECT_FROM_INTERNAL);
+    string FW_PROTECT_FROM_INTERNAL = (string) SCR::Read(.sysconfig.SuSEfirewall2.FW_PROTECT_FROM_INTERNAL);
     if( FW_PROTECT_FROM_INTERNAL == nil ) FW_PROTECT_FROM_INTERNAL = "yes";
     settings["FW_PROTECT_FROM_INTERNAL"] = FW_PROTECT_FROM_INTERNAL;
 
-    string FW_DEV_DMZ = SCR::Read(.sysconfig.SuSEfirewall2.FW_DEV_DMZ);
+    string FW_DEV_DMZ = (string) SCR::Read(.sysconfig.SuSEfirewall2.FW_DEV_DMZ);
     if( FW_DEV_DMZ == nil ) FW_DEV_DMZ = "";
     settings["FW_DEV_DMZ"] = FW_DEV_DMZ;
 
-    string FW_DEV_INT = SCR::Read(.sysconfig.SuSEfirewall2.FW_DEV_INT);
+    string FW_DEV_INT = (string) SCR::Read(.sysconfig.SuSEfirewall2.FW_DEV_INT);
     if( FW_DEV_INT == nil ) FW_DEV_INT = "";
     settings["FW_DEV_INT"] = FW_DEV_INT;
 
-    string FW_DEV_EXT = SCR::Read(.sysconfig.SuSEfirewall2.FW_DEV_EXT);
+    string FW_DEV_EXT = (string) SCR::Read(.sysconfig.SuSEfirewall2.FW_DEV_EXT);
     if( FW_DEV_EXT == nil ) FW_DEV_EXT = "";
     settings["FW_DEV_EXT"] = FW_DEV_EXT;
 
-    string FW_SERVICES_DMZ_UDP = SCR::Read(.sysconfig.SuSEfirewall2.FW_SERVICES_DMZ_UDP);
+    string FW_SERVICES_DMZ_UDP = (string) SCR::Read(.sysconfig.SuSEfirewall2.FW_SERVICES_DMZ_UDP);
     if( FW_SERVICES_DMZ_UDP == nil ) FW_SERVICES_DMZ_UDP = "";
     settings["FW_SERVICES_DMZ_UDP"] = FW_SERVICES_DMZ_UDP;
 
-    string FW_SERVICES_INT_UDP = SCR::Read(.sysconfig.SuSEfirewall2.FW_SERVICES_INT_UDP);
+    string FW_SERVICES_INT_UDP = (string) SCR::Read(.sysconfig.SuSEfirewall2.FW_SERVICES_INT_UDP);
     if( FW_SERVICES_INT_UDP == nil ) FW_SERVICES_INT_UDP = "";
     settings["FW_SERVICES_INT_UDP"] = FW_SERVICES_INT_UDP;
 
-    string FW_SERVICES_EXT_UDP = SCR::Read(.sysconfig.SuSEfirewall2.FW_SERVICES_EXT_UDP);
+    string FW_SERVICES_EXT_UDP = (string) SCR::Read(.sysconfig.SuSEfirewall2.FW_SERVICES_EXT_UDP);
     if( FW_SERVICES_EXT_UDP == nil ) FW_SERVICES_EXT_UDP = "";
     settings["FW_SERVICES_EXT_UDP"] = FW_SERVICES_EXT_UDP;
 
-    string FW_SERVICES_DMZ_TCP = SCR::Read(.sysconfig.SuSEfirewall2.FW_SERVICES_DMZ_TCP);
+    string FW_SERVICES_DMZ_TCP = (string) SCR::Read(.sysconfig.SuSEfirewall2.FW_SERVICES_DMZ_TCP);
     if( FW_SERVICES_DMZ_TCP == nil ) FW_SERVICES_DMZ_TCP = "";
     settings["FW_SERVICES_DMZ_TCP"] = FW_SERVICES_DMZ_TCP;
 
-    string FW_SERVICES_INT_TCP = SCR::Read(.sysconfig.SuSEfirewall2.FW_SERVICES_INT_TCP);
+    string FW_SERVICES_INT_TCP = (string) SCR::Read(.sysconfig.SuSEfirewall2.FW_SERVICES_INT_TCP);
     if( FW_SERVICES_INT_TCP == nil ) FW_SERVICES_INT_TCP = "";
     settings["FW_SERVICES_INT_TCP"] = FW_SERVICES_INT_TCP;
 
-    string FW_SERVICES_EXT_TCP = SCR::Read(.sysconfig.SuSEfirewall2.FW_SERVICES_EXT_TCP);
+    string FW_SERVICES_EXT_TCP = (string) SCR::Read(.sysconfig.SuSEfirewall2.FW_SERVICES_EXT_TCP);
     if( FW_SERVICES_EXT_TCP == nil ) FW_SERVICES_EXT_TCP = "";
     settings["FW_SERVICES_EXT_TCP"] = FW_SERVICES_EXT_TCP;
 
-    string FW_AUTOPROTECT_SERVICES = SCR::Read(.sysconfig.SuSEfirewall2.FW_AUTOPROTECT_SERVICES);
+    string FW_AUTOPROTECT_SERVICES = (string) SCR::Read(.sysconfig.SuSEfirewall2.FW_AUTOPROTECT_SERVICES);
     if( FW_AUTOPROTECT_SERVICES == nil ) FW_AUTOPROTECT_SERVICES = "yes";
     settings["FW_AUTOPROTECT_SERVICES"] = FW_AUTOPROTECT_SERVICES;
 
-    string FW_MASQ_NETS = SCR::Read(.sysconfig.SuSEfirewall2.FW_MASQ_NETS);
+    string FW_MASQ_NETS = (string) SCR::Read(.sysconfig.SuSEfirewall2.FW_MASQ_NETS);
     if( FW_MASQ_NETS == nil ) FW_MASQ_NETS = "";
     settings["FW_MASQ_NETS"] = FW_MASQ_NETS;
 
-    string FW_ROUTE = SCR::Read(.sysconfig.SuSEfirewall2.FW_ROUTE);
+    string FW_ROUTE = (string) SCR::Read(.sysconfig.SuSEfirewall2.FW_ROUTE);
     if( FW_ROUTE == nil ) FW_ROUTE = "no";
     settings["FW_ROUTE"] = FW_ROUTE;
 
-    string FW_MASQUERADE = SCR::Read(.sysconfig.SuSEfirewall2.FW_MASQUERADE);
+    string FW_MASQUERADE = (string) SCR::Read(.sysconfig.SuSEfirewall2.FW_MASQUERADE);
     if( FW_MASQUERADE == nil ) FW_MASQUERADE = "no";
     settings["FW_MASQUERADE"] = FW_MASQUERADE;
 
-    string FW_ALLOW_FW_TRACEROUTE = SCR::Read(.sysconfig.SuSEfirewall2.FW_ALLOW_FW_TRACEROUTE);
+    string FW_ALLOW_FW_TRACEROUTE = (string) SCR::Read(.sysconfig.SuSEfirewall2.FW_ALLOW_FW_TRACEROUTE);
     if( FW_ALLOW_FW_TRACEROUTE == nil ) FW_ALLOW_FW_TRACEROUTE = "yes";
     settings["FW_ALLOW_FW_TRACEROUTE"] = FW_ALLOW_FW_TRACEROUTE;
 
 //  </AUTOCODE>
 
     // fetch list of network devices
-    list devicelist = SCR::Read(.probe.netif);
+    list devicelist = (list) SCR::Read(.probe.netif);
     if (devicelist == nil) devicelist = [];
-    list devices = [];
 
     // filter the device names
+    list devices = [];
     foreach(map device, devicelist, ``{
-	string device = device["dev_name"]:"";
-	if( device != ""
-	    && !issubstring(device,"lo")
-	    && !issubstring(device,"sit"))
-	{
-	    change(devices,device);
+	string dev = device["dev_name"]:"";
+	if(dev != "" && !issubstring(dev, "lo") && !issubstring(dev, "sit")) {
+	    change(devices, dev);
 	}
     });
 
@@ -267,13 +263,11 @@ global define boolean Write() ``{
 		    "", Label::ContinueButton(), Label::AbortButton(),
 		    Label::RetryButton(), `focus_yes );
 
-	    if( ret == `retry)
-	    {
-		retry=true;
+	    if(ret == `retry) {
+		retry = true;
 	    }
-	    else if(ret==`no)
-	    {
-		return `next;
+	    else if(ret == `no) {
+		return false;
 	    }
 	}
     }
@@ -386,6 +380,42 @@ global define boolean Write() ``{
 }
 
 /**
+ * Is this interface external for firewall?
+ *
+ * @param interface	the name of the interface
+ * @return boolean	true if it is an external interface
+ */
+global define boolean IsExtInterface( string interface ) ``{
+    list servs = splitstring(settings[ "FW_DEV_EXT" ]:"", " ");
+    if(servs == nil) servs = [];
+    return contains( servs, interface );
+}
+
+/**
+ * Is this interface internal for firewall?
+ *
+ * @param interface	the name of the interface
+ * @return boolean	true if it is an internal interface
+ */
+global define boolean IsIntInterface( string interface ) ``{
+    list servs = splitstring(settings[ "FW_DEV_INT" ]:"", " ");
+    if(servs == nil) servs = [];
+    return contains( servs, interface );
+}
+
+/**
+ * Is this interface DMZ for firewall?
+ *
+ * @param interface	the name of the interface
+ * @return boolean	true if it is a DMZ interface
+ */
+global define boolean IsDmzInterface( string interface ) ``{
+    list servs = splitstring(settings[ "FW_DEV_DMZ" ]:"", " ");
+    if(servs == nil) servs = [];
+    return contains( servs, interface );
+}
+
+/**
  *  Add service into a given setting variable. Low-level manipulation.
  *
  *  @param set		the name of the sysconfig variable to be modified
@@ -393,9 +423,9 @@ global define boolean Write() ``{
  *  @return boolean	true on success
  */
 define boolean AddServiceToConfig( string set, string service ) ``{
-    
+
     y2debug( "Before adding services: %1" , settings[set]:"");
-    
+
     list servs = splitstring(settings[set]:"", " ");
     if(servs == nil) servs = [];
 
@@ -405,7 +435,7 @@ define boolean AddServiceToConfig( string set, string service ) ``{
     settings[ set ] = sers;
 
     y2debug( "After adding services: %1" , settings[set]:"");
-    
+
     return true;
 }
 
@@ -424,7 +454,7 @@ define boolean RemoveServiceFromConfig( string set, string service ) ``{
     string sers = mergestring(servs, " ");
     if(servs == nil) return false;
     settings[ set ] = sers;
-    
+
     return true;
 }
 
@@ -443,7 +473,7 @@ global define boolean AddService(string service, string proto, string interface)
 	y2debug( "Unknown protocol: %1", proto );
 	return false;
     }
-    
+
     if( interface == "all" ) {
 	y2debug( "Adding to all %1", service );
 	AddServiceToConfig ( "FW_SERVICES_EXT_"+proto, service );
@@ -486,7 +516,7 @@ global define boolean RemoveService(string service, string proto, string interfa
 	y2error( "Unknown protocol: %1", proto );
 	return false;
     }
-    
+
     if( interface == "all" ) {
 	y2debug( "Removing from all %1", service );
 	RemoveServiceFromConfig ( "FW_SERVICES_EXT_"+proto, service );
@@ -512,42 +542,6 @@ global define boolean RemoveService(string service, string proto, string interfa
     }
 
     return true;
-}
-
-/**
- * Is this interface external for firewall?
- *
- * @param interface	the name of the interface
- * @return boolean	true if it is an external interface
- */
-global define boolean IsExtInterface( string interface ) ``{
-    list servs = splitstring(settings[ "FW_DEV_EXT" ]:"", " ");
-    if(servs == nil) servs = [];
-    return contains( servs, interface );
-}
-
-/**
- * Is this interface internal for firewall?
- *
- * @param interface	the name of the interface
- * @return boolean	true if it is an internal interface
- */
-global define boolean IsIntInterface( string interface ) ``{
-    list servs = splitstring(settings[ "FW_DEV_INT" ]:"", " ");
-    if(servs == nil) servs = [];
-    return contains( servs, interface );
-}
-
-/**
- * Is this interface DMZ for firewall?
- *
- * @param interface	the name of the interface
- * @return boolean	true if it is a DMZ interface
- */
-global define boolean IsDmzInterface( string interface ) ``{
-    list servs = splitstring(settings[ "FW_DEV_DMZ" ]:"", " ");
-    if(servs == nil) servs = [];
-    return contains( servs, interface );
 }
 
 /**

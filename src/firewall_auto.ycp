@@ -36,9 +36,9 @@ string func = "";
 map param = $[];
 
 /* Check arguments */
-if(size(Args()) > 0 && is(Args(0), string)) {
+if(size(WFM::Args()) > 0 && is(WFM::Args(0), string)) {
     func = WFM::Args(0);
-    if(size(Args()) > 1 && is(Args(1), map))
+    if(size(WFM::Args()) > 1 && is(WFM::Args(1), map))
 	param = WFM::Args(1);
 }
 y2debug("func=%1", func);
