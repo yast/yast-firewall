@@ -23,14 +23,15 @@ textdomain "firewall";
 
 include "ui/common_popups.ycp";
 include "ui/common_messages.ycp";
-include "ui/wizard_dialog.ycp";
-include "wizard/sequencer.ycp";
 
 include "firewall/io.ycp";
 
 import "Progress";
+import "Wizard";
 
 import "Runlevel";
+
+include "wizard/sequencer.ycp";
 
 /**
  * Main interface function
@@ -93,8 +94,8 @@ global define Firewall() ``{
     string caption = _("Firewall configuration");
     term contents = `Label(_("Initializing ..."));
 
-    UI::CreateWizardDialog();
-    UI::SetWizardContentsButtons(caption,contents,help,BackButtonLabel(),NextButtonLabel());
+    Wizard::CreateDialog();
+    Wizard::SetContentsButtons(caption,contents,help,BackButtonLabel(),NextButtonLabel());
 
     any ret = WizardSequencer(aliases, sequence);
     UI::CloseDialog();
@@ -183,7 +184,7 @@ global define ReadDialog() ``{
     term contents = `Label(_("Reading settings ..."));
     /* use ProgressBar if possible */
 
-    UI::SetWizardContentsButtons(caption,contents,help,BackButtonLabel(),NextButtonLabel());
+    Wizard::SetContentsButtons(caption,contents,help,BackButtonLabel(),NextButtonLabel());
     UI::ChangeWidget(`id(`back),`Enabled, false);
     UI::ChangeWidget(`id(`next),`Enabled, false);
     UI::SetFocus(`id(`abort));
@@ -237,7 +238,7 @@ global define WriteDialog() ``{
     boolean retry = true;
     string whatfailedmsg = "";
 
-    UI::SetWizardContents("",`Empty(),"",false,true);
+    Wizard::SetContents("",`Empty(),"",false,true);
     UI::ChangeWidget(`id(`abort),`Enabled, false);
     // Translator: Button to finally write settings
     UI::ChangeWidget(`id(`next),`Label, _("Quit"));
@@ -359,7 +360,7 @@ global define DevDialog() ``{
     string help = _("<br><p><b>General:</b><br>This tools aims to be an easy to use configuration front-end for the Linux
 packet filter engine. The configuration items in the following menus are
 a collection of the most important functionalities of the SuSEfirewall2
-package. Take a few moments to go through all menues and select the
+package. Take a few moments to go through all menus and select the
 options carefully.</p>
 <p>
 <br>
@@ -426,7 +427,7 @@ have an internal network.
        );
 
 
-    UI::SetWizardContentsButtons(caption,contents,help,BackButtonLabel(),NextButtonLabel());
+    Wizard::SetContentsButtons(caption,contents,help,BackButtonLabel(),NextButtonLabel());
     UI::ChangeWidget(`id(`back),`Enabled, false);
 
     if( FW_DEV_EXT != "" )
@@ -484,15 +485,15 @@ to which you allow access from the Internet. Use YOU (YaST2 Online Update)
 to keep your system up-to-date with the latest update packages from the
 SuSE FTP servers.</p>
 <br>
-<p><b>http:</b><br>Service to run a web server, such as Apache</p>
-<p><b>smtp</b><br>Service is used by mail servers that accept incoming e-mail, such as sendmail</p>
-<p><b>pop3</b> and <b>imap:</b><br>Protocols for fetching e-mails from your host</p>
+<p><b>http:</b><br>Service to run a web server, such as Apache.</p>
+<p><b>smtp</b><br>Service used by mail servers that accept incoming e-mail, such as sendmail.</p>
+<p><b>pop3</b> and <b>imap:</b><br>Protocols for fetching e-mails from your host.</p>
 <p><b>telnet:</b><br>An obsolete method for remotely logging in to your
-computer.</p><p><b>ssh:</b><br>ssh is preferred over telnet for both security and features</p>
+computer.</p><p><b>ssh:</b><br>ssh is preferred over telnet for both security and features.</p>
 <p><b>rsync:</b><br>Rsync can be used as a replacement for insecure file transfers via
-FTP. It is optimized for slow links and quite easy to configure</p>
+FTP. It is optimized for slow links and quite easy to configure.</p>
 <p>Just enabling a service here is most likely not enough to
-provide server services. You also have to start the appropriate daemons</p>
+provide server services. You also have to start the appropriate daemons.</p>
 ");
 
     string caption = _("Firewall Configuration (Step 2 of 4):  Services");
@@ -566,7 +567,7 @@ provide server services. You also have to start the appropriate daemons</p>
     additional_services =filter(`s,services_list,``(s!="" && !contains(selectable_services,s)));
     services_list = filter(`s,services_list,``(s!="" && contains(selectable_services,s)));
 
-    UI::SetWizardContentsButtons(caption,contents,help,BackButtonLabel(),NextButtonLabel());
+    Wizard::SetContentsButtons(caption,contents,help,BackButtonLabel(),NextButtonLabel());
 
 //    services_string = mergestring(services_list," ");
 
@@ -652,10 +653,10 @@ communicate via proxies to the Internet than to use masquerading.</p>
 <p><b>Protect all running services</b> means that all network access to services, TCP, and UDP on this machine
 will be prevented except for those to which you explicitly allowed access in the previous dialog.</p>
 <p><b>Protect from internal network</b> means that <u>internal</u> machines may
-only access explicitly allowed services on the machine. They will be also
-effected by the FW_AUTOPROTECT_SERVICES option. However, specifying services
+only access explicitly allowed services on the machine. They will also be
+affected by the FW_AUTOPROTECT_SERVICES option. However, specifying services
 that should be available from the internal network is beyond the scope of this
-workflow. If you want your machine to be accessible from the internal
+workflow. For your machine to be accessible from the internal
 network, <u>unset</u> this option.</p>
 ");
 
@@ -693,7 +694,7 @@ network, <u>unset</u> this option.</p>
     string FW_AUTOPROTECT_SERVICES	= lookup(firewall_settings,"FW_AUTOPROTECT_SERVICES", "no");
     string FW_PROTECT_FROM_INTERNAL	= lookup(firewall_settings,"FW_PROTECT_FROM_INTERNAL","yes");
 
-    UI::SetWizardContentsButtons(caption,contents,help,BackButtonLabel(),NextButtonLabel());
+    Wizard::SetContentsButtons(caption,contents,help,BackButtonLabel(),NextButtonLabel());
 
     if( FW_ALLOW_FW_TRACEROUTE == "yes" )
     {
@@ -774,7 +775,7 @@ network, <u>unset</u> this option.</p>
 as your computer would not accept any packets
 from the internal network.
 
-Do you really want to proceed with this setup?
+Proceed with this setup?
 "));
 		if ( choice == false )
 		{
@@ -806,11 +807,11 @@ Do you really want to proceed with this setup?
  */
 global define LoggingDialog() ``{
     string help = _("
-<p>Choose which packets should be logged</p>
-<p>With <b>Log critical dropped/accepted packets</b>, only packets arriving on
+<p>Choose which packets should be logged.
+With <b>Log critical dropped and accepted packets</b>, only packets arriving on
 critical ports that were dropped or accepted, as specified, are 
-logged.</p> <p><b>Log all dropped packets</b> logs all dropped packets</p>
-<p><b>Log all accepted packets</b> logs all accepted packets. Attention: This
+logged.  <b>Log all dropped packets</b> logs all dropped packets.
+<b>Log all accepted packets</b> logs all accepted packets. Attention: This
 option is dangerous as your log file will grow very quicky if you activate this.</p>
 ");
     string caption = _("Firewall configuration (step 4 of 4): Logging options");
@@ -839,7 +840,7 @@ option is dangerous as your log file will grow very quicky if you activate this.
 			//Lable for Checkbox
 			`Left(`Label(_("Debug options "))),
 			//Helplable for Checkbox
-			`Left(`Label(_("This option causes a large amount of output"))),
+			`Left(`Label(_("This option causes a large amount of output."))),
 			// Checkbox option
 			`Left(`CheckBox (`id ("drop_all"), _("Log all dropped packets"), FW_LOG_DROP_ALL=="yes")),
 			// Checkbox option
@@ -854,7 +855,7 @@ option is dangerous as your log file will grow very quicky if you activate this.
 	`HVStretch()
     );
 
-    UI::SetWizardContentsButtons(caption,contents,help,BackButtonLabel(),NextButtonLabel());
+    Wizard::SetContentsButtons(caption,contents,help,BackButtonLabel(),NextButtonLabel());
 
     any ret = nil;
     while(true) {
@@ -934,7 +935,7 @@ when you boot your system.</p>
 	return `config;
     }
 
-    UI::SetWizardContentsButtons(caption,contents,help,BackButtonLabel(),NextButtonLabel());
+    Wizard::SetContentsButtons(caption,contents,help,BackButtonLabel(),NextButtonLabel());
 
     any ret = nil;
     while(true) {
@@ -1010,7 +1011,7 @@ when you boot your system.</p>
 	`HVStretch()
     );
 
-    UI::SetWizardContentsButtons(caption,contents,help,BackButtonLabel(),NextButtonLabel());
+    Wizard::SetContentsButtons(caption,contents,help,BackButtonLabel(),NextButtonLabel());
     UI::ChangeWidget(`id(`back),`Enabled, false);
 
     boolean firewallstopped = true;

@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Jul 22 16:37:08 CEST 2002 - lnussel@suse.de
+
+- more proof read texts
+- import Wizard instead of including it
+
+-------------------------------------------------------------------
 Fri Jul 12 16:35:48 CEST 2002 - arvin@suse.de
 
 - use proper namespace for Args and CallFunction (#16776)
