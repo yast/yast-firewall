@@ -1719,7 +1719,7 @@ global define map<string, map<string, boolean> > GetServicesInGroups (list<strin
  * @return list<string>	list of devices
  */
 global list<string> GetFirewallDevices () {
-    if (Mode::installation==false) {
+    if (Mode::normal==true) {
 	NetworkDevices::Read();
     }
 

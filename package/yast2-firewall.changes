@@ -1,4 +1,13 @@
 -------------------------------------------------------------------
+Mon Sep 20 09:01:46 CEST 2004 - locilka@suse.cz
+
+- fixed bug #45440
+  although special ipppX ISDN devices were proposed as external
+  devices, they weren't offered in combobox in the firewall
+  editation as a single item
+- 2.10.11
+
+-------------------------------------------------------------------
 Tue Sep 14 12:37:30 CEST 2004 - locilka@suse.cz
 
 - default values enable_firewall and open_ssh were moved into the

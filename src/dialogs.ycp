@@ -20,6 +20,7 @@ import "Progress";
 import "Service";
 import "SuSEFirewall";
 import "Wizard";
+import "ISDN";
 
 list<string> firewall_services_selected = [ ];
 
@@ -177,6 +178,9 @@ entering their names separated by spaces, for example: <i>modem0 dsl1</i>.</p>")
 	NetworkDevices::Read();
     }
     list<string> netdevices = NetworkDevices::List("");
+    if (Mode::installation==true) {
+	netdevices = (list<string>) toset(union(netdevices, ISDN::NetDeviceList()));
+    }
     netdevices = filter(string dev, netdevices, ``{
 	return dev != "" && !issubstring(dev, "lo") && !issubstring(dev, "sit");
     });
@@ -254,7 +258,7 @@ have an internal network.
 	}
 	else {
 	    FW_DEV_EXT = (string) UI::QueryWidget(`id("interface"),`Value);
-	    if( ret == `next && FW_DEV_EXT == none )
+	    if( ret == `next && ( FW_DEV_EXT == none || FW_DEV_EXT == "" ))
 	    {
 		Popup::Message(_("Select an external interface."));
 		UI::SetFocus(`id("interface"));
