@@ -215,7 +215,7 @@ have an internal network.
 
 
     Wizard::SetContentsButtons(caption,contents,help,Label::BackButton(),Label::NextButton());
-    Wizard::DisableBackButton();
+    if (!Mode::installation) Wizard::DisableBackButton();
 
     if( FW_DEV_EXT != "" )
     {
@@ -714,10 +714,8 @@ very quicky.</p>");
 	`HVStretch()
     );
 
-    if(Mode::config)
-	Wizard::SetContentsButtons(caption,contents,help,Label::BackButton(),Label::FinishButton());
-    else
-	Wizard::SetContentsButtons(caption,contents,help,Label::BackButton(),Label::NextButton());
+    Wizard::SetContentsButtons(caption,contents,help,Label::BackButton(),Label::NextButton());
+    Wizard::SetNextButton(`next, Label::FinishButton());
 
     any ret = nil;
     while(true) {
@@ -740,7 +738,7 @@ very quicky.</p>");
 	    firewall_settings["FW_LOG_ACCEPT_ALL"] = FW_LOG_ACCEPT_ALL;
 	    SuSEFirewall::settings = firewall_settings;
 	    SuSEFirewall::start = true;
-	    SuSEFirewall::proposal_changed_by_user = true;
+	    if (ret == `next) SuSEFirewall::proposal_changed_by_user = true;
 	    break;
 	}
     };
