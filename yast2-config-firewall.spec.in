@@ -14,7 +14,8 @@ Name:		@RPMNAME@
 Release:	1
 Copyright:	(c) 2000 SuSE GmbH
 Group:		System Environment/YaST
-Requires:	yast2 yast2-trans-firewall yast2-lib-wizard yast2-lib-sequencer
+#Requires:	yast2 yast2-trans-firewall yast2-lib-wizard yast2-lib-sequencer
+Requires:	yast2 yast2-lib-wizard yast2-lib-sequencer
 BuildArchitectures:	noarch
 
 Packager:	@MAINTAINER@
