@@ -227,9 +227,9 @@
 			_("Start firewall")
 			],
 		       [
-			_("Stopping firewall"),
-			_("Saving settings"),
-			_("Starting firewall")
+			_("Stopping firewall..."),
+			_("Saving settings..."),
+			_("Starting firewall...")
 			],
 		       help
 		       );

@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Mar  3 13:30:45 CET 2003 - mvidner@suse.de
+
+- Texts from final proofreading.
+
+-------------------------------------------------------------------
 Wed Feb 26 04:38:31 CET 2003 - nashif@suse.de
 
 - fixed bug when writing config in autoinst mode (#24221)
