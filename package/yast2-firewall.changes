@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Mar 31 18:06:51 CEST 2004 - msvec@suse.cz
+
+- fixed network configurations listing
+- 2.9.11
+
+-------------------------------------------------------------------
 Wed Mar 31 17:57:23 CEST 2004 - msvec@suse.cz
 
 - fixed [Back] button behavior in step 2 (#37700)

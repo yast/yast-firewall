@@ -213,21 +213,7 @@ global define boolean Read() {
 
 //  </AUTOCODE>
 
-    // fetch list of network devices
-    list<map> devicelist = (list<map>) SCR::Read(.probe.netif);
-    if (devicelist == nil) devicelist = [];
-
-    // filter the device names
-    list devices = [];
-    foreach(map device, devicelist, {
-	string dev = device["dev_name"]:"";
-	if(dev != "" && !issubstring(dev, "lo") && !issubstring(dev, "sit")) {
-            devices[size(devices)] = dev;
-	}
-    });
-
-    settings["network_devices"] = devices;
-
+    y2milestone("settings=%1", settings);
     return true;
 }
 

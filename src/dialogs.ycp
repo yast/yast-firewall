@@ -13,6 +13,7 @@ textdomain "firewall";
 
 import "Label";
 import "Mode";
+import "NetworkDevices";
 import "Popup";
 import "Progress";
 import "Service";
@@ -157,10 +158,17 @@ as the external interface. Your ethernet interface is not the external
 interface in this case.</li></ul></p>
 ");
 
+    // fetch list of network devices
+    NetworkDevices::Read();
+    list<string> netdevices = NetworkDevices::List("");
+    netdevices = filter(string dev, netdevices, ``{
+	return dev != "" && !issubstring(dev, "lo") && !issubstring(dev, "sit");
+    });
+
     /* ComboBox item (No network device selected) */
     string none = _("(none)");
-    list default_devices = ["eth0","ppp0","ippp0"];
-    list intdevices = sort(union(firewall_settings["network_devices"]:[],[none]));
+    list default_devices = []; //["eth0","ppp0","ippp0"];
+    list intdevices = sort(union(netdevices, [none]));
     list devices = sort(union(intdevices,default_devices));
 
     string FW_DEV_EXT = firewall_settings["FW_DEV_EXT"]:"";
