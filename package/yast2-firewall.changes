@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Sep  2 13:52:48 CEST 2002 - mvidner@suse.cz
+
+- Fixed firewall deactivation (broken by stricter insserv) (#18735).
+- 2.6.6
+
+-------------------------------------------------------------------
 Tue Aug 27 20:00:00 CEST 2002 - jsuchome@suse.cz
 
 - provide/obsolete old translation packages
