@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Wed Feb 26 04:38:31 CET 2003 - nashif@suse.de
+
+- fixed bug when writing config in autoinst mode (#24221)
+- Use Runlevel to set runlevels
+- Improved Write function and removed duplicate code
+- 2.7.5
+
+-------------------------------------------------------------------
 Thu Feb 20 02:12:09 CET 2003 - nashif@suse.de
 
 - bug #23887: Finish installation after configuration is written
