@@ -381,16 +381,13 @@ Do you really want to use this port?"),
 
 	// FIXME: hardcoded, should work with zones and interfaces included
 	RedrawAllowedServices("EXT");
-	UI::ChangeWidget(`id("allowed_services_zone"), `Value, "current_zone_EXT");
+	UI::ChangeWidget(`id("allowed_services_zone"), `Value, "EXT");
     }
 
     symbol HandleAllowedServices (string key, map event) {
 	any ret = event["ID"]:nil;
 
-	y2milestone("EVENT: %1", ret);
-
 	string current_zone = (string) UI::QueryWidget(`id("allowed_services_zone"), `Value);
-	current_zone = regexpsub(current_zone, "^current_zone_(.*)", "\\1");
 
 	// changing zone
 	if (ret == "allowed_services_zone") {
@@ -642,20 +639,39 @@ Do you really want to use this port?"),
 
     void HandlePopupIPsecTrustAsZone () {
 	UI::OpenDialog(all_popup_definition, IPsecTrustAsZone());
-	UI::WaitForEvent();
+	
+	string default_value = SuSEFirewall::GetTrustIPsecAs();
+	UI::ChangeWidget(`id("trust_ipsec_as"), `Value, default_value);
+	
+	any ret = UI::UserInput();
+
+	if (ret == "ok") {
+	    string new_value = (string) UI::QueryWidget(`id("trust_ipsec_as"), `Value);
+	    SuSEFirewall::SetTrustIPsecAs(new_value);
+	}
+
 	UI::CloseDialog();
     }
+
+    // IPsec support opens IPsec traffic from external zone
+    void InitIPsecSupport (string key) {
+	boolean supported = SuSEFirewall::IsServiceSupportedInZone("ipsec", "EXT");
+	UI::ChangeWidget(`id("ispsec_support"), `Value, supported);
+    }    
 
     symbol HandleIPsecSupport (string key, map event) {
 	any ret = event["ID"]:nil;
 
 	if (ret == "ipsec_details") {
 	    HandlePopupIPsecTrustAsZone();
-	} else {
-	    y2error("Undefined return value: %1", ret);
 	}
 
 	return nil;
+    }
+
+    void StoreIPsecSupport (string key, map event) {
+	boolean to_support = (boolean) UI::QueryWidget(`id("ispsec_support"), `Value);
+	SuSEFirewall::SetServicesForZones(["ipsec"], ["EXT"], to_support);
     }
 
     void InitLoggingLevel (string key) {

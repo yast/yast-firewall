@@ -124,9 +124,9 @@
 	"IPsecSupport"		: $[
 	    "widget"		: `custom,
 	    "custom_widget"	: `VBox(),
-	    "init"		: FakeInit,
+	    "init"		: InitIPsecSupport,
 	    "handle"		: HandleIPsecSupport,
-	    "store"		: FakeStore,
+	    "store"		: StoreIPsecSupport,
 	    "help"		: HelpForDialog("base-ipsec-support"),
 	],
 	"LoggingLevel"		: $[

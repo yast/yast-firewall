@@ -15,6 +15,15 @@
     textdomain "firewall";
 
     import "SuSEFirewall";
+    import "SuSEFirewallServices";
+
+    map protocol_type_names = $[
+	// FIXME: TRANSLATORS: .... 4x Label?
+	"TCP" : _("TCP Ports"),
+	"UDP" : _("UDP Ports"),
+	"RPC" : _("RPC Services"),
+	"IP"  : _("IP Protocols"),
+    ];
 
     string SummaryZoneHeader (string zone_id) {
 	return "<h2>" + SuSEFirewall::GetZoneFullName(zone_id) + "</h2>\n";
@@ -99,10 +108,18 @@
 		foreach (string service_id, string service_name, SuSEFirewallServices::GetSupportedServices(), {
 		    translations_to_service_ids[service_name] = service_id;
 		});
+		// Allowed known services
 		foreach (string service_name, string service_id, translations_to_service_ids, {
 		    if (SuSEFirewall::IsServiceSupportedInZone(service_id, zone_id)) {
-			open_services = open_services + "<li>" + service_name + "</li>";
+			open_services = open_services + "<li>" + service_name + "</li>\n";
 		    }
+		});
+		// Additional (unknown) ports, services, protocols...
+		foreach (string protocol, ["TCP", "UDP", "RPC", "IP"], {
+		    string additional_services = mergestring(SuSEFirewall::GetAdditionalServices(protocol, zone_id), ", ");
+		    if (additional_services == "") return;
+		    open_services = open_services +
+			"<li>" + protocol_type_names[protocol]:"" + ": " + additional_services + "</li>\n";
 		});
 
 		ret_val = ret_val + "<ul>" + (open_services != "" ?

@@ -684,7 +684,7 @@
 
     term IPsecTrustAsZone () {
 	list<term> trust_zones = add(GetZonesListedItems(), `item(`id("no"),
-	    _("The Same Zone as The Packet Came")));
+	    _("The Same Zone as The Original Source Network")));
 
 	term dialog = `Frame (
 	    _("IPsec Zone"),
