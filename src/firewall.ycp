@@ -19,16 +19,24 @@
 
     import "SuSEFirewall";
     import "Mode";
-
-    include "firewall/wizards.ycp";
+    import "CommandLine";
 
     any ret = nil;
-    // installation has other sequence
-    if (Mode::installation()) {
-	ret = FirewallInstallationSequence();
+
+    // there are some arguments - starting commandline
+    if (size(WFM::Args())>0) {
+	include "firewall/cmdline.ycp";
+    // GUI or TextUI
     } else {
-	ret = FirewallSequence();
+	include "firewall/wizards.ycp";
+	// installation has other sequence
+	if (Mode::installation()) {
+	    ret = FirewallInstallationSequence();
+	} else {
+	    ret = FirewallSequence();
+	}
     }
+
     y2debug("ret=%1",ret);
 
     y2milestone("Firewall module finished");

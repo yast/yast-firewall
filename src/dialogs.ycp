@@ -242,7 +242,7 @@
 	    Label::BackButton (), Label::AcceptButton ()
 	);
 
-	InitBoxSummary();
+	InitBoxSummary([]);
 
 	symbol ret = nil;
 	while (true) {

@@ -396,7 +396,7 @@
 		`Left( `Label(_("Redirection:")) ),
 		`HBox (
 		    // TRANSLATORS: text entry
-		    `TextEntry (`id("add_redirctto_ip"), _("Redirect To Masqueraded IP")),
+		    `TextEntry (`id("add_redirectto_ip"), _("Redirect To Masqueraded IP")),
 		    // TRANSLATORS: text entry
 		    `TextEntry (`id("add_redirectto_port"), _("Redirect To Port"))
 		),

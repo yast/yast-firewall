@@ -30,7 +30,7 @@
     ];
 
     string SummaryZoneHeader (string zone_id) {
-	return "<h2>" + SuSEFirewall::GetZoneFullName(zone_id) + "</h2>\n";
+	return "\n<h2>" + SuSEFirewall::GetZoneFullName(zone_id) + "</h2>\n";
     }
 
     string OKMark = "<font color='#339900'>"  + UI::Glyph(`CheckMark)        + "</font>";
@@ -133,12 +133,12 @@
 			"<li>" + protocol_type_names[protocol]:"" + ": " + additional_services + "</li>\n";
 		});
 
-		ret_val = ret_val + "<ul>" + (open_services != "" ?
+		ret_val = ret_val + "<ul>\n" + (open_services != "" ?
 		    open_services
 		    :
 		    // TRANSLATORS: informative text
 		    _("Zone has no open ports.")
-		) + "</ul>";
+		) + "</ul>\n";
 	    }
 	}
 
@@ -155,29 +155,33 @@
 
     string SummaryFirewallStart () {
 	// TRANSLATORS: Summary header item
-	string ret_message = "<h2>" + _("Firewall Starting") + "</h2>";
+	string ret_message = "\n<h2>" + _("Firewall Starting") + "</h2>\n";
 
 	if (SuSEFirewall::GetEnableService()) {
 	    // TRANSLATORS: Summary text item
-	    ret_message = ret_message + "<ul><li>" + _("Start firewall when booting") + "</li></ul>";
+	    ret_message = ret_message + "<ul>\n<li>" + _("Start firewall when booting") + "</li>\n</ul>\n";
 	} else {
 	    // TRANSLATORS: Summary text item
-	    ret_message = ret_message + "<ul><li>" + _("Start firewall manually") + "</li></ul>";
+	    ret_message = ret_message + "<ul>\n<li>" + _("Start firewall manually") + "</li>\n</ul>\n";
 	}
 
 	return ret_message;
     }
 
-    string InitBoxSummary () {
+    string InitBoxSummary (list <string> for_zones) {
 	string summary = SummaryFirewallStart();
 
+	if (size(for_zones)==0) for_zones = SuSEFirewall::GetKnownFirewallZones();
+
 	foreach (string zone_id, SuSEFirewall::GetKnownFirewallZones(), {
-	    summary = summary
-		+ SummaryZoneHeader(zone_id)
-		+ SummaryZoneBody(zone_id);
+	    if (contains(for_zones,zone_id)) {
+		summary = summary
+		    + SummaryZoneHeader(zone_id)
+		    + SummaryZoneBody(zone_id);
+	    }
 	});
 
-	if (Mode::normal()) {
+	if (Mode::normal() && !Mode::commandline()) {
 	    UI::ChangeWidget(`id("box_summary_richtext"), `Value, summary);
 	}
 

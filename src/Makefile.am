@@ -14,7 +14,8 @@ ynclude_DATA =		\
 	subdialogs.ycp	\
 	uifunctions.ycp	\
 	helps.ycp	\
-	summary.ycp
+	summary.ycp	\
+	cmdline.ycp
 
 desktop_DATA = firewall.desktop
 
