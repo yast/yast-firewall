@@ -3,6 +3,7 @@ Tue Jan 25 12:42:52 CET 2005 - locilka@suse.cz
 
 - replaced SuSEfirewall2_final with SuSEfirewall2_setup for
   checking whether SuSEfirewall2 is running (bugzilla #50157)
+- 2.11.6
 
 -------------------------------------------------------------------
 Mon Jan 17 13:24:35 CET 2005 - locilka@suse.cz
