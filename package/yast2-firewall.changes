@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Sep  7 12:43:01 CEST 2004 - locilka@suse.cz
+
+- fixed bug #44759 because of chaned defaults, firewall wasn't
+  written in normal mode configuration
+- 2.10.9
+
+-------------------------------------------------------------------
 Mon Sep  6 13:35:07 CEST 2004 - locilka@suse.cz
 
 - added SetModified() function to autoyast

@@ -846,11 +846,13 @@ global define boolean Write() {
     // indicates that the firewall settings weren't modified
     // usable for external use in other modules
     if (GetModified()==false) {
+	y2milestone("Firewall wasn't modified");
 	return true;
     }
 
     // only activated firewall's setting is writen in installation (proposal) mode
-    if ((Mode::config == false) && (SuSEFirewall::enable_firewall == false)) {
+    if ((Mode::config == true) && (SuSEFirewall::enable_firewall == false)) {
+	y2debug("Firewall disabled in proposal");
 	return true;
     }
 
