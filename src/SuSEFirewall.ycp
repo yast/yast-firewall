@@ -1,10 +1,10 @@
 /**
  * File:	modules/SuSEFirewall.ycp
- * Package: 	Configuration of SuSE firewall
+ * Package:	Configuration of SuSE firewall
  * Summary:	Main module, providing IO functions
  *
  * Authors:	Anas Nashif (nashif@suse.de)
- *              Michael Hager <mike@suse.de>
+ *          Michael Hager <mike@suse.de>
  *
  * $Id$
  */
@@ -277,7 +277,7 @@
 
 	    foreach(`cmd,cmds,
 		    ``{
-		retry = true;
+		boolean retry = true;
 		while(retry)
 		{
 		    retry = false;
