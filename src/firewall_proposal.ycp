@@ -48,6 +48,10 @@ if(func == "MakeProposal") {
 	"preformatted_proposal" : proposal["out"]:"",
 	"warning_level" : (proposal["warning"]:"" == "" ? nil : `warning),
 	"warning" : proposal["warning"]:nil,
+	"links" : [
+	    "firewall--enable_firewall_in_proposal", "firewall--disable_firewall_in_proposal",
+	    "firewall--enable_ssh_in_proposal", "firewall--disable_ssh_in_proposal",
+	],
     ];
 }
 /* run the module */
@@ -95,10 +99,6 @@ else if(func == "Description") {
 	/* Menu label */
 	"menu_title" : _("&Firewall"),
 	"id" : "firewall",
-	"links" : [
-	    "firewall--enable_firewall_in_proposal", "firewall--disable_firewall_in_proposal",
-	    "firewall--enable_ssh_in_proposal", "firewall--disable_ssh_in_proposal",
-	],
     ];
 }
 /* write the proposal */
