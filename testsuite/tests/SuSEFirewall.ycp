@@ -5,6 +5,8 @@
  * Author:	Michal Svec <msvec@suse.cz>
  *
  * $Id$
+ *
+ * testedfiles: SuSEFirewall.ycp
  */
 
 {
