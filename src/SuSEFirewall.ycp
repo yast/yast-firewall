@@ -24,6 +24,7 @@ import "Report";
 import "Service";
 import "Summary";
 import "NetworkDevices";
+import "String";
 
 /* global settings map */
 global map<string,any> settings = $[];
@@ -34,7 +35,7 @@ global boolean personal_firewall_is_active = false;
 global boolean proposal_changed_by_user = false;
 
 /* default value for firewall enabled/disabled */
-global boolean enable_firewall = true;
+global boolean enable_firewall = false;
 
 /**
  * Write only, used during autoinstallation.
@@ -98,7 +99,7 @@ global map<string, list<string> > global_portmap_services = $[
     "nfs-server"   : [ "status", "nlockmgr", "mountd", "nfs", "nfs_acl" ],
     "nis-server"   : [ "ypserv", "fypxfrd", "ypbind", "yppasswdd" ],
     // usable for client answering as server
-    "nis-client-ypbind" : [ "ypbind" ],
+    "nis-client"   : [ "ypbind" ],
     "all-services" : [ "status", "nlockmgr", "mountd", "nfs", "nfs_acl", "ypserv", "fypxfrd", "ypbind", "yppasswdd" ],
 ];
 
@@ -449,12 +450,12 @@ global define list Summary() {
 
     if (start) {
 	// autoyast summary header
-	summary = Summary::AddHeader(summary, _("External Device"));
+	summary = Summary::AddHeader(summary, _("External Interfaces"));
 	summary = Summary::AddLine(summary, (settings["FW_DEV_EXT"]:"" != "") ?
 			       settings["FW_DEV_EXT"]:"" : Summary::NotConfigured());
 
 	// autoyast summary header
-	summary = Summary::AddHeader(summary, _("Internal Device"));
+	summary = Summary::AddHeader(summary, _("Internal Interfaces"));
 	summary = Summary::AddLine(summary, (settings["FW_DEV_INT"]:"" != "") ?
 			       settings["FW_DEV_INT"]:"" : Summary::NotConfigured());
 
@@ -646,13 +647,19 @@ global define void Propose () ``{
 
     y2milestone("Initializing proposal");
     
-    // All network devices
-    list<string> netdevices = NetworkDevices::List("");
+    // All "dialup" network devices
+    // Bugzilla #44656 - only network devices are protected by default
+    list<string> netdevices = NetworkDevices::List("dialup");
     netdevices = filter(string dev, netdevices, ``{
 	return dev != "" && !issubstring(dev, "lo") && !issubstring(dev, "sit");
     });
 
-    // Firewall is disabled if there is no network
+    list<string> non_dialup_netdevices = NetworkDevices::List("");
+    non_dialup_netdevices = filter(string dev, non_dialup_netdevices, ``{
+	return dev != "" && !issubstring(dev, "lo") && !issubstring(dev, "sit") && !contains(netdevices, dev);
+    });
+
+    // Firewall is disabled if there is no dialup network
     if (size(netdevices)==0) {
 	SuSEFirewall::enable_firewall = false;
 	// some devices (all) could be removed
@@ -661,7 +668,7 @@ global define void Propose () ``{
     SuSEFirewall::enable_firewall = true;
 
     settings["FW_DEV_EXT"] = mergestring(sort(netdevices), " ");
-    settings["FW_DEV_INT"] = "";
+    settings["FW_DEV_INT"] = mergestring(sort(non_dialup_netdevices), " ");
     settings["FW_DEV_DMZ"] = "";
 
     // list of Open TCP ports
@@ -705,7 +712,9 @@ global define void Propose () ``{
 
     // We don't trust any IPsec
     settings["FW_IPSEC_TRUST"] = "no";
-    settings["FW_PROTECT_FROM_INTERNAL"] = "yes";
+
+    // external devices are dialup devices, other are internal by default
+    settings["FW_PROTECT_FROM_INTERNAL"] = "no";
 
     // All services are auto-protected by default
     settings["FW_AUTOPROTECT_SERVICES"] = "yes";
@@ -748,6 +757,21 @@ global define map<string, string> GetPreformattedProposal () {
     );
 
     if (SuSEFirewall::enable_firewall == true) {
+	if (settings["FW_DEV_EXT"]:"" != "") {
+	    ret = ret + "<li>" + sformat (
+		// TRANSLATORS: Proposal rich text item, %1 is list of External interfaces
+		_("External Interfaces: %1"),
+		String::EscapeTags(settings["FW_DEV_EXT"]:"")
+	    ) + "</li>";
+	}
+	if (settings["FW_DEV_INT"]:"" != "") {
+	    ret = ret + "<li>" + sformat (
+		// TRANSLATORS: Proposal rich text item, %1 is list of Internal interfaces
+		_("Internal Interfaces: %1"),
+		String::EscapeTags(settings["FW_DEV_INT"]:"")
+	    ) + "</li>";
+	}
+
 	string open_tcp_ports = settings["FW_SERVICES_EXT_TCP"]:"";
 	// This is the hack for presenting unregistered ports of VNC
 	if (regexpmatch(open_tcp_ports,"5801 5901")) {
@@ -1664,18 +1688,40 @@ global define void UpdateProposal () ``{
     list<string> devices_ext = toset(splitstring(settings["FW_DEV_EXT"]:"", " "));
     list<string> devices_int = toset(splitstring(settings["FW_DEV_INT"]:"", " "));
     list<string> devices_dmz = toset(splitstring(settings["FW_DEV_DMZ"]:"", " "));
-    list<string> all_devices_in_configuration = flatten([ devices_ext, devices_int, devices_dmz ]);
+    list<string> all_devices_in_configuration = toset(flatten([ devices_ext, devices_int, devices_dmz ]));
 
-    // All network devices known now
-    list<string> netdevices = (list<string>) NetworkDevices::List("");
+    // All dialup network devices
+    list<string> netdevices = (list<string>) NetworkDevices::List("dialup");
     netdevices = filter(string dev, netdevices, ``{
 	return dev != "" && !issubstring(dev, "lo") && !issubstring(dev, "sit");
     });
-y2milestone("NETDEVICES: %1", netdevices);
-y2milestone("KNWDEVICES: %1", known_devices_before_update);
+
+    // All network devices known now
+    list<string> all_devices = NetworkDevices::List("");
+    all_devices = filter(string dev, all_devices, ``{
+	return dev != "" && !issubstring(dev, "lo") && !issubstring(dev, "sit");
+    });
+
+    // All non-dialup network devices
+    list<string> non_dialup_netdevices = all_devices;
+    non_dialup_netdevices = filter(string dev, non_dialup_netdevices, ``{
+	return !contains(netdevices, dev);
+    });
+
+y2debug("
+BEFORE:  %1
+DIALUP:  %2
+ALL:     %3
+NONDIAL: %4", known_devices_before_update, netdevices, all_devices, non_dialup_netdevices);
+
+    // there are no dialup interfaces yet (or yet now)
+    if (size(netdevices)==0 && !proposal_changed_by_user) {
+	SuSEFirewall::enable_firewall = false;
+	return;
+    }
 
     // listing all now known devices
-    foreach (string netdevice, netdevices, {
+    foreach (string netdevice, all_devices, {
 	// device, which is placed somewhere yet
 	if (IsExtInterface(netdevice)) return;
 	if (IsIntInterface(netdevice)) return;
@@ -1684,12 +1730,27 @@ y2milestone("KNWDEVICES: %1", known_devices_before_update);
 	// if this device was known and was removed
 	if (contains(known_devices_before_update, netdevice)) return;
 
-	y2milestone("New device found '%1', adding into FW_DEV_EXT devices", netdevice);
-	proposal_warnings = add(proposal_warnings, sformat(
-	    // TRANSLATORS: Warning in installation proposal, %1 is a device (eth0, sl0, ...)
-	    _("New network device '%1' found; added as an external firewall interface"), netdevice)
+	string device_group = "";
+	// if the interface is a dialup interface
+	if (contains(netdevices, netdevice)) {
+	    device_group = "EXT";
+	    devices_ext = add(devices_ext, netdevice);
+	} else {
+	    device_group = "INT";
+	    devices_int = add(devices_int, netdevice);
+	}
+
+	y2milestone("New device found '%1', adding into FW_DEV_%2 devices", netdevice, device_group);
+	proposal_warnings = add(proposal_warnings, sformat(    
+	    ((device_group=="EXT") ?
+		// TRANSLATORS: Warning in installation proposal, %1 is a device name (eth0, sl0, ...)
+		_("New network device '%1' found; added as an external firewall interface")
+		:
+		// TRANSLATORS: Warning in installation proposal, %1 is a device name (eth0, sl0, ...)
+		_("New network device '%1' found; added as an internal firewall interface")
+	    ), netdevice)
 	);
-	devices_ext = add(devices_ext, netdevice);
+	
 	proposal_updated = true;
     });
 
@@ -1707,6 +1768,7 @@ y2milestone("KNWDEVICES: %1", known_devices_before_update);
 	devices_ext = RemoveDevice(devices_ext, netdevice);
 	devices_int = RemoveDevice(devices_int, netdevice);
 	devices_dmz = RemoveDevice(devices_dmz, netdevice);
+
 	proposal_updated = true;
     });
 

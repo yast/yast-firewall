@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Fri Sep  3 12:44:38 CEST 2004 - locilka@suse.cz
+
+- fixed #44656 Firewall in install proposal is disabled by default
+  if there are any dial-up interfaces, they are proposed as 
+  external interfaces, other interfaces as internal interfaces and
+  the firewall is proposed to be enabled.
+
+-------------------------------------------------------------------
 Thu Sep  2 09:06:36 CEST 2004 - locilka@suse.cz
 
 - fixed #44566 Wrong handling with newly added interfaces into the
