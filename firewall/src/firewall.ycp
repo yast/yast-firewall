@@ -1,0 +1,48 @@
+/**
+ * Copyright 2004, Novell, Inc.  All rights reserved.
+ *
+ * File:	clients/firewall.ycp
+ * Package:	Firewall configuration
+ * Summary:	Firewall configuration dialogs
+ * Authors:	Lukas Ocilka <locilka@suse.cz>
+ *
+ * $Id$
+ *
+ * File includes helps for yast2-firewall dialogs.
+ */
+
+{
+    y2milestone("----------------------------------------");
+    y2milestone("Firewall module started");
+
+    textdomain "firewall";
+
+    import "SuSEFirewall";
+    import "Mode";
+    import "CommandLine";
+
+    any ret = nil;
+
+    // there are some arguments - starting commandline
+    if (size(WFM::Args())>0) {
+	include "firewall/cmdline.ycp";
+    // GUI or TextUI
+    } else {
+	include "firewall/wizards.ycp";
+	// installation has other sequence
+	if (Mode::installation()) {
+	    ret = FirewallInstallationSequence();
+	} else {
+	    ret = FirewallSequence();
+	}
+    }
+
+    y2debug("ret=%1",ret);
+
+    y2milestone("Firewall module finished");
+    y2milestone("----------------------------------------");
+
+    return ret;
+
+/* EOF */
+}

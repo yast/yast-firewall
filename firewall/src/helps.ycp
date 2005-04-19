@@ -1,0 +1,132 @@
+/**
+ * Copyright 2004, Novell, Inc.  All rights reserved.
+ *
+ * File:	include/firewall/helps.ycp
+ * Package:	Firewall configuration
+ * Summary:	Firewall dialogs helps
+ * Authors:	Lukas Ocilka <locilka@suse.cz>
+ *
+ * $Id$
+ *
+ * File includes helps for yast2-firewall dialogs.
+ */
+
+{
+    textdomain "firewall";
+
+    map <string, string> HELPS = $[
+
+	// TRANSLATORS: Read dialog help
+	"reading_configuration" : _("<p><b><big>Reading Firewall Configuration</big></b>
+<br>Please wait...</p>"),
+
+	// TRANSLATORS: Write dialog help
+	"saving_configuration" : _("<p><b><big>Saving Firewall Configuration</big></b>
+<br>Please wait...</p>"),
+
+	// TRANSLATORS: Firewall interfaces dialog help
+	"firewall-interfaces" : _("<p><b><big>Interfaces</big></b>
+<br>Here, assign your network devices into firewall zones
+by selecting the device in the table and clicking <b>Change</b>.</p>
+
+<p>Enter special strings, like <i>any</i>, into the external zone using 
+<b>Custom</b>. You can also enter interfaces not yet configured here.
+If you need masquerading, the string <i>any</i> is not allowed.</p>
+
+<p>Every network device should be assigned to a firewall zone.
+Network traffic through any unassigned interface is blocked.</p>
+"),
+
+	// TRANSLATORS: Allowed services dialog help
+	"allowed-services" : _("<p><b><big>Allowed Services</big></b>
+<br>Here, specify services or ports that should be accessible from the network.
+Networks are divided into firewall zones.</p>
+
+<p>To allow a service, select the <b>Zone</b> and the
+<b>Service to Allow</b> then press <b>Add</b>.
+To remove an allowed service, select the <b>Zone</b> and the <b>Allowed Service<b> then press <b>Remove</b>.</p>
+
+<p>By unselecting <b>Protect Firewall from Internal Zone</b>, remove 
+protection from the zone. All services and ports would be unprotected from this zone.</p>
+"),
+
+	// TRANSLATORS: Base masquerade dialog help
+	"base-masquerading" : _("<p><b><big>Masquerading</big></b>
+<br>Masquerading is a function that hides your internal network behind your firewall and allows
+your internal network to access the external network, such as the Internet, transparently. Requests
+from the external network to the internal one are blocked.
+Select <b>Masquerade Networks</b> to masquerade your networks
+to the external network.</p>
+"),
+
+	// TRANSLATORS: Redirect-masquerade table dialog help
+	"masquerade-redirect-table" : _("<p><b><big>Redirect Requests to Masqueraded IP</big></b>
+<br>Although requests from the external network cannot reach your internal network, it is possible to
+transparently redirect any requested ports on your firewall to any internal IP.  
+To add a new redirect rule, press <b>Add</b> and complete the redirect form.</p>
+
+<p>To removed any redirect rule, select it in the table and press <b>Remove</b>.</p>
+"),
+
+	// TRANSLATORS: Simple broadcast configuration dialog help
+	"simple-broadcast-configuration" : _("<p><b><big>Broadcast Configuration</big></b>
+<br>Broadcast packets are special UDP packets sent to the whole network to find 
+neighboring computers or send information to each computer in the network.
+For example, CUPS servers provide information about their printing queues using broadcast packets.</p>
+
+<p>SuSEfirewall2 services selected in allowed interfaces automatically add needed broadcast
+ports here. To remove any or add any others, edit lists of space-separated ports for
+particular zones.</p>
+
+<p>Other dropped broadcast packets are logged. It could be quite a lot of packets in wider networks.
+To suppress logging of these packets, deselect <b>Log Not Accepted Broadcast Packets</b>
+for the desired zones.</p>
+"),
+
+	// TRANSLATORS: Base IPsec configuration dialog help
+	"base-ipsec-support" : _("<p><b><big>IPsec Support</big></b>
+<br>IPsec is an encrypted communication between trusted hosts or networks through untrusted networks, such as
+the Internet. This dialog opens IPsec for an external zone using
+<b>IPsec Support Enabled</b>.</p>
+
+<p><b>Details</b> configures how to handle successfully decrypted
+IPsec packets.  For example, they could be handled as if they were from the internal zone.</p>
+"),
+
+	// TRANSLATORS: Base Logging configuration dialog help
+	"base-logging" : _("<p><b><big>Logging Level</big></b>
+<br>This is a base configuration dialog for IP packet logging settings. Here,
+configure logging for incoming connection packets. Outgoing ones are not logged at all.</p>
+
+<p>There are two groups of logged IP packets: <b>Accepted Packets</b> and <b>Not Accepted Packets</b>.
+You can choose from three levels of logging for each group: <b>Log All</b> for logging every
+packet, <b>Log Only Critical</b> for log only interesting ones, or <b>Do Not Log Any</b>
+for no logging. You should log at least critical accepted packets.</p>
+"),
+
+	// TRANSLATORS: Base Summary dialog help
+	"box-summary" : _("<p><b><big>Summary</big></b>
+<br>Here, find a summary of your configuration settings.
+This summary is divided into general configuration and parts for each firewall zone.
+Every existing zone is summarized here.</p>
+
+<p><b>Firewall Starting</b> shows whether the firewall is started in the
+<b>boot process</b> or only <b>manually</b>.</p>
+
+<p>Firewall zones must have a network interface assigned to list the following items in the summary:</p>
+
+<p><b>Interfaces</b>: All interfaces are listed using their configuration name and device name.</p>
+
+<p><b>Open Services, Ports, and Protocols</b>: This lists all allowed network services, additional
+TCP (Transmission Control Protocol), UDP (User Datagram Protocol), and RPC (Remote Procedure Call)
+ports, and IP (Internet Protocol) protocols.</p>
+"),
+
+    ];
+
+    string HelpForDialog (string identification) {
+	return HELPS[identification]:sformat("FIXME: Help for '%1' is missing!", identification);
+    }
+
+/* EOF */
+}

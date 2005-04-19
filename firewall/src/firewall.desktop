@@ -1,0 +1,49 @@
+[Desktop Entry]
+Type=Application
+Categories=Qt;X-SuSE-YaST;X-SuSE-YaST-Security;
+
+X-KDE-ModuleType=Library
+X-KDE-RootOnly=true
+X-KDE-HasReadOnlyMode=true
+X-KDE-Library=yast2
+X-SuSE-YaST-Call=firewall
+
+X-SuSE-YaST-Group=Security
+X-SuSE-YaST-Argument=
+X-SuSE-YaST-RootOnly=true
+X-SuSE-YaST-AutoInst=all
+X-SuSE-YaST-Geometry=
+X-SuSE-YaST-SortKey=
+X-SuSE-YaST-AutoInstClonable=true
+X-SuSE-YaST-AutoInstRequires=lan
+
+Icon=firewall
+Exec=/sbin/yast2 firewall 
+
+Name=Firewall
+GenericName=Firewall setup for advanced users
+GenericName[cs]=Nastavení firewallu pro pokročilé uživatele
+GenericName[de]=Firewallkonfiguration für fortgeschrittene Anwender
+Name[es]=Cortafuegos
+GenericName[es]=Configuración del cortafuegos para usuarios avanzados
+Name[hu]=Tűzfal
+GenericName[hu]=A tűzfal szakértői beállítása
+GenericName[it]=Impostazione firewall per gli utenti esperti
+Name[ko]=방화벽
+GenericName[ko]=고급 사용자를 위한 방화벽 설정
+GenericName[nl]=Firewall instelling voor geavanceerde gebruikers
+GenericName[pt]=Configuração de Firewall para usuários avançados
+GenericName[sk]=Nastavenie firewallu pre pokročilých používateľov
+Name[sv]=Brandvägg
+GenericName[sv]=Brandväggsinställningar för avancerade användare
+GenericName[da]=Brandvæggskonfiguration for avancerede brugere
+GenericName[el]=Εγκατάσταση Firewall για προχωρημένους χρήστες
+GenericName[fr]=Configuration Firewall pour utilisateurs experts
+Name[ja]=ファイアウォール
+GenericName[ja]=上級のファイアウォール設定
+Name[lt]=Ugniasienė
+GenericName[lt]=Ugniasienės konfigūravimas patyrusiems vartotojams
+Name[sl]=Požarni zid
+GenericName[sl]=Nastavitve požarnega zidu za napredne uporabnike
+GenericName[tr]=İleri kullanıcılar için firewall ayarları
+X-KDE-SubstituteUID=true
