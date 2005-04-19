@@ -18,7 +18,7 @@
     import "SuSEFirewall";
 
     // UI VARIABLES AND FUNCTIONS
-    boolean expert_ui = (ProductFeatures::ui_mode == "expert");
+    boolean expert_ui = (ProductFeatures::GetFeature ("globals", "ui_mode") == "expert");
 
     /**
      * Function returns if this UI is an Expert UI.
