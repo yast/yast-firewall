@@ -280,7 +280,7 @@
 	    if (! PortAliases::IsKnownPortName(port)) {
 		checked = Popup::ContinueCancelHeadline(
 		    // TRANSLATORS: popup headline
-		    _("Uknown Port Name"),
+		    _("Unknown Port Name"),
 		    sformat(
 			// TRANSLATORS: popup message, %1 is a port-name
 			_("Port name '%1' is unknown in your current system.
