@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Tue May  3 08:54:28 CEST 2005 - locilka@suse.cz
+
+- Fixed bug #81502
+  Firewall informed wrong about protecting from the Internal zone
+  in the summary dialog.
+- 2.11.12
+
+-------------------------------------------------------------------
 Fri Mar  4 09:05:56 CET 2005 - locilka@suse.cz
 
 - fixed bug #67335

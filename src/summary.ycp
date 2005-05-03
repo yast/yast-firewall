@@ -139,7 +139,7 @@
 		("<h3>" + _("Open Services, Ports, and Protocols") + "</h3>")
 	    ) + "\n";
 	    // internal zone and unprotected
-	    if (zone_id == "INT" && SuSEFirewall::GetProtectFromInternalZone()) {
+	    if (zone_id == "INT" && !SuSEFirewall::GetProtectFromInternalZone()) {
 		// TRANSLATORS: informative text
 		ret_val = ret_val + ul_start + li_start + _("Internal zone is unprotected.  All ports are open.") + li_end + ul_end + "\n";
 	    } else {
