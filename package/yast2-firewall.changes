@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon May  9 09:47:42 CEST 2005 - locilka@suse.cz
+
+- Moving "Requires: SuSEfirewall2" to yast2 package
+
+-------------------------------------------------------------------
 Tue Apr 19 11:33:44 CEST 2005 - locilka@suse.cz
 
 - Applied new functional interface of ProductFeatures
