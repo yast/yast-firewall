@@ -85,6 +85,9 @@
 	return SuSEFirewall::StopServices();
     }
 
+    // maximum length of the string "Interface Name" (min. 3)
+    integer max_length_intname = 35;
+
     /**
      * Function redraws Interfaces Table
      */
@@ -97,6 +100,11 @@
 	    string zone_name = _("No Zone Assigned");
 	    if (interface["zone"]:nil != nil)
 		zone_name = SuSEFirewall::GetZoneFullName(interface["zone"]:nil);
+
+	    // shortening the network card name
+	    if (interface["name"]:nil != nil && size(interface["name"]:"")>max_length_intname) {
+		interface["name"] = substring(interface["name"]:"", 0, (max_length_intname - 3)) + "...";
+	    }
 
 	    table_items = add (table_items, `item( `id("known-" + interface["id"]:nil),
 		interface["name"]:nil,
@@ -132,6 +140,10 @@
 	// initializing names of interfaces
 	known_device_names = $[];
 	foreach (map <string, string> known_interface, SuSEFirewall::GetAllKnownInterfaces(), {
+	    // shortening the network card name
+	    if (size(known_interface["name"]:"")>max_length_intname) {
+		known_interface["name"] = substring(known_interface["name"]:"", 0, (max_length_intname - 3)) + "...";
+	    }
 	    known_device_names[known_interface["id"]:""] = known_interface["name"]:"";
 	});
 
