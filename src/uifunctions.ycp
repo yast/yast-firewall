@@ -731,8 +731,10 @@ Use the port number instead of the port name.
 	    HandlePopupAddRedirectToMasqueradedIPRule();
 	} else if (ret == "remove_redirect_to_masquerade") {
 	    integer current_item = (integer) UI::QueryWidget(`id("table_redirect_masq"), `CurrentItem);
-	    SuSEFirewall::RemoveForwardIntoMasqueradeRule(current_item);
-	    RedrawRedirectToMasqueradedIPTable();
+	    if (Confirm::DeleteSelected()) {
+		SuSEFirewall::RemoveForwardIntoMasqueradeRule(current_item);
+		RedrawRedirectToMasqueradedIPTable();
+	    }
 	}
     }
 

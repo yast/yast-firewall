@@ -65,9 +65,9 @@
 		),
 		`HBox (
 		    // TRANSLATORS: push button
-		    `PushButton(`id("change_firewall_interface"), _("&Change")),
+		    `PushButton(`id("change_firewall_interface"), _("&Change...")),
 		    // TRANSLATORS: push button
-		    `PushButton(`id("user_defined_firewall_interface"), _("C&ustom"))
+		    `PushButton(`id("user_defined_firewall_interface"), _("C&ustom..."))
 		)
 	    )
 	);
@@ -218,7 +218,7 @@
 			`Top ( `PushButton ( `id ( "remove_allowed_service" ), `opt ( `hstretch ), Label::RemoveButton() ) ),
 			`HStretch(),
 			// TRANSLATORS: push button
-			`Bottom ( `PushButton ( `id ( "advanced_allowed_service" ), `opt ( `hstretch ), _("A&dvanced") ) )
+			`Bottom ( `PushButton ( `id ( "advanced_allowed_service" ), `opt ( `hstretch ), _("A&dvanced...") ) )
 		    )
 		)
 	    )
@@ -764,7 +764,7 @@
 		`Left ( `CheckBox (`id("ispsec_support"), _("&IPsec Support Enabled")) ),
 		`HStretch (),
 		// TRANSLATORS: push button
-		`Right ( `PushButton(`id("ipsec_details"), _("&Details")) )
+		`Right ( `PushButton(`id("ipsec_details"), _("&Details...")) )
 	    )
 	);
 

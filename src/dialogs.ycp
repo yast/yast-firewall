@@ -143,10 +143,10 @@
 		`VStretch ()
 	    ),
 	    // TRANSLATORS: part of dialog caption
-	    "caption"		: firewall_caption + " - " + _("Start-Up"),
+	    "caption"		: firewall_caption + ": " + _("Start-Up"),
 	    // TRANSLATORS: tree menu item
 	    "tree_item_label"	: _("Start-Up"),
-	    "widget_names"	: [ "auto_start_up", "start_stop", "DisableBackButton" ]
+	    "widget_names"	: [ "DisableBackButton", "auto_start_up", "start_stop" ]
 	],
 	"interfaces"		: $[
 	    "contents"		: `VBox (
@@ -154,10 +154,10 @@
 		`VSpacing (1)
 	    ),
 	    // TRANSLATORS: part of dialog caption
-	    "caption"		: firewall_caption + " - " + _("Interfaces"),
+	    "caption"		: firewall_caption + ": " + _("Interfaces"),
 	    // TRANSLATORS: tree menu item
 	    "tree_item_label"	: _("Interfaces"),
-	    "widget_names"	: [ "FirewallInterfaces" ]
+	    "widget_names"	: [ "DisableBackButton", "FirewallInterfaces" ]
 	],
 	"allowed_services"	: $[
 	    "contents"		: `VBox (
@@ -165,10 +165,10 @@
 		`VSpacing (1)
 	    ),
 	    // TRANSLATORS: part of dialog caption
-	    "caption"		: firewall_caption + " - " + _("Allowed Services"),
+	    "caption"		: firewall_caption + ": " + _("Allowed Services"),
 	    // TRANSLATORS: tree menu item
 	    "tree_item_label"	: _("Allowed Services"),
-	    "widget_names"	: [ "AllowedServices" ]
+	    "widget_names"	: [ "DisableBackButton", "AllowedServices" ]
 	],
 	"masquerading"		: $[
 	    "contents"		: `VBox (
@@ -178,10 +178,10 @@
 		`VSpacing (1)
 	    ),
 	    // TRANSLATORS: part of dialog caption
-	    "caption"		: firewall_caption + " - " + _("Network Masquerading"),
+	    "caption"		: firewall_caption + ": " + _("Network Masquerading"),
 	    // TRANSLATORS: tree menu item
 	    "tree_item_label"	: _("Masquerading"),
-	    "widget_names"	: [ "Masquerading", "RedirectToMasqueradedIP" ]
+	    "widget_names"	: [ "DisableBackButton", "Masquerading", "RedirectToMasqueradedIP" ]
 	],
 	"broadcast_simple"	: $[
 	    "contents"		: `VBox (
@@ -189,10 +189,10 @@
 		`VStretch ()
 	    ),
 	    // TRANSLATORS: part of dialog caption
-	    "caption"		: firewall_caption + " - " + _("Broadcast Configuration"),
+	    "caption"		: firewall_caption + ": " + _("Broadcast Configuration"),
 	    // TRANSLATORS: tree menu item
 	    "tree_item_label"	: _("Broadcast"),
-	    "widget_names"	: [ "BroadcastConfigurationSimple" ]
+	    "widget_names"	: [ "DisableBackButton", "BroadcastConfigurationSimple" ]
 	],
 	"ipsec_support"		: $[
 	    "contents"		: `VBox (
@@ -200,10 +200,10 @@
 		`VStretch ()
 	    ),
 	    // TRANSLATORS: part of dialog caption
-	    "caption"		: firewall_caption + " - " + _("IPsec Support"),
+	    "caption"		: firewall_caption + ": " + _("IPsec Support"),
 	    // TRANSLATORS: tree menu item
 	    "tree_item_label"	: _("IPsec Support"),
-	    "widget_names"	: [ "IPsecSupport" ]
+	    "widget_names"	: [ "DisableBackButton", "IPsecSupport" ]
 	],
 	"logging_level"		: $[
 	    "contents"		: `VBox (
@@ -211,10 +211,10 @@
 		`VStretch ()
 	    ),
 	    // TRANSLATORS: part of dialog caption
-	    "caption"		: firewall_caption + " - " + _("Logging Level"),
+	    "caption"		: firewall_caption + ": " + _("Logging Level"),
 	    // TRANSLATORS: tree menu item
 	    "tree_item_label"	: _("Logging Level"),
-	    "widget_names"	: [ "LoggingLevel" ]
+	    "widget_names"	: [ "DisableBackButton", "LoggingLevel" ]
 	],
     ];
 
@@ -244,7 +244,7 @@
     symbol BoxSummaryDialog () {
 	Wizard::SetContentsButtons (
 	    // TRANSLATORS: part of dialog caption
-	    firewall_caption + " - " + _("Summary"),
+	    firewall_caption + ": " + _("Summary"),
 	    BoxSummary(),
 	    HelpForDialog("box-summary"),
 	    Label::BackButton (), Label::AcceptButton ()

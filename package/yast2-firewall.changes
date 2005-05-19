@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu May 19 08:45:26 CEST 2005 - locilka@suse.cz
+
+- Changed texts and labels to be YaST2 Guidelines-Compatible
+- Added popup confirmation for deleting forward rule in Masquerade
+
+-------------------------------------------------------------------
 Mon May  9 09:47:42 CEST 2005 - locilka@suse.cz
 
 - Moving "Requires: SuSEfirewall2" to yast2 package
