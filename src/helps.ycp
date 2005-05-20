@@ -46,7 +46,7 @@ Networks are divided into firewall zones.</p>
 <b>Service to Allow</b> then press <b>Add</b>.
 To remove an allowed service, select the <b>Zone</b> and the <b>Allowed Service<b> then press <b>Remove</b>.</p>
 
-<p>By unselecting <b>Protect Firewall from Internal Zone</b>, remove 
+<p>By deselecting <b>Protect Firewall from Internal Zone</b>, remove 
 protection from the zone. All services and ports would be unprotected from this zone.</p>
 "),
 
