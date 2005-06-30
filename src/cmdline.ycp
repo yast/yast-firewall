@@ -42,7 +42,7 @@
 	    // unknown zone
 	    if (!contains(SuSEFirewall::GetKnownFirewallZones(), zone)) {
 		// TRANSLATORS: CommandLine error, %1 is a firewall zone shortcut
-		CommandLine::Error(sformat(_("Unknown zone '%1'"), zone));
+		CommandLine::Error(sformat(_("Unknown zone %1."), zone));
 		return false;
 	    // defined, known zone
 	    } else {
@@ -54,7 +54,7 @@
 	    if (optional) return true;
 
 	    // TRANSLATORS: CommandLine error, %1 is needed parameter name
-	    CommandLine::Error(sformat(_("Parameter '%1' must be set"), "zone"));
+	    CommandLine::Error(sformat(_("Parameter %1 must be set."), "zone"));
 	    return false;
 	}
     }
@@ -62,7 +62,7 @@
     void ListFirewallZones () {
 	CommandLine::Print("");
 	// TRANSLATORS: CommandLine header
-	CommandLine::Print(String::UnderlinedHeader(_("Listing Known Firewall Zones"),0));
+	CommandLine::Print(String::UnderlinedHeader(_("Listing Known Firewall Zones:"),0));
 	CommandLine::Print("");
 
 	list <list <string> > table_items = [];
@@ -109,7 +109,7 @@
 
 	CommandLine::Print("");
 	// TRANSLATORS: CommandLine header
-	CommandLine::Print(String::UnderlinedHeader(_("Summary"), 0));
+	CommandLine::Print(String::UnderlinedHeader(_("Summary:"), 0));
 	CommandLine::Print("");
 	CommandLine::Print(InitBoxSummary(for_zones));
 
@@ -120,11 +120,11 @@
     boolean FWCMDStartup (map options) {
 	if (options["atboot"]:nil!=nil && options["manual"]:nil!=nil) {
 	    // TRANSLATORS: CommandLine error message
-	    CommandLine::Error(_("Only one parameter is allowed"));
+	    CommandLine::Error(_("Only one parameter is allowed."));
 	} else if (options["atboot"]:nil!=nil) {
 	    CommandLine::Print("");
 	    // TRANSLATORS: CommandLine header
-	    CommandLine::Print(String::UnderlinedHeader(_("Start-Up"), 0));
+	    CommandLine::Print(String::UnderlinedHeader(_("Start-Up:"), 0));
 	    CommandLine::Print("");
 	    // TRANSLATORS: CommandLine progress information
 	    CommandLine::Print(_("Enabling firewall in the boot process..."));
@@ -133,7 +133,7 @@
 	} else if (options["manual"]:nil!=nil) {
 	    CommandLine::Print("");
 	    // TRANSLATORS: CommandLine header
-	    CommandLine::Print(String::UnderlinedHeader(_("Start-Up"), 0));
+	    CommandLine::Print(String::UnderlinedHeader(_("Start-Up:"), 0));
 	    CommandLine::Print("");
 	    // TRANSLATORS: CommandLine progress information
 	    CommandLine::Print(_("Removing firewall from the boot process..."));
@@ -142,7 +142,7 @@
 	} else if (options["show"]:nil!=nil) {
 	    CommandLine::Print("");
 	    // TRANSLATORS: CommandLine header
-	    CommandLine::Print(String::UnderlinedHeader(_("Start-Up"), 0));
+	    CommandLine::Print(String::UnderlinedHeader(_("Start-Up:"), 0));
 	    CommandLine::Print("");
 	    if (SuSEFirewall::GetEnableService()) {
 		// TRANSLATORS: CommandLine informative text
@@ -173,7 +173,7 @@
 	// creating current configuration list
 	if (options["show"]:nil!=nil) {
 	    // TRANSLATORS: CommandLine header
-	    CommandLine::Print(String::UnderlinedHeader(_("Network Interfaces in Firewall Zones"),0));
+	    CommandLine::Print(String::UnderlinedHeader(_("Network Interfaces in Firewall Zones:"),0));
 	    CommandLine::Print("");
 
 	    list <list <string> > table_items = [];
@@ -187,7 +187,7 @@
 		});
 		foreach (string spec_int, SuSEFirewall::GetSpecialInterfacesInZone(zone), {
 		    // TRANSLATORS: CommandLine table item (unknown/special string/interface)
-		    table_items = add(table_items, [zone, spec_int, _("Special Firewall String")]);
+		    table_items = add(table_items, [zone, spec_int, _("Special firewall string")]);
 		});
 	    });
 	    // print unassigned only in general view
@@ -212,44 +212,44 @@
 	    string interface = (string) options["interface"]:nil;
 	    if (interface==nil) {
 		// TRANSLATORS: CommandLine error, %1 is needed parameter name
-		CommandLine::Error(sformat(_("Parameter '%1' must be set"), "interface"));
+		CommandLine::Error(sformat(_("Parameter %1 must be set."), "interface"));
 		return false;
 	    }
 	    if (for_zone==nil) {
 		// TRANSLATORS: CommandLine error, %1 is needed parameter name
-		CommandLine::Error(sformat(_("Parameter '%1' must be set"), "zone"));
+		CommandLine::Error(sformat(_("Parameter %1 must be set."), "zone"));
 		return false;
 	    }
 	    // unknown interface
 	    if (interfaces[interface]:$[]==$[]) {
 		// TRANSLATORS: CommandLine progress information, %1 is the special string, %2 is the zone name
-		CommandLine::Print(sformat(_("Adding special string '%1' into zone '%2'..."), interface, for_zone));
+		CommandLine::Print(sformat(_("Adding special string %1 into zone %2..."), interface, for_zone));
 		SuSEFirewall::AddSpecialInterfaceIntoZone(interface, for_zone);
 	    } else {
 		// TRANSLATORS: CommandLine progress information, %1 is the network interface name, %2 is the zone name
-		CommandLine::Print(sformat(_("Adding interface '%1' into zone '%2'..."), interface, for_zone));
+		CommandLine::Print(sformat(_("Adding interface %1 into zone %2..."), interface, for_zone));
 		SuSEFirewall::AddInterfaceIntoZone(interface, for_zone);
 	    }
 	} if (options["remove"]:nil!=nil) {
 	    string interface = (string) options["interface"]:nil;
 	    if (interface==nil) {
 		// TRANSLATORS: CommandLine error, %1 is needed parameter name
-		CommandLine::Error(sformat(_("Parameter '%1' must be set"), "interface"));
+		CommandLine::Error(sformat(_("Parameter %1 must be set."), "interface"));
 		return false;
 	    }
 	    if (for_zone==nil) {
 		// TRANSLATORS: CommandLine error, %1 is needed parameter name
-		CommandLine::Error(sformat(_("Parameter '%1' must be set"), "zone"));
+		CommandLine::Error(sformat(_("Parameter %1 must be set."), "zone"));
 		return false;
 	    }
 	    // unknown interface
 	    if (interfaces[interface]:$[]==$[]) {
 		// TRANSLATORS: CommandLine progress information, %1 is the special string, %2 is the zone name
-		CommandLine::Print(sformat(_("Removing special string '%1' from zone '%2'..."), interface, for_zone));
+		CommandLine::Print(sformat(_("Removing special string %1 from zone %2..."), interface, for_zone));
 		SuSEFirewall::RemoveSpecialInterfaceFromZone(interface, for_zone);
 	    } else {
 		// TRANSLATORS: CommandLine progress information, %1 is the network interface name, %2 is the zone name
-		CommandLine::Print(sformat(_("Removing interface '%1' from zone '%2'..."), interface, for_zone));
+		CommandLine::Print(sformat(_("Removing interface %1 from zone %2..."), interface, for_zone));
 		SuSEFirewall::RemoveInterfaceFromZone(interface, for_zone);
 	    }
 	}
@@ -261,11 +261,11 @@
     boolean FWCMDLogging (map options) {
 	map <string, string> logging_meaning = $[
 	    // TRANSLATORS: CommandLine table item
-	    "ALL" : _("Log All"),
+	    "ALL" : _("Log all"),
 	    // TRANSLATORS: CommandLine table item
-	    "CRIT" : _("Log Only Critical"),
+	    "CRIT" : _("Log only critical"),
 	    // TRANSLATORS: CommandLine table item
-	    "NONE" : _("Do Not Log Any"),
+	    "NONE" : _("Do not log any"),
 	];
 
 	if (options["show"]:nil!=nil) {
@@ -274,7 +274,7 @@
 
 	    CommandLine::Print("");
 	    // TRANSLATORS: CommandLine header
-	    CommandLine::Print(String::UnderlinedHeader(_("Global Logging Settings"),0));
+	    CommandLine::Print(String::UnderlinedHeader(_("Global Logging Settings:"),0));
 	    CommandLine::Print("");
 
 	    CommandLine::Print(String::TextTable(
@@ -288,14 +288,14 @@
 		    // TRANSLATORS: CommandLine table item
 		    [ _("Accepted"),	 tolower(log_accepted),	   logging_meaning[log_accepted]:"Software Error"    ],
 		    // TRANSLATORS: CommandLine table item
-		    [ _("Not Accepted"), tolower(log_nonaccepted), logging_meaning[log_nonaccepted]:"Software Error" ]
+		    [ _("Not accepted"), tolower(log_nonaccepted), logging_meaning[log_nonaccepted]:"Software Error" ]
 		],
 		$[]
 	    ));
 	    CommandLine::Print("");
 
 	    // TRANSLATORS: CommandLine header
-	    CommandLine::Print(String::UnderlinedHeader(_("Logging Broadcast Packets"),0));
+	    CommandLine::Print(String::UnderlinedHeader(_("Logging Broadcast Packets:"),0));
 	    CommandLine::Print("");
 
 	    list <list <string> > table_items = [];
@@ -305,10 +305,10 @@
 		    SuSEFirewall::GetZoneFullName(zone),
 		    (SuSEFirewall::GetIgnoreLoggingBroadcast(zone)=="yes" ?
 			// TRANSLATORS: CommandLine table item
-			_("Logging Enabled")
+			_("Logging enabled")
 			:
 			// TRANSLATORS: CommandLine table item
-			_("Logging Disabled")
+			_("Logging disabled")
 		    )
 		]);
 	    });
@@ -333,7 +333,7 @@
 		string value = tolower((string) options["accepted"]:nil);
 		if (!contains(possible_levels, value)) {
 		    // TRANSLATORS: CommandLine error message, %1 is an option value, %2 is an option name
-		    CommandLine::Error(sformat(_("Value '%1' is not allowed for option '%2'."), options["accepted"]:nil, "accepted"));
+		    CommandLine::Error(sformat(_("Value %1 is not allowed for option %2."), options["accepted"]:nil, "accepted"));
 		    return false;
 		}
 		SuSEFirewall::SetLoggingSettings("ACCEPT",toupper(value));
@@ -342,7 +342,7 @@
 		string value = tolower((string) options["nonaccepted"]:nil);
 		if (!contains(possible_levels, value)) {
 		    // TRANSLATORS: CommandLine error message, %1 is an option value, %2 is an option name
-		    CommandLine::Error(sformat(_("Value '%1' is not allowed for option '%2'."), options["nonaccepted"]:nil, "nonaccepted"));
+		    CommandLine::Error(sformat(_("Value %1 is not allowed for option %2."), options["nonaccepted"]:nil, "nonaccepted"));
 		    return false;
 		}
 		SuSEFirewall::SetLoggingSettings("DROP",toupper(value));
@@ -365,7 +365,7 @@
 		string value = tolower((string) options["logbroadcast"]:nil);
 		if (!contains(["yes", "no"], value)) {
 		    // TRANSLATORS: CommandLine error message, %1 is an option value, %2 is an option name
-		    CommandLine::Error(sformat(_("Value '%1' is not allowed for option '%2'."), options["logbroadcast"]:nil, "logbroadcast"));
+		    CommandLine::Error(sformat(_("Value %1 is not allowed for option %2."), options["logbroadcast"]:nil, "logbroadcast"));
 		    return false;
 		}
 		
@@ -393,7 +393,7 @@
 
 	    CommandLine::Print("");
 	    // TRANSLATORS: CommandLine header
-	    CommandLine::Print(String::UnderlinedHeader(_("Allowed Broadcast Ports"),0));
+	    CommandLine::Print(String::UnderlinedHeader(_("Allowed Broadcast Ports:"),0));
 	    CommandLine::Print("");
 	    list <list <string> > table_items = [];
 	    map <string, list <string> > broadcast_ports = SuSEFirewall::GetBroadcastAllowedPorts();
@@ -426,7 +426,7 @@
 	    // undefined zone
 	    if (options["zone"]:nil==nil) {
 		// TRANSLATORS: CommandLine error, %1 is needed parameter name
-		CommandLine::Error(sformat(_("Parameter '%1' must be set"), "zone"));
+		CommandLine::Error(sformat(_("Parameter %1 must be set."), "zone"));
 		return false;
 	    }
 	    // unknown zone
@@ -438,7 +438,7 @@
 	    // undefined port
 	    if (options["port"]:nil==nil) {
 		// TRANSLATORS: CommandLine error, %1 is needed parameter name
-		CommandLine::Error(sformat(_("Parameter '%1' must be set"), "port"));
+		CommandLine::Error(sformat(_("Parameter %1 must be set."), "port"));
 		return false;
 	    }
 
@@ -470,7 +470,7 @@
     void FWCMDServicesList() {
 	CommandLine::Print("");
 	// TRANSLATORS: CommandLine header
-	CommandLine::Print(String::UnderlinedHeader(_("Defined Firewall Services"),0));
+	CommandLine::Print(String::UnderlinedHeader(_("Defined Firewall Services:"),0));
 	list <list <string> > table_items = [];
 	foreach (string service_id, string service_name, SuSEFirewallServices::GetSupportedServices(), {
 	    table_items = add (table_items, [ service_id, service_name ]);
@@ -479,7 +479,7 @@
 	CommandLine::Print(String::TextTable(
 	    [
 		// TRANSLATORS: CommandLine table header item
-		_("Id"),
+		_("ID"),
 		// TRANSLATORS: CommandLine table header item
 		_("Service Name")
 	    ],table_items,$[]
@@ -493,18 +493,18 @@
 
 	map <string, string> detailed_def = $[
 	    // TRANSLATORS: CommandLine table item
-	    "tcp_ports"		: _("TCP Port"),
+	    "tcp_ports"		: _("TCP port"),
 	    // TRANSLATORS: CommandLine table item
-	    "udp_ports"		: _("UDP Port"),
+	    "udp_ports"		: _("UDP port"),
 	    // TRANSLATORS: CommandLine table item
-	    "rpc_ports"		: _("RPC Port"),
+	    "rpc_ports"		: _("RPC port"),
 	    // TRANSLATORS: CommandLine table item
-	    "ip_protocols"	: _("IP Protocol"),
+	    "ip_protocols"	: _("IP protocol"),
 	];
 
 	CommandLine::Print("");
 	// TRANSLATORS: CommandLine header
-	CommandLine::Print(String::UnderlinedHeader(_("Allowed Services in Zones"),0));
+	CommandLine::Print(String::UnderlinedHeader(_("Allowed Services in Zones:"),0));
 	CommandLine::Print("");
 	list <list <string> > table_items = [];
 	foreach (string zone, SuSEFirewall::GetKnownFirewallZones(), {
@@ -514,9 +514,9 @@
 		table_items = add (table_items, [
 		    zone,
 		    // TRANSLATORS: CommandLine table item (all firewall services are allowed in this zone)
-		    "*" + _("All Services") + "*",
+		    "*" + _("All services") + "*",
 		    // TRANSLATORS: CommandLine table item (this zone is not protected at all)
-		    "*" + _("Entire Zone Unprotected") + "*"
+		    "*" + _("Entire zone unprotected") + "*"
 		]);
 		return;
 	    }
@@ -553,7 +553,7 @@
 
 	CommandLine::Print("");
 	// TRANSLATORS: CommandLine header
-	CommandLine::Print(String::UnderlinedHeader(_("Additional Allowed Ports"),0));
+	CommandLine::Print(String::UnderlinedHeader(_("Additional Allowed Ports:"),0));
 	CommandLine::Print("");
 	table_items = [];
 	foreach (string zone, SuSEFirewall::GetKnownFirewallZones(), {
@@ -563,9 +563,9 @@
 		table_items = add (table_items, [
 		    zone,
 		    // TRANSLATORS: CommandLine table item (all ports are allowed in this zone)
-		    "*" + _("All Ports") + "*",
+		    "*" + _("All ports") + "*",
 		    // TRANSLATORS: CommandLine table item (this zone is not protected at all)
-		    "*" + _("Entire Zone Unprotected") + "*"
+		    "*" + _("Entire zone unprotected") + "*"
 		]);
 		return;
 	    }
@@ -590,7 +590,7 @@
 
 	CommandLine::Print("");
 	// TRANSLATORS: CommandLine header
-	CommandLine::Print(String::UnderlinedHeader(_("Allowed Additional IP Protocols in Zones"),0));
+	CommandLine::Print(String::UnderlinedHeader(_("Allowed Additional IP Protocols in Zones:"),0));
 	CommandLine::Print("");
 	table_items = [];
 	foreach (string zone, SuSEFirewall::GetKnownFirewallZones(), {
@@ -600,9 +600,9 @@
 		table_items = add (table_items, [
 		    zone,
 		    // TRANSLATORS: CommandLine table item (all protocols are allowed in this zone)
-		    "*" + _("All IP Protocols") + "*",
+		    "*" + _("All IP protocols") + "*",
 		    // TRANSLATORS: CommandLine table item (this zone is not protected at all)
-		    "*" + _("Entire Zone Unprotected") + "*"
+		    "*" + _("Entire zone unprotected") + "*"
 		]);
 		return;
 	    }
@@ -626,7 +626,7 @@
 	foreach (string service, services, {
 	    if (!SuSEFirewallServices::IsKnownService(service)) {
 		// TRANSLATORS: CommandLine error message, %1 is a service id
-		CommandLine::Error((sformat(_("Unknown service '%1'."), service)));
+		CommandLine::Error((sformat(_("Unknown service %1."), service)));
 		services = filter (string service_item, services, {
 		    return service_item != service;
 		});
@@ -667,7 +667,7 @@
 	protect = tolower(protect);
 	if (!contains(["yes","no"], protect)) {
 	    // TRANSLATORS: CommandLine error message, %1 is an option value, %2 is an option name
-	    CommandLine::Error(sformat(_("Value '%1' is not allowed for option '%2'."), protect, "protect"));
+	    CommandLine::Error(sformat(_("Value %1 is not allowed for option %2."), protect, "protect"));
 	    return nil;
 	}
 	// Only Protect from Internal is supported
@@ -724,7 +724,7 @@
 	    if (count_entries==0) {
 		CommandLine::Error(sformat(
 		    // TRANSLATORS: CommandLine error message, %1 is a list of possible entries (without translation)
-		    _("At least one of '%1' must be set."),
+		    _("At least one of %1 must be set."),
 		    "service, tcpport, udpport, rpcport, protocol"
 		));
 	    }
@@ -737,7 +737,7 @@
 	} else {
 	    CommandLine::Error(sformat(
 		    // TRANSLATORS: CommandLine error message, %1 is a list of possible action commands
-		    _("At least one action command from '%1' must be set."),
+		    _("At least one action command from %1 must be set."),
 		    "list, show, add, remove"
 	    ));
 	}
@@ -746,7 +746,7 @@
     void FWCMDMasqRedirectShow (map options) {
 	CommandLine::Print("");
 	// TRANSLATORS: CommandLine header
-	CommandLine::Print(String::UnderlinedHeader(_("Redirect Requests to Masqueraded IP"),0));
+	CommandLine::Print(String::UnderlinedHeader(_("Redirect Requests to Masqueraded IP:"),0));
 	CommandLine::Print("");
 	
 	list <list <string> > table_items = [];
@@ -774,18 +774,18 @@
 	CommandLine::Print(String::TextTable(
 	    [
 		// TRANSLATORS: CommandLine table header item
-		_("Id"),
+		_("ID"),
 		// TRANSLATORS: CommandLine table header item
 		_("Source Network"),
 		// TRANSLATORS: CommandLine table header item
 		_("Protocol"),
-		// TRANSLATORS: CommandLine table header item
+		// TRANSLATORS: CommandLine table header item, Req.=Requested
 		_("Req. IP"),
-		// TRANSLATORS: CommandLine table header item
+		// TRANSLATORS: CommandLine table header item, Req.=Requested
 		_("Req. Port"),
-		// TRANSLATORS: CommandLine table header item
+		// TRANSLATORS: CommandLine table header item, Redir.=Redirect
 		_("Redir. to IP"),
-		// TRANSLATORS: CommandLine table header item
+		// TRANSLATORS: CommandLine table header item, Redir.=Redirect
 		_("Redir. to Port")
 		],
 	    table_items, $[]
@@ -803,7 +803,7 @@
 	    foreach (string option, [ "sourcenet", "protocol", "req_port", "redir_ip" ], {
 		if (options[option]:nil==nil) {
 		    // TRANSLATORS: CommandLine error, %1 is needed parameter name
-		    CommandLine::Error(sformat(_("Parameter '%1' must be set"), option));
+		    CommandLine::Error(sformat(_("Parameter %1 must be set."), option));
 		    checked = false;
 		}
 	    });
@@ -819,7 +819,7 @@
 	    new["protocol"] = tolower(new["protocol"]:"");
 	    if (!contains(["tcp","udp"], new["protocol"]:"")) {
 		// TRANSLATORS: CommandLine error message, %1 is an option value, %2 is an option name
-		CommandLine::Error(sformat(_("Value '%1' is not allowed for option '%2'."), new["protocol"]:"", "protocol"));
+		CommandLine::Error(sformat(_("Value %1 is not allowed for option %2."), new["protocol"]:"", "protocol"));
 		return false;
 	    }
 	    
@@ -834,7 +834,7 @@
 		    } else {
 			port_errors = port_errors + (port_errors!="" ? "\n":"") +
 			    // TRANSLATORS: CommandLine error message, %1 is a port name
-			    sformat(_("Unknown port name '%1'."), new[key]:"");
+			    sformat(_("Unknown port name %1."), new[key]:"");
 		    }
 		}
 	    });
@@ -852,7 +852,7 @@
 	} else if (options["remove"]:nil!=nil) {
 	    if (options["record"]:nil==nil) {
 		// TRANSLATORS: CommandLine error, %1 is needed parameter name
-		CommandLine::Error(sformat(_("Parameter '%1' must be set"), "record"));
+		CommandLine::Error(sformat(_("Parameter %1 must be set."), "record"));
 		return false;
 	    }
 	    integer record = (integer) options["record"]:0;
@@ -867,7 +867,7 @@
 	if (options["show"]:nil!=nil) {
 	    CommandLine::Print("");
 	    // TRANSLATORS: CommandLine header
-	    CommandLine::Print(String::UnderlinedHeader(_("Masquerading Settings"),0));
+	    CommandLine::Print(String::UnderlinedHeader(_("Masquerading Settings:"),0));
 	    CommandLine::Print("");
 	    CommandLine::Print(sformat(
 		// TRANSLATORS: CommandLine informative text, %1 is "enabled" or "disabled"
@@ -890,8 +890,8 @@
 
     map cmdline = $[
 	"id" : "firewall",
-	// TRANSLATORS: CommandLine help heder
-	"help" : _("Firewall Configuration"),
+	// TRANSLATORS: CommandLine help 
+	"help" : _("Firewall configuration"),
 	"initialize" : SuSEFirewall::Read,
 	"finish" : SuSEFirewall::Write,
 	"actions" : $[
@@ -934,7 +934,7 @@
 	    "broadcast" : $[
 		"handler" : FWCMDBroadcast,
 		// TRANSLATORS: CommandLine help
-		"help" : _("Broadcast packets settings"),
+		"help" : _("Broadcast packet settings"),
 		"example" : "broadcast add zone=INT port=ipp,233",
 	    ],
 	    "masquerade" : $[
@@ -949,7 +949,7 @@
 	    "masqredirect" : $[
 		"handler" : FWCMDMasqRedirect,
 		// TRANSLATORS: CommandLine help
-		"help" : _("Redirect Requests to Masqueraded IP"),
+		"help" : _("Redirect requests to masqueraded IP"),
 		"example" : "masqredirect remove record=6",
 	    ],
 	    "logging" : $[

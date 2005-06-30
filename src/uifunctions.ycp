@@ -97,7 +97,7 @@
 	// firstly listing all known interfaces
 	foreach (map <string, string> interface, SuSEFirewall::GetAllKnownInterfaces(), {
 	    // TRANSLATORAS: table item, connected with firewall zone of interface
-	    string zone_name = _("No Zone Assigned");
+	    string zone_name = _("No zone assigned");
 	    if (interface["zone"]:nil != nil)
 		zone_name = SuSEFirewall::GetZoneFullName(interface["zone"]:nil);
 
@@ -295,8 +295,8 @@
 		    _("Unknown Port Name"),
 		    sformat(
 			// TRANSLATORS: popup message, %1 is a port-name
-			_("Port name '%1' is unknown in your current system.
-It probably would not work at all.
+			_("Port name %1 is unknown in your current system.
+It probably would not work.
 Really use this port?
 "),
 			port
@@ -610,7 +610,7 @@ Use the port number instead of the port name.
 	    UI::SetFocus(`id(ui_id));
 	    Popup::Error(
 		// TRANSLATORS: popup message, right definition is two lines belos this message
-		_("Wrong IP definition.")
+		_("Invalid IP definition.")
 		+ "\n\n" +
 		Address::Valid4()
 	    );

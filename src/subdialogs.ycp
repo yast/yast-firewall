@@ -78,7 +78,7 @@
     term SetFirewallInterfaceIntoZone (string device, string interface, list <term> zones) {
 	term dialog = `Frame (
 	    // TRANSLATORS: frame label
-	    _("Select Zone for Network Interface"),
+	    _("Zone for Network Interface"),
 	    `VBox (
 		`HBox (
 		    `VBox (
@@ -761,7 +761,7 @@
 	    _("IPsec Support"),
 	    `HBox (
 		// TRANSLATORS: check box
-		`Left ( `CheckBox (`id("ispsec_support"), _("&IPsec Support Enabled")) ),
+		`Left ( `CheckBox (`id("ispsec_support"), _("&Enabled")) ),
 		`HStretch (),
 		// TRANSLATORS: push button
 		`Right ( `PushButton(`id("ipsec_details"), _("&Details...")) )
@@ -888,7 +888,7 @@
     term BoxSummary () {
 	term dialog = `HBox (
 	    // TRANSLATORS: informative label in dialog
-	    `RichText(`id("box_summary_richtext"), _("Creating summary.  Please wait..."))
+	    `RichText(`id("box_summary_richtext"), _("Creating summary..."))
 	);
 
 	return dialog;

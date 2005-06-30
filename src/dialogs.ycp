@@ -30,21 +30,21 @@
 	    "get_service_auto_start"	: SuSEFirewall::GetEnableService,
 	    "set_service_auto_start"	: SuSEFirewall::SetEnableService,
 	    // TRANSLATORS: Radio selection
-	    "start_auto_button"		: _("Start Firew&all When Booting"),
+	    "start_auto_button"		: _("&When Booting"),
 	    // TRANSLATORS: Radio selection
-	    "start_manual_button"	: _("Start Firewall &Manually"),
+	    "start_manual_button"	: _("&Manually"),
 	    "help"			: sformat(CWMServiceStart::AutoStartHelpTemplate (),
 		// TRANSLATORS: part of help text - radio button label, NO SHORTCUT!!!
-		_("Start Firewall When Booting"),
+		_("When Booting"),
 		// TRANSLATORS: part of help text - radio button label, NO SHORTCUT!!!
-		_("Start Firewall Manually")
+		_("Manually")
 	    )
 	]),
 	"start_stop" : CWMServiceStart::CreateStartStopWidget ($[
 	    "service_id"		: "SuSEfirewall2_setup",
-					  // TRANSLATORS: Informating label
+					  // TRANSLATORS: status information
 	    "service_running_label"	: _("Firewall is running"),
-					  // TRANSLATORS: Informating label
+					  // TRANSLATORS: status information
 	    "service_not_running_label"	: _("Firewall is not running"),
 					  // TRANSLATORS: Push button
 	    "start_now_button"		: _("&Start Firewall Now"),
@@ -189,7 +189,7 @@
 		`VStretch ()
 	    ),
 	    // TRANSLATORS: part of dialog caption
-	    "caption"		: firewall_caption + ": " + _("Broadcast Configuration"),
+	    "caption"		: firewall_caption + ": " + _("Broadcast"),
 	    // TRANSLATORS: tree menu item
 	    "tree_item_label"	: _("Broadcast"),
 	    "widget_names"	: [ "DisableBackButton", "BroadcastConfigurationSimple" ]
