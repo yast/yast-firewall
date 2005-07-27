@@ -21,7 +21,7 @@ Icon=yast-firewall
 Exec=/sbin/yast2 firewall 
 
 Name=Firewall
-GenericName=Firewall setup for advanced users
+GenericName=Configure a firewall
 GenericName[cs]=Nastavení firewallu pro pokročilé uživatele
 GenericName[de]=Firewallkonfiguration für fortgeschrittene Anwender
 Name[es]=Cortafuegos
