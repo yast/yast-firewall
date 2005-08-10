@@ -282,8 +282,6 @@
 	string current_item = (string) UI::QueryWidget(
 	    `id ("table_firewall_interfaces"), `CurrentItem);
 
-	y2milestone("SEL %1, EV %2", current_item, event_reason);
-
 	// double click on the table item
 	if (ret == "table_firewall_interfaces" && event_reason == "Activated") {
 	    // known iterface means -> as it was pressed [Change] button
