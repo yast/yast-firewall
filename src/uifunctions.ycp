@@ -85,6 +85,26 @@
 	return SuSEFirewall::StopServices();
     }
 
+    /**
+     * Function sets appropriate states for [Change] and [Custom] buttons
+     */
+    void SetFirewallInterfacesCustomAndChangeButtons(string current_item) {
+	// if called from Init() function
+	if (current_item == nil)
+	    current_item = (string) UI::QueryWidget(
+		`id ("table_firewall_interfaces"), `CurrentItem);
+    
+	// string is one of known network interfaces
+	if (regexpmatch(current_item, "^known-.*")) {
+	    UI::ChangeWidget(`id("change_firewall_interface"), `Enabled, true);
+	    UI::ChangeWidget(`id("user_defined_firewall_interface"), `Enabled, true);
+	// string is a custom string
+	} else {
+	    UI::ChangeWidget(`id("change_firewall_interface"), `Enabled, false);
+	    UI::ChangeWidget(`id("user_defined_firewall_interface"), `Enabled, true);
+	}
+    }
+
     // maximum length of the string "Interface Name" (min. 3)
     integer max_length_intname = 35;
 
@@ -96,7 +116,7 @@
 
 	// firstly listing all known interfaces
 	foreach (map <string, string> interface, SuSEFirewall::GetAllKnownInterfaces(), {
-	    // TRANSLATORAS: table item, connected with firewall zone of interface
+	    // TRANSLATORS: table item, connected with firewall zone of interface
 	    string zone_name = _("No zone assigned");
 	    if (interface["zone"]:nil != nil)
 		zone_name = SuSEFirewall::GetZoneFullName(interface["zone"]:nil);
@@ -127,6 +147,8 @@
 	});
 
 	UI::ChangeWidget ( `id("table_firewall_interfaces"), `Items, table_items);
+	
+	SetFirewallInterfacesCustomAndChangeButtons(nil);
     }
 
     // map of device names
@@ -254,26 +276,47 @@
      */
     symbol HandleFirewallInterfaces (string key, map event) {
 	any ret = event["ID"]:nil;
+	// "Activated" (double-click) or "SelectionChanged" (any other)
+	string event_reason = event["EventReason"]:"SelectionChanged";
 
 	string current_item = (string) UI::QueryWidget(
 	    `id ("table_firewall_interfaces"), `CurrentItem);
 
-	// "change" can handle both interfaces and special strings
-	if (ret == "change_firewall_interface") {
-	    // handling interfaces
+	y2milestone("SEL %1, EV %2", current_item, event_reason);
+
+	// double click on the table item
+	if (ret == "table_firewall_interfaces" && event_reason == "Activated") {
+	    // known iterface means -> as it was pressed [Change] button
 	    if (regexpmatch(current_item, "^known-")) {
-		HandlePopupSetFirewallInterfaceIntoZone(
-		    regexpsub(current_item, "^known-(.*)", "\\1")
-		);
-	    // handling special strings
+		ret = "change_firewall_interface";
+	    // known iterface means -> as it was pressed [Custom] button
 	    } else if (regexpmatch(current_item, "^special-")) {
-		HandlePopupAdditionalSettingsForZones();
-	    } else {
-		y2error("Uknown interfaces_item '%1'", current_item);
+		ret = "user_defined_firewall_interface";
 	    }
-	// "user-defined" can only handle special strings
-	} else if (ret == "user_defined_firewall_interface") {
-	    HandlePopupAdditionalSettingsForZones();
+	}
+
+	// Double click on the item or some modification button has been pressed
+	if (ret == "change_firewall_interface" || ret == "user_defined_firewall_interface") {
+	    // "change" can handle both interfaces and special strings
+	    if (ret == "change_firewall_interface") {
+		// handling interfaces
+		if (regexpmatch(current_item, "^known-")) {
+		    HandlePopupSetFirewallInterfaceIntoZone(
+			regexpsub(current_item, "^known-(.*)", "\\1")
+		    );
+		// handling special strings
+		} else if (regexpmatch(current_item, "^special-")) {
+		    HandlePopupAdditionalSettingsForZones();
+		} else {
+		    y2error("Uknown interfaces_item '%1'", current_item);
+		}
+	    // "user-defined" can only handle special strings
+	    } else if (ret == "user_defined_firewall_interface") {
+		HandlePopupAdditionalSettingsForZones();
+	    }
+	// single click (changed current item)
+	} else if (ret == "table_firewall_interfaces" && event_reason == "SelectionChanged") {
+	    SetFirewallInterfacesCustomAndChangeButtons(current_item);
 	}
 
 	return nil;

@@ -3,6 +3,10 @@ Wed Aug 10 09:30:10 CEST 2005 - locilka@suse.cz
 
 - Fixing Progress in MakeProposal function (installation)
   Patch created by mvidner
+- Fixing bug #103196,
+  Enabling or Disabling [Change] button when needed
+  Activating modification popups when double-clicked on any
+  firewall network interface
 - 2.12.3
 
 -------------------------------------------------------------------

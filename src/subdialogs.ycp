@@ -54,6 +54,7 @@
 	    `VBox (
 		`Table (
 		    `id("table_firewall_interfaces"),
+		    `opt(`notify,`immediate),
 		    `header (
 			// TRANSLATORS: table header item
 			_("Device"),
