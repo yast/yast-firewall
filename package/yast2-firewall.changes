@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Tue Aug 16 08:57:19 CEST 2005 - locilka@suse.cz
+
+- Fixing bug #104635
+  From now, YaST doesn't complain when the additional allowed port
+  is a numeric range of ports such as "550:570".
+- 2.12.4 
+
+-------------------------------------------------------------------
 Wed Aug 10 09:30:10 CEST 2005 - locilka@suse.cz
 
 - Fixing Progress in MakeProposal function (installation)

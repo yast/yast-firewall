@@ -329,7 +329,20 @@
 
 	foreach (string port, ports, {
 	    if (port == "") return;
+	    // common numeric port
 	    if (regexpmatch(port, "^[0-9]+$")) return;
+	    // common port range
+	    if (regexpmatch(port, "^[0-9]+:[0-9]+$")) {
+		string port1 = regexpsub(port, "^([0-9]+):[0-9]+$", "\\1");
+		string port2 = regexpsub(port, "^[0-9]+:([0-9]+)$", "\\1");
+		
+		integer port1i = tointeger(port1);
+		integer port2i = tointeger(port2);
+		
+		// port range is defined as 'A:B' where A<B
+		if (port1i != nil && port2i != nil && port1i < port2i) return;
+	    }
+
 	    if (! PortAliases::IsKnownPortName(port)) {
 		checked = Popup::ContinueCancelHeadline(
 		    // TRANSLATORS: popup headline
