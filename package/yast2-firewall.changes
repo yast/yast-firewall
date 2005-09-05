@@ -1,4 +1,13 @@
 -------------------------------------------------------------------
+Mon Sep  5 13:30:33 CEST 2005 - locilka@suse.cz
+
+- Fixing bug #112899
+  [Advanced...] button had been truncated in some languages because
+  of fixed length of the button. Changing UI to stretch when
+  needed.
+- 2.12.5
+
+-------------------------------------------------------------------
 Tue Aug 16 08:57:19 CEST 2005 - locilka@suse.cz
 
 - Fixing bug #104635

@@ -183,45 +183,45 @@
 		// TRANSLATORS: combo box
 		_("All&owed Services for Selected Zone"), GetZonesListedItems() )
 	    ),
-	    `VSquash (
-		`HBox (
-		    `HWeight ( 9,
-			`Bottom ( `Left( `ReplacePoint( `id("allow_service_names_replacepoint"),
-			    // items handled by replacepoint
-			    // TRANSLATORS: combo box
-			    `ComboBox(`id("allow_service_names"), _("&Service to Allow"),[])
-			)))
+
+	    `VSpacing ( 1 ),
+
+	    `HBox(
+		`VBox (
+		    `opt(`hstretch),
+		    `Left( `ReplacePoint( `id("allow_service_names_replacepoint"),
+			// items handled by replacepoint
+			// TRANSLATORS: combo box
+			`ComboBox(`id("allow_service_names"), _("&Service to Allow"),[])
+		    )),
+
+		    `Table (
+			`id("table_allowed_services"),
+			`opt(`hstretch, `vstretch),
+			`header (
+			    // TRANSLATORS: table header item
+			    _("Allowed Service")
+	    		), []
 		    ),
-		    `HWeight ( 2,
-			`Bottom ( `PushButton ( `id ( "add_allowed_service" ), `opt ( `hstretch ), Label::AddButton() ) )
-		    )
-		)
-	    ),
-	    `HBox (
-		`HWeight ( 9,
-		    `VBox (
-			`Table (
-			    `id("table_allowed_services"),
-			    `header (
-				// TRANSLATORS: table header item
-				_("Allowed Service")
-	    		    ), []
-			),
-			`VSpacing(1),
-			`Left( `CheckBox(`id("protect_from_internal"), `opt(`notify),
-			    // TRANSLATORS: check box
-			    _("&Protect Firewall from Internal Zone"))
-			)
-		    )
+
+		    `VSpacing( 1 ),
+
+		    `Left( `CheckBox(`id("protect_from_internal"), `opt(`notify),
+			// TRANSLATORS: check box
+			_("&Protect Firewall from Internal Zone")
+		    ))
 		),
-		`HWeight ( 2,
-		    `VBox (
-			`Top ( `PushButton ( `id ( "remove_allowed_service" ), `opt ( `hstretch ), Label::RemoveButton() ) ),
-			`HStretch(),
-			// TRANSLATORS: push button
-			`Bottom ( `PushButton ( `id ( "advanced_allowed_service" ), `opt ( `hstretch ), _("A&dvanced...") ) )
-		    )
-		)
+		`HSquash( `VBox (
+		    `VSpacing( 1.1 ),
+		    `PushButton ( `id ( "add_allowed_service" ), `opt ( `hstretch ), " " + Label::AddButton() + " "),
+
+		    `PushButton ( `id ( "remove_allowed_service" ), `opt ( `hstretch ), " " + Label::RemoveButton() + " "),
+
+		    `Empty(`opt(`vstretch)),
+
+		    // TRANSLATORS: push button
+		    `PushButton ( `id ( "advanced_allowed_service" ), `opt ( `hstretch ), " " + _("A&dvanced...") + " ")
+		))
 	    )
 	);
 
