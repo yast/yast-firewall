@@ -68,6 +68,7 @@ if(func == "MakeProposal") {
 	"links" : [
 	    "firewall--enable_firewall_in_proposal", "firewall--disable_firewall_in_proposal",
 	    "firewall--enable_ssh_in_proposal", "firewall--disable_ssh_in_proposal",
+	    "firewall--enable_vnc_in_proposal", "firewall--disable_vnc_in_proposal",
 	],
     ];
 
@@ -78,32 +79,59 @@ else if(func == "AskUser") {
     any chosen_id = param["chosen_id"]:nil;
     y2milestone("Firewall Proposal wanted to change with id %1", chosen_id);
 
-    // user clicked on any clickable <a href> in proposal
+    /*
+     * When user clicks on any clickable <a href> in firewall proposal,
+     * one of these actions is called
+     */
+
+    // Enable firewall
     if (chosen_id == "firewall--enable_firewall_in_proposal") {
-	y2milestone("Firewall enabled by single-click");
+	y2milestone("Firewall enabled by a single-click");
 	SuSEFirewall::SetEnableService(true);
 	SuSEFirewall::SetStartService(true);
 	ret = $[ "workflow_sequence" : `next ];
 	SuSEFirewallProposal::SetChangedByUser(true);
+
+    // Disable firewall
     } else if (chosen_id == "firewall--disable_firewall_in_proposal") {
-	y2milestone("Firewall disabled by single-click");
+	y2milestone("Firewall disabled by a single-click");
 	SuSEFirewall::SetEnableService(false);
 	SuSEFirewall::SetStartService(false);
 	ret = $[ "workflow_sequence" : `next ];
 	SuSEFirewallProposal::SetChangedByUser(true);
+
+    // Enable SSH service
     } else if (chosen_id == "firewall--enable_ssh_in_proposal") {
-	y2milestone("SSH enabled by single-click");
-	SuSEFirewall::SetServicesForZones (["ssh"], ["EXT"], true);
+	y2milestone("SSH enabled by a single-click");
+	SuSEFirewallProposal::OpenServiceOnNonDialUpInterfaces("ssh");
 	ret = $[ "workflow_sequence" : `next ];
 	SuSEFirewallProposal::SetChangedByUser(true);
+
+    // Disable SSH service
     } else if (chosen_id == "firewall--disable_ssh_in_proposal") {
-	y2milestone("SSH disabled by single-click");
-	SuSEFirewall::SetServicesForZones (["ssh"], ["EXT"], false);
+	y2milestone("SSH disabled by a single-click");
+	SuSEFirewall::SetServicesForZones (["ssh"], SuSEFirewall::GetKnownFirewallZones(), false);
 	ret = $[ "workflow_sequence" : `next ];
 	SuSEFirewallProposal::SetChangedByUser(true);
+
+    // Enable VNC service
+    } else if (chosen_id == "firewall--enable_vnc_in_proposal") {
+	y2milestone("VNC enabled by a single-click");
+	SuSEFirewallProposal::OpenServiceOnNonDialUpInterfaces("vnc");
+	ret = $[ "workflow_sequence" : `next ];
+	SuSEFirewallProposal::SetChangedByUser(true);
+
+    // Disable VNC service
+    } else if (chosen_id == "firewall--disable_vnc_in_proposal") {
+	y2milestone("VNC disabled by a single-click");
+	SuSEFirewall::SetServicesForZones (["vnc"], SuSEFirewall::GetKnownFirewallZones(), false);
+	ret = $[ "workflow_sequence" : `next ];
+	SuSEFirewallProposal::SetChangedByUser(true);
+
+    // Change the firewall settings in usual configuration dialogs
     } else {
-	// user wants to change the firewall settings
 	map <string, any> stored = (map <string, any>) SuSEFirewall::Export();
+	y2milestone("Editing firewall settings");
 	symbol result = (symbol) WFM::CallFunction("firewall");
 
 	if (result != `next) SuSEFirewall::Import(stored);
@@ -114,6 +142,7 @@ else if(func == "AskUser") {
 	ret = $[ "workflow_sequence" : result ];
     }
 }
+
 /* create titles */
 else if(func == "Description") {
     ret = $[
