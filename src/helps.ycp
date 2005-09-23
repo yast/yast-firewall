@@ -37,7 +37,7 @@ If you need masquerading, the string <tt>any</tt> is not allowed.</p>
 Network traffic through any unassigned interface is blocked.</p>
 "),
 
-	// TRANSLATORS: Allowed services dialog help
+	// TRANSLATORS: Allowed services dialog help 1/2
 	"allowed-services" : _("<p><b><big>Allowed Services</big></b>
 <br>Here, specify services or ports that should be accessible from the network.
 Networks are divided into firewall zones.</p>
@@ -48,7 +48,17 @@ To remove an allowed service, select the <b>Zone</b> and the <b>Allowed Service<
 
 <p>By deselecting <b>Protect Firewall from Internal Zone</b>, remove 
 protection from the zone. All services and ports would be unprotected from this zone.</p>
-"),
+") +
+
+	// TRANSLATORS: Allowed services dialog help 2/2
+	_("<p>Additional settings can be configured using the <b>Advanced...</b> button.
+Entries must be separated by a space. There you can allow TCP, UDP and RPC ports and
+also IP protocols.</p>
+<p>TCP and UDP ports can be filled in as port-names (<tt>ftp-data</tt>),
+port-numbers (<tt>3128</tt>) and also port-ranges (<tt>8000:8520</tt>).
+RPC ports must be filled in as service-names (<tt>portmap</tt> or <tt>nlockmgr</tt>),
+IP protocols as the protocol-name (<tt>esp</tt>).
+</p>"),
 
 	// TRANSLATORS: Base masquerade dialog help
 	"base-masquerading" : _("<p><b><big>Masquerading</big></b>

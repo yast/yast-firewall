@@ -2,7 +2,10 @@
 Fri Sep 23 09:51:30 CEST 2005 - locilka@suse.cz
 
 - Adding support for VNC and SSH installations.
-  VNC/SSH can be enabled/disabled by a single click.
+  VNC/SSH can be enabled/disabled by a single click
+  (enhancement #113211).
+- Adding more help for Advanced configuration of Allowed Services.
+  Also with examples (enhancement #104635).
 - 2.13.0
 
 -------------------------------------------------------------------
