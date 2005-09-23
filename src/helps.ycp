@@ -110,7 +110,7 @@ configure logging for incoming connection packets. Outgoing ones are not logged 
 
 <p>There are two groups of logged IP packets: <b>Accepted Packets</b> and <b>Not Accepted Packets</b>.
 You can choose from three levels of logging for each group: <b>Log All</b> for logging every
-packet, <b>Log Only Critical</b> for loggin only interesting ones, or <b>Do Not Log Any</b>
+packet, <b>Log Only Critical</b> for logging only interesting ones, or <b>Do Not Log Any</b>
 for no logging. You should log at least critical accepted packets.</p>
 "),
 
