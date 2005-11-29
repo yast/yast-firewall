@@ -328,19 +328,31 @@
 	boolean checked = true;
 
 	foreach (string port, ports, {
+	    // just a waste-space
 	    if (port == "") return;
 	    // common numeric port
-	    if (regexpmatch(port, "^[0-9]+$")) return;
+	    if (regexpmatch(port, "^[0123456789]+$")) return;
 	    // common port range
-	    if (regexpmatch(port, "^[0-9]+:[0-9]+$")) {
-		string port1 = regexpsub(port, "^([0-9]+):[0-9]+$", "\\1");
-		string port2 = regexpsub(port, "^[0-9]+:([0-9]+)$", "\\1");
+	    if (regexpmatch(port, "^[0123456789]+:[0123456789]+$")) {
+		string port1 = regexpsub(port, "^([0123456789]+):[0123456789]+$", "\\1");
+		string port2 = regexpsub(port, "^[0123456789]+:([0123456789]+)$", "\\1");
 		
 		integer port1i = tointeger(port1);
 		integer port2i = tointeger(port2);
 		
 		// port range is defined as 'A:B' where A<B
 		if (port1i != nil && port2i != nil && port1i < port2i) return;
+		else {
+		    checked = Popup::ContinueCancelHeadline (
+			// TRANSLATORS: popup headline
+			_("Wrong Port Range Definition"),
+			// TRANSLATORS: popup message, %1 is a port-range defined by user
+			sformat(_("Port range %1 is defined wrong.
+It must be defined as the min_port_number:max_port_number and
+max_port_number must be bigger than min_port_number."), port)
+		    );
+		    return;
+		}
 	    }
 
 	    if (! PortAliases::IsKnownPortName(port)) {
