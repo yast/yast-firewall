@@ -345,9 +345,9 @@
 		else {
 		    checked = Popup::ContinueCancelHeadline (
 			// TRANSLATORS: popup headline
-			_("Wrong Port Range Definition"),
+			_("Invalid Port Range Definition"),
 			// TRANSLATORS: popup message, %1 is a port-range defined by user
-			sformat(_("Port range %1 is defined wrong.
+			sformat(_("Port range %1 is invalid.
 It must be defined as the min_port_number:max_port_number and
 max_port_number must be bigger than min_port_number."), port)
 		    );

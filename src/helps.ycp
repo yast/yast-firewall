@@ -51,14 +51,15 @@ protection from the zone. All services and ports would be unprotected from this 
 ") +
 
 	// TRANSLATORS: Allowed services dialog help 2/2
-	_("<p>Additional settings can be configured using the <b>Advanced...</b> button.
-Entries must be separated by a space. There you can allow TCP, UDP and RPC ports and
-also IP protocols.</p>
-<p>TCP and UDP ports can be filled in as port-names (<tt>ftp-data</tt>),
-port-numbers (<tt>3128</tt>) and also port-ranges (<tt>8000:8520</tt>).
-RPC ports must be filled in as service-names (<tt>portmap</tt> or <tt>nlockmgr</tt>),
-IP protocols as the protocol-name (<tt>esp</tt>).
-</p>"),
+	_("<p>Additional settings can be configured using <b>Advanced</b>.
+Entries must be separated by a space. There you can allow TCP, UDP, and RPC ports and
+IP protocols.</p>
+<p>TCP and UDP ports can be entered as port names (<tt>ftp-data</tt>),
+port numbers (<tt>3128</tt>), and port ranges (<tt>8000:8520</tt>).
+RPC ports must be entered as service names (<tt>portmap</tt> or <tt>nlockmgr</tt>) and
+IP protocols as the protocol name (<tt>esp</tt>).
+</p>
+"),
 
 	// TRANSLATORS: Base masquerade dialog help
 	"base-masquerading" : _("<p><b><big>Masquerading</big></b>
