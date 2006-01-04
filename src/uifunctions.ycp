@@ -19,6 +19,9 @@
     import "Popup";
     import "Address";
     import "Wizard";
+    import "Report";
+    import "NetworkService";
+    import "Label";
 
     include "firewall/generalfunctions.ycp";
 
@@ -136,10 +139,24 @@
 	foreach (string zone, SuSEFirewall::GetKnownFirewallZones(), {
 	    list <string> specials = SuSEFirewall::GetSpecialInterfacesInZone(zone);
 	    string zone_name = SuSEFirewall::GetZoneFullName(zone);
+	    string custom_string_text = "";
 	    foreach (string special, specials, {
-		table_items = add (table_items, `item( `id("special-" + special),
+		// Managed by the Network Manager && string is 'any' in the 'EXT' zone
+		if (
+		    NetworkService::IsManaged() &&
+		    special == SuSEFirewall::special_all_interface_string &&
+		    zone == SuSEFirewall::special_all_interface_zone
+		) {
+		    // TRANSLATORS: table item, kind of "User defined string" in the SuSEfirewall2 configuration.
+		    //              This one means that all interfaces managed by a Network Manager are covered by that string.
+		    custom_string_text = _("All Network Manager interfaces");
+		} else {
 		    // TRANSLATORS: table item, "User defined string" instead of Device_name
-		    _("Custom string"),
+		    custom_string_text = _("Custom string");
+		}
+
+		table_items = add (table_items, `item( `id("special-" + special),
+		    custom_string_text,
 		    special,
 		    zone_name
 		));
@@ -252,6 +269,32 @@
 		// checking for removed additions
 		foreach (string old_addition_item, starting_additionals[zone_shortname]:[], {
 		    if (old_addition_item != "" && !contains(new_additions, old_addition_item)) {
+			if (
+			    NetworkService::IsManaged() &&
+			    old_addition_item == SuSEFirewall::special_all_interface_string &&
+			    zone_shortname == SuSEFirewall::special_all_interface_zone
+			) {
+			    y2warning("Trying to remove support for active Network Manager");
+			    if (!Report::AnyQuestion(
+				// TRANSLATORS: headline label
+				_("Warning"),
+				// TRANSLATORS: important question
+				//              %1 is a special string, currently 'any'
+				//              %2 is a zone name, currently 'External Zone'
+				sformat(_("You are using the Network Manager for your network interfaces.
+Now, you want to remove the string '%1' from the '%2' zone
+which is vitally important for the Network Manager.
+
+Are you sure you want to remove that special string?"),
+				    SuSEFirewall::special_all_interface_string,
+				    SuSEFirewall::GetZoneFullName(SuSEFirewall::special_all_interface_zone)
+				),
+				Label::YesButton(),
+				Label::NoButton(),
+				`no
+			    )) return;
+			    y2warning("User confirmed the removing of the string");
+			}
 			changed = true;
 			events_remove = add (events_remove, [ old_addition_item, zone_shortname ]);
 		    }

@@ -18,6 +18,7 @@
     import "SuSEFirewallServices";
     import "Mode";
     import "String";
+    import "NetworkService";
 
     // use simple textual summary for commandline
     boolean simple_text = false;
@@ -62,10 +63,14 @@
 	if (spec_interface == "any") {
 	    if (zone == "EXT") {
 		ret_val = " '" + spec_interface + "' "
-		// TRANSLATORS: an informative text
-		+ _("Any unassigned interface will be assigned to this zone.");
+		+ (NetworkService::IsManaged() ?
+		    // TRANSLATORS: an informative text, text presented in HTML - newlines are not needed
+		    _("All network interfaces handled by the Network Manager and all other unassigned interfaces will be assigned to this zone.")
+		    :
+		    // TRANSLATORS: an informative text, text presented in HTML - newlines are not needed
+		    _("Any unassigned interface will be assigned to this zone.")
+		);
 	    } else {
-		// FIXME: really?
 		ret_val = " '" + spec_interface + "' "
 		    // TRANSLATORS: informative text
 		    + _("Currently supported only in external zone.");
