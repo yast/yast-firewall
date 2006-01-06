@@ -634,9 +634,9 @@ Really use this port?
 
 	// enabling or disabling masquerade redirect table when masquerading is enabled
 	// and also possible
-	if (!IsThisExpertConfiguration()) {
+	//if (!IsThisExpertConfiguration()) {
 	    SetMasqueradeTableUsable(masquerade && masquerade_possible);
-	}
+	//}
 
 	// impossible masquerading, user gets information why
 	if (!masquerade_possible) {
@@ -825,9 +825,9 @@ Use the port number instead of the port name.
 	    boolean masquerade = (boolean) UI::QueryWidget(`id("masquerade_networks"), `Value);
 	    SuSEFirewall::SetMasquerade(masquerade);
 	    // enabling or disabling masquerade redirect table when masquerade enabled
-	    if (!IsThisExpertConfiguration()) {
+	    //if (!IsThisExpertConfiguration()) {
 		SetMasqueradeTableUsable(masquerade);
-	    }
+	    //}
 	}
 
 	return nil;

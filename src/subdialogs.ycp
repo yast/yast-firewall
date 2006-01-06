@@ -174,13 +174,13 @@ to get a working configuration."),
 		`Left( `CheckBox(`id("masquerade_networks"), `opt(`notify),
 		    // TRANSLATORS: check box
 		    _("&Masquerade Networks"))
-		),
-		(IsThisExpertConfiguration() ?
+		)//,
+		//(IsThisExpertConfiguration() ?
 		    // TRANSLATORS: select box
-		    `Left( `ComboBox(`id("masquerade_outer_zone"), _("Zone &to Masquerade On"), GetZonesListedItems() ) )
-		    :
-		    nil
-		)
+		//    `Left( `ComboBox(`id("masquerade_outer_zone"), _("Zone &to Masquerade On"), GetZonesListedItems() ) )
+		//    :
+		//    nil
+		//)
 	    )
 	);
 	
