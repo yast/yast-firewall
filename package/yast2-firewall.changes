@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Jan  6 15:27:07 CET 2006 - locilka@suse.cz
+
+- Adjusting for SLES10
+- 2.13.4 
+
+-------------------------------------------------------------------
 Wed Jan  4 10:27:52 CET 2006 - locilka@suse.cz
 
 - Adding Network Manager support

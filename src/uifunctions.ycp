@@ -601,7 +601,7 @@ Really use this port?
 	//        it is EXT for Simple configuration as default
 	boolean possible = false;
 
-	if (!IsThisExpertConfiguration()) {
+	// if (!IsThisExpertConfiguration()) {
 	    // needs to have any external and any other interface
 	    boolean has_external = false;
 	    boolean has_other    = false;
@@ -618,9 +618,9 @@ Really use this port?
 	    });
 	    
 	    possible = (has_external && has_other);
-	} else {
-	    y2error("FIXME: missing functionality for expert configuration");
-	}
+	// } else {
+	//    y2error("FIXME: missing functionality for expert configuration");
+	//}
 
 	return possible;
     }
@@ -644,12 +644,12 @@ Really use this port?
 	    UI::ChangeWidget(`id("masquerade_networks"), `Enabled, false);
 
 	    UI::ReplaceWidget(`id("replacepoint_masquerade_information"),
-		(!IsThisExpertConfiguration() ?
+		//(!IsThisExpertConfiguration() ?
 		    // TRANSLATORS: informative label
 		    `Left(`Label(_("Masquerading needs at least one external interface and one other interface.")))
-		    :
-		    `Left(`Label("FIXME: missing functionality for expert configuration"))
-		)
+		    //:
+		    //`Left(`Label("FIXME: missing functionality for expert configuration"))
+		//)
 	    );
 	}
 
