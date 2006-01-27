@@ -54,7 +54,7 @@
 	if (NetworkService::IsManaged()) network_manager = `Left (
 	    // TRANSLATORS: an informative text
 	    //              When using a Network Manager, Firewall cannot determine NM-handled network interfaces
-	    `Label (_("Particular interfaces managed by the Network Manager are not listed."))
+	    `Label (_("Interfaces controlled by NetworkManager are not listed."))
 	);
 
 	term dialog = `Frame (
@@ -134,7 +134,7 @@
 			    // TRANSLATORS: an informative text in a popup dialog, more newlines are allowed
 			    //              %1 is the 'any' string (by default)
 			    //              %2 is the name of the EXT zone (by default)
-			    _("You are currently using the Network Manager.
+			    _("You are currently using NetworkManager.
 You need to have a string '%1' in the zone '%2'
 to get a working configuration."),
 			    SuSEFirewall::special_all_interface_string, SuSEFirewall::GetZoneFullName(SuSEFirewall::special_all_interface_zone)

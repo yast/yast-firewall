@@ -44,9 +44,9 @@ Network traffic through any unassigned interface is blocked.</p>
     //              Used only when the network interfaces are handled by the Network Manager tool
     //              %1 is a string 'any' (by default)
     //              %2 is a zone name 'External Zone' (by default)
-    sformat(_("<p>You are currently using the <b>Network Manager</b> for handling your
+    sformat(_("<p>You are currently using NetworkManager to control your
 network interfaces. You should insert a string '%1' into the zone '%2' using
-the <b>Custom</b> button. Otherwise your configuration needn't to work.
+<b>Custom</b>. Otherwise your configuration might not work.
 </p>"), SuSEFirewall::special_all_interface_string, SuSEFirewall::GetZoneFullName(SuSEFirewall::special_all_interface_zone)):""
 ),
 
@@ -69,8 +69,8 @@ Entries must be separated by a space. There you can allow TCP, UDP, and RPC port
 IP protocols.</p>
 <p>TCP and UDP ports can be entered as port names (<tt>ftp-data</tt>),
 port numbers (<tt>3128</tt>), and port ranges (<tt>8000:8520</tt>).
-RPC ports must be entered as service names (<tt>portmap</tt> or <tt>nlockmgr</tt>) and
-IP protocols as the protocol name (<tt>esp</tt>).
+RPC ports must be entered as service names (<tt>portmap</tt> or <tt>nlockmgr</tt>).
+Enter IP protocols as the protocol name (<tt>esp</tt>).
 </p>
 "),
 

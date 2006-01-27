@@ -65,7 +65,7 @@
 		ret_val = " '" + spec_interface + "' "
 		+ (NetworkService::IsManaged() ?
 		    // TRANSLATORS: an informative text, text presented in HTML - newlines are not needed
-		    _("All network interfaces handled by the Network Manager and all other unassigned interfaces will be assigned to this zone.")
+		    _("All network interfaces handled by NetworkManager and all other unassigned interfaces will be assigned to this zone.")
 		    :
 		    // TRANSLATORS: an informative text, text presented in HTML - newlines are not needed
 		    _("Any unassigned interface will be assigned to this zone.")

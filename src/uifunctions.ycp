@@ -149,7 +149,7 @@
 		) {
 		    // TRANSLATORS: table item, kind of "User defined string" in the SuSEfirewall2 configuration.
 		    //              This one means that all interfaces managed by a Network Manager are covered by that string.
-		    custom_string_text = _("All Network Manager interfaces");
+		    custom_string_text = _("All NetworkManager interfaces");
 		} else {
 		    // TRANSLATORS: table item, "User defined string" instead of Device_name
 		    custom_string_text = _("Custom string");
@@ -281,11 +281,11 @@
 				// TRANSLATORS: important question
 				//              %1 is a special string, currently 'any'
 				//              %2 is a zone name, currently 'External Zone'
-				sformat(_("You are using the Network Manager for your network interfaces.
-Now, you want to remove the string '%1' from the '%2' zone
-which is vitally important for the Network Manager.
+				sformat(_("You are using NetworkManager for your network interfaces.
+Now, you want to remove the string '%1' from the '%2' zone,
+which is vitally important for NetworkManager.
 
-Are you sure you want to remove that special string?"),
+Really remove that special string?"),
 				    SuSEFirewall::special_all_interface_string,
 				    SuSEFirewall::GetZoneFullName(SuSEFirewall::special_all_interface_zone)
 				),
