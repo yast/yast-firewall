@@ -13,7 +13,7 @@
 
 {
     textdomain "firewall";
-    import "NetworkService";
+    //import "NetworkService";
     import "SuSEFirewall";
 
     map <string, string> HELPS = $[
@@ -37,18 +37,18 @@ If you need masquerading, the string <tt>any</tt> is not allowed.</p>
 
 <p>Every network device should be assigned to a firewall zone.
 Network traffic through any unassigned interface is blocked.</p>
-") +
+"),
 // Network Manager
-(NetworkService::IsManaged() ?
-    // TRANSLATORS: Optional help text for Firewall interfaces
-    //              Used only when the network interfaces are handled by the Network Manager tool
-    //              %1 is a string 'any' (by default)
-    //              %2 is a zone name 'External Zone' (by default)
-    sformat(_("<p>You are currently using NetworkManager to control your
-network interfaces. You should insert a string '%1' into the zone '%2' using
-<b>Custom</b>. Otherwise your configuration might not work.
-</p>"), SuSEFirewall::special_all_interface_string, SuSEFirewall::GetZoneFullName(SuSEFirewall::special_all_interface_zone)):""
-),
+//(NetworkService::IsManaged() ?
+//    // TRANSLATORS: Optional help text for Firewall interfaces
+//    //              Used only when the network interfaces are handled by the Network Manager tool
+//    //              %1 is a string 'any' (by default)
+//    //              %2 is a zone name 'External Zone' (by default)
+//    sformat(_("<p>You are currently using NetworkManager to control your
+//network interfaces. You should insert a string '%1' into the zone '%2' using
+//<b>Custom</b>. Otherwise your configuration might not work.
+//</p>"), SuSEFirewall::special_all_interface_string, SuSEFirewall::GetZoneFullName(SuSEFirewall::special_all_interface_zone)):""
+//),
 
 	// TRANSLATORS: Allowed services dialog help 1/2
 	"allowed-services" : _("<p><b><big>Allowed Services</big></b>
