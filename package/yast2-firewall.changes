@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Mon Feb 13 10:48:01 CET 2006 - locilka@suse.cz
+
+- NetworkManager has changed behavior again. Currently it reports
+  its network interfaces so the NetworkManager support from 2.13.3
+  is removed (#149075).
+- 2.13.5
+
+-------------------------------------------------------------------
 Fri Jan 27 09:12:19 CET 2006 - locilka@suse.cz
 
 - merged proofed texts
