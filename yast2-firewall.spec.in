@@ -1,7 +1,7 @@
 @HEADER-COMMENT@
 
 @HEADER@
-BuildRequires:	yast2-devel-packages yast2-installation
+BuildRequires:	yast2-installation perl-XML-Writer update-desktop-files yast2 yast2-devtools yast2-testsuite
 Requires:	yast2
 
 Provides:	yast2-config-firewall

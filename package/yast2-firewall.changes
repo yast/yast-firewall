@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Mar  6 14:47:19 CET 2006 - locilka@suse.cz
+
+- Adjusted BuildRequires for the package
+- 2.13.6
+
+-------------------------------------------------------------------
 Mon Feb 13 10:48:01 CET 2006 - locilka@suse.cz
 
 - NetworkManager has changed behavior again. Currently it reports
