@@ -14,6 +14,7 @@
     import "Popup";
     import "SuSEFirewall";
     import "Wizard";
+    import "Confirm";
 
     include "firewall/helps.ycp";
 
@@ -25,6 +26,10 @@
     define symbol ReadDialog() {
 
 	Wizard::RestoreHelp(HelpForDialog("reading_configuration"));
+
+	// Checking for root's permissions
+	if (!Confirm::MustBeRoot())
+	    return `abort;
 
 	// reading firewall settings
 	boolean ret = SuSEFirewall::Read();
