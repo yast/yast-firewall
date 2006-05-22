@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon May 22 10:19:23 CEST 2006 - locilka@suse.cz
+
+- Fixing visibility of widgets in Broadcast Configuration (#175920)
+- 2.13.8
+
+-------------------------------------------------------------------
 Thu Mar 23 08:35:02 CET 2006 - locilka@suse.cz
 
 - Added checking for root permissions into the module startup

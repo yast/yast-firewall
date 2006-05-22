@@ -911,11 +911,15 @@ Use the port number instead of the port name.
 	    boolean log_packets = (SuSEFirewall::GetIgnoreLoggingBroadcast(zone) == "no");
 	    replace_dialog = add(replace_dialog,
 		`HBox(
-		    `TextEntry(`id("bcast_ports_" + zone), zone_name, ports_for_zone),
-		    `VBox (
-			`Label(""),
-			// TRANSLATORS: check box
-			`CheckBox(`id("bcast_log_" + zone), _("&Log Not Accepted Broadcast Packets"), log_packets)
+		    `HWeight( 40,
+			`TextEntry(`id("bcast_ports_" + zone), zone_name, ports_for_zone)
+		    ),
+		    `HWeight( 60,
+			`VBox (
+			    `Label(""),
+			    // TRANSLATORS: check box
+			    `CheckBox(`id("bcast_log_" + zone), _("&Log Not Accepted Broadcast Packets"), log_packets)
+			)
 		    )
 		)
 	    );
