@@ -19,13 +19,13 @@
 
     import "SuSEFirewall";
     import "Mode";
-    import "CommandLine";
 
     any ret = nil;
 
     // there are some arguments - starting commandline
     if (size(WFM::Args())>0) {
-	include "firewall/cmdline.ycp";
+	import "SuSEFirewallCMDLine";
+	SuSEFirewallCMDLine::Run();
     // GUI or TextUI
     } else {
 	include "firewall/wizards.ycp";

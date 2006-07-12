@@ -16,12 +16,10 @@
 
     import "SuSEFirewall";
     import "SuSEFirewallServices";
+    import "SuSEFirewallUI";
     import "Mode";
     import "String";
     // import "NetworkService";
-
-    // use simple textual summary for commandline
-    boolean simple_text = false;
 
     map protocol_type_names = $[
 	// TRANSLATORS: Summary item label
@@ -50,7 +48,7 @@
     }
 
     string SummaryZoneHeader (string zone_id) {
-	if (simple_text) {
+	if (SuSEFirewallUI::simple_text_output) {
 	    return String::UnderlinedHeader(SuSEFirewall::GetZoneFullName(zone_id),0);
 	} else {
 	    return "\n<h2>" + SuSEFirewall::GetZoneFullName(zone_id) + "</h2>\n";
@@ -97,7 +95,7 @@
 
 	if (size(interfaces_in_zone)>0 || size(special_interfaces)>0) {
 	    ret_summary = ret_summary +
-		(simple_text ?
+		(SuSEFirewallUI::simple_text_output ?
 		    // TRANSLATORS: Summary item label
 		    String::UnderlinedHeader(_("Interfaces"),4)
 		    :
@@ -136,7 +134,7 @@
 
 	// any interface must be assigned
 	if (size(interfaces_in_zone)>0 || size(special_interfaces)>0) {
-	    ret_val = (simple_text ?
+	    ret_val = (SuSEFirewallUI::simple_text_output ?
 		// TRANSLATORS: CommandLine summary header
 		String::UnderlinedHeader(_("Open Services, Ports, and Protocols"),4)
 		:
@@ -190,7 +188,7 @@
 
     string SummaryFirewallStart () {
 	// TRANSLATORS: Summary header item
-	string ret_message = "\n" + (simple_text ?
+	string ret_message = "\n" + (SuSEFirewallUI::simple_text_output ?
 	    // TRANSLATORS: CommandLine Summary header
 	    String::UnderlinedHeader(_("Firewall Starting"),0)
 	    :
@@ -210,7 +208,7 @@
     }
 
     string SummaryUnassignedInterfaces () {
-	string ret_message = "\n" + (simple_text ?
+	string ret_message = "\n" + (SuSEFirewallUI::simple_text_output ?
 	    // TRANSLATORS: Summary text item
 	    String::UnderlinedHeader(_("Unassigned Interfaces"),0)
 	    :

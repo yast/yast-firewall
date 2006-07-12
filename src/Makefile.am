@@ -15,8 +15,11 @@ ynclude_DATA =		\
 	uifunctions.ycp	\
 	helps.ycp	\
 	summary.ycp	\
-	cmdline.ycp	\
 	generalfunctions.ycp
+
+module_DATA =		\
+	SuSEFirewallUI.ycp \
+	SuSEFirewallCMDLine.ycp
 
 desktop_DATA = firewall.desktop
 

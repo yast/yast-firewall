@@ -1,29 +1,29 @@
 /**
  * Copyright 2004, Novell, Inc.  All rights reserved.
  *
- * File:	firewall/cmdline.ycp
+ * File:	modules/SuSEFirewallCMDLine.ycp
  * Package:	Firewall configuration
- * Summary:	Command Line for YaST2 Firewall
+ * Summary:	Command Line for YaST2 Firewall (Only for Firewall)
  * Authors:	Lukas Ocilka <locilka@suse.cz>
  *
  * $Id$
  */
 
 {
+    module "SuSEFirewallCMDLine";
+
     textdomain "firewall";
 
     import "CommandLine";
     import "SuSEFirewall";
     import "SuSEFirewallServices";
+    import "SuSEFirewallUI";
     import "Mode";
     import "Report";
     import "String";
 
     include "firewall/summary.ycp";
     include "firewall/generalfunctions.ycp";
-    
-    // simple_text variable from summary.ycp
-    simple_text = true;
 
     list <string> CommaSeparatedList(any comma_separated_string) {
 	return splitstring((string) comma_separated_string, ",");
@@ -1149,11 +1149,19 @@
 	],
     ];
 
-    y2milestone("----------------------------------------");
-    y2milestone(sformat("Starting CommandLine with parameters %1", WFM::Args()));
-    SummaryInitCommandLine();
-    CommandLine::Run(cmdline);
-    y2milestone("----------------------------------------");
+    /**
+     * Runs the commandline interface for firewall
+     */
+    global void Run () {
+	// variable from SuSEFirewallUI
+	SuSEFirewallUI::simple_text_output = true;
+
+	y2milestone("----------------------------------------");
+	y2milestone(sformat("Starting CommandLine with parameters %1", WFM::Args()));
+	SummaryInitCommandLine();
+	CommandLine::Run(cmdline);
+	y2milestone("----------------------------------------");
+    }
 
 /* EOF */
 }
