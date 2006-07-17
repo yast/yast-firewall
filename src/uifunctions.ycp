@@ -20,8 +20,8 @@
     import "Address";
     import "Wizard";
     import "Report";
-    // import "NetworkService";
     import "Label";
+    import "Mode";
 
     include "firewall/generalfunctions.ycp";
     include "firewall/helps.ycp";
@@ -614,9 +614,24 @@ Are you sure you want to use the current settings?"), services_definition)
 	    UI::ChangeWidget(`id("protect_from_internal"), `Value, false);
 	}
 
-	// FIXME: hardcoded, should work with zones and interfaces included
-	RedrawAllowedServices("EXT");
-	UI::ChangeWidget(`id("allowed_services_zone"), `Value, "EXT");
+	// The default zone
+	string init_zone = "EXT";
+
+	// All zones
+	list <string> all_currently_known_zones = SuSEFirewall::GetKnownFirewallZones();
+
+	// The default zone must exist in configuration
+	if (! contains(all_currently_known_zones, init_zone)) {
+	    init_zone = all_currently_known_zones[0]:nil;
+	}
+	// Checking
+	if (init_zone == nil) {
+	    y2error("There are no zones defined!");
+	    return;
+	}
+
+	RedrawAllowedServices(init_zone);
+	UI::ChangeWidget(`id("allowed_services_zone"), `Value, init_zone);
     }
 
     symbol HandleAllowedServices (string key, map event) {
@@ -1012,5 +1027,54 @@ Use the port number instead of the port name.
 	});
 
 	SuSEFirewall::SetBroadcastAllowedPorts(allowed_bcast_ports);
+    }
+
+    void SetEnableFirewall (boolean new_state) {
+	// Checks the current firewall service state
+	if (SuSEFirewall::GetEnableService() == new_state) {
+	    return;
+	}
+
+	if (Mode::config() || Mode::installation() || Mode::normal()) {
+	    string question_headline = "";
+	    string question_text = "";
+
+	    // enabling firewall
+	    if (new_state) {
+		// TRANSLATORS: popup question headline
+		question_headline = _("Enabling Firewall");
+		// TRANSLATORS: popup question, enabling firewall
+		question_text = _("You are just about to enable the firewall service.
+This will enable the firewall in the boot process and also start it
+immediately after the firewall configuration gets written.
+
+Are you sure you want to enable it?");
+		// disabling firewall
+	    } else {
+		// TRANSLATORS: popup question headline
+		question_headline = _("Disabling Firewall");
+		// TRANSLATORS: popup question, disabling firewall
+		question_text = _("You are just about to disable the firewall service.
+This will disable the firewall in the boot process and also start it
+immediately after the firewall configuration gets written.
+
+Are you sure you want to disable it?");
+	    }
+
+	    // Ask users whether they are sure to do it
+	    if (! Popup::YesNoHeadline (
+		question_headline,
+		question_text
+	    )) {
+		// denied
+		return;
+	    }
+	}
+	    
+	y2milestone("New Settings - Firewall Enabled: %1, Firewall Started: %1 (after Write())", new_state);
+	
+	// Changes the default values - Enable and Start at once
+	SuSEFirewall::SetEnableService(new_state);
+	SuSEFirewall::SetStartService(new_state);
     }
 }
