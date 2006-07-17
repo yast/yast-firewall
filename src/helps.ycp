@@ -146,6 +146,40 @@ TCP (Transmission Control Protocol), UDP (User Datagram Protocol), and RPC (Remo
 ports, and IP (Internet Protocol) protocols.</p>
 "),
 
+	// TRANSLATORS: Additional Services dialog help 1/6
+	"additional-services" : _("<p>Here you can enter some additional
+ports or protocols to be enabled in the respective firewall zone.</p>") +
+
+	// TRANSLATORS: Additional Services dialog help 2/6
+	// please, do not modify examples
+	_("<p><b>TCP Ports</b> and <b>UDP Ports</b> can be entered as
+list of port numbers, port names or port ranges separated by spaces,
+e.g., <tt>22</tt>, <tt>http</tt> or <tt>137:139</tt>.</p>") +
+
+	// TRANSLATORS: Additional Services dialog help 3/6
+	// please, do not modify examples
+	_("<p><b>RPC Ports</b> is a list of RPC services, e.g.,
+<tt>nlockmgr</tt>, <tt>ypbind</tt> or <tt>portmap</tt> separated by spaces.</p>") +
+
+	// TRANSLATORS: Additional Services dialog help 4/6
+	// please, do not modify examples
+	_("<p><b>IP Protocols</b> is a list of protocols, e.g.,
+<tt>esp</tt>, <tt>smp</tt> or <tt>chaos</tt> separated by spaces.
+The current list of protocols can be found at
+http://www.iana.org/assignments/protocol-numbers location.</p>") +
+
+	// TRANSLATORS: Additional Services dialog help 5/6
+	// please, do not modify examples
+	_("<p><b>Port range</b> is a couples of numbers, with a colon in between,
+and it represents all numbers inside the range including the numbers themselves.
+The first port number must be lower than the second one,
+e.g. <tt>200:215</tt>.</p>") +
+
+	// TRANSLATORS: Additional Services dialog help 6/6
+	_("<p><b>Port name</b> is a name assigned to port number by the IANA
+organization. One port number can have more port names assigned. The current
+assignment in use can be found in the <tt>/etc/services</tt> file.</p>")
+
     ];
 
     string HelpForDialog (string identification) {
