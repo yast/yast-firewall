@@ -12,6 +12,7 @@ Mon Jul 17 11:05:09 CEST 2006 - locilka@suse.cz
   firewall service. Enabled firewall (start at boot) is started
   immediately after the SuSEFirewall::Write() operation
   and vice versa for disabled firewall (start manually).
+- Modified .spec and Make files for building the package.
 - 2.13.9
 
 -------------------------------------------------------------------

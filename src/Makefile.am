@@ -2,6 +2,8 @@
 
 yncludedir = @yncludedir@/firewall
 
+YCPCFLAGS = -M . -I .
+
 client_DATA =		\
 	firewall.ycp	\
 	firewall_auto.ycp	\
@@ -24,6 +26,6 @@ module_DATA =		\
 desktop_DATA = firewall.desktop
 
 
-EXTRA_DIST = $(client_DATA) $(ynclude_DATA) $(desktop_DATA)
+EXTRA_DIST = $(client_DATA) $(ynclude_DATA) $(module_DATA) $(desktop_DATA)
 
 include $(top_srcdir)/Makefile.am.common
