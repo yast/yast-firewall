@@ -28,4 +28,9 @@ desktop_DATA = firewall.desktop
 
 EXTRA_DIST = $(client_DATA) $(ynclude_DATA) $(module_DATA) $(desktop_DATA)
 
+firewall:
+	test -l firewall || ln -s . firewall
+
+ycpchook = firewall
+
 include $(top_srcdir)/Makefile.am.common
