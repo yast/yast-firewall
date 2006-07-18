@@ -195,14 +195,42 @@
 	    // TRANSLATORS: UI Summary header
 	    ("<h2>" + _("Firewall Starting") + "</h2>")
 	) + "\n";
+	
+	ret_message = ret_message + ul_start;
 
+	// Firewall is enabled/disabled in the boot process
 	if (SuSEFirewall::GetEnableService()) {
 	    // TRANSLATORS: Summary text item
-	    ret_message = ret_message + ul_start + li_start + _("Start firewall when booting") + li_end + ul_end + "\n\n";
+	    ret_message = ret_message + li_start + _("Start firewall when booting") + li_end + "\n\n";
 	} else {
 	    // TRANSLATORS: Summary text item
-	    ret_message = ret_message + ul_start + li_start + _("Start firewall manually") + li_end + ul_end + "\n\n";
+	    ret_message = ret_message + li_start + _("Start firewall manually") + li_end + "\n\n";
 	}
+	
+	// Firewall should be running/stopped
+	if (SuSEFirewall::GetStartService()) {
+	    // Is running and will be running again
+	    if (SuSEFirewall::IsStarted()) {
+		// TRANSLATORS: Summary text item
+		ret_message = ret_message + li_start + _("Firewall will be running after the configuration gets written") + li_end + "\n";
+	    // Is stopped and will be running
+	    } else {
+		// TRANSLATORS: Summary text item
+		ret_message = ret_message + li_start + _("Firewall will be started after the configuration gets written") + li_end + "\n";
+	    }
+	} else {
+	    // Is running and will be stopped
+	    if (SuSEFirewall::IsStarted()) {
+		// TRANSLATORS: Summary text item
+		ret_message = ret_message + li_start + _("Firewall will be stopped after the configuration gets written") + li_end + "\n";
+	    // Is not running and will not be running
+	    } else {
+		// TRANSLATORS: Summary text item
+		ret_message = ret_message + li_start + _("Firewall will not be running after the configuration gets written") + li_end + "\n";
+	    }
+	}
+	
+	ret_message = ret_message + ul_end + "\n\n";
 
 	return ret_message;
     }

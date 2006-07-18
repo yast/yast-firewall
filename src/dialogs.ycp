@@ -34,7 +34,7 @@
 	    //    or
 	    //    disabled + stop (after Write())
 	    "set_service_auto_start"	: SetEnableFirewall,
-
+	    
 	    // TRANSLATORS: Radio selection
 	    "start_auto_button"		: _("&When Booting"),
 	    // TRANSLATORS: Radio selection
