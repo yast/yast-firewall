@@ -170,7 +170,7 @@ http://www.iana.org/assignments/protocol-numbers location.</p>") +
 
 	// TRANSLATORS: Additional Services dialog help 5/6
 	// please, do not modify examples
-	_("<p><b>Port range</b> is a couples of numbers, with a colon in between,
+	_("<p><b>Port range</b> is a couple of numbers, with a colon in between,
 and it represents all numbers inside the range including the numbers themselves.
 The first port number must be lower than the second one,
 e.g. <tt>200:215</tt>.</p>") +

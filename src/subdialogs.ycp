@@ -258,6 +258,41 @@
 	return dialog;
     }
 
+    term ExpertAcceptRules () {
+	term dialog = `VBox(
+	    `Left( `ComboBox(`id("allowed_services_zone"), `opt(`notify),
+		// TRANSLATORS: combo box
+		_("Expert Rules Services for Selected Zone"), GetZonesListedItems() )
+	    ),
+
+	    `VSpacing ( 1 ),
+
+	    `VBox (
+		`Table (
+		    `id("table_expert_accept_rules"),
+		    `header (
+			// TRANSLATORS: table header item
+			_("Source Network"),
+			// TRANSLATORS: table header item
+			_("Protocol"),
+			// TRANSLATORS: table header item
+			_("Destination Port"),
+			// TRANSLATORS: table header item
+			_("Source Port")
+		    ), []
+		),
+		`VSquash (
+		    `HBox (
+			`PushButton(`id("add_redirect_to_masquerade"), Label::AddButton()),
+			`PushButton(`id("remove_redirect_to_masquerade"), Label::RemoveButton())
+		    )
+		)
+	    )
+	);
+
+	return dialog;
+    }
+
     term AdditionalServices (string zone_name) {
 	term dialog = `HBox (
 	    // help text with a defined minimal size
