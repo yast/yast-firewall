@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Aug 11 10:41:40 CEST 2006 - locilka@suse.cz
+
+- Fixed BuildRequires loop: removing yast2-installation (#198412).
+- Added missing SuSEFirewallUI module.
+- 2.13.11
+
+-------------------------------------------------------------------
 Tue Jul 18 14:56:24 CEST 2006 - locilka@suse.cz
 
 - Summary informs whether the firewall service will be running or

@@ -1,0 +1,20 @@
+/**
+ * Copyright 2004, Novell, Inc.  All rights reserved.
+ *
+ * File:	modules/SuSEFirewallUI.ycp
+ * Package:	Firewall configuration
+ * Summary:	UI for Firewall (Only for Firewall)
+ * Authors:	Lukas Ocilka <locilka@suse.cz>
+ *
+ * $Id: $
+ */
+
+{
+    module "SuSEFirewallUI";
+
+    textdomain "firewall";
+
+    global boolean simple_text_output = false;
+
+/* EOF */
+}
