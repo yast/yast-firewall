@@ -55,6 +55,7 @@
      * Fake function for CWM Tree Widget.
      */
     void DisableBackButton (string key) {
+	Wizard::SetDesktopIcon("firewall");
 	UI::ChangeWidget(`id(`back), `Enabled, false);
     }
 
@@ -165,6 +166,7 @@
      * Function initializes Interfaces table and known_device_names
      */
     void InitFirewallInterfaces (string key) {
+	Wizard::SetDesktopIcon("firewall");
 
 	// initializing names of interfaces
 	known_device_names = $[];
@@ -608,6 +610,8 @@ Are you sure you want to use the current settings?"), services_definition)
     }
 
     void InitAllowedServices (string key) {
+	Wizard::SetDesktopIcon("firewall");
+
 	if (SuSEFirewall::GetProtectFromInternalZone()) {
 	    UI::ChangeWidget(`id("protect_from_internal"), `Value, true);
 	} else {
@@ -712,6 +716,8 @@ Are you sure you want to use the current settings?"), services_definition)
     }
 
     void InitMasquerading (string key) {
+	Wizard::SetDesktopIcon("firewall");
+    
 	boolean masquerade = SuSEFirewall::GetMasquerade();
 	boolean masquerade_possible = IsMasqueradingPossible();
 
@@ -934,6 +940,8 @@ Use the port number instead of the port name.
     }
 
     void InitRedirectToMasqueradedIP (string key) {
+	Wizard::SetDesktopIcon("firewall");
+	
 	RedrawRedirectToMasqueradedIPTable();
     }
 
@@ -955,6 +963,8 @@ Use the port number instead of the port name.
 
     // IPsec support opens IPsec traffic from external zone
     void InitIPsecSupport (string key) {
+	Wizard::SetDesktopIcon("firewall");
+	
 	boolean supported = SuSEFirewall::IsServiceSupportedInZone("ipsec", "EXT");
 	UI::ChangeWidget(`id("ispsec_support"), `Value, supported);
     }    
@@ -975,6 +985,8 @@ Use the port number instead of the port name.
     }
 
     void InitLoggingLevel (string key) {
+	Wizard::SetDesktopIcon("firewall");
+	
 	UI::ChangeWidget(`id("logging_ACCEPT"), `Value, SuSEFirewall::GetLoggingSettings("ACCEPT"));
 	UI::ChangeWidget(`id("logging_DROP"),   `Value, SuSEFirewall::GetLoggingSettings("DROP"));
     }
@@ -987,6 +999,8 @@ Use the port number instead of the port name.
     }
 
     void InitBroadcastConfigurationSimple (string key) {
+	Wizard::SetDesktopIcon("firewall");
+	
 	term replace_dialog = `VBox();
 
 	map <string, list <string> > allowed_bcast_ports = SuSEFirewall::GetBroadcastAllowedPorts ();
@@ -1030,47 +1044,6 @@ Use the port number instead of the port name.
     }
 
     void SetEnableFirewall (boolean new_state) {
-	// Checks the current firewall service state
-	if (SuSEFirewall::GetEnableService() == new_state) {
-	    return;
-	}
-
-	if (Mode::config() || Mode::installation() || Mode::normal()) {
-	    string question_headline = "";
-	    string question_text = "";
-
-	    // enabling firewall
-	    if (new_state) {
-		// TRANSLATORS: popup question headline
-		question_headline = _("Enabling Firewall");
-		// TRANSLATORS: popup question, enabling firewall
-		question_text = _("You are just about to enable the firewall service.
-This will enable the firewall in the boot process and also start it
-immediately after the firewall configuration gets written.
-
-Are you sure you want to enable it?");
-		// disabling firewall
-	    } else {
-		// TRANSLATORS: popup question headline
-		question_headline = _("Disabling Firewall");
-		// TRANSLATORS: popup question, disabling firewall
-		question_text = _("You are just about to disable the firewall service.
-This will disable the firewall in the boot process and also start it
-immediately after the firewall configuration gets written.
-
-Are you sure you want to disable it?");
-	    }
-
-	    // Ask users whether they are sure to do it
-	    if (! Popup::YesNoHeadline (
-		question_headline,
-		question_text
-	    )) {
-		// denied
-		return;
-	    }
-	}
-	    
 	y2milestone("New Settings - Firewall Enabled: %1, Firewall Started: %1 (after Write())", new_state);
 	
 	// Changes the default values - Enable and Start at once
