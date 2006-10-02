@@ -365,7 +365,7 @@
 	    port_err + "\n\n" +
 	    // TRANSLATORS: popup message, %1 stands for the maximal port number
 	    // that is possible to use in port-range
-	    sformat(_("Port number must be in the interval from 1 to %1 included."), SuSEFirewall::max_port_number)
+	    sformat(_("The port number must be in the interval from 1 to %1 (inclusive)."), SuSEFirewall::max_port_number)
 	);
     }
 
@@ -469,14 +469,13 @@ Really use this port?
 	    list <string> ports = splitstring(services_definition, ",");
 	    return Popup::YesNoHeadline (
 		// TRANSLATORS: popup headline
-		_("Invalid Additional Services Definition"),
+		_("Invalid Additional Service Definition"),
 		// TRANSLATORS: popup message, %1 stands for the wrong settings (might be quite long)
-		sformat(_("It appears that the additional services settings
+		sformat(_("It appears that the additional service settings
 %1
-are wrong. Entries should be separated by spaces instead of commas
-that are not allowed.
-
-Are you sure you want to use the current settings?"), services_definition)
+are wrong. Entries should be separated by spaces instead of commas,
+which are not allowed.
+Really use the current settings?"), services_definition)
 	    );
 	}
 	
