@@ -20,16 +20,17 @@
     import "Address";
     import "Wizard";
     import "Report";
-    // import "NetworkService";
     import "Label";
+    import "Mode";
 
     include "firewall/generalfunctions.ycp";
+    include "firewall/helps.ycp";
 
     // GLOBAL UI CONFIGURATION
     term all_popup_definition = `opt(`decorated,`centered);
 
     // EXAMPLE FUNCTIONS
-/**
+/*
  *    void ExampleInit(string key) {
  *	y2milestone("Example Init");
  *    }
@@ -54,6 +55,7 @@
      * Fake function for CWM Tree Widget.
      */
     void DisableBackButton (string key) {
+	Wizard::SetDesktopIcon("firewall");
 	UI::ChangeWidget(`id(`back), `Enabled, false);
     }
 
@@ -141,19 +143,8 @@
 	    string zone_name = SuSEFirewall::GetZoneFullName(zone);
 	    string custom_string_text = "";
 	    foreach (string special, specials, {
-		//// Managed by the Network Manager && string is 'any' in the 'EXT' zone
-		//if (
-		//    NetworkService::IsManaged() &&
-		//    special == SuSEFirewall::special_all_interface_string &&
-		//    zone == SuSEFirewall::special_all_interface_zone
-		//) {
-		//    // TRANSLATORS: table item, kind of "User defined string" in the SuSEfirewall2 configuration.
-		//    //              This one means that all interfaces managed by a Network Manager are covered by that string.
-		//    custom_string_text = _("All NetworkManager interfaces");
-		//} else {
-		    // TRANSLATORS: table item, "User defined string" instead of Device_name
-		    custom_string_text = _("Custom string");
-		//}
+		// TRANSLATORS: table item, "User defined string" instead of Device_name
+		custom_string_text = _("Custom string");
 
 		table_items = add (table_items, `item( `id("special-" + special),
 		    custom_string_text,
@@ -175,6 +166,7 @@
      * Function initializes Interfaces table and known_device_names
      */
     void InitFirewallInterfaces (string key) {
+	Wizard::SetDesktopIcon("firewall");
 
 	// initializing names of interfaces
 	known_device_names = $[];
@@ -269,32 +261,6 @@
 		// checking for removed additions
 		foreach (string old_addition_item, starting_additionals[zone_shortname]:[], {
 		    if (old_addition_item != "" && !contains(new_additions, old_addition_item)) {
-			//if (
-			//    NetworkService::IsManaged() &&
-			//    old_addition_item == SuSEFirewall::special_all_interface_string &&
-			//    zone_shortname == SuSEFirewall::special_all_interface_zone
-			//) {
-			//    y2warning("Trying to remove support for active Network Manager");
-			//    if (!Report::AnyQuestion(
-			//	// TRANSLATORS: headline label
-			//	_("Warning"),
-			//	// TRANSLATORS: important question
-			//	//              %1 is a special string, currently 'any'
-			//	//              %2 is a zone name, currently 'External Zone'
-			//	sformat(_("You are using NetworkManager for your network interfaces.
-//Now, you want to remove the string '%1' from the '%2' zone,
-//which is vitally important for NetworkManager.
-//
-//Really remove that special string?"),
-			//	    SuSEFirewall::special_all_interface_string,
-			//	    SuSEFirewall::GetZoneFullName(SuSEFirewall::special_all_interface_zone)
-			//	),
-			//	Label::YesButton(),
-			//	Label::NoButton(),
-			//	`no
-			//    )) return;
-			//    y2warning("User confirmed the removing of the string");
-			//}
 			changed = true;
 			events_remove = add (events_remove, [ old_addition_item, zone_shortname ]);
 		    }
@@ -364,17 +330,79 @@
     }
 
     /**
+     * Reports that the port definition is wrong. Either a single port
+     * or a port range. Returns whether user accepts the wrong port definition
+     * despite this warning.
+     *
+     * @param integer port_nr
+     * @param string port_definition might be a single port or a port-range definition
+     * @return boolean whether user accepts the port definition despite the warning.
+     *
+     * @example
+     *	// maximum port number is 65535, port range
+     *	boolean accepted = ReportWrongPortDefinition(99999, "5:99999");
+     *	// dtto., single port
+     *	boolean whattodo = ReportWrongPortDefinition(78910, "78910");
+     */
+    boolean ReportWrongPortDefinition (string port_nr, string port_definition) {
+	string port_err = "";
+
+	if (port_nr == port_definition) {
+	    // TRANSLATORS: error message, %1 stands for the port number
+	    port_err = sformat(_("Port number %1 is invalid."), port_nr);
+	} else {
+	    // TRANSLATORS: error message, %1 stands for the port number,
+	    // %2 stands for, e.g., port range, where the wrong port definition %1 was found
+	    port_err = sformat(
+		_("Port number %1 in definition %2 is invalid."),
+		port_nr, port_definition
+	    );
+	}
+
+	return Popup::ContinueCancelHeadline (
+	    // TRANSLATORS: popup headline
+	    _("Invalid Port Definition"),
+	    port_err + "\n\n" +
+	    // TRANSLATORS: popup message, %1 stands for the maximal port number
+	    // that is possible to use in port-range
+	    sformat(_("The port number must be in the interval from 1 to %1 (inclusive)."), SuSEFirewall::max_port_number)
+	);
+    }
+
+    boolean CheckPortNumberDefinition (integer port_nr, string port) {
+	if (port_nr < 1 || port_nr > SuSEFirewall::max_port_number) {
+	    return ReportWrongPortDefinition(tostring(port_nr), port);
+	} else {
+	    return true;
+	}
+    }
+
+    /**
      * Function checks list of ports if they exist (are known).
      *
+     * @param string ui_id for the setfocus
+     * @param list <string> of ports to be checked
      */
     boolean CheckIfTheyAreAllKnownPorts(string ui_id, list <string> ports) {
 	boolean checked = true;
 
+	// begin of for~each
 	foreach (string port, ports, {
+	    // previos port was wrong, break the loop
+	    if (!checked) break;
+
 	    // just a waste-space
 	    if (port == "") return;
+
 	    // common numeric port
-	    if (regexpmatch(port, "^[0123456789]+$")) return;
+	    if (regexpmatch(port, "^[0123456789]+$")) {
+		integer port_nr = tointeger(port);
+		if (CheckPortNumberDefinition(port_nr, port) && checked) checked = true;
+		else checked = false;
+		
+		return;
+	    }
+
 	    // common port range
 	    if (regexpmatch(port, "^[0123456789]+:[0123456789]+$")) {
 		string port1 = regexpsub(port, "^([0123456789]+):[0123456789]+$", "\\1");
@@ -382,24 +410,30 @@
 		
 		integer port1i = tointeger(port1);
 		integer port2i = tointeger(port2);
+
+		if (! CheckPortNumberDefinition(port1i, port)) checked = false;
+
+		if (! CheckPortNumberDefinition(port2i, port)) checked = false;
 		
 		// port range is defined as 'A:B' where A<B
-		if (port1i != nil && port2i != nil && port1i < port2i) return;
-		else {
-		    checked = Popup::ContinueCancelHeadline (
+		else if (port1i != nil && port2i != nil && port1i < port2i) return;
+		else if (!Popup::ContinueCancelHeadline (
 			// TRANSLATORS: popup headline
 			_("Invalid Port Range Definition"),
 			// TRANSLATORS: popup message, %1 is a port-range defined by user
 			sformat(_("Port range %1 is invalid.
 It must be defined as the min_port_number:max_port_number and
 max_port_number must be bigger than min_port_number."), port)
-		    );
-		    return;
+		) && checked) {
+		    checked = false;
 		}
+		
+		return;
 	    }
 
+	    // port number
 	    if (! PortAliases::IsKnownPortName(port)) {
-		checked = Popup::ContinueCancelHeadline(
+		if (! Popup::ContinueCancelHeadline(
 		    // TRANSLATORS: popup headline
 		    _("Unknown Port Name"),
 		    sformat(
@@ -410,16 +444,42 @@ Really use this port?
 "),
 			port
 		    )
-		);
-		// if agreed, check the next one, else set UI focus
-		if (!checked) {
-		    UI::SetFocus(`id(ui_id));
-		    break;
-		}
+		)) checked = false;
+		
+		return;
 	    }
+	// end of for~each
 	});
 
+	if (!checked) {
+	    UI::SetFocus(`id(ui_id));
+	}
+
 	return checked;
+    }
+
+    /**
+     * Checks the string (services definition) for syntax errors
+     *
+     * @param string services_definition
+     * @return boolean whether everything was ok or whether user wants is despite the error
+     */
+    boolean CheckAdditionalServicesDefinition (string services_definition) {
+	if (regexpmatch(services_definition, ",")) {
+	    list <string> ports = splitstring(services_definition, ",");
+	    return Popup::YesNoHeadline (
+		// TRANSLATORS: popup headline
+		_("Invalid Additional Service Definition"),
+		// TRANSLATORS: popup message, %1 stands for the wrong settings (might be quite long)
+		sformat(_("It appears that the additional service settings
+%1
+are wrong. Entries should be separated by spaces instead of commas,
+which are not allowed.
+Really use the current settings?"), services_definition)
+	    );
+	}
+	
+	return true;
     }
 
     boolean HandlePopupAdditionalServices (string zone) {
@@ -438,6 +498,9 @@ Really use this port?
 	UI::ChangeWidget(`id("additional_udp"), `Value, mergestring(additional_udp, " "));
 	UI::ChangeWidget(`id("additional_rpc"), `Value, mergestring(additional_rpc, " "));
 	UI::ChangeWidget(`id("additional_ip"),  `Value, mergestring(additional_ip,  " "));
+	
+	// Filling up help
+	UI::ChangeWidget(`help_text, `Value, HelpForDialog("additional-services"));
 
 	any ret = nil;
 	boolean ret_value = false;
@@ -445,14 +508,23 @@ Really use this port?
 	    ret = UI::UserInput();
 
 	    if (ret == "ok") {
-		list <string> new_additional_tcp = toset(splitstring(
-		    (string) UI::QueryWidget(`id("additional_tcp"), `Value), " "));
-		list <string> new_additional_udp = toset(splitstring(
-		    (string) UI::QueryWidget(`id("additional_udp"), `Value), " "));
-		list <string> new_additional_rpc = toset(splitstring(
-		    (string) UI::QueryWidget(`id("additional_rpc"), `Value), " "));
-		list <string> new_additional_ip  = toset(splitstring(
-		    (string) UI::QueryWidget(`id("additional_ip"),  `Value), " "));
+		string s_additional_tcp = (string) UI::QueryWidget(`id("additional_tcp"), `Value);
+		list <string> new_additional_tcp = toset(splitstring(s_additional_tcp, " "));
+
+		string s_additional_udp = (string) UI::QueryWidget(`id("additional_udp"), `Value);
+		list <string> new_additional_udp = toset(splitstring(s_additional_udp, " "));
+
+		string s_additional_rpc = (string) UI::QueryWidget(`id("additional_rpc"), `Value);
+		list <string> new_additional_rpc = toset(splitstring(s_additional_rpc, " "));
+
+		string s_additional_ip = (string) UI::QueryWidget(`id("additional_ip"),  `Value);
+		list <string> new_additional_ip  = toset(splitstring(s_additional_ip, " "));
+		
+		// Check the format
+		if (!CheckAdditionalServicesDefinition(s_additional_tcp)) continue;
+		if (!CheckAdditionalServicesDefinition(s_additional_udp)) continue;
+		if (!CheckAdditionalServicesDefinition(s_additional_rpc)) continue;
+		if (!CheckAdditionalServicesDefinition(s_additional_ip))  continue;
 
 		// checking for known TCP and UDP port names
 		if (!CheckIfTheyAreAllKnownPorts("additional_tcp", new_additional_tcp)) continue;
@@ -537,15 +609,32 @@ Really use this port?
     }
 
     void InitAllowedServices (string key) {
+	Wizard::SetDesktopIcon("firewall");
+
 	if (SuSEFirewall::GetProtectFromInternalZone()) {
 	    UI::ChangeWidget(`id("protect_from_internal"), `Value, true);
 	} else {
 	    UI::ChangeWidget(`id("protect_from_internal"), `Value, false);
 	}
 
-	// FIXME: hardcoded, should work with zones and interfaces included
-	RedrawAllowedServices("EXT");
-	UI::ChangeWidget(`id("allowed_services_zone"), `Value, "EXT");
+	// The default zone
+	string init_zone = "EXT";
+
+	// All zones
+	list <string> all_currently_known_zones = SuSEFirewall::GetKnownFirewallZones();
+
+	// The default zone must exist in configuration
+	if (! contains(all_currently_known_zones, init_zone)) {
+	    init_zone = all_currently_known_zones[0]:nil;
+	}
+	// Checking
+	if (init_zone == nil) {
+	    y2error("There are no zones defined!");
+	    return;
+	}
+
+	RedrawAllowedServices(init_zone);
+	UI::ChangeWidget(`id("allowed_services_zone"), `Value, init_zone);
     }
 
     symbol HandleAllowedServices (string key, map event) {
@@ -626,6 +715,8 @@ Really use this port?
     }
 
     void InitMasquerading (string key) {
+	Wizard::SetDesktopIcon("firewall");
+    
 	boolean masquerade = SuSEFirewall::GetMasquerade();
 	boolean masquerade_possible = IsMasqueradingPossible();
 
@@ -848,6 +939,8 @@ Use the port number instead of the port name.
     }
 
     void InitRedirectToMasqueradedIP (string key) {
+	Wizard::SetDesktopIcon("firewall");
+	
 	RedrawRedirectToMasqueradedIPTable();
     }
 
@@ -869,6 +962,8 @@ Use the port number instead of the port name.
 
     // IPsec support opens IPsec traffic from external zone
     void InitIPsecSupport (string key) {
+	Wizard::SetDesktopIcon("firewall");
+	
 	boolean supported = SuSEFirewall::IsServiceSupportedInZone("ipsec", "EXT");
 	UI::ChangeWidget(`id("ispsec_support"), `Value, supported);
     }    
@@ -889,6 +984,8 @@ Use the port number instead of the port name.
     }
 
     void InitLoggingLevel (string key) {
+	Wizard::SetDesktopIcon("firewall");
+	
 	UI::ChangeWidget(`id("logging_ACCEPT"), `Value, SuSEFirewall::GetLoggingSettings("ACCEPT"));
 	UI::ChangeWidget(`id("logging_DROP"),   `Value, SuSEFirewall::GetLoggingSettings("DROP"));
     }
@@ -901,6 +998,8 @@ Use the port number instead of the port name.
     }
 
     void InitBroadcastConfigurationSimple (string key) {
+	Wizard::SetDesktopIcon("firewall");
+	
 	term replace_dialog = `VBox();
 
 	map <string, list <string> > allowed_bcast_ports = SuSEFirewall::GetBroadcastAllowedPorts ();
@@ -941,5 +1040,13 @@ Use the port number instead of the port name.
 	});
 
 	SuSEFirewall::SetBroadcastAllowedPorts(allowed_bcast_ports);
+    }
+
+    void SetEnableFirewall (boolean new_state) {
+	y2milestone("New Settings - Firewall Enabled: %1, Firewall Started: %1 (after Write())", new_state);
+	
+	// Changes the default values - Enable and Start at once
+	SuSEFirewall::SetEnableService(new_state);
+	SuSEFirewall::SetStartService(new_state);
     }
 }

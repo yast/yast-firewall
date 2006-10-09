@@ -16,8 +16,7 @@
     import "ProductFeatures";
     import "SuSEFirewallServices";
     import "SuSEFirewall";
-    //import "NetworkService";
-
+    
     // UI VARIABLES AND FUNCTIONS
     boolean expert_ui = (ProductFeatures::GetFeature ("globals", "ui_mode") == "expert");
 
@@ -259,29 +258,69 @@
 	return dialog;
     }
 
-    term AdditionalServices (string zone_name) {
-	term dialog = `Frame (
-	    // TRANSLATORS: frame label
-	    _("Additional Allowed Ports"),
+    term ExpertAcceptRules () {
+	term dialog = `VBox(
+	    `Left( `ComboBox(`id("allowed_services_zone"), `opt(`notify),
+		// TRANSLATORS: combo box
+		_("Expert Rules Services for Selected Zone"), GetZonesListedItems() )
+	    ),
+
+	    `VSpacing ( 1 ),
+
 	    `VBox (
-		`HSpacing(45),
-		`VSpacing(1),
-		// TRANSLATORS: label, %1 is a zone name like "External Zone"
-		`Left ( `Label(sformat(_("Settings for Zone: %1"), zone_name)) ),
-		// TRANSLATORS: text entry
-		`TextEntry(`id("additional_tcp"), _("&TCP Ports")),
-		// TRANSLATORS: text entry
-		`TextEntry(`id("additional_udp"), _("&UDP Ports")),
-		// TRANSLATORS: text entry
-		`TextEntry(`id("additional_rpc"), _("&RPC Ports")),
-		// TRANSLATORS: text entry
-		`TextEntry(`id("additional_ip"),  _("&IP Protocols")),
-		`VSpacing(1),
-		`HBox (
-		    `PushButton(`id("ok"), Label::OKButton()),
-		    `PushButton(`id("cancel"), Label::CancelButton())
+		`Table (
+		    `id("table_expert_accept_rules"),
+		    `header (
+			// TRANSLATORS: table header item
+			_("Source Network"),
+			// TRANSLATORS: table header item
+			_("Protocol"),
+			// TRANSLATORS: table header item
+			_("Destination Port"),
+			// TRANSLATORS: table header item
+			_("Source Port")
+		    ), []
+		),
+		`VSquash (
+		    `HBox (
+			`PushButton(`id("add_redirect_to_masquerade"), Label::AddButton()),
+			`PushButton(`id("remove_redirect_to_masquerade"), Label::RemoveButton())
+		    )
 		)
 	    )
+	);
+
+	return dialog;
+    }
+
+    term AdditionalServices (string zone_name) {
+	term dialog = `HBox (
+	    // help text with a defined minimal size
+	    `MinSize (30, 12, `RichText (`id(`help_text), "")),
+	    `HSpacing (1.5),
+	    `Top ( `Frame (
+		// TRANSLATORS: frame label
+		_("Additional Allowed Ports"),
+		`VBox (
+		    `HSpacing(45),
+		    `VSpacing(1),
+		    // TRANSLATORS: label, %1 is a zone name like "External Zone"
+		    `Left ( `Label(sformat(_("Settings for Zone: %1"), zone_name)) ),
+		    // TRANSLATORS: text entry
+		    `TextEntry(`id("additional_tcp"), _("&TCP Ports")),
+		    // TRANSLATORS: text entry
+		    `TextEntry(`id("additional_udp"), _("&UDP Ports")),
+		    // TRANSLATORS: text entry
+		    `TextEntry(`id("additional_rpc"), _("&RPC Ports")),
+		    // TRANSLATORS: text entry
+		    `TextEntry(`id("additional_ip"),  _("&IP Protocols")),
+		    `VSpacing(1),
+		    `HBox (
+			`PushButton(`id("ok"), Label::OKButton()),
+			`PushButton(`id("cancel"), Label::CancelButton())
+		    )
+		)
+	    ))
 	);
 
 	return dialog;

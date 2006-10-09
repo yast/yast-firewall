@@ -28,7 +28,13 @@
     map<string,map<string,any> > widgets_handling = $[
 	"auto_start_up" : CWMServiceStart::CreateAutoStartWidget ($[
 	    "get_service_auto_start"	: SuSEFirewall::GetEnableService,
-	    "set_service_auto_start"	: SuSEFirewall::SetEnableService,
+
+	    // Special function that adjusts the firewall
+	    //    enabled + start (after Write())
+	    //    or
+	    //    disabled + stop (after Write())
+	    "set_service_auto_start"	: SetEnableFirewall,
+	    
 	    // TRANSLATORS: Radio selection
 	    "start_auto_button"		: _("&When Booting"),
 	    // TRANSLATORS: Radio selection
@@ -249,6 +255,7 @@
 	    HelpForDialog("box-summary"),
 	    Label::BackButton (), Label::AcceptButton ()
 	);
+	Wizard::SetDesktopIcon("firewall");
 	UI::ChangeWidget(`id(`back), `Enabled, true);
 
 	InitBoxSummary([]);

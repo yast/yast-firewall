@@ -70,9 +70,14 @@ Continue with configuration?
 	Wizard::SetContentsButtons ("", `Empty(), "", "", "");
     }
 
+    /**
+     * Returns whether user confirmed aborting the configuration.
+     *
+     * @return boolean result
+     */
     define boolean AbortDialog () {
 	if (SuSEFirewall::GetModified()) {
-	    return Popup::ContinueCancelHeadline(
+	    return Popup::YesNoHeadline(
 		// TRANSLATORS: popup headline
 		_("Aborting Firewall Configuration"),
 		// TRANSLATORS: popup message

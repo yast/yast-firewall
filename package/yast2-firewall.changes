@@ -1,4 +1,61 @@
 -------------------------------------------------------------------
+Mon Oct  9 17:15:19 CEST 2006 - locilka@suse.cz
+
+- Merged SLES10 SP1 branch to openSUSE 10.2.
+- 2.14.0
+
+-------------------------------------------------------------------
+Mon Oct  2 16:46:11 CEST 2006 - locilka@suse.cz
+
+- Merged proofread texts
+- 2.13.13
+
+-------------------------------------------------------------------
+Mon Oct  2 09:02:40 CEST 2006 - locilka@suse.cz
+
+- Added missing firewall icon to all dialogs
+- Removed warning pop-up message that firewall will be
+  started/stopped when it gets enabled/disabled.
+- 2.13.12
+
+-------------------------------------------------------------------
+Fri Aug 11 10:41:40 CEST 2006 - locilka@suse.cz
+
+- Fixed BuildRequires loop: removing yast2-installation (#198412).
+- Added missing SuSEFirewallUI module.
+- 2.13.11
+
+-------------------------------------------------------------------
+Tue Jul 18 14:56:24 CEST 2006 - locilka@suse.cz
+
+- Summary informs whether the firewall service will be running or
+  stopped after the configuration gets written.
+- 2.13.10
+
+-------------------------------------------------------------------
+Mon Jul 17 11:05:09 CEST 2006 - locilka@suse.cz
+
+- Adding help for Additional Services dialog.
+- Checking port ranges for rightness.
+- Checking additional services for a common mistake: separating
+  entries by a comma instead of a space.
+- Most of problems were mentioned in bugzilla bug #190871.
+- Fixed appropriate dialog buttons for AbortDialog. Yes/No instead
+  of Continue/Cancel (#187078).
+- Unified starting and stopping vs. enabling and disabling the
+  firewall service. Enabled firewall (start at boot) is started
+  immediately after the SuSEFirewall::Write() operation
+  and vice versa for disabled firewall (start manually).
+- Modified .spec and Make files for building the package.
+- 2.13.9
+
+-------------------------------------------------------------------
+Wed Jul 12 09:38:02 CEST 2006 - locilka@suse.cz
+
+- Speeding commandline up. Moving commandline definition into the
+  separate YCP module SuSEFirewallCMDLine.
+
+-------------------------------------------------------------------
 Mon May 22 10:19:23 CEST 2006 - locilka@suse.cz
 
 - Fixing visibility of widgets in Broadcast Configuration (#175920)
