@@ -31,4 +31,5 @@ Summary:	Configuration of firewall
 @moduledir@/SuSEFirewall*
 @clientdir@/firewall*
 @desktopdir@/firewall.desktop
+@schemadir@/autoyast/rnc/firewall.rnc
 %doc @docdir@

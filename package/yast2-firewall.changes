@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Oct 26 17:30:30 CEST 2006 - locilka@suse.cz
+
+- Added and fixed firewall.rnc for checking AutoYaST profile
+  (#215248).
+- 2.14.1
+
+-------------------------------------------------------------------
 Mon Oct  9 17:15:19 CEST 2006 - locilka@suse.cz
 
 - Merged SLES10 SP1 branch to openSUSE 10.2.
