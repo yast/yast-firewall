@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Oct 26 17:34:06 CEST 2006 - locilka@suse.cz
+
+- Added and fixed firewall.rnc for checking AutoYaST profile
+  (#215248).
+- 2.13.14
+
+-------------------------------------------------------------------
 Mon Oct  2 16:46:11 CEST 2006 - locilka@suse.cz
 
 - Merged proofread texts
