@@ -178,7 +178,11 @@ for example, <tt>200:215</tt>.</p>") +
 	// TRANSLATORS: Additional Services dialog help 6/6
 	_("<p>The <b>Port Name</b> is a name assigned to a port number by the IANA
 organization. One port number can have multiple port names assigned. Find
-the assignment currently in use in the <tt>/etc/services</tt> file.</p>")
+the assignment currently in use in the <tt>/etc/services</tt> file.</p>"),
+
+	// TRANSLATORS: help for Installation Proposal Dialog
+	"installation_proposal" : _("<p><b><big>Firewall</big></b><br />
+Firewall is a defensive mechanism that protects your computer from network attacks.</p>"),
 
     ];
 

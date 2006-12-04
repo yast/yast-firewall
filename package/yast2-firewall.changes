@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Dec  4 16:38:22 CET 2006 - locilka@suse.cz
+
+- A little help/description for firewall module in installation
+  proposal (using result of FATE #301151).
+- 2.15.0
+
+-------------------------------------------------------------------
 Thu Oct 26 17:30:30 CEST 2006 - locilka@suse.cz
 
 - Added and fixed firewall.rnc for checking AutoYaST profile
