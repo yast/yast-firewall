@@ -51,11 +51,18 @@
     // UI Functions
 
     /**
+     * Sets the dialog icon.
+     */
+    void SetFirewallIcon () {
+	Wizard::SetTitleIcon("yast-firewall");
+    }
+
+    /**
      * Function disables the back button.
      * Fake function for CWM Tree Widget.
      */
     void DisableBackButton (string key) {
-	Wizard::SetDesktopIcon("firewall");
+	SetFirewallIcon();
 	UI::ChangeWidget(`id(`back), `Enabled, false);
     }
 
@@ -166,7 +173,7 @@
      * Function initializes Interfaces table and known_device_names
      */
     void InitFirewallInterfaces (string key) {
-	Wizard::SetDesktopIcon("firewall");
+	SetFirewallIcon();
 
 	// initializing names of interfaces
 	known_device_names = $[];
@@ -609,7 +616,7 @@ Really use the current settings?"), services_definition)
     }
 
     void InitAllowedServices (string key) {
-	Wizard::SetDesktopIcon("firewall");
+	SetFirewallIcon();
 
 	if (SuSEFirewall::GetProtectFromInternalZone()) {
 	    UI::ChangeWidget(`id("protect_from_internal"), `Value, true);
@@ -715,7 +722,7 @@ Really use the current settings?"), services_definition)
     }
 
     void InitMasquerading (string key) {
-	Wizard::SetDesktopIcon("firewall");
+	SetFirewallIcon();
     
 	boolean masquerade = SuSEFirewall::GetMasquerade();
 	boolean masquerade_possible = IsMasqueradingPossible();
@@ -939,7 +946,7 @@ Use the port number instead of the port name.
     }
 
     void InitRedirectToMasqueradedIP (string key) {
-	Wizard::SetDesktopIcon("firewall");
+	SetFirewallIcon();
 	
 	RedrawRedirectToMasqueradedIPTable();
     }
@@ -962,7 +969,7 @@ Use the port number instead of the port name.
 
     // IPsec support opens IPsec traffic from external zone
     void InitIPsecSupport (string key) {
-	Wizard::SetDesktopIcon("firewall");
+	SetFirewallIcon();
 	
 	boolean supported = SuSEFirewall::IsServiceSupportedInZone("ipsec", "EXT");
 	UI::ChangeWidget(`id("ispsec_support"), `Value, supported);
@@ -984,7 +991,7 @@ Use the port number instead of the port name.
     }
 
     void InitLoggingLevel (string key) {
-	Wizard::SetDesktopIcon("firewall");
+	SetFirewallIcon();
 	
 	UI::ChangeWidget(`id("logging_ACCEPT"), `Value, SuSEFirewall::GetLoggingSettings("ACCEPT"));
 	UI::ChangeWidget(`id("logging_DROP"),   `Value, SuSEFirewall::GetLoggingSettings("DROP"));
@@ -998,7 +1005,7 @@ Use the port number instead of the port name.
     }
 
     void InitBroadcastConfigurationSimple (string key) {
-	Wizard::SetDesktopIcon("firewall");
+	SetFirewallIcon();
 	
 	term replace_dialog = `VBox();
 

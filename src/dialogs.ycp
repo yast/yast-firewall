@@ -255,7 +255,7 @@
 	    HelpForDialog("box-summary"),
 	    Label::BackButton (), Label::AcceptButton ()
 	);
-	Wizard::SetDesktopIcon("firewall");
+	SetFirewallIcon();
 	UI::ChangeWidget(`id(`back), `Enabled, true);
 
 	InitBoxSummary([]);
