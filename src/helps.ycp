@@ -184,6 +184,57 @@ the assignment currently in use in the <tt>/etc/services</tt> file.</p>"),
 	"installation_proposal" : _("<p><b><big>Firewall</big></b><br />
 Firewall is a defensive mechanism that protects your computer from network attacks.</p>"),
 
+	// TRANSLATORS: general help for Custom Rules 1/5
+	"custom-rules" : _("<p><b><big>Custom Rules</big></b><br>
+Here yoy can set special firewall rules that allow new connections
+matching these rules.<p>") +
+
+	// TRANSLATORS: general help for Custom Rules 2/5
+	_("<p><b>Source Network</b><br>
+Network or IP where the connection comes from,
+e.g., <tt>192.168.0.1</tt> or <tt>192.168.0.0/255.255.255.0</tt>
+or <tt>192.168.0.0/24</tt> or <tt>0/0</tt> (which means <tt>all</tt>).<p>") +
+
+	// TRANSLATORS: general help for Custom Rules 3/5
+	_("<p><b>Protocol</b><br>
+Protocol used by that packet. Special protocol <tt>RPC</tt> is used for
+RPC services.<p>") +
+
+	// TRANSLATORS: general help for Custom Rules 4/5
+	_("<p><b>Destination Port</b><br>
+Port name, port number or range of ports that are allowed to be
+accessed, e.g., <tt>smtp</tt> or <tt>25</tt> or <tt>100:110</tt>.
+In case of <tt>RPC</tt> protocol, use the RPC service name.
+This entry is optional.<p>") +
+
+	// TRANSLATORS: general help for Custom Rules 5/5
+	_("<p><b>Source Port</b><br>
+Port name, port number or range of ports where the packet
+originates from. This entry is optional.<p>"),
+
+	// TRANSLATORS: help for Custom Rules - Adding new rule 1/4
+	"custom-rules-popup" : _("<p><b>Source Network</b><br>
+Network or IP where the connection comes from,
+e.g., <tt>192.168.0.1</tt> or <tt>192.168.0.0/255.255.255.0</tt>
+or <tt>192.168.0.0/24</tt> or <tt>0/0</tt> (which means <tt>all</tt>).<p>") +
+
+	// TRANSLATORS: help for Custom Rules - Adding new rule 2/4
+	_("<p><b>Protocol</b><br>
+Protocol used by that packet. Special protocol <tt>RPC</tt> is used for
+RPC services.<p>") +
+
+	// TRANSLATORS: help for Custom Rules - Adding new rule 3/4
+	_("<p><b>Destination Port</b><br>
+Port name, port number or range of ports that are allowed to be
+accessed, e.g., <tt>smtp</tt> or <tt>25</tt> or <tt>100:110</tt>.
+In case of <tt>RPC</tt> protocol, use the RPC service name.
+This entry is optional.<p>") +
+
+	// TRANSLATORS: help for Custom Rules - Adding new rule 4/4
+	_("<p><b>Source Port</b><br>
+Port name, port number or range of ports where the packet
+originates from. This entry is optional.<p>"),
+
     ];
 
     string HelpForDialog (string identification) {

@@ -1,4 +1,13 @@
 -------------------------------------------------------------------
+Tue Feb 27 14:28:21 CET 2007 - locilka@suse.cz
+
+- Added support for Firewall Custom Rules (FATE #120042,
+  FATE #100068). Supported settings are: Source Network, Source
+  Port, Protocol, and Destination Port.
+- Added new testsuite.
+- 2.15.2
+
+-------------------------------------------------------------------
 Thu Feb 22 17:26:21 CET 2007 - locilka@suse.cz
 
 - Fixed and unified icons in dialogs.

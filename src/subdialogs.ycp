@@ -77,7 +77,8 @@
 		    // TRANSLATORS: push button
 		    `PushButton(`id("change_firewall_interface"), _("&Change...")),
 		    // TRANSLATORS: push button
-		    `PushButton(`id("user_defined_firewall_interface"), _("C&ustom..."))
+		    `PushButton(`id("user_defined_firewall_interface"), _("C&ustom...")),
+		    `HStretch ()
 		)
 	    )
 	);
@@ -281,11 +282,10 @@
 			_("Source Port")
 		    ), []
 		),
-		`VSquash (
-		    `HBox (
-			`PushButton(`id("add_redirect_to_masquerade"), Label::AddButton()),
-			`PushButton(`id("remove_redirect_to_masquerade"), Label::RemoveButton())
-		    )
+		`HBox (
+		    `PushButton(`id("add_redirect_to_masquerade"), Label::AddButton()),
+		    `PushButton(`id("remove_redirect_to_masquerade"), Label::RemoveButton()),
+		    `HStretch()
 		)
 	    )
 	);
@@ -426,11 +426,10 @@
 			_("Redir. to Port")
 		    ), []
 		),
-		`VSquash (
-		    `HBox (
-			`PushButton(`id("add_redirect_to_masquerade"), Label::AddButton()),
-			`PushButton(`id("remove_redirect_to_masquerade"), Label::RemoveButton())
-		    )
+		`HBox (
+		    `PushButton(`id("add_redirect_to_masquerade"), Label::AddButton()),
+		    `PushButton(`id("remove_redirect_to_masquerade"), Label::RemoveButton()),
+		    `HStretch()
 		)
 	    )
 	);
@@ -807,7 +806,7 @@
  */
 
 /**
- * Only for Exper configuration
+ * Only for Expert configuration
  *
  *    term AdvancedSecuritySettings () {
  *	term dialog = `Frame (
@@ -885,71 +884,62 @@
  *    }
  */
 
-/**
- * Only for Expert configuration
- *
- *    term CustomFirewallRules () {
- *	term dialog = `Frame (
- *	    _("Custom Allowed Rules"),
- *	    `VBox (
- *		`Table (
- *		    `header (
- *			_("Source Network"),
- *			_("Protocol"),
- *			_("Port")
- *		    ),
- *		    // FIXME: fake items
- *		    [
- *			`item(`id("1"), "189.12.35.0/24", "tcp", "ssh"),
- *			`item(`id("2"), "147.25.136.9", "tcp", "ssh"),
- *			`item(`id("3"), "145.8.0.0/20", "tcp", "domain"),
- *			`item(`id("3"), "145.8.0.0/20", "udp", "domain")
- *		    ]
- *		),
- *		`VSquash (
- *		    `HBox (
- *			`PushButton(`id("add_custom_rule"), Label::AddButton()),
- *			`PushButton(`id("remove_custom_rule"), Label::RemoveButton())
- *		    )
- *		)
- *	    )
- *	);
- *	
- *	return dialog;
- *    }
- */
+    term CustomFirewallRules () {
+	term dialog = `Frame (
+	    _("Custom Allowed Rules"),
+	    `VBox (
+		`Left (`ComboBox (`id("custom_rules_firewall_zone"), `opt(`notify),
+		    // TRANSLATORS: combo box
+		    _("Firewall &Zone"), GetZonesListedItems() )
+		),
 
-/**
- * Only for Expert configuration
- *
- *    term AddCustomFirewallRule () {
- *	term dialog = `Frame (
- *	    _("Add New Allowing Rule"),
- *	    `VBox (
- *		`HBox (
- *		    `TextEntry(`id("add_source_network"), _("Source Network")),
- *		    `HSquash (
- *			`ComboBox (`id("add_protocol"), _("Protocol"), [
- *			    `item( `id("tcp"),  "tcp"),
- *			    `item( `id("udp"),  "udp"),
- *			    `item( `id("icmp"), "icmp"),
- *			])
- *		    ),
- *		    `HSquash (
- *			`TextEntry (`id("add_destination_port"), _("Port"))
- *		    )
- *		),
- *		`VSpacing(1),
- *		`HBox (
- *		    `PushButton(`id("ok"), Label::AddButton()),
- *		    `PushButton(`id("cancel"), Label::CancelButton())
- *		)
- *	    )
- *	);
- *	
- *	return dialog;
- *    }
- */
+		`VSpacing ( 1 ),
+
+		`Table (
+		    `id ("custom_rules_table"),
+		    `header (
+			_("Source Network"),
+			_("Protocol"),
+			_("Destination Port"),
+			_("Source Port")
+		    ),
+		    []
+		),
+		`HBox (
+		    `PushButton(`id("add_custom_rule"), Label::AddButton()),
+		    `PushButton(`id("remove_custom_rule"), Label::RemoveButton()),
+		    `HStretch ()
+		)
+	    )
+	);
+	
+	return dialog;
+    }
+
+    term AddCustomFirewallRule () {
+	return `VBox (
+	    `Frame (
+		_("Add New Allowing Rule"),
+		`VBox (
+		    `TextEntry(`id("add_source_network"), _("Source &Network")),
+		    `Left (`ComboBox (`id("add_protocol"), _("&Protocol"), [
+			`item( `id("tcp"),	 SuSEFirewall::GetProtocolTranslatedName("tcp")),
+		        `item( `id("udp"),	 SuSEFirewall::GetProtocolTranslatedName("udp")),
+			`item( `id("_rpc_"), SuSEFirewall::GetProtocolTranslatedName("_rpc_")),
+		    ])),
+		    `TextEntry (`id("add_destination_port"), _("&Destination Port (Optional)")),
+		    `TextEntry (`id("add_source_port"), _("&Source Port (Optional)"))
+		)
+	    ),
+
+	    `VSpacing(1),
+
+	    `HBox (
+		`PushButton(`id("ok"), Label::AddButton()),
+		`PushButton(`id("cancel"), Label::CancelButton())
+	    )
+	);
+    }
 
     // local helper function for Summary
     string HTMLWrong (string emphasize_string) {

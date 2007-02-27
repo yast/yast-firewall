@@ -133,6 +133,14 @@
 	    //"store"		: NoStoreNeeded,
 	    "help"		: HelpForDialog("masquerade-redirect-table"),
 	],
+	"CustomRules" : $[
+	    "widget"		: `custom,
+	    "custom_widget"	: `VBox(),
+	    "init"		: InitCustomRules,
+	    "handle"		: HandleCustomRules,
+	    // "store"		: NoStoreNeeded,
+	    "help"		: HelpForDialog("custom-rules"),
+	]
     ];
 
     // TRANSLATORS: Part of dialog caption
@@ -222,6 +230,16 @@
 	    "tree_item_label"	: _("Logging Level"),
 	    "widget_names"	: [ "DisableBackButton", "LoggingLevel" ]
 	],
+	"custom_rules"		: $[
+	    "contents"          : `VBox (
+		CustomFirewallRules()
+	    ),
+	    // TRANSLATORS: part of dialog caption
+	    "caption"		: firewall_caption + ": " + _("Custom Rules"),
+	    // TRANSLATORS: tree menu item
+	    "tree_item_label"	: _("Custom Rules"),
+	    "widget_names"	: [ "DisableBackButton", "CustomRules" ]
+	]
     ];
 
     map<symbol,any> functions = $[
@@ -230,7 +248,7 @@
 
     symbol RunFirewallDialogs () {
 	list<string> simple_dialogs = [ "start_up", "interfaces", "allowed_services",
-	    "masquerading", "broadcast_simple", "ipsec_support", "logging_level" ];
+	    "masquerading", "broadcast_simple", "ipsec_support", "logging_level", "custom_rules" ];
 
 	return DialogTree::ShowAndRun ($[
 	    "ids_order"		: simple_dialogs,

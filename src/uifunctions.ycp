@@ -15,6 +15,7 @@
     import "Confirm";
     import "SuSEFirewall";
     import "SuSEFirewallServices";
+    import "SuSEFirewallExpertRules";
     import "PortAliases";
     import "Popup";
     import "Address";
@@ -22,6 +23,8 @@
     import "Report";
     import "Label";
     import "Mode";
+    import "IP";
+    import "Netmask";
 
     include "firewall/generalfunctions.ycp";
     include "firewall/helps.ycp";
@@ -47,6 +50,57 @@
  *    }
  *
  */
+
+    /**
+     * Checks the network entry which can be defined in several formats.
+     *
+     * @example
+     *	CheckNetwork ("192.168.0.1") -> true
+     *	CheckNetwork ("192.168.0.0/20") -> true
+     *	CheckNetwork ("192.168.0.0/255.255.255.0") -> true
+     *	CheckNetwork ("0/0") -> true
+     */
+    boolean CheckNetwork (string network) {
+	boolean ret = nil;
+
+	if (network == nil || network == "") {
+	    ret = false;
+
+	} else if (network == "0/0") {
+	    ret = true;
+
+	// 192.168.0.1, 0.8.55.999
+	} else if (regexpmatch(network, "^[0123456789\.]+$")) {
+	    ret = IP::Check4 (network);
+
+	// 192.168.0.0/20, 0.8.55/158
+	} else if (regexpmatch(network, "^[0123456789\.]+/[0123456789]+$")) {
+	    string network_ip   = regexpsub (network, "^([0123456789\.]+)/[0123456789]+$", "\\1");
+	    string network_mask = regexpsub (network, "^[0123456789\.]+/([0123456789]+)$", "\\1");
+	    
+	    ret = (IP::Check4 (network_ip) && Netmask::Check4 (network_mask));
+
+	// 192.168.0.0/255.255.255.0, 0.8.55/10.258.12
+	} else if (regexpmatch(network, "^[0123456789\.]+/[0123456789\.]+$")) {
+	    string network_ip   = regexpsub (network, "^([0123456789\.]+)/[0123456789\.]+$", "\\1");
+	    string network_mask = regexpsub (network, "^[0123456789\.]+/([0123456789\.]+)$", "\\1");
+	    
+	    ret = (IP::Check4 (network_ip) && Netmask::Check4 (network_mask));
+	}
+	
+	if (ret != true || ! Mode::test()) {
+	    // TRANSLATORS: error message, %1 represents the erroneous network definition
+	    Report::Error (sformat (_("Invalid network definition '%1'.
+Network can be defined as an IP or IP with slash and netmask.
+
+For instance: 192.168.0.1
+or 192.168.0.0/20
+or 192.168.0.0/255.255.255.0
+or 0/0"), network));
+	}
+
+	return ret;
+    }
 
     // UI Functions
 
@@ -381,6 +435,15 @@
 	    return ReportWrongPortDefinition(tostring(port_nr), port);
 	} else {
 	    return true;
+	}
+    }
+
+    boolean CheckPortNameDefinition (string port_name) {
+	if (PortAliases::IsAllowedPortName(port_name)) {
+	    return true;
+	} else {
+	    Report::Error (PortAliases::AllowedPortNameOrNumber());
+	    return false;
 	}
     }
 
@@ -826,6 +889,32 @@ Use the port number instead of the port name.
 	return true;
     }
 
+    string UserReadablePortName (string port, string protocol) {
+	if (port == "") return "";
+	if (port == nil) return nil;
+
+	protocol = tolower (protocol);
+	// Do not seek port number for RPC services
+	if (protocol == "rpc" || protocol == "_rpc_") return port;
+
+	// number
+	if (regexpmatch (port, "^[0123456789]+$")) {
+	    string port_name = GetPortName (port);
+	    // port name must be known and not the same as defined yet
+	    if (port_name != nil && port_name != port) {
+		port = sformat("%1 (%2)", port_name, port);
+	    }
+	// not a port range
+	} else if (! regexpmatch (port, "^[0123456789]+:[0123456789]+$")) {
+	    string port_number = GetPortNumber (port);
+	    if (port_number != nil && port_number != port) {
+		port = sformat("%1 (%2)", port, port_number);
+	    }
+	}
+
+	return port;
+    }
+
     void RedrawRedirectToMasqueradedIPTable() {
 	list <term> items = [];
 
@@ -838,11 +927,7 @@ Use the port number instead of the port name.
 
 	    // printing port names rather then port numbers
 	    foreach (string key, [ "req_port", "to_port" ], {
-		string port_name = GetPortName(rule[key]:"");
-		// port name must be known and not the same as defined yet
-		if (port_name!=nil && port_name!=rule[key]:"") {
-		    rule[key] = sformat("%1 (%2)", port_name, rule[key]:"");
-		}
+		rule[key] = UserReadablePortName (rule[key]:"", rule["protocol"]:"");
 	    });
 
 	    items = add (items,
@@ -859,12 +944,13 @@ Use the port number instead of the port name.
 	    row_id = row_id + 1;
 	});
 
-	UI::ChangeWidget(`id("table_redirect_masq"), `Items, items);
+	UI::ChangeWidget (`id("table_redirect_masq"), `Items, items);
     }
 
 
     void HandlePopupAddRedirectToMasqueradedIPRule () {
 	UI::OpenDialog(all_popup_definition, AddRedirectToMasqueradedIPRule());
+	UI::SetFocus (`id("add_source_network"));
 
 	boolean ret_value = false;
 
@@ -1055,5 +1141,165 @@ Use the port number instead of the port name.
 	// Changes the default values - Enable and Start at once
 	SuSEFirewall::SetEnableService(new_state);
 	SuSEFirewall::SetStartService(new_state);
+    }
+
+    string customrules_current_zone = nil;
+
+    void RedrawCustomRules (string current_zone) {
+	if (current_zone == nil || ! contains (SuSEFirewall::GetKnownFirewallZones(), current_zone)) {
+	    y2error("Unknown zone '%1'", current_zone);
+	    return nil;
+	}
+
+	list <map <string, string> > rules = SuSEFirewallExpertRules::GetListOfAcceptRules (current_zone);
+
+	// some rules are already defined
+	if (size(rules) > 0) {
+	    integer counter = -1;
+	    list <term> items = maplist (map <string, string> one_rule, rules, {
+		counter = counter + 1;
+		return `item (
+		    `id (counter),
+		    one_rule["network"]:"",
+		    SuSEFirewall::GetProtocolTranslatedName (one_rule["protocol"]:""),
+		    UserReadablePortName (one_rule["dport"]:"", one_rule["protocol"]:""),
+		    UserReadablePortName (one_rule["sport"]:"", "")
+		);
+	    });
+
+	    items = sort (term aa, term bb, items, ``(aa[1]:"" < bb[1]:""));
+
+	    UI::ChangeWidget (`id ("custom_rules_table"), `Items, items);
+	    UI::ChangeWidget (`id ("remove_custom_rule"), `Enabled, true);
+
+	// no rules defined
+	} else {
+	    UI::ChangeWidget (`id ("custom_rules_table"), `Items, []);
+	    UI::ChangeWidget (`id ("remove_custom_rule"), `Enabled, false);
+	}
+    }
+
+    void InitCustomRules (string key) {
+	SetFirewallIcon();
+
+	// set the default once, EXT is the first one
+	if (customrules_current_zone == nil) {
+	    foreach (string one_zone, (list <string>) union (SuSEFirewall::GetKnownFirewallZones(), ["EXT"]), {
+		// at least one interface in the zone
+		if (size (SuSEFirewall::GetInterfacesInZoneSupportingAnyFeature(one_zone)) > 0)
+		    customrules_current_zone = one_zone;
+	    });
+	    // nothing found, set the default manually
+	    if (customrules_current_zone == nil)
+		customrules_current_zone = "EXT";
+	}
+
+	UI::ChangeWidget (`id ("custom_rules_firewall_zone"), `Value, customrules_current_zone);
+
+	RedrawCustomRules (customrules_current_zone);
+    }
+
+    void DeleteSelectedCustomRule (string selected_zone, integer current_item) {
+	if (SuSEFirewallExpertRules::DeleteRuleID (selected_zone, current_item)) {
+	    RedrawCustomRules (selected_zone);
+	    UI::ChangeWidget (`id("custom_rules_table"), `SelectedItem, 0);
+	}
+    }
+
+    boolean CheckPortNameOrNumber (string port) {
+	// port number
+	if (regexpmatch(port, "^[0123456789]+$")) {
+	    return CheckPortNumberDefinition (tointeger (port), port);
+	// not a port range 
+	} else if (! regexpmatch(port, "^[0123456789]+:[0123456789]+$")) {
+	    return CheckPortNameDefinition (port);
+	}
+    }
+
+    boolean HandlePopupAddCustomRule (string selected_zone) {
+	UI::OpenDialog (all_popup_definition,
+	    `HBox (
+		`MinWidth (
+		    30,
+		    `RichText (HelpForDialog ("custom-rules-popup"))
+		),
+		AddCustomFirewallRule()
+	    )
+	);
+	UI::SetFocus (`id("add_source_network"));
+
+	boolean ret_value = false;
+
+	while (true) {
+	    any ret = UI::UserInput();
+
+	    if (ret == "cancel") {
+		break;
+	    } else if (ret == "ok") {
+		if (!CheckExistency("add_source_network"))	continue;
+		if (!CheckExistency("add_protocol"))		continue;
+
+		string add_source_network   = (string) UI::QueryWidget(`id("add_source_network"),   `Value);
+		string add_protocol	    = (string) UI::QueryWidget(`id("add_protocol"),	    `Value);
+		string add_destination_port = (string) UI::QueryWidget(`id("add_destination_port"), `Value);
+		string add_source_port      = (string) UI::QueryWidget(`id("add_source_port"),      `Value);
+
+		// network is mandatory
+		if (add_source_network == "" || ! CheckNetwork (add_source_network)) {
+		    UI::SetFocus (`id ("add_source_network"));
+		    continue;
+		}
+		// destination port is optional
+		if (add_destination_port != "" && ! CheckPortNameOrNumber (add_destination_port)) {
+		    UI::SetFocus (`id ("add_destination_port"));
+		    continue;
+		}
+		// source port is optional
+		if (add_source_port != "" && ! CheckPortNameOrNumber (add_source_port)) {
+		    UI::SetFocus (`id ("add_source_port"));
+		    continue;
+		}
+
+		SuSEFirewallExpertRules::AddNewAcceptRule (
+		    selected_zone,
+		    $[
+			"network"	: add_source_network,
+			"protocol"	: add_protocol,
+			"dport"	: add_destination_port,
+			"sport"	: add_source_port
+		    ]
+		);
+		
+		ret_value = true;
+		break;
+	    }
+	}
+
+	UI::CloseDialog();
+
+	return ret_value;
+    }
+
+    symbol HandleCustomRules (string key, map event) {
+	any ret = event["ID"]:nil;
+	
+	string selected_zone = (string) UI::QueryWidget (`id ("custom_rules_firewall_zone"), `Value);
+
+	if (ret == "custom_rules_firewall_zone") {
+	    customrules_current_zone = selected_zone;
+	    RedrawCustomRules (selected_zone);
+	} else if (ret == "add_custom_rule") {
+	    if (HandlePopupAddCustomRule (selected_zone)) {
+		RedrawCustomRules (selected_zone);
+	    }
+	} else if (ret == "remove_custom_rule") {
+	    integer current_item = (integer) UI::QueryWidget(`id("custom_rules_table"), `CurrentItem);
+
+	    if (current_item != nil && Confirm::DeleteSelected()) {
+		DeleteSelectedCustomRule (selected_zone, current_item);
+	    }
+	}
+
+	return nil;
     }
 }

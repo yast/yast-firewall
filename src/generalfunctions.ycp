@@ -46,7 +46,7 @@
 	    y2error("Port name/number must be defined");
 	    return nil;
 	}
-	// if port is a port number, find port number
+	// if port is a port name, find port number
 	if (regexpmatch(port_to_be_checked, "^[0123456789]+$")) {
 	    list <string> port_aliases = PortAliases::GetListOfServiceAliases(port_to_be_checked);
 	    // clear port name
