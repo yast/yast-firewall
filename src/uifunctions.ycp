@@ -88,7 +88,7 @@
 	    ret = (IP::Check4 (network_ip) && Netmask::Check4 (network_mask));
 	}
 	
-	if (ret != true || ! Mode::test()) {
+	if (ret != true && ! Mode::testsuite()) {
 	    // TRANSLATORS: error message, %1 represents the erroneous network definition
 	    Report::Error (sformat (_("Invalid network definition '%1'.
 Network can be defined as an IP or IP with slash and netmask.

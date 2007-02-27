@@ -13,14 +13,9 @@ Return	true
 Return	true
 Return	true
 Return	true
-Log	Invalid network definition '172.55.0.0/33'.
 Return	false
-Log	Invalid network definition '256.168.0.255'.
 Return	false
-Log	Invalid network definition '172.55.0.0/125.85.5.5'.
 Return	false
-Log	Invalid network definition '192.168.0.255/5.5.5'.
 Return	false
-Log	Invalid network definition '192.168.0.255/255.255.0.255'.
 Return	false
 Dump	
