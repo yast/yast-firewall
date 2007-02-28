@@ -21,6 +21,7 @@ import "SuSEFirewallProposal";
 import "Popup";
 import "Progress";
 import "ProductFeatures";
+import "Report";
 
 include "firewall/helps.ycp";
 
@@ -30,11 +31,21 @@ boolean enable_ssh_default = ProductFeatures::GetBooleanFeature ("globals", "fir
 // run this only once
 if (!SuSEFirewallProposal::GetProposalInitialized()) {
 
-    // variables from control file
-    y2milestone("Default firewall values: enable_firewall=%1, enable_ssh=%2",
-	ProductFeatures::GetBooleanFeature ("globals", "enable_firewall"), ProductFeatures::GetBooleanFeature ("globals", "firewall_enable_ssh"));
-    SuSEFirewall::SetEnableService(ProductFeatures::GetBooleanFeature ("globals", "enable_firewall")); 
-    SuSEFirewall::SetStartService (ProductFeatures::GetBooleanFeature ("globals", "enable_firewall")); 
+    // Package must be installed
+    if (SuSEFirewall::SuSEFirewallIsInstalled()) {
+	// variables from control file
+	y2milestone("Default firewall values: enable_firewall=%1, enable_ssh=%2",
+	    ProductFeatures::GetBooleanFeature ("globals", "enable_firewall"), ProductFeatures::GetBooleanFeature ("globals", "firewall_enable_ssh"));
+	SuSEFirewall::SetEnableService(ProductFeatures::GetBooleanFeature ("globals", "enable_firewall"));
+	SuSEFirewall::SetStartService (ProductFeatures::GetBooleanFeature ("globals", "enable_firewall"));
+    // Package is missing
+    } else {
+	// variables from control file
+	y2milestone("Default firewall values: enable_firewall=%1, enable_ssh=%2",
+	    false, false);
+	SuSEFirewall::SetEnableService(false);
+	SuSEFirewall::SetStartService (false);
+    }
 
 
     SuSEFirewallProposal::SetProposalInitialized(true);
@@ -87,8 +98,15 @@ else if(func == "AskUser") {
      * one of these actions is called
      */
 
+    // Package SuSEfirewall2 is not installed
+    if (! SuSEFirewall::SuSEFirewallIsInstalled()) {
+	// TRANSLATORS: message popup
+	Report::Message (_("Firewall configuration cannot be changed.
+SuSEfirewall2 package is not installed."));
+	ret = $[ "workflow_sequence" : `next ];
+
     // Enable firewall
-    if (chosen_id == "firewall--enable_firewall_in_proposal") {
+    } else if (chosen_id == "firewall--enable_firewall_in_proposal") {
 	y2milestone("Firewall enabled by a single-click");
 	SuSEFirewall::SetEnableService(true);
 	SuSEFirewall::SetStartService(true);
