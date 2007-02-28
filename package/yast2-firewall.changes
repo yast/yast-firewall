@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Wed Feb 28 15:31:25 CET 2007 - locilka@suse.cz
+
+- Check and install SuSEfirewall2 package when reading the
+  configuration. Supported in yast2-2.15.15 and later (#245506).
+- 2.15.3
+
+-------------------------------------------------------------------
 Tue Feb 27 14:28:21 CET 2007 - locilka@suse.cz
 
 - Added support for Firewall Custom Rules (FATE #120042,
