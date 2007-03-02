@@ -284,7 +284,12 @@
 
 	    if (ret == `back || ret == `next) break;
 
-	    if (ret == `abort && AbortDialog() == true) break;
+	    // bugzilla #249777, `cancel == [x] (Closing YaST UI).
+	    if ((ret == `abort || ret == `cancel) && AbortDialog() == true) {
+		// ret is evaluated by the dialog sequencer
+		ret = `abort;
+		break;
+	    }
 	}
 
 	return ret;
