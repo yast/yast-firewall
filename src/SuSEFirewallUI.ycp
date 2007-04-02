@@ -16,5 +16,29 @@
 
     global boolean simple_text_output = false;
 
+    /**
+     * Show details in the summary dialog?
+     * Internal variable.
+     */
+    boolean show_summary_details = false;
+
+    /**
+     * Returns whether summary should be more detailed.
+     *
+     * @return boolean show detailed summary
+     */
+    global boolean GetShowSummaryDetails () {
+	return show_summary_details;
+    }
+
+    /**
+     * Sets whether summary should be more detailed.
+     *
+     * @param boolean show detailed summary
+     */
+    global void SetShowSummaryDetails (boolean set_show) {
+	if (set_show != nil) show_summary_details = set_show;
+    }
+
 /* EOF */
 }

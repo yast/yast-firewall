@@ -947,9 +947,12 @@
     }
 
     term BoxSummary () {
-	term dialog = `HBox (
+	term dialog = `VBox (
 	    // TRANSLATORS: informative label in dialog
-	    `RichText(`id("box_summary_richtext"), _("Creating summary..."))
+	    `RichText(`id("box_summary_richtext"), _("Creating summary...")),
+	    `VSpacing (1),
+	    // TRANSLATORS: check box in summary dialog
+	    `Left(`CheckBox (`id ("show_details"), `opt (`notify), _("&Show Details")))
 	);
 
 	return dialog;

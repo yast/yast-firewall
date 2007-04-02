@@ -28,6 +28,7 @@
 
     include "firewall/generalfunctions.ycp";
     include "firewall/helps.ycp";
+    include "firewall/subdialogs.ycp";
 
     // GLOBAL UI CONFIGURATION
     term all_popup_definition = `opt(`decorated,`centered);

@@ -278,9 +278,9 @@
 
 	InitBoxSummary([]);
 
-	symbol ret = nil;
+	any ret = nil;
 	while (true) {
-	    ret = (symbol) UI::UserInput();
+	    ret = UI::UserInput();
 
 	    if (ret == `back || ret == `next) break;
 
@@ -290,8 +290,15 @@
 		ret = `abort;
 		break;
 	    }
+	    
+	    if (ret == "show_details") {
+		SuSEFirewallUI::SetShowSummaryDetails (
+		    (boolean) UI::QueryWidget (`id ("show_details"), `Value)
+		);
+		InitBoxSummary([]);
+	    }
 	}
 
-	return ret;
+	return (symbol) ret;
     }
 }

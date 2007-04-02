@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Apr  2 13:37:15 CEST 2007 - locilka@suse.cz
+
+- Show firewall summary details on request (#230042).
+- 2.15.4
+
+-------------------------------------------------------------------
 Fri Mar  2 13:37:56 CET 2007 - locilka@suse.cz
 
 - Adding forgotten handling of `cancel in the Summary dialog

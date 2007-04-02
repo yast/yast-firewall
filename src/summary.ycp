@@ -19,7 +19,11 @@
     import "SuSEFirewallUI";
     import "Mode";
     import "String";
-    // import "NetworkService";
+
+    include "firewall/subdialogs.ycp";
+    include "firewall/uifunctions.ycp";
+
+    boolean show_details = false;
 
     map protocol_type_names = $[
 	// TRANSLATORS: Summary item label
@@ -30,6 +34,8 @@
 	"RPC" : _("RPC Services"),
 	// TRANSLATORS: Summary item label
 	"IP"  : _("IP Protocols"),
+	// TRANSLATORS: Summary item label
+	"BRD"  : _("Broadcast Ports"),
     ];
 
     string li_start = "<li>";
@@ -126,7 +132,69 @@
 	return ret_summary;
     }
 
-    string SummaryOpenServicesInZone(string zone_id) {
+    /**
+     * Returns HTML-formatted information about ports contained in a service
+     * defined by parameter service_id.
+     *
+     * @param string service_id
+     * @return string detailed information
+     */
+    string ShowServiceDetails (string service_id) {
+	list <string> tcp_ports       = SuSEFirewallServices::GetNeededTCPPorts (service_id);
+	list <string> udp_ports       = SuSEFirewallServices::GetNeededUDPPorts (service_id);
+	list <string> rpc_ports       = SuSEFirewallServices::GetNeededRPCPorts (service_id);
+	list <string> ip_protocols    = SuSEFirewallServices::GetNeededIPProtocols (service_id);
+	list <string> broadcast_ports = SuSEFirewallServices::GetNeededBroadcastPorts (service_id);
+
+	string ret = "";
+
+	// TCP ports
+	if (size (tcp_ports) > 0) {
+	    // "ssh" -> "ssh (22)"
+	    tcp_ports = maplist (string tcp_port, tcp_ports, {
+		return UserReadablePortName (tcp_port, "TCP");
+	    });
+	    ret = ret +
+		li_start + protocol_type_names["TCP"]:"" + ": " +  mergestring (tcp_ports, ", ") + li_end + "\n";
+	}
+
+	// UDP Ports
+	if (size (udp_ports) > 0) {
+	    udp_ports = maplist (string udp_port, udp_ports, {
+		return UserReadablePortName (udp_port, "UDP");
+	    });
+	    ret = ret +
+		li_start + protocol_type_names["UDP"]:"" + ": " +  mergestring (udp_ports, ", ") + li_end + "\n";
+	}
+
+	// RPC Services
+	if (size (rpc_ports) > 0) {
+	    ret = ret +
+		li_start + protocol_type_names["RPC"]:"" + ": " +  mergestring (rpc_ports, ", ") + li_end + "\n";
+	}
+
+	// IP Protocols
+	if (size (ip_protocols) > 0) {
+	    ret = ret +
+		li_start + protocol_type_names["IP"]:"" + ": " +  mergestring (ip_protocols, ", ") + li_end + "\n";
+	}
+
+	// Broadcast (UDP)
+	if (size (broadcast_ports) > 0) {
+	    broadcast_ports = maplist (string broadcast_port, broadcast_ports, {
+		return UserReadablePortName (broadcast_port, "UDP");
+	    });
+	    ret = ret +
+		li_start + protocol_type_names["BRD"]:"" + ": " +  mergestring (broadcast_ports, ", ") + li_end + "\n";
+	}
+
+	if (ret == "")
+	    return "";
+
+	return "\n" + ul_start + ret + ul_end + "\n";
+    }
+
+    string SummaryOpenServicesInZone (string zone_id, boolean show_details) {
 	string ret_val = "";
 
 	list <string> interfaces_in_zone = SuSEFirewall::GetInterfacesInZone(zone_id);
@@ -154,8 +222,13 @@
 		});
 		// Allowed known services
 		foreach (string service_name, string service_id, translations_to_service_ids, {
-		    if (SuSEFirewall::IsServiceSupportedInZone(service_id, zone_id)) {
-			open_services = open_services + li_start + service_name + li_end + "\n";
+		    if (SuSEFirewall::IsServiceSupportedInZone (service_id, zone_id)) {
+			open_services = open_services +
+			    li_start +
+			    service_name + (show_details ? ":":"") +
+			    li_end +
+			    (show_details ? ShowServiceDetails (service_id):"") +
+			    "\n";
 		    }
 		});
 		// Additional (unknown) ports, services, protocols...
@@ -178,11 +251,11 @@
 	return ret_val;
     }
 
-    string SummaryZoneBody (string zone_id) {
+    string SummaryZoneBody (string zone_id, boolean show_details) {
 	return
 	    ul_start + "\n" +
-	    SummaryInterfacesInZone(zone_id) +
-	    SummaryOpenServicesInZone(zone_id) +
+	    SummaryInterfacesInZone (zone_id) +
+	    SummaryOpenServicesInZone (zone_id, show_details) +
 	    ul_end + "\n";
     }
 
@@ -280,6 +353,12 @@
     }
 
     string InitBoxSummary (list <string> for_zones) {
+	show_details = SuSEFirewallUI::GetShowSummaryDetails();
+	y2milestone ("Regenerating summary dialog, details: %1", show_details);
+
+	// just as first init
+	UI::ChangeWidget (`id ("show_details"), `Value, show_details);
+
 	string summary = SummaryFirewallStart();
 	
 	summary = summary + SummaryUnassignedInterfaces();
@@ -289,8 +368,8 @@
 	foreach (string zone_id, SuSEFirewall::GetKnownFirewallZones(), {
 	    if (contains(for_zones,zone_id)) {
 		summary = summary
-		    + SummaryZoneHeader(zone_id)
-		    + SummaryZoneBody(zone_id);
+		    + SummaryZoneHeader (zone_id)
+		    + SummaryZoneBody (zone_id, show_details);
 	    }
 	});
 
