@@ -274,10 +274,10 @@
 	// Firewall is enabled/disabled in the boot process
 	if (SuSEFirewall::GetEnableService()) {
 	    // TRANSLATORS: Summary text item
-	    ret_message = ret_message + li_start + _("Start firewall when booting") + li_end + "\n\n";
+	    ret_message = ret_message + li_start + _("<b>Enable</b> firewall automatic starting") + li_end + "\n\n";
 	} else {
 	    // TRANSLATORS: Summary text item
-	    ret_message = ret_message + li_start + _("Start firewall manually") + li_end + "\n\n";
+	    ret_message = ret_message + li_start + _("<b>Disable</b> firewall automatic starting") + li_end + "\n\n";
 	}
 	
 	// Firewall should be running/stopped
@@ -289,13 +289,13 @@
 	    // Is stopped and will be running
 	    } else {
 		// TRANSLATORS: Summary text item
-		ret_message = ret_message + li_start + _("Firewall will be started after the configuration gets written") + li_end + "\n";
+		ret_message = ret_message + li_start + _("Firewall <b>will be started</b> after the configuration gets written") + li_end + "\n";
 	    }
 	} else {
 	    // Is running and will be stopped
 	    if (SuSEFirewall::IsStarted()) {
 		// TRANSLATORS: Summary text item
-		ret_message = ret_message + li_start + _("Firewall will be stopped after the configuration gets written") + li_end + "\n";
+		ret_message = ret_message + li_start + _("Firewall <b>will be stopped</b> after the configuration gets written") + li_end + "\n";
 	    // Is not running and will not be running
 	    } else {
 		// TRANSLATORS: Summary text item
@@ -359,9 +359,10 @@
 	// just as first init
 	UI::ChangeWidget (`id ("show_details"), `Value, show_details);
 
-	string summary = SummaryFirewallStart();
-	
-	summary = summary + SummaryUnassignedInterfaces();
+	string summary =
+	    SummaryFirewallStart() +
+	    "<hr />" +
+	    SummaryUnassignedInterfaces();
 
 	if (size(for_zones)==0) for_zones = SuSEFirewall::GetKnownFirewallZones();
 

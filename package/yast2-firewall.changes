@@ -1,4 +1,13 @@
 -------------------------------------------------------------------
+Wed Apr  4 10:20:50 CEST 2007 - locilka@suse.cz
+
+- A brand new and better revolutionary solution has been worked out
+  for a firewall service starting/stopping and enabling/disabling
+  in order to maximize user understanding and minimize errors
+  (#259304).
+- 2.15.5
+
+-------------------------------------------------------------------
 Mon Apr  2 13:37:15 CEST 2007 - locilka@suse.cz
 
 - Show firewall summary details on request (#230042).

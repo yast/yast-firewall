@@ -36,14 +36,14 @@
 	    "set_service_auto_start"	: SetEnableFirewall,
 	    
 	    // TRANSLATORS: Radio selection
-	    "start_auto_button"		: _("&When Booting"),
+	    "start_auto_button"		: _("&Enable firewall automatic starting"),
 	    // TRANSLATORS: Radio selection
-	    "start_manual_button"	: _("&Manually"),
+	    "start_manual_button"	: _("&Disable firewall automatic starting"),
 	    "help"			: sformat(CWMServiceStart::AutoStartHelpTemplate (),
 		// TRANSLATORS: part of help text - radio button label, NO SHORTCUT!!!
-		_("When Booting"),
+		_("Enable firewall"),
 		// TRANSLATORS: part of help text - radio button label, NO SHORTCUT!!!
-		_("Manually")
+		_("Disable firewall")
 	    )
 	]),
 	"start_stop" : CWMServiceStart::CreateStartStopWidget ($[
@@ -140,7 +140,13 @@
 	    "handle"		: HandleCustomRules,
 	    // "store"		: NoStoreNeeded,
 	    "help"		: HelpForDialog("custom-rules"),
-	]
+	],
+	"CheckServiceStartVsStartedStopped" : $[
+	    "widget"		: `custom,
+	    "custom_widget"	: `Empty(),
+	    "init"		: InitServiceStartVsStartedStopped,
+	    "help"		: " ",
+	],
     ];
 
     // TRANSLATORS: Part of dialog caption
@@ -153,14 +159,14 @@
 		`VSpacing (1),
 		// disabling start/stop buttons when it doesn't make sense
 		(Mode::normal() ? "start_stop" : `Empty()),
-		"hide_back_button",
+		(Mode::normal() ? "CheckServiceStartVsStartedStopped" : `Empty()),
 		`VStretch ()
 	    ),
 	    // TRANSLATORS: part of dialog caption
 	    "caption"		: firewall_caption + ": " + _("Start-Up"),
 	    // TRANSLATORS: tree menu item
 	    "tree_item_label"	: _("Start-Up"),
-	    "widget_names"	: [ "DisableBackButton", "auto_start_up", "start_stop" ]
+	    "widget_names"	: [ "DisableBackButton", "auto_start_up", "start_stop", "CheckServiceStartVsStartedStopped" ]
 	],
 	"interfaces"		: $[
 	    "contents"		: `VBox (

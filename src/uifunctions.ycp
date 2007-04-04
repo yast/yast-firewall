@@ -129,8 +129,9 @@ or 0/0"), network));
 	Wizard::RestoreHelp (HelpForDialog("saving_configuration"));
 	boolean success = SuSEFirewall::SaveAndRestartService ();
 	if (success) SuSEFirewall::SetStartService(true);
-	sleep(1000);
+	sleep(500);
 	UI::CloseDialog ();
+
 	return success;
     }
 
@@ -139,8 +140,12 @@ or 0/0"), network));
      * to be started after exiting YaST
      */
     boolean StartNow() {
+	UI::OpenDialog(`Label(_("Starting firewall...")));
 	SuSEFirewall::SetStartService(true);
-	return SuSEFirewall::StartServices();
+	boolean ret = SuSEFirewall::StartServices();
+	UI::CloseDialog ();
+
+	return ret;
     }
     
     /**
@@ -148,8 +153,12 @@ or 0/0"), network));
      * to be stopped after exiting YaST
      */
     boolean StopNow() {
+	UI::OpenDialog(`Label(_("Stopping firewall...")));
 	SuSEFirewall::SetStartService(false);
-	return SuSEFirewall::StopServices();
+	boolean ret = SuSEFirewall::StopServices();
+	UI::CloseDialog ();
+
+	return ret;
     }
 
     /**
@@ -1136,12 +1145,45 @@ Use the port number instead of the port name.
 	SuSEFirewall::SetBroadcastAllowedPorts(allowed_bcast_ports);
     }
 
+    boolean firewall_enabled_st = nil;
+    boolean firewall_started_st = nil;
+
+    void InitServiceStartVsStartedStopped (string key) {
+	firewall_enabled_st = SuSEFirewall::GetEnableService();
+	firewall_started_st = SuSEFirewall::IsStarted();
+    }
+
     void SetEnableFirewall (boolean new_state) {
-	y2milestone("New Settings - Firewall Enabled: %1, Firewall Started: %1 (after Write())", new_state);
-	
+	if (firewall_enabled_st == new_state) {
+	    y2milestone ("Enable firewall status preserved (enable=%1)", firewall_enabled_st);
+	    return;
+	}
+
+	boolean curr_running = SuSEFirewall::IsStarted();
+	boolean new_running  = new_state;
+
+	// disabling firewall
+	if (new_state == false && curr_running == true) {
+	    // TRANSLATORS: popup question
+	    if (Popup::YesNo (_("Firewall automatic starting has been just set to be disabled
+but firewall is currently running.
+
+Would you like to stop the firewall after the new configuration is written?"))) {
+		y2milestone ("User decided to stop the firewall after it is disabled");
+		new_running = false;
+	    } else {
+		y2milestone ("User decided not to stop the firewall after it is disabled");
+		new_running = true;
+	    }
+	}
+
 	// Changes the default values - Enable and Start at once
-	SuSEFirewall::SetEnableService(new_state);
-	SuSEFirewall::SetStartService(new_state);
+	SuSEFirewall::SetEnableService (new_state);
+	SuSEFirewall::SetStartService  (new_running);
+
+	y2milestone("New Settings - Firewall Enabled: %1, Firewall Started: %2 (after Write())",
+	    SuSEFirewall::GetEnableService(), SuSEFirewall::GetStartService()
+	);
     }
 
     string customrules_current_zone = nil;
