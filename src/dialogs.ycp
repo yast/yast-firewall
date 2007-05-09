@@ -277,7 +277,8 @@
 	    firewall_caption + ": " + _("Summary"),
 	    BoxSummary(),
 	    HelpForDialog("box-summary"),
-	    Label::BackButton (), Label::AcceptButton ()
+	    Label::BackButton (),
+	    (Mode::normal() ? Label::FinishButton() : Label::AcceptButton ())
 	);
 	SetFirewallIcon();
 	UI::ChangeWidget(`id(`back), `Enabled, true);

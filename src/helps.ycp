@@ -186,7 +186,7 @@ Firewall is a defensive mechanism that protects your computer from network attac
 
 	// TRANSLATORS: general help for Custom Rules 1/5
 	"custom-rules" : _("<p><b><big>Custom Rules</big></b><br>
-Here yoy can set special firewall rules that allow new connections
+Here you can set special firewall rules that allow new connections
 matching these rules.<p>") +
 
 	// TRANSLATORS: general help for Custom Rules 2/5
