@@ -124,28 +124,35 @@ SuSEfirewall2 package is not installed."));
     // Enable SSH service
     } else if (chosen_id == "firewall--enable_ssh_in_proposal") {
 	y2milestone("SSH enabled by a single-click");
-	SuSEFirewallProposal::OpenServiceOnNonDialUpInterfaces("ssh");
+	SuSEFirewallProposal::OpenServiceOnNonDialUpInterfaces("service:ssh");
 	ret = $[ "workflow_sequence" : `next ];
 	SuSEFirewallProposal::SetChangedByUser(true);
 
     // Disable SSH service
     } else if (chosen_id == "firewall--disable_ssh_in_proposal") {
 	y2milestone("SSH disabled by a single-click");
-	SuSEFirewall::SetServicesForZones (["ssh"], SuSEFirewall::GetKnownFirewallZones(), false);
+	SuSEFirewall::SetServicesForZones (["service:ssh"], SuSEFirewall::GetKnownFirewallZones(), false);
+
+	// SSH might be also defined by a port, not only using a service:sshd
+	foreach (string zone, SuSEFirewall::GetKnownFirewallZones(), {
+	    if (SuSEFirewall::HaveService("ssh", "TCP", zone))
+		SuSEFirewall::RemoveService("ssh", "TCP", zone);
+	});
+
 	ret = $[ "workflow_sequence" : `next ];
 	SuSEFirewallProposal::SetChangedByUser(true);
 
     // Enable VNC service
     } else if (chosen_id == "firewall--enable_vnc_in_proposal") {
 	y2milestone("VNC enabled by a single-click");
-	SuSEFirewallProposal::OpenServiceOnNonDialUpInterfaces("vnc");
+	SuSEFirewallProposal::OpenServiceOnNonDialUpInterfaces("service:xorg-x11-Xvnc");
 	ret = $[ "workflow_sequence" : `next ];
 	SuSEFirewallProposal::SetChangedByUser(true);
 
     // Disable VNC service
     } else if (chosen_id == "firewall--disable_vnc_in_proposal") {
 	y2milestone("VNC disabled by a single-click");
-	SuSEFirewall::SetServicesForZones (["vnc"], SuSEFirewall::GetKnownFirewallZones(), false);
+	SuSEFirewall::SetServicesForZones (["service:xorg-x11-Xvnc"], SuSEFirewall::GetKnownFirewallZones(), false);
 	ret = $[ "workflow_sequence" : `next ];
 	SuSEFirewallProposal::SetChangedByUser(true);
 

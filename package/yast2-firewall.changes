@@ -1,4 +1,14 @@
 -------------------------------------------------------------------
+Wed May 16 12:09:01 CEST 2007 - locilka@suse.cz
+
+- Opening "service:sshd" (defined by package) instead "ssh" in the
+  firewall proposal and "service:xorg-x11-Xvnc" instead of "vnc"
+  (#274761)
+- Disabling "ssh" by one-click-feature in the firewall proposal
+  disables both "service:sshd" and "ssh" port if added manually.
+- 2.15.6
+
+-------------------------------------------------------------------
 Wed May  9 11:02:55 CEST 2007 - locilka@suse.cz
 
 - Fixed typo (#270965).
