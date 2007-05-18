@@ -17,6 +17,7 @@ y2milestone("Firewall proposal started");
 y2milestone("Arguments: %1", WFM::Args());
 
 import "SuSEFirewall";
+import "SuSEFirewallServices";
 import "SuSEFirewallProposal";
 import "Popup";
 import "Progress";
@@ -124,14 +125,19 @@ SuSEfirewall2 package is not installed."));
     // Enable SSH service
     } else if (chosen_id == "firewall--enable_ssh_in_proposal") {
 	y2milestone("SSH enabled by a single-click");
-	SuSEFirewallProposal::OpenServiceOnNonDialUpInterfaces("service:ssh");
+	SuSEFirewallProposal::OpenServiceOnNonDialUpInterfaces("service:sshd");
 	ret = $[ "workflow_sequence" : `next ];
 	SuSEFirewallProposal::SetChangedByUser(true);
 
     // Disable SSH service
     } else if (chosen_id == "firewall--disable_ssh_in_proposal") {
 	y2milestone("SSH disabled by a single-click");
-	SuSEFirewall::SetServicesForZones (["service:ssh"], SuSEFirewall::GetKnownFirewallZones(), false);
+	// new service definition
+	if (SuSEFirewallServices::IsKnownService("service:sshd"))
+	    SuSEFirewall::SetServicesForZones (["service:sshd"], SuSEFirewall::GetKnownFirewallZones(), false);
+	// old service definition
+	if (SuSEFirewallServices::IsKnownService("ssh"))
+	    SuSEFirewall::SetServicesForZones (["ssh"], SuSEFirewall::GetKnownFirewallZones(), false);
 
 	// SSH might be also defined by a port, not only using a service:sshd
 	foreach (string zone, SuSEFirewall::GetKnownFirewallZones(), {
