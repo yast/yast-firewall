@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri May 25 13:30:04 CEST 2007 - jsrain@suse.cz
+
+- removed outdated translations from .desktop-files (#271209)
+
+-------------------------------------------------------------------
 Wed May 16 12:09:01 CEST 2007 - locilka@suse.cz
 
 - Opening "service:sshd" (defined by package) instead "ssh" in the
