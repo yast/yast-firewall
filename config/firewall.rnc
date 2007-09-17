@@ -44,8 +44,16 @@ y2_firewall =
   | FW_SERVICES_INT_RPC
   | FW_SERVICES_INT_TCP
   | FW_SERVICES_INT_UDP
+  | FW_CONFIGURATIONS_DMZ
+  | FW_CONFIGURATIONS_EXT
+  | FW_CONFIGURATIONS_INT
+  | FW_LOAD_MODULES
 
 firewall = element firewall { y2_firewall* }
+FW_CONFIGURATIONS_DMZ = element FW_CONFIGURATIONS_DMZ { text }
+FW_CONFIGURATIONS_EXT = element FW_CONFIGURATIONS_EXT { text }
+FW_CONFIGURATIONS_INT = element FW_CONFIGURATIONS_INT { text }
+FW_LOAD_MODULES = element FW_LOAD_MODULES { text }
 fw_allow_fw_traceroute = element fw_allow_fw_traceroute { text }
 fw_autoprotect_services = element fw_autoprotect_services { text }
 FW_DEV_EXT = element FW_DEV_EXT { text }
