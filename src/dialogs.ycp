@@ -36,9 +36,9 @@
 	    "set_service_auto_start"	: SetEnableFirewall,
 	    
 	    // TRANSLATORS: Radio selection
-	    "start_auto_button"		: _("&Enable firewall automatic starting"),
+	    "start_auto_button"		: _("&Enable Firewall Automatic Starting"),
 	    // TRANSLATORS: Radio selection
-	    "start_manual_button"	: _("&Disable firewall automatic starting"),
+	    "start_manual_button"	: _("&Disable Firewall Automatic Starting"),
 	    "help"			: sformat(CWMServiceStart::AutoStartHelpTemplate (),
 		// TRANSLATORS: part of help text - radio button label, NO SHORTCUT!!!
 		_("Enable firewall"),

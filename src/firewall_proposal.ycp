@@ -103,7 +103,7 @@ else if(func == "AskUser") {
     if (! SuSEFirewall::SuSEFirewallIsInstalled()) {
 	// TRANSLATORS: message popup
 	Report::Message (_("Firewall configuration cannot be changed.
-SuSEfirewall2 package is not installed."));
+The SuSEfirewall2 package is not installed."));
 	ret = $[ "workflow_sequence" : `next ];
 
     // Enable firewall

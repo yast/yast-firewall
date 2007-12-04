@@ -1165,10 +1165,10 @@ Use the port number instead of the port name.
 	// disabling firewall
 	if (new_state == false && curr_running == true) {
 	    // TRANSLATORS: popup question
-	    if (Popup::YesNo (_("Firewall automatic starting has been just set to be disabled
+	    if (Popup::YesNo (_("Firewall automatic starting has been disabled
 but firewall is currently running.
 
-Would you like to stop the firewall after the new configuration is written?"))) {
+Stop the firewall after the new configuration is written?"))) {
 		y2milestone ("User decided to stop the firewall after it is disabled");
 		new_running = false;
 	    } else {
