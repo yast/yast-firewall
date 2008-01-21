@@ -2,9 +2,8 @@
 
 @HEADER@
 BuildRequires:	perl-XML-Writer update-desktop-files yast2 yast2-devtools yast2-testsuite
-# SuSEFirewallExpertRules::DeleteRuleID()
-# SuSEFirewall::SuSEFirewallIsInstalled()
-Requires:	yast2 >= 2.15.15
+# SuSEFirewallServices::GetFilenameFromServiceDefinedByPackage()
+Requires:	yast2 >= 2.16.22
 
 Provides:	yast2-config-firewall
 Obsoletes:	yast2-config-firewall

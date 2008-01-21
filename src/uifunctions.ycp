@@ -656,6 +656,21 @@ Really use the current settings?"), services_definition)
 	map <string, string> translations_to_service_ids = $[];
 
 	foreach (string service_id, string service_name, SuSEFirewallServices::GetSupportedServices(), {
+	    // a service with the very same name (translation) already defined
+	    if (translations_to_service_ids[service_name]:nil != nil) {
+		// service:apache2 -> apache2
+		if (SuSEFirewallServices::ServiceDefinedByPackage (service_id)) {
+		    service_name = sformat (
+			"%1 (%2)",
+			service_name, SuSEFirewallServices::GetFilenameFromServiceDefinedByPackage (service_id)
+		    );
+		} else {
+		    service_name = sformat (
+			"%1 (%2)",
+			service_name, service_id
+		    );
+		}
+	    }
 	    translations_to_service_ids[service_name] = service_id;
 	});
 

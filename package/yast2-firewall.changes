@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Mon Jan 21 15:20:33 CET 2008 - locilka@suse.cz
+
+- UI adjusted to be possible to proceed with more services defined
+  by package with the same name / translation.
+- Requires yast2 >= 2.16.22 
+
+-------------------------------------------------------------------
 Tue Dec  4 15:30:30 CET 2007 - locilka@suse.cz
 
 - Merged proofread texts.
