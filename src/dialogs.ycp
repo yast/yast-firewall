@@ -34,7 +34,7 @@
 	    //    or
 	    //    disabled + stop (after Write())
 	    "set_service_auto_start"	: SetEnableFirewall,
-	    
+
 	    // TRANSLATORS: Radio selection
 	    "start_auto_button"		: _("&Enable Firewall Automatic Starting"),
 	    // TRANSLATORS: Radio selection
@@ -70,7 +70,7 @@
 		_("Save Settings and Restart Firewall Now")
 	    )
 	]),
-	// hack function for disabling BackButon
+	// hack function for disabling BackButton
 	"DisableBackButton" : $[
 	    "widget"		: `custom,
 	    "custom_widget"	: `Empty(),
@@ -297,7 +297,7 @@
 		ret = `abort;
 		break;
 	    }
-	    
+
 	    if (ret == "show_details") {
 		SuSEFirewallUI::SetShowSummaryDetails (
 		    (boolean) UI::QueryWidget (`id ("show_details"), `Value)
