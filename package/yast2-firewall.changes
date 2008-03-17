@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Mar 17 12:43:32 CET 2008 - jsrain@suse.cz
+
+- added 'StartupNotify=true' to the desktop file (bnc #304964)
+
+-------------------------------------------------------------------
 Mon Jan 21 15:20:33 CET 2008 - locilka@suse.cz
 
 - UI adjusted to be possible to proceed with more services defined

@@ -24,3 +24,4 @@ Exec=/sbin/yast2 firewall
 Name=Firewall
 GenericName=Configure a firewall
 X-KDE-SubstituteUID=true
+StartupNotify=true
