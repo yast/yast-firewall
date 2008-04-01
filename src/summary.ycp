@@ -295,11 +295,11 @@
 	    // Is running and will be stopped
 	    if (SuSEFirewall::IsStarted()) {
 		// TRANSLATORS: Summary text item
-		ret_message = ret_message + li_start + _("Firewall <b>will be stopped</b> after the configuration gets written") + li_end + "\n";
+		ret_message = ret_message + li_start + _("Firewall <b>will be stopped</b> after the configuration is written") + li_end + "\n";
 	    // Is not running and will not be running
 	    } else {
 		// TRANSLATORS: Summary text item
-		ret_message = ret_message + li_start + _("Firewall will not start after the configuration gets written") + li_end + "\n";
+		ret_message = ret_message + li_start + _("Firewall will not start after the configuration is written") + li_end + "\n";
 	    }
 	}
 	
