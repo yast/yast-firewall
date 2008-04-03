@@ -9,6 +9,7 @@ y2_firewall =
   | FW_DEV_INT
   | FW_DEV_DMZ
   | fw_ipsec_trust
+  | FW_IPSEC_TRUST
   | FW_LOG_ACCEPT_ALL
   | FW_LOG_ACCEPT_CRIT
   | FW_LOG_DROP_ALL
