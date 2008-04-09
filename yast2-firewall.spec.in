@@ -1,7 +1,9 @@
 @HEADER-COMMENT@
 
 @HEADER@
-BuildRequires:	perl-XML-Writer update-desktop-files yast2 yast2-devtools yast2-testsuite
+BuildRequires:	perl-XML-Writer update-desktop-files yast2-devtools yast2-testsuite
+BuildRequires:	yast2 >= 2.16.47
+
 # FW_SERVICES_ACCEPT_RELATED_*
 Requires:	yast2 >= 2.16.47
 
