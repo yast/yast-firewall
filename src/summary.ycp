@@ -17,6 +17,7 @@
     import "SuSEFirewall";
     import "SuSEFirewallServices";
     import "SuSEFirewallUI";
+    import "SuSEFirewallExpertRules";
     import "Mode";
     import "String";
 
@@ -46,7 +47,6 @@
 
     // Function initializes spacial behaviour for commandline
     void SummaryInitCommandLine () {
-	// TRANSLATORS: 2-chars string, for commandline summary "[ OK ]"
 	li_start = "        * ";
 	li_end   = "";
 	ul_start = "";
@@ -251,11 +251,57 @@
 	return ret_val;
     }
 
+    string SummaryCustomRules (string zone, boolean show_details) {
+	if (! show_details) {
+	    y2milestone ("No details, no custom rules %1", zone);
+	    return "";
+	}
+
+	// FATE #303304: YaST Firewall module shall show custom rules on Summary page
+	list <map <string, string> > custom_rules = SuSEFirewallExpertRules::GetListOfAcceptRules (zone);
+
+	if (custom_rules == nil) {
+	    y2error ("Wrong custom rules for %1", zone);
+	    return "";
+	} else if (size (custom_rules) == 0) {
+	    y2milestone ("No custom rules defined");
+	    return "";
+	}
+
+	// Example:
+	//   All requests from network 80.44.11.0/24 to UDP port 53 originating on port 53
+	//   $[ "network" : "80.44.11.0/24", "protocol" : "udp", "dport" : "53",  "sport" : "53" ]
+	//
+	// Possible keys for parameters are "network", "protocol", "dport" and "sport".
+	// Mandatory are "network" and "protocol".
+
+	string rules = "<h3>" + _("Custom Rules") + "</h3>";
+
+	rules = rules + ul_start;
+
+	foreach (map <string, string> one_rule, custom_rules, {
+	    string proto = one_rule["protocol"]:"tcp";
+	    string one_rule_s = li_start + sformat (
+		    _("Network: <i>%1</i>, Protocol: <i>%2</i>, Destination Port: <i>%3</i>, Source Port: <i>%4</i>"),
+		    one_rule["network"]:_("All"),
+		    SuSEFirewall::GetProtocolTranslatedName (one_rule["protocol"]:_("All")),
+		    (one_rule["dport"]:"" != "" ? UserReadablePortName (one_rule["dport"]:"", proto) : _("All")),
+		    (one_rule["sport"]:"" != "" ? UserReadablePortName (one_rule["sport"]:"", proto) : _("All"))
+		) + li_end;
+	    rules = rules + one_rule_s;
+	});
+
+	rules = rules + ul_end;
+
+	return rules;
+    }
+
     string SummaryZoneBody (string zone_id, boolean show_details) {
 	return
 	    ul_start + "\n" +
 	    SummaryInterfacesInZone (zone_id) +
 	    SummaryOpenServicesInZone (zone_id, show_details) +
+	    SummaryCustomRules (zone_id, show_details) +
 	    ul_end + "\n";
     }
 
@@ -351,6 +397,8 @@
 
 	return ret_message;
     }
+
+
 
     string InitBoxSummary (list <string> for_zones) {
 	show_details = SuSEFirewallUI::GetShowSummaryDetails();
