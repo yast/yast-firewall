@@ -40,7 +40,11 @@
  *	y2milestone("Example Init");
  *    }
  *
-
+ *    symbol ExampleHandle(string key, map event) {
+ *	any ret = event["ID"]:nil;
+ *	y2milestone("Example Handle");
+ *	return nil;
+ *    }
  *
  *    void ExampleStore(string key, map event) {
  *	any ret = event["ID"]:nil;
