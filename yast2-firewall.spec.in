@@ -2,8 +2,8 @@
 
 @HEADER@
 BuildRequires:	perl-XML-Writer update-desktop-files yast2 yast2-devtools yast2-testsuite
-# SuSEFirewallServices::GetFilenameFromServiceDefinedByPackage()
-Requires:	yast2 >= 2.16.22
+# FW_SERVICES_ACCEPT_RELATED_*
+Requires:	yast2 >= 2.16.47
 
 Provides:	yast2-config-firewall
 Obsoletes:	yast2-config-firewall

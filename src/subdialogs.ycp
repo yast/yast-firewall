@@ -778,6 +778,27 @@
 	return dialog;
     }
 
+    term BroadcastReply () {
+	term dialog = `VBox (
+	    `Left (`Label (_("Accepting the Broadcast Reply"))),
+	    `Table (
+		`id ("table_broadcastreply"),
+		`header (
+		    _("Zone"),
+		    _("Service"),
+		    _("Accepted from Network")
+		),
+		[]
+	    ),
+	    `Left (`HBox (
+		`PushButton (`id (`add_br), _("&Add...")),
+		`PushButton (`id (`delete_br), _("&Delete"))
+	    ))
+	);
+
+	return dialog;
+    }
+
 /**
  * Only for Expert configuration
  *

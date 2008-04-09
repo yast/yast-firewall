@@ -109,6 +109,13 @@
 	    "store"		: StoreBroadcastConfigurationSimple,
 	    "help"		: HelpForDialog("simple-broadcast-configuration"),
 	],
+	"BroadcastReply": $[
+	    "widget"		: `custom,
+	    "custom_widget"	: `VBox(),
+	    "init"		: InitBroadcastReply,
+	    "handle"		: HandleBroadcastReply,
+	    "help"		: HelpForDialog("broadcast-reply"),
+	],
 	"IPsecSupport"		: $[
 	    "widget"		: `custom,
 	    "custom_widget"	: `VBox(),
@@ -206,13 +213,15 @@
 	"broadcast_simple"	: $[
 	    "contents"		: `VBox (
 		BroadcastConfigurationSimple(),
+		`VSpacing(1),
+		BroadcastReply(),
 		`VStretch ()
 	    ),
 	    // TRANSLATORS: part of dialog caption
 	    "caption"		: firewall_caption + ": " + _("Broadcast"),
 	    // TRANSLATORS: tree menu item
 	    "tree_item_label"	: _("Broadcast"),
-	    "widget_names"	: [ "DisableBackButton", "BroadcastConfigurationSimple" ]
+	    "widget_names"	: [ "DisableBackButton", "BroadcastConfigurationSimple", "BroadcastReply" ]
 	],
 	"ipsec_support"		: $[
 	    "contents"		: `VBox (

@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Wed Apr  9 15:35:22 CEST 2008 - locilka@suse.cz
+
+- Implemented Firewall support for SMB browsing (fate #300970)
+- Fixed custom-rules - adding port range (bnc #376650).
+- 2.16.1
+
+-------------------------------------------------------------------
 Thu Apr  3 17:08:00 CEST 2008 - ug@suse.de
 
 - rnc file fixed
