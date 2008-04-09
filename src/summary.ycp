@@ -252,11 +252,6 @@
     }
 
     string SummaryCustomRules (string zone, boolean show_details) {
-	if (! show_details) {
-	    y2milestone ("No details, no custom rules %1", zone);
-	    return "";
-	}
-
 	// FATE #303304: YaST Firewall module shall show custom rules on Summary page
 	list <map <string, string> > custom_rules = SuSEFirewallExpertRules::GetListOfAcceptRules (zone);
 
@@ -279,17 +274,21 @@
 
 	rules = rules + ul_start;
 
-	foreach (map <string, string> one_rule, custom_rules, {
-	    string proto = one_rule["protocol"]:"tcp";
-	    string one_rule_s = li_start + sformat (
-		    _("Network: <i>%1</i>, Protocol: <i>%2</i>, Destination Port: <i>%3</i>, Source Port: <i>%4</i>"),
-		    one_rule["network"]:_("All"),
-		    SuSEFirewall::GetProtocolTranslatedName (one_rule["protocol"]:_("All")),
-		    (one_rule["dport"]:"" != "" ? UserReadablePortName (one_rule["dport"]:"", proto) : _("All")),
-		    (one_rule["sport"]:"" != "" ? UserReadablePortName (one_rule["sport"]:"", proto) : _("All"))
-		) + li_end;
-	    rules = rules + one_rule_s;
-	});
+	if (! show_details) {
+	    rules = rules + li_start + sformat (_("%1 custom rules are defined"), size (custom_rules)) + li_end;
+	} else {
+	    foreach (map <string, string> one_rule, custom_rules, {
+		string proto = one_rule["protocol"]:"tcp";
+		string one_rule_s = li_start + sformat (
+			_("Network: <i>%1</i>, Protocol: <i>%2</i>, Destination port: <i>%3</i>, Source port: <i>%4</i>"),
+			one_rule["network"]:_("All"),
+			SuSEFirewall::GetProtocolTranslatedName (one_rule["protocol"]:_("All")),
+			(one_rule["dport"]:"" != "" ? UserReadablePortName (one_rule["dport"]:"", proto) : _("All")),
+			(one_rule["sport"]:"" != "" ? UserReadablePortName (one_rule["sport"]:"", proto) : _("All"))
+		    ) + li_end;
+		rules = rules + one_rule_s;
+	    });
+	}
 
 	rules = rules + ul_end;
 
