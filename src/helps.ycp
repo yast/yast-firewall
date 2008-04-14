@@ -170,7 +170,7 @@ http://www.iana.org/assignments/protocol-numbers.</p>") +
 
 	// TRANSLATORS: Additional Services dialog help 5/6
 	// please, do not modify examples
-	_("<p>The <b>Port Range</b> consists of two comma-seperated numbers that represent
+	_("<p>The <b>Port Range</b> consists of two colon-separated numbers that represent
 all numbers inside the range including the numbers themselves.
 The first port number must be lower than the second one,
 for example, <tt>200:215</tt>.</p>") +
