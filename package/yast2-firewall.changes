@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Apr 14 12:01:44 CEST 2008 - locilka@suse.cz
+
+- Unified Button Labels: OK instead of Accept (fate #120373).
+- 2.16.2
+
+-------------------------------------------------------------------
 Wed Apr  9 15:35:22 CEST 2008 - locilka@suse.cz
 
 - Implemented Firewall support for SMB browsing (fate #300970)

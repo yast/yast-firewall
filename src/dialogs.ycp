@@ -272,9 +272,9 @@
 	    "widget_descr"	: widgets_handling,
 	    "back_button"	: Label::BackButton(),
 	    "abort_button"	: Label::AbortButton(),
-	    // if 'normal' or 'installation', [Next] button, else [Accept]
+	    // if 'normal' or 'installation', [Next] button, else [OK]
 	    "next_button"	: (Mode::normal() ?
-		Label::NextButton () : Label::AcceptButton ()
+		Label::NextButton () : Label::OKButton ()
 	    ),
 	    "functions"		: functions,
 	]);
@@ -287,7 +287,7 @@
 	    BoxSummary(),
 	    HelpForDialog("box-summary"),
 	    Label::BackButton (),
-	    (Mode::normal() ? Label::FinishButton() : Label::AcceptButton ())
+	    (Mode::normal() ? Label::FinishButton() : Label::OKButton ())
 	);
 	SetFirewallIcon();
 	UI::ChangeWidget(`id(`back), `Enabled, true);
