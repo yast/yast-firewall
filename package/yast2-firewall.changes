@@ -3,6 +3,7 @@ Tue Jul  8 11:30:47 CEST 2008 - locilka@suse.cz
 
 - Explicitely enabling functionality that offers to install
   firewall packages if missing (bnc #388773).
+- Adjusted firewall proposal to new API (fallback ports to open).
 - 2.17.0
 
 -------------------------------------------------------------------

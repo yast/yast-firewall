@@ -128,10 +128,10 @@ The SuSEfirewall2 package is not installed."));
 
 	if (SuSEFirewallServices::IsKnownService("service:sshd")) {
 	    y2milestone ("Service 'service:sshd' is known");
-	    SuSEFirewallProposal::OpenServiceOnNonDialUpInterfaces("service:sshd");
+	    SuSEFirewallProposal::OpenServiceOnNonDialUpInterfaces("service:sshd", ["ssh"]);
 	} else if (SuSEFirewallServices::IsKnownService("ssh")) {
 	    y2warning ("Only service 'ssh' is known");
-	    SuSEFirewallProposal::OpenServiceOnNonDialUpInterfaces("ssh");
+	    SuSEFirewallProposal::OpenServiceOnNonDialUpInterfaces("ssh", ["ssh"]);
 	}
 	
 	ret = $[ "workflow_sequence" : `next ];
@@ -159,7 +159,7 @@ The SuSEfirewall2 package is not installed."));
     // Enable VNC service
     } else if (chosen_id == "firewall--enable_vnc_in_proposal") {
 	y2milestone("VNC enabled by a single-click");
-	SuSEFirewallProposal::OpenServiceOnNonDialUpInterfaces("service:xorg-x11-Xvnc");
+	SuSEFirewallProposal::OpenServiceOnNonDialUpInterfaces("service:xorg-x11-Xvnc", ["5801", "5901"]);
 	ret = $[ "workflow_sequence" : `next ];
 	SuSEFirewallProposal::SetChangedByUser(true);
 
