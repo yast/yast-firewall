@@ -4,8 +4,8 @@
 BuildRequires:	perl-XML-Writer update-desktop-files yast2-devtools yast2-testsuite
 BuildRequires:	yast2 >= 2.16.47
 
-# FW_SERVICES_ACCEPT_RELATED_*
-Requires:	yast2 >= 2.16.47
+# SuSEFirewall::SetInstallPackagesIfMissing, bnc #388773
+Requires:	yast2 >= 2.17.5
 
 Provides:	yast2-config-firewall
 Obsoletes:	yast2-config-firewall

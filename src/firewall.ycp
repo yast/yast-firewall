@@ -22,6 +22,11 @@
 
     any ret = nil;
 
+    // bnc #388773
+    // Explicitely enable offering to install the firewall packages
+    // if they are missing
+    SuSEFirewall::SetInstallPackagesIfMissing (true);
+
     // there are some arguments - starting commandline
     if (size(WFM::Args())>0) {
 	import "SuSEFirewallCMDLine";
