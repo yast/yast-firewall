@@ -3,7 +3,9 @@ Tue Jul 15 18:37:56 CEST 2008 - locilka@suse.cz
 
 - SuSEFirewallUI and SuSEFirewallCMDLine YCP modules marked as
   internal.
+- Added SuSEFirewallCMDLine documentation.
 - Using [Cancel] instead of [Abort].
+- 2.17.1
 
 -------------------------------------------------------------------
 Tue Jul  8 11:30:47 CEST 2008 - locilka@suse.cz

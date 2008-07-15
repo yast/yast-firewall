@@ -26,6 +26,12 @@
     include "firewall/summary.ycp";
     include "firewall/generalfunctions.ycp";
 
+    /**
+     * Returns list of strings made from the comma-separated string got as param.
+     *
+     * @param any comma_separated_string
+     * @return list <string> items
+     */
     list <string> CommaSeparatedList(any comma_separated_string) {
 	return splitstring((string) comma_separated_string, ",");
     }
@@ -60,6 +66,9 @@
 	}
     }
 
+    /**
+     * Function prints table of known firewall zones
+     */
     void ListFirewallZones () {
 	CommandLine::Print("");
 	// TRANSLATORS: CommandLine header
@@ -84,6 +93,11 @@
 	CommandLine::Print("");
     }
 
+    /**
+     * Calls ListFirewallZones
+     *
+     * @return boolean always false
+     */
     boolean FWCMDZones (map options) {
 	// listing known zones
 	if (options["list"]:nil != nil) {
@@ -94,6 +108,12 @@
 	return false;
     }
 
+    /**
+     * Prints firewall summary for zones
+     *
+     * @param map options
+     * @return boolean always false
+     */
     boolean FWCMDSummary (map options) {
 	// printing summary
 
@@ -118,6 +138,11 @@
 	return false;
     }
 
+    /**
+     * Sets startup details
+     *
+     * @return boolean always true
+     */
     boolean FWCMDStartup (map options) {
 	if (options["atboot"]:nil!=nil && options["manual"]:nil!=nil) {
 	    // TRANSLATORS: CommandLine error message
@@ -158,6 +183,12 @@
 	return true;
     }
 
+    /**
+     * Sets network interface assignment
+     *
+     * @param map options
+     * @return boolean whether write call is needed
+     */
     boolean FWCMDInterfaces (map options) {
 	list <string> unassigned_interfaces = [];
 	map <string, map <string, string> > interfaces = $[];
@@ -259,6 +290,12 @@
 	return true;
     }
 
+    /**
+     * Sets logging details
+     *
+     * @param map options
+     * @return boolean whether write is needed
+     */
     boolean FWCMDLogging (map options) {
 	map <string, string> logging_meaning = $[
 	    // TRANSLATORS: CommandLine table item
@@ -379,6 +416,12 @@
 	}
     }
 
+    /**
+     * Sets broadcast
+     *
+     * @param map options
+     * @return boolean if write is needed
+     */
     boolean FWCMDBroadcast (map options) {
 	if (options["show"]:nil!=nil) {
 	    // all zones if no zone is defined
@@ -468,6 +511,9 @@
 	return false;
     }
 
+    /**
+     * Prints all known firewall services
+     */
     void FWCMDServicesList() {
 	CommandLine::Print("");
 	// TRANSLATORS: CommandLine header
@@ -488,6 +534,12 @@
 	CommandLine::Print("");
     }
 
+    /**
+     * Prints currently allowed services
+     *
+     * @param list <string> for_zones
+     * @param boolean detailed
+     */
     void FWCMDServicesShow (list <string> for_zones, boolean detailed) {
 	map <string, string> known_services = SuSEFirewallServices::GetSupportedServices();
 	boolean protect_from_INT = SuSEFirewall::GetProtectFromInternalZone();
@@ -623,6 +675,13 @@
 	CommandLine::Print("");
     }
 
+    /**
+     * Adds/removes services to/from zone.
+     *
+     * @param string action ("add" or "remove")
+     * @param  string zone
+     * @param list <string> services
+     */
     void FWCMDServicesDefinedServicesManagement(string action, string zone, list <string> services) {
 	foreach (string service, services, {
 	    if (!SuSEFirewallServices::IsKnownService(service)) {
@@ -640,6 +699,15 @@
 	    SuSEFirewall::SetServicesForZones(services, [zone], false);
 	}
     }
+
+    /**
+     * Adds/removes ports to/from zone.
+     *
+     * @param string action ("add" or "remove")
+     * @param string zone
+     * @param list <string> ports_or_protocols
+     * @param string type
+     */
     void FWCMDServicesAdditionalPortsManagement(string action, string zone, list <string> ports_or_protocols, string type) {
 	map <string, string> types = $[
 	    "tcpport"		: "TCP",
@@ -664,6 +732,12 @@
 	}
     }
 
+    /**
+     * Sets protect-from value
+     *
+     * @param string zone (only "INT" is supported)
+     * @param string protect "yes" or "no"
+     */
     void FWCMDServicesProtect(string zone, string protect) {
 	protect = tolower(protect);
 	if (!contains(["yes","no"], protect)) {
@@ -680,6 +754,12 @@
 	SuSEFirewall::SetProtectFromInternalZone(protect=="yes");
     }
 
+    /**
+     * Overall handler function for services
+     *
+     * @param map options
+     * @return boolean whether write call is needed
+     */
     boolean FWCMDServices (map options) {
 	// listing all known defined services
 	if (options["list"]:nil!=nil) {
@@ -744,6 +824,11 @@
 	}
     }
 
+    /**
+     * Prints the table of the current redirect-to-masquerade rules
+     *
+     * @param map options
+     */
     void FWCMDMasqRedirectShow (map options) {
 	CommandLine::Print("");
 	// TRANSLATORS: CommandLine header
@@ -794,6 +879,12 @@
 	CommandLine::Print("");
     }
 
+    /**
+     * Overall handler for redirect to masqueraded network
+     *
+     * @param map options
+     * @return boolean whether write call is needed
+     */
     boolean FWCMDMasqRedirect (map options) {
 	if (options["show"]:nil!=nil) {
 	    FWCMDMasqRedirectShow(options);
@@ -864,6 +955,12 @@
 	}
     }
 
+    /**
+     * Overall masquerade-related handler
+     *
+     * @param map options
+     * @return boolean whether write call is needed
+     */
     boolean FWCMDMasquerade (map options) {
 	if (options["show"]:nil!=nil) {
 	    CommandLine::Print("");
