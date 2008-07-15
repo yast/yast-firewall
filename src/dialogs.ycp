@@ -271,7 +271,7 @@
 	    "screens"		: tabs,
 	    "widget_descr"	: widgets_handling,
 	    "back_button"	: Label::BackButton(),
-	    "abort_button"	: Label::AbortButton(),
+	    "abort_button"	: Label::CancelButton(),
 	    // if 'normal' or 'installation', [Next] button, else [OK]
 	    "next_button"	: (Mode::normal() ?
 		Label::NextButton () : Label::OKButton ()
@@ -289,6 +289,7 @@
 	    Label::BackButton (),
 	    (Mode::normal() ? Label::FinishButton() : Label::OKButton ())
 	);
+	Wizard::SetAbortButton (`abort, Label::CancelButton());
 	SetFirewallIcon();
 	UI::ChangeWidget(`id(`back), `Enabled, true);
 

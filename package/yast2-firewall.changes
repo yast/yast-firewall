@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Jul 15 18:37:56 CEST 2008 - locilka@suse.cz
+
+- SuSEFirewallUI YCP module marked as internal.
+- Using [Cancel] instead of [Abort].
+
+-------------------------------------------------------------------
 Tue Jul  8 11:30:47 CEST 2008 - locilka@suse.cz
 
 - Explicitely enabling functionality that offers to install

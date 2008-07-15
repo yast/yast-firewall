@@ -5,8 +5,9 @@
  * Package:	Firewall configuration
  * Summary:	UI for Firewall (Only for Firewall)
  * Authors:	Lukas Ocilka <locilka@suse.cz>
+ * Internal
  *
- * $Id: $
+ * $Id:$
  */
 
 {

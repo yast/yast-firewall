@@ -12,6 +12,7 @@
 {
     import "Wizard";
     import "Sequencer";
+    import "Label";
 
     include "firewall/complex.ycp";
     include "firewall/dialogs.ycp";
@@ -72,6 +73,7 @@
 	];
 
 	Wizard::CreateDialog();
+	Wizard::SetAbortButton (`abort, Label::CancelButton());
 	SetFirewallIcon();
 
 	any ret = Sequencer::Run(aliases, sequence);
