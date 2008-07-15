@@ -1,7 +1,8 @@
 -------------------------------------------------------------------
 Tue Jul 15 18:37:56 CEST 2008 - locilka@suse.cz
 
-- SuSEFirewallUI YCP module marked as internal.
+- SuSEFirewallUI and SuSEFirewallCMDLine YCP modules marked as
+  internal.
 - Using [Cancel] instead of [Abort].
 
 -------------------------------------------------------------------

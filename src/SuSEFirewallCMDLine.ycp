@@ -5,6 +5,7 @@
  * Package:	Firewall configuration
  * Summary:	Command Line for YaST2 Firewall (Only for Firewall)
  * Authors:	Lukas Ocilka <locilka@suse.cz>
+ * Internal
  *
  * $Id$
  */
