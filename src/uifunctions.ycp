@@ -1083,8 +1083,16 @@ Use the port number instead of the port name.
     void InitIPsecSupport (string key) {
 	SetFirewallIcon();
 	
-	boolean supported = SuSEFirewall::IsServiceSupportedInZone("ipsec", "EXT");
-	UI::ChangeWidget(`id("ispsec_support"), `Value, supported);
+	// FIXME: check whether such service exists
+	boolean supported = SuSEFirewall::IsServiceSupportedInZone("service:ipsec", "EXT");
+
+	if (supported == nil) {
+	    y2error ("No such service 'service:ipsec'");
+	    UI::ChangeWidget(`id("ispsec_support"), `Enabled, false);
+	} else {
+	    UI::ChangeWidget(`id("ispsec_support"), `Enabled, true);
+	    UI::ChangeWidget(`id("ispsec_support"), `Value, supported);
+	}
     }    
 
     symbol HandleIPsecSupport (string key, map event) {

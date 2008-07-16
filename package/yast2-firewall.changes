@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Wed Jul 16 18:50:14 CEST 2008 - locilka@suse.cz
+
+- No more built-in YaST Firewall services...
+
+-------------------------------------------------------------------
 Tue Jul 15 18:37:56 CEST 2008 - locilka@suse.cz
 
 - SuSEFirewallUI and SuSEFirewallCMDLine YCP modules marked as
