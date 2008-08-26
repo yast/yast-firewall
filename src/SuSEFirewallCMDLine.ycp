@@ -1025,7 +1025,7 @@
 		"example" : [
 		    "services show detailed",
 		    "services set protect=yes zone=INT",
-		    "services add service=dhcp-server zone=EXT",
+		    "services add service=service:dhcp-server zone=EXT",
 		    "services remove ipprotocol=esp tcpport=12,13,ipp zone=DMZ",
 		],
 	    ],
