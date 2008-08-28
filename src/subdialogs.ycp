@@ -103,9 +103,9 @@
 		    )
 		),
 		`VSpacing(1),
-		`HBox (
-		    `PushButton(`id("ok"), Label::OKButton()),
-		    `PushButton(`id("cancel"), Label::CancelButton())
+		`ButtonBox (
+		    `PushButton (`id("ok"), `opt (`okButton, `default, `key_F10), Label::OKButton()),
+		    `PushButton (`id("cancel"), `opt (`cancelButton, `key_F9), Label::CancelButton())
 		)
 	    )
 	);
@@ -121,29 +121,9 @@
 
 	foreach (string zone_id, map <string, string> zone_attributes, zones_additons, {
 	    user_defined_zones = add(user_defined_zones,
-		`TextEntry(`id("zone_additions_" + zone_id), zone_attributes["name"]:"", zone_attributes["items"]:"")
+		`InputField (`id("zone_additions_" + zone_id), `opt (`hstretch), zone_attributes["name"]:"", zone_attributes["items"]:"")
 	    );
 	});
-
-	term network_manager = `Empty();
-	//if (NetworkService::IsManaged()) {
-	//    network_manager = `VBox (
-	//	`Left (
-	//	    `Label (
-	//		sformat(
-	//		    // TRANSLATORS: an informative text in a popup dialog, more newlines are allowed
-	//		    //              %1 is the 'any' string (by default)
-	//		    //              %2 is the name of the EXT zone (by default)
-	//		    _("You are currently using NetworkManager.
-//You need to have a string '%1' in the zone '%2'
-//to get a working configuration."),
-	//		    SuSEFirewall::special_all_interface_string, SuSEFirewall::GetZoneFullName(SuSEFirewall::special_all_interface_zone)
-	//		)
-	//	    )
-	//	),
-	//	`VSpacing(1)
-	//    );
-	//}
 
 	term dialog = `Frame (
 	    // TRANSLATORS: frame label
@@ -151,13 +131,12 @@
 	    `VBox (
 		`HStretch(),
 		`VSpacing(1),
-		network_manager,
 		user_defined_zones,
 		`VSpacing(1),
 		`VSpacing(1),
-		`HBox (
-		    `PushButton(`id("ok"), Label::OKButton()),
-		    `PushButton(`id("cancel"), Label::CancelButton())
+		`ButtonBox (
+		    `PushButton (`id ("ok"), `opt (`okButton, `default, `key_F10), Label::OKButton()),
+		    `PushButton (`id ("cancel"), `opt (`cancelButton, `key_F9), Label::CancelButton())
 		)
 	    )
 	);
@@ -307,17 +286,17 @@
 		    // TRANSLATORS: label, %1 is a zone name like "External Zone"
 		    `Left ( `Label(sformat(_("Settings for Zone: %1"), zone_name)) ),
 		    // TRANSLATORS: text entry
-		    `TextEntry(`id("additional_tcp"), _("&TCP Ports")),
+		    `InputField (`id("additional_tcp"), `opt (`hstretch), _("&TCP Ports")),
 		    // TRANSLATORS: text entry
-		    `TextEntry(`id("additional_udp"), _("&UDP Ports")),
+		    `InputField (`id("additional_udp"), `opt (`hstretch), _("&UDP Ports")),
 		    // TRANSLATORS: text entry
-		    `TextEntry(`id("additional_rpc"), _("&RPC Ports")),
+		    `InputField (`id("additional_rpc"), `opt (`hstretch), _("&RPC Ports")),
 		    // TRANSLATORS: text entry
-		    `TextEntry(`id("additional_ip"),  _("&IP Protocols")),
+		    `InputField (`id("additional_ip"), `opt (`hstretch), _("&IP Protocols")),
 		    `VSpacing(1),
-		    `HBox (
-			`PushButton(`id("ok"), Label::OKButton()),
-			`PushButton(`id("cancel"), Label::CancelButton())
+		    `ButtonBox (
+			`PushButton(`id("ok"), `opt(`okButton, `key_F10, `default), Label::OKButton()),
+			`PushButton(`id("cancel"), `opt  (`cancelButton, `key_F9), Label::CancelButton())
 		    )
 		)
 	    ))
@@ -452,7 +431,7 @@
 			    `item( `id("0/0"), "0/0")
 			]),
 			// TRANSLATORS: text entry
-			`TextEntry (`id("add_requested_ip"), _("Re&quested IP"))
+			`InputField (`id("add_requested_ip"), `opt (`hstretch), _("Re&quested IP"))
 		    ),
 		    `VBox (
 			// TRANSLATORS: select box
@@ -461,7 +440,7 @@
 			    `item( `id("udp"), "UDP")
 			]),
 			// TRANSLATORS: text entry
-			`TextEntry (`id("add_requested_port"), _("R&equested Port"))
+			`InputField (`id("add_requested_port"), `opt (`hstretch), _("R&equested Port"))
 		    )
 		),
 		`VSpacing(1),
@@ -469,14 +448,14 @@
 		`Left( `Label(_("Redirection:")) ),
 		`HBox (
 		    // TRANSLATORS: text entry
-		    `TextEntry (`id("add_redirectto_ip"), _("Re&direct to Masqueraded IP")),
+		    `InputField (`id("add_redirectto_ip"), `opt (`hstretch), _("Re&direct to Masqueraded IP")),
 		    // TRANSLATORS: text entry
-		    `TextEntry (`id("add_redirectto_port"), _("&Redirect to Port"))
+		    `InputField (`id("add_redirectto_port"), `opt (`hstretch), _("&Redirect to Port"))
 		),
 		`VSpacing(1),
-		`HBox (
-		    `PushButton(`id("ok"), Label::AddButton()),
-		    `PushButton(`id("cancel"), Label::CancelButton())
+		`ButtonBox (
+		    `PushButton (`id ("ok"), `opt (`okButton, `default, `key_F10), Label::AddButton()),
+		    `PushButton (`id ("cancel"), `opt (`cancelButton, `key_F9), Label::CancelButton())
 		)
 	    )
 	);
@@ -880,9 +859,9 @@
 		    )
 		),
 		`VSpacing(1),
-		`HBox (
-		    `PushButton(`id("ok"), Label::OKButton()),
-		    `PushButton(`id("cancel"), Label::CancelButton())
+		`ButtonBox (
+		    `PushButton (`id ("ok"), `opt (`okButton, `default, `key_F10), Label::OKButton()),
+		    `PushButton (`id ("cancel"), `opt (`cancelButton, `key_F9), Label::CancelButton())
 		)
 	    )
 	);
@@ -942,22 +921,22 @@
 	    `Frame (
 		_("Add New Allowing Rule"),
 		`VBox (
-		    `TextEntry(`id("add_source_network"), _("Source &Network")),
+		    `InputField (`id("add_source_network"), `opt (`hstretch), _("Source &Network")),
 		    `Left (`ComboBox (`id("add_protocol"), _("&Protocol"), [
 			`item( `id("tcp"),	 SuSEFirewall::GetProtocolTranslatedName("tcp")),
 		        `item( `id("udp"),	 SuSEFirewall::GetProtocolTranslatedName("udp")),
 			`item( `id("_rpc_"), SuSEFirewall::GetProtocolTranslatedName("_rpc_")),
 		    ])),
-		    `TextEntry (`id("add_destination_port"), _("&Destination Port (Optional)")),
-		    `TextEntry (`id("add_source_port"), _("&Source Port (Optional)"))
+		    `InputField (`id("add_destination_port"), `opt (`hstretch), _("&Destination Port (Optional)")),
+		    `InputField (`id("add_source_port"), `opt (`hstretch), _("&Source Port (Optional)"))
 		)
 	    ),
 
 	    `VSpacing(1),
 
-	    `HBox (
-		`PushButton(`id("ok"), Label::AddButton()),
-		`PushButton(`id("cancel"), Label::CancelButton())
+	    `ButtonBox (
+		`PushButton (`id ("ok"), `opt (`okButton, `default, `key_F10), Label::AddButton()),
+		`PushButton (`id ("cancel"), `opt (`cancelButton, `key_F9), Label::CancelButton())
 	    )
 	);
     }

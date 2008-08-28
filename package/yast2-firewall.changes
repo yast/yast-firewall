@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Thu Aug 28 14:06:47 CEST 2008 - locilka@suse.cz
+
+- Pup-up dialogs adapted to new ButtonBox widget (FATE #303446).
+- TextEntry -> InputField.
+- Adapted RPM dependencies.
+- 2.17.2
+
+-------------------------------------------------------------------
 Wed Jul 16 18:50:14 CEST 2008 - locilka@suse.cz
 
 - No more built-in YaST Firewall services...

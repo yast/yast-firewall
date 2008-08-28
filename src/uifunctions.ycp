@@ -1512,10 +1512,9 @@ Stop the firewall after the new configuration is written?"))) {
 		    `HWeight (1, `InputField (`id (`port), `opt (`disabled), _("Po&rt"), ""))
 		)),
 		`VSpacing (1),
-		`HBox (
-		    `PushButton (`id (`ok), Label::AddButton()),
-		    `VSpacing (1),
-		    `PushButton (`id (`cancel), Label::CancelButton())
+		`ButtonBox (
+		    `PushButton (`id (`ok), `opt (`okButton, `default, `key_F10), Label::AddButton()),
+		    `PushButton (`id (`cancel), `opt (`cancelButton, `key_F9), Label::CancelButton())
 		)
 	    )
 	);
