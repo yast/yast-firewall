@@ -618,7 +618,7 @@ Really use the current settings?"), services_definition)
 		
 		ret_value = true;
 		break;
-	    } else if (ret == "cancel") {
+	    } else if (ret == "cancel" || ret == `cancel) {
 		ret_value = false;
 		break;
 	    }
@@ -983,7 +983,7 @@ Use the port number instead of the port name.
 	while (true) {
 	    any ret = UI::UserInput();
 
-	    if (ret == "cancel") {
+	    if (ret == "cancel" || ret == `cancel) {
 		break;
 	    } else if (ret == "ok") {
 
@@ -1300,7 +1300,7 @@ Stop the firewall after the new configuration is written?"))) {
 	while (true) {
 	    any ret = UI::UserInput();
 
-	    if (ret == "cancel") {
+	    if (ret == "cancel" || ret == `cancel) {
 		break;
 	    } else if (ret == "ok") {
 		if (!CheckExistency("add_source_network"))	continue;
