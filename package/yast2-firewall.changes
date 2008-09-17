@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Wed Sep 17 13:32:35 CEST 2008 - locilka@suse.cz
+
+- Fixed button labels, helps, confirmation when deleting a selected
+  entry and enabling/disabling buttons considering the data listed
+  in tables - all according to YaST Style Guide (bnc #421049).
+- 2.17.4
+
+-------------------------------------------------------------------
 Wed Sep 10 16:42:03 CEST 2008 - locilka@suse.cz
 
 - Handling pop-up window close button (`cancel) (bnc #419101).

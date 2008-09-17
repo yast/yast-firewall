@@ -225,7 +225,7 @@
 		    `VSpacing( 1.1 ),
 		    `PushButton ( `id ( "add_allowed_service" ), `opt ( `hstretch ), " " + Label::AddButton() + " "),
 
-		    `PushButton ( `id ( "remove_allowed_service" ), `opt ( `hstretch ), " " + Label::RemoveButton() + " "),
+		    `PushButton ( `id ( "remove_allowed_service" ), `opt ( `hstretch ), " " + Label::DeleteButton() + " "),
 
 		    `Empty(`opt(`vstretch)),
 
@@ -263,7 +263,7 @@
 		),
 		`HBox (
 		    `PushButton(`id("add_redirect_to_masquerade"), Label::AddButton()),
-		    `PushButton(`id("remove_redirect_to_masquerade"), Label::RemoveButton()),
+		    `PushButton(`id("remove_redirect_to_masquerade"), Label::DeleteButton()),
 		    `HStretch()
 		)
 	    )
@@ -328,7 +328,7 @@
  *		`VSquash (
  *		    `HBox (
  *			`PushButton(`id("add_masquerade_network"), Label::AddButton()),
- *			`PushButton(`id("remove_masquerade_network"), Label::RemoveButton())
+ *			`PushButton(`id("remove_masquerade_network"), Label::DeleteButton())
  *		    )
  *		)
  *	    )
@@ -366,7 +366,7 @@
  *			    `item( `id("0/0"), "0/0")
  *			]),
  *			// TRANSLATORS: text entry
- *			`TextEntry (`id("add_destination_port"), _("Port"))
+ *			`InputField (`id("add_destination_port"), `opt (`hstretch), _("Port"))
  *		    ))
  *		),
  *		`VSpacing(1),
@@ -407,7 +407,7 @@
 		),
 		`HBox (
 		    `PushButton(`id("add_redirect_to_masquerade"), Label::AddButton()),
-		    `PushButton(`id("remove_redirect_to_masquerade"), Label::RemoveButton()),
+		    `PushButton(`id("remove_redirect_to_masquerade"), Label::DeleteButton()),
 		    `HStretch()
 		)
 	    )
@@ -489,7 +489,7 @@
  *		`VSquash (
  *		    `HBox (
  *			`PushButton(`id("add_transparent_redirection"), Label::AddButton()),
- *			`PushButton(`id("remove_transparent_redirection"), Label::RemoveButton())
+ *			`PushButton(`id("remove_transparent_redirection"), Label::DeleteButton())
  *		    )
  *		)
  *	    )
@@ -529,12 +529,12 @@
  *			])
  *		    ),
  *		    `HWeight ( 10,
- *			`TextEntry (`id("add_destination_port"), _("Requested Port"))
+ *			`InputField (`id("add_destination_port"), `opt (`hstretch), _("Requested Port"))
  *		    )
  *		),
  *		`VSpacing(1),
  *		`Left ( `Label(_("Transparently Redirect To:")) ),
- *		`TextEntry (`id("add_localredirect_port"), _("Local Port On 127.0.0.1")),
+ *		`InputField (`id("add_localredirect_port"), `opt (`hstretch), _("Local Port On 127.0.0.1")),
  *		`VSpacing(1),
  *		`HBox (
  *		    `PushButton(`id("ok"), Label::AddButton()),
@@ -572,7 +572,7 @@
  *		`VSquash (
  *		    `HBox (
  *			`PushButton(`id("add_forward_network"), Label::AddButton()),
- *			`PushButton(`id("remove_forward_network"), Label::RemoveButton())
+ *			`PushButton(`id("remove_forward_network"), Label::DeleteButton())
  *		    )
  *		)
  *	    )
@@ -615,7 +615,7 @@
  *			])
  *		    ),
  *		    `HWeight ( 10,
- *			`TextEntry (`id("add_port"), _("Port"))
+ *			`InputField (`id("add_port"), `opt (`hstretch), _("Port"))
  *		    )
  *		),
  *		`VSpacing(1),
@@ -658,7 +658,7 @@
  *		`Left (
  *		    `HBox (
  *			// FIXME: fake frequency
- *			`HVSquash ( `TextEntry (`id("frequency"), _("Frequency"), "3")),
+ *			`HVSquash ( `InputField (`id("frequency"), `opt (`hstretch), _("Frequency"), "3")),
  *			`VBox ( `Label(""), `Label ("/") ),
  *			`ComboBox (`id("unit"),	 _("Unit"), [
  *			    `item(`id("second"), _("Second")),
@@ -671,7 +671,7 @@
  *		`Left (
  *		    `HBox (
  *			// FIXME: fake log file
- *			`TextEntry (`id("file_name"), Label::FileName(), "/var/log/SuSEfirewall2"),
+ *			`InputField (`id("file_name"), `opt (`hstretch), Label::FileName(), "/var/log/SuSEfirewall2"),
  *			`VBox ( `Label(""), `PushButton (`id("browse_logfile"), Label::BrowseButton()) )
  *		    )
  *		)
@@ -795,7 +795,7 @@
  *			])
  *		    ),
  *		    `HWeight ( 1,
- *			`TextEntry (`id("htb_unit"), `opt(`hsquash), _("kbit/sec."))
+ *			`InputField (`id("htb_unit"), `opt(`hsquash), _("kbit/sec."))
  *		    )
  *		)
  *	    )
@@ -907,7 +907,7 @@
 		),
 		`HBox (
 		    `PushButton(`id("add_custom_rule"), Label::AddButton()),
-		    `PushButton(`id("remove_custom_rule"), Label::RemoveButton()),
+		    `PushButton(`id("remove_custom_rule"), Label::DeleteButton()),
 		    `HStretch ()
 		)
 	    )

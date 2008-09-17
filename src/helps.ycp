@@ -57,7 +57,7 @@ Networks are divided into firewall zones.</p>
 
 <p>To allow a service, select the <b>Zone</b> and the
 <b>Service to Allow</b> then press <b>Add</b>.
-To remove an allowed service, select the <b>Zone</b> and the <b>Allowed Service</b> then press <b>Remove</b>.</p>
+To remove an allowed service, select the <b>Zone</b> and the <b>Allowed Service</b> then press <b>Delete</b>.</p>
 
 <p>By deselecting <b>Protect Firewall from Internal Zone</b>, remove 
 protection from the zone. All services and ports would be unprotected from this zone.</p>
@@ -89,7 +89,7 @@ Although requests from the external network cannot reach your internal network, 
 transparently redirect any requested ports on your firewall to any internal IP.  
 To add a new redirect rule, press <b>Add</b> and complete the redirect form.</p>
 
-<p>To removed any redirect rule, select it in the table and press <b>Remove</b>.</p>
+<p>To removed any redirect rule, select it in the table and press <b>Delete</b>.</p>
 "),
 
 	// TRANSLATORS: Simple broadcast configuration dialog help

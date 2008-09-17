@@ -702,6 +702,10 @@ Really use the current settings?"), services_definition)
 
 	// disable or enable buttons, selectboxes, table
 	RedrawAllowedServicesDialog(current_zone);
+
+	if (size (allowed_services) == 0) {
+	    UI::ChangeWidget(`id("remove_allowed_service"), `Enabled, false);
+	}
     }
 
     void InitAllowedServices (string key) {
@@ -750,9 +754,11 @@ Really use the current settings?"), services_definition)
 	    SuSEFirewall::SetServicesForZones([add_service], [current_zone], true);
 	    RedrawAllowedServices (current_zone);
 	} else if (ret == "remove_allowed_service") {
-	    string remove_service = (string) UI::QueryWidget(`id("table_allowed_services"), `CurrentItem);
-	    SuSEFirewall::SetServicesForZones([remove_service], [current_zone], false);
-	    RedrawAllowedServices (current_zone);
+	    if (Confirm::DeleteSelected()) {
+		string remove_service = (string) UI::QueryWidget(`id("table_allowed_services"), `CurrentItem);
+		SuSEFirewall::SetServicesForZones([remove_service], [current_zone], false);
+		RedrawAllowedServices (current_zone);
+	    }
 	} else if (ret == "advanced_allowed_service") {
 	    // redraw when "OK" button pressed
 	    if (HandlePopupAdditionalServices(current_zone)) {
@@ -1138,7 +1144,7 @@ Use the port number instead of the port name.
 	    replace_dialog = add(replace_dialog,
 		`HBox(
 		    `HWeight( 40,
-			`TextEntry(`id("bcast_ports_" + zone), zone_name, ports_for_zone)
+			`InputField (`id("bcast_ports_" + zone), `opt (`hstretch), zone_name, ports_for_zone)
 		    ),
 		    `HWeight( 60,
 			`VBox (
@@ -1435,6 +1441,9 @@ Stop the firewall after the new configuration is written?"))) {
 
 	if (UI::WidgetExists (`id ("table_broadcastreply")))
 	    UI::ChangeWidget (`id ("table_broadcastreply"), `Items, items);
+
+	if (UI::WidgetExists (`id (`delete_br)))
+	    UI::ChangeWidget (`id (`delete_br), `Enabled, (size (items) != 0));
     }
 
     void InitBroadcastReply (string key) {
