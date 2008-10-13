@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Oct 13 10:00:42 CEST 2008 - locilka@suse.cz
+
+- Fixed helps broken by proofreading (bnc #430521).
+
+-------------------------------------------------------------------
 Wed Sep 17 13:32:35 CEST 2008 - locilka@suse.cz
 
 - Fixed button labels, helps, confirmation when deleting a selected
