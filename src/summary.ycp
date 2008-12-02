@@ -57,7 +57,7 @@
 	if (SuSEFirewallUI::simple_text_output) {
 	    return String::UnderlinedHeader(SuSEFirewall::GetZoneFullName(zone_id),0);
 	} else {
-	    return "\n<h2>" + SuSEFirewall::GetZoneFullName(zone_id) + "</h2>\n";
+	    return "\n<h2>" + String::EscapeTags (SuSEFirewall::GetZoneFullName(zone_id)) + "</h2>\n";
 	}
     }
 
@@ -114,10 +114,10 @@
 		ret_summary = ret_summary +
 		    li_start + " " +
 		    (interface_id_to_name[interface_id]:"" != "" ?
-			interface_id_to_name[interface_id]:"" + " / "
+			String::EscapeTags (interface_id_to_name[interface_id]:"") + " / "
 			:
 			""
-		    ) + interface_id + li_end + "\n";
+		    ) + String::EscapeTags (interface_id) + li_end + "\n";
 	    });
 	    foreach (string spec_interface, special_interfaces, {
 		ret_summary = ret_summary +
@@ -182,10 +182,10 @@
 	// Broadcast (UDP)
 	if (size (broadcast_ports) > 0) {
 	    broadcast_ports = maplist (string broadcast_port, broadcast_ports, {
-		return UserReadablePortName (broadcast_port, "UDP");
+		return String::EscapeTags (UserReadablePortName (broadcast_port, "UDP"));
 	    });
 	    ret = ret +
-		li_start + protocol_type_names["BRD"]:"" + ": " +  mergestring (broadcast_ports, ", ") + li_end + "\n";
+		li_start + protocol_type_names["BRD"]:"" + ": " +  String::EscapeTags (mergestring (broadcast_ports, ", ")) + li_end + "\n";
 	}
 
 	if (ret == "")
@@ -225,7 +225,7 @@
 		    if (SuSEFirewall::IsServiceSupportedInZone (service_id, zone_id)) {
 			open_services = open_services +
 			    li_start +
-			    service_name + (show_details ? ":":"") +
+			    String::EscapeTags (service_name) + (show_details ? ":":"") +
 			    li_end +
 			    (show_details ? ShowServiceDetails (service_id):"") +
 			    "\n";
@@ -236,7 +236,7 @@
 		    string additional_services = mergestring(SuSEFirewall::GetAdditionalServices(protocol, zone_id), ", ");
 		    if (additional_services == "") return;
 		    open_services = open_services +
-			li_start + protocol_type_names[protocol]:"" + ": " + additional_services + li_end + "\n";
+			li_start + protocol_type_names[protocol]:"" + ": " + String::EscapeTags (additional_services) + li_end + "\n";
 		});
 
 		ret_val = ret_val + ul_start + (open_services != "" ?
@@ -281,10 +281,10 @@
 		string proto = one_rule["protocol"]:"tcp";
 		string one_rule_s = li_start + sformat (
 			_("Network: <i>%1</i>, Protocol: <i>%2</i>, Destination port: <i>%3</i>, Source port: <i>%4</i>"),
-			one_rule["network"]:_("All"),
-			SuSEFirewall::GetProtocolTranslatedName (one_rule["protocol"]:_("All")),
-			(one_rule["dport"]:"" != "" ? UserReadablePortName (one_rule["dport"]:"", proto) : _("All")),
-			(one_rule["sport"]:"" != "" ? UserReadablePortName (one_rule["sport"]:"", proto) : _("All"))
+			String::EscapeTags (one_rule["network"]:_("All")),
+			String::EscapeTags (SuSEFirewall::GetProtocolTranslatedName (one_rule["protocol"]:_("All"))),
+			(one_rule["dport"]:"" != "" ? String::EscapeTags (UserReadablePortName (one_rule["dport"]:"", proto)) : _("All")),
+			(one_rule["sport"]:"" != "" ? String::EscapeTags (UserReadablePortName (one_rule["sport"]:"", proto)) : _("All"))
 		    ) + li_end;
 		rules = rules + one_rule_s;
 	    });
