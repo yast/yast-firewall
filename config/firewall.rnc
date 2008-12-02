@@ -6,6 +6,7 @@ y2_firewall =
   fw_allow_fw_traceroute
   | fw_autoprotect_services
   | FW_DEV_EXT
+  | FW_ALLOW_FW_TRACEROUTE
   | FW_DEV_INT
   | FW_DEV_DMZ
   | fw_ipsec_trust
@@ -60,6 +61,7 @@ FW_CONFIGURATIONS_EXT = element FW_CONFIGURATIONS_EXT { text }
 FW_CONFIGURATIONS_INT = element FW_CONFIGURATIONS_INT { text }
 FW_LOAD_MODULES = element FW_LOAD_MODULES { text }
 fw_allow_fw_traceroute = element fw_allow_fw_traceroute { text }
+FW_ALLOW_FW_TRACEROUTE = element FW_ALLOW_FW_TRACEROUTE { text }
 fw_autoprotect_services = element fw_autoprotect_services { text }
 FW_DEV_EXT = element FW_DEV_EXT { text }
 FW_DEV_INT = element FW_DEV_INT { text }
