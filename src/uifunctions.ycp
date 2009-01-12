@@ -694,6 +694,16 @@ Really use the current settings?"), services_definition)
 	    });
 	}
 
+	// BNC #461790: A better sorting
+	allowed_services = sort (term x, term y, allowed_services,
+	    ``(tolower(x[1]:"a") <= tolower(y[1]:"b"))
+	);
+	not_allowed_services = sort (term x, term y, not_allowed_services,
+	    ``(tolower(x[1]:"a") <= tolower(y[1]:"b"))
+	);
+
+	y2milestone ("%1", not_allowed_services);
+
 	UI::ChangeWidget(`id("table_allowed_services"), `Items, allowed_services);
 	UI::ReplaceWidget(`id("allow_service_names_replacepoint"),
 	    // TRANSLATORS: select box
