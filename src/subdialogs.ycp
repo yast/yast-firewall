@@ -207,7 +207,7 @@
 
 		    `Table (
 			`id("table_allowed_services"),
-			`opt(`hstretch, `vstretch),
+			`opt(`hstretch, `vstretch, `keepSorting),
 			`header (
 			    // TRANSLATORS: table header item
 			    _("Allowed Service")
