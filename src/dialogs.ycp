@@ -116,6 +116,9 @@
 	    "handle"		: HandleBroadcastReply,
 	    "help"		: HelpForDialog("broadcast-reply"),
 	],
+/*
+	IPsec is not supported any more (no service defined by package)
+
 	"IPsecSupport"		: $[
 	    "widget"		: `custom,
 	    "custom_widget"	: `VBox(),
@@ -124,6 +127,7 @@
 	    "store"		: StoreIPsecSupport,
 	    "help"		: HelpForDialog("base-ipsec-support"),
 	],
+*/
 	"LoggingLevel"		: $[
 	    "widget"		: `custom,
 	    "custom_widget"	: `VBox(),
@@ -223,6 +227,9 @@
 	    "tree_item_label"	: _("Broadcast"),
 	    "widget_names"	: [ "DisableBackButton", "BroadcastConfigurationSimple", "BroadcastReply" ]
 	],
+/*
+	IPsec is not supported any more (no service defined by package)
+
 	"ipsec_support"		: $[
 	    "contents"		: `VBox (
 		IPsecSupport(),
@@ -234,6 +241,7 @@
 	    "tree_item_label"	: _("IPsec Support"),
 	    "widget_names"	: [ "DisableBackButton", "IPsecSupport" ]
 	],
+*/
 	"logging_level"		: $[
 	    "contents"		: `VBox (
 		LoggingLevel(),
@@ -263,7 +271,7 @@
 
     symbol RunFirewallDialogs () {
 	list<string> simple_dialogs = [ "start_up", "interfaces", "allowed_services",
-	    "masquerading", "broadcast_simple", "ipsec_support", "logging_level", "custom_rules" ];
+	    "masquerading", "broadcast_simple", /* "ipsec_support", */ "logging_level", "custom_rules" ];
 
 	return DialogTree::ShowAndRun ($[
 	    "ids_order"		: simple_dialogs,
