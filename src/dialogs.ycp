@@ -35,15 +35,15 @@
 	    //    disabled + stop (after Write())
 	    "set_service_auto_start"	: SetEnableFirewall,
 
-	    // TRANSLATORS: Radio selection
+	    // TRANSLATORS: Radio selection, See #h1
 	    "start_auto_button"		: _("&Enable Firewall Automatic Starting"),
-	    // TRANSLATORS: Radio selection
+	    // TRANSLATORS: Radio selection, See #h2
 	    "start_manual_button"	: _("&Disable Firewall Automatic Starting"),
 	    "help"			: sformat(CWMServiceStart::AutoStartHelpTemplate (),
-		// TRANSLATORS: part of help text - radio button label, NO SHORTCUT!!!
-		_("Enable firewall"),
-		// TRANSLATORS: part of help text - radio button label, NO SHORTCUT!!!
-		_("Disable firewall")
+		// TRANSLATORS: part of help text describind #h1, Do not use any shortcut
+		_("Enable Firewall Automatic Starting"),
+		// TRANSLATORS: part of help text describing #h2, Do not use any shortcut
+		_("Disable Firewall Automatic Starting")
 	    )
 	]),
 	"start_stop" : CWMServiceStart::CreateStartStopWidget ($[

@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Tue Jan 20 14:54:18 CET 2009 - locilka@suse.cz
+
+- Updated help text according to suggestions (bnc #461406).
+
+-------------------------------------------------------------------
 Tue Jan 13 15:22:25 CET 2009 - locilka@suse.cz
 
 - Dropping the IPsec support as it doesn't have service defined by
