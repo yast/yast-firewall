@@ -7,7 +7,7 @@ Tue Jan 20 14:54:18 CET 2009 - locilka@suse.cz
 Tue Jan 13 15:22:25 CET 2009 - locilka@suse.cz
 
 - Dropping the IPsec support as it doesn't have service defined by
-  package yet.
+  package yet (bnc #478487).
 
 -------------------------------------------------------------------
 Mon Jan 12 10:27:26 CET 2009 - locilka@suse.cz
