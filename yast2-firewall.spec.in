@@ -20,7 +20,7 @@ BuildArchitectures:	noarch
 Summary:	YaST2 - Firewall Configuration
 
 %description
--
+A YaST2 module to be used for configuring a firewall.
 
 @PREP@
 
