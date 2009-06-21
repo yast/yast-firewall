@@ -17,7 +17,7 @@ Obsoletes:	yast2-trans-firewall
 
 BuildArchitectures:	noarch
 
-Summary:	Configuration of firewall
+Summary:	YaST2 - Firewall Configuration
 
 %description
 -
