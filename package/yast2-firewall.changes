@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Oct 23 11:55:48 CEST 2009 - kmachalkova@suse.cz
+
+- Enable SSH service if user opts for opening SSH port in fw
+  (bnc#537980)
+- 2.18.1 
+
+-------------------------------------------------------------------
 Tue Jan 20 14:54:18 CET 2009 - locilka@suse.cz
 
 - Updated help text according to suggestions (bnc #461406).
