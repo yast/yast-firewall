@@ -3,6 +3,8 @@ Fri Oct 23 11:55:48 CEST 2009 - kmachalkova@suse.cz
 
 - Enable SSH service if user opts for opening SSH port in fw
   (bnc#537980)
+- Make testsuite pass - Netmask.ycp newly uses different checks for 
+  prefix- and netmask-style defined subnets
 - 2.18.1 
 
 -------------------------------------------------------------------
