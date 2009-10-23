@@ -80,7 +80,7 @@
 	    string network_ip   = regexpsub (network, "^([0123456789\.]+)/[0123456789]+$", "\\1");
 	    string network_mask = regexpsub (network, "^[0123456789\.]+/([0123456789]+)$", "\\1");
 	    
-	    ret = (IP::Check4 (network_ip) && Netmask::CheckPrefix4 (network_mask));
+	    ret = (IP::Check4 (network_ip) && Netmask::Check4 (network_mask));
 
 	// 192.168.0.0/255.255.255.0, 0.8.55/10.258.12
 	} else if (regexpmatch(network, "^[0123456789\.]+/[0123456789\.]+$")) {
