@@ -687,7 +687,7 @@ Really use the current settings?"), services_definition)
 	} else {
 	    foreach (string service_name, string service_id, translations_to_service_ids, {
 		if (SuSEFirewall::IsServiceSupportedInZone(service_id, current_zone)) {
-		    allowed_services = add (allowed_services, `item(`id(service_id), service_name));
+		    allowed_services = add (allowed_services, `item(`id(service_id), service_name, SuSEFirewallServices::GetDescription(service_id)));
 		} else {
 		    not_allowed_services = add (not_allowed_services, `item(`id(service_id), service_name));
 		}
@@ -701,8 +701,6 @@ Really use the current settings?"), services_definition)
 	not_allowed_services = sort (term x, term y, not_allowed_services,
 	    ``(tolower(x[1]:"a") <= tolower(y[1]:"b"))
 	);
-
-	y2milestone ("%1", not_allowed_services);
 
 	UI::ChangeWidget(`id("table_allowed_services"), `Items, allowed_services);
 	UI::ReplaceWidget(`id("allow_service_names_replacepoint"),

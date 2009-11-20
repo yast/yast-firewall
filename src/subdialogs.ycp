@@ -210,7 +210,9 @@
 			`opt(`hstretch, `vstretch, `keepSorting),
 			`header (
 			    // TRANSLATORS: table header item
-			    _("Allowed Service")
+			    _("Allowed Service"),
+			    // TRANSLATORS: table header item
+			    _("Description")
 	    		), []
 		    ),
 

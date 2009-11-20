@@ -4,8 +4,8 @@
 BuildRequires:	perl-XML-Writer update-desktop-files yast2-devtools yast2-testsuite
 BuildRequires:	yast2 >= 2.16.47
 
-# SuSEFirewall::SetInstallPackagesIfMissing, bnc #388773
-Requires:	yast2 >= 2.17.6
+# SuSEFirewallServices::GetDescription
+Requires:	yast2 >= 2.17.76
 
 # ButtonBox widget
 Conflicts:	yast2-ycp-ui-bindings < 2.17.3
