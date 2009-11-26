@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Nov 26 19:20:16 CET 2009 - kmachalkova@suse.cz
+
+- Adapted to new Netmask API - prefix and netmask are now checked
+  by two separate functions
+- 2.19.0 
+
+-------------------------------------------------------------------
 Fri Nov 20 13:12:06 CET 2009 - locilka@suse.cz
 
 - Added description to the list of allowed services (FATE #306804).
