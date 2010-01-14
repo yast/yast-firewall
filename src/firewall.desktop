@@ -19,9 +19,8 @@ X-SuSE-YaST-AutoInstRequires=lan
 X-SuSE-YaST-AutoInstSchema=firewall.rnc
 
 Icon=yast-firewall
-Exec=/sbin/yast2 firewall 
+Exec=xdg-su -c "/sbin/yast2 firewall"
 
 Name=Firewall
 GenericName=Configure a firewall
-X-KDE-SubstituteUID=true
 StartupNotify=true

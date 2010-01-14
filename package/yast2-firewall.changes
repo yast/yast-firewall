@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Wed Jan 13 18:56:03 CET 2010 - kmachalkova@suse.cz
+
+- Adjusted .desktop file(s) to wrap /sbin/yast2/ calls in xdg-su
+  where root privileges are needed, removed X-KDE-SubstituteUID key 
+  (bnc#540627)
+
+-------------------------------------------------------------------
 Thu Nov 26 19:20:16 CET 2009 - kmachalkova@suse.cz
 
 - Adapted to new Netmask API - prefix and netmask are now checked
