@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Apr  2 15:24:40 CEST 2010 - locilka@suse.cz
+
+- Added missing help for accepting-broadcast-reply (BNC #583046).
+- 2.17.9
+
+-------------------------------------------------------------------
 Fri Nov 20 13:12:06 CET 2009 - locilka@suse.cz
 
 - Added description to the list of allowed services (FATE #306804).

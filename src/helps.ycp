@@ -107,6 +107,15 @@ To suppress logging of these packets, deselect <b>Log Not Accepted Broadcast Pac
 for the desired zones.</p>
 "),
 
+	"broadcast-reply" : _("<p><b><big>Broadcast Reply<big></b><br>
+Firewall usually drops packets that are sent by another machines as their reply
+to broadcast packets sent by your system, e.g., Samba browsing or SLP browsing.</p>
+
+<p>Here you can configure which packets are allowed to pass through the firewall. Use <b>Add</b>
+button to add a new rule. You will have to choose the firewall zone and also choose from
+some already defined services or set your rule completely manually.</p>
+"),
+
 	// TRANSLATORS: Base IPsec configuration dialog help
 	"base-ipsec-support" : _("<p><b><big>IPsec Support</big></b>
 <br>IPsec is an encrypted communication between trusted hosts or networks through untrusted networks, such as
@@ -238,7 +247,7 @@ originates from. This entry is optional.</p>"),
     ];
 
     string HelpForDialog (string identification) {
-	return HELPS[identification]:sformat("FIXME: Help for '%1' is missing!", identification);
+	return HELPS[identification]:sformat(_("FIXME: Help for '%1' is missing!"), identification);
     }
 
 /* EOF */
