@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Apr  2 15:24:40 CEST 2010 - locilka@suse.cz
+
+- Added missing help for accepting-broadcast-reply (BNC #583046).
+
+-------------------------------------------------------------------
 Wed Jan 13 18:56:03 CET 2010 - kmachalkova@suse.cz
 
 - Adjusted .desktop file(s) to wrap /sbin/yast2/ calls in xdg-su
