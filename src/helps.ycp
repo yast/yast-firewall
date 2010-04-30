@@ -107,7 +107,7 @@ To suppress logging of these packets, deselect <b>Log Not Accepted Broadcast Pac
 for the desired zones.</p>
 "),
 
-	"broadcast-reply" : _("<p><b><big>Broadcast Reply<big></b><br>
+	"broadcast-reply" : _("<p><b><big>Broadcast Reply</big></b><br>
 Firewall usually drops packets that are sent by another machines as their reply
 to broadcast packets sent by your system, e.g., Samba browsing or SLP browsing.</p>
 
