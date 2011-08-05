@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Aug  5 12:32:00 CEST 2011 - tgoettlicher@suse.de
+
+- fixed .desktop file (bnc #681249)
+
+-------------------------------------------------------------------
 Fri Apr  2 15:24:40 CEST 2010 - locilka@suse.cz
 
 - Added missing help for accepting-broadcast-reply (BNC #583046).
