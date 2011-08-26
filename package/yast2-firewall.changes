@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Aug 26 13:33:57 CEST 2011 - locilka@suse.cz
+
+- Fixed Custom Rules dialog to handle additional flags (bnc#712670)
+
+-------------------------------------------------------------------
 Fri Apr  2 15:24:40 CEST 2010 - locilka@suse.cz
 
 - Added missing help for accepting-broadcast-reply (BNC #583046).

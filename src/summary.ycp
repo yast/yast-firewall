@@ -280,11 +280,12 @@
 	    foreach (map <string, string> one_rule, custom_rules, {
 		string proto = one_rule["protocol"]:"tcp";
 		string one_rule_s = li_start + sformat (
-			_("Network: <i>%1</i>, Protocol: <i>%2</i>, Destination port: <i>%3</i>, Source port: <i>%4</i>"),
+			_("Network: <i>%1</i>, Protocol: <i>%2</i>, Destination port: <i>%3</i>, Source port: <i>%4</i>, Options: <i>%5</i>"),
 			String::EscapeTags (one_rule["network"]:_("All")),
 			String::EscapeTags (SuSEFirewall::GetProtocolTranslatedName (one_rule["protocol"]:_("All"))),
 			(one_rule["dport"]:"" != "" ? String::EscapeTags (UserReadablePortName (one_rule["dport"]:"", proto)) : _("All")),
-			(one_rule["sport"]:"" != "" ? String::EscapeTags (UserReadablePortName (one_rule["sport"]:"", proto)) : _("All"))
+			(one_rule["sport"]:"" != "" ? String::EscapeTags (UserReadablePortName (one_rule["sport"]:"", proto)) : _("All")),
+			(one_rule["options"]:"" != "" ? String::EscapeTags (one_rule["options"]:"") : _("None"))
 		    ) + li_end;
 		rules = rules + one_rule_s;
 	    });

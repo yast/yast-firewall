@@ -903,7 +903,8 @@
 			_("Source Network"),
 			_("Protocol"),
 			_("Destination Port"),
-			_("Source Port")
+			_("Source Port"),
+			_("Options")
 		    ),
 		    []
 		),
@@ -930,7 +931,8 @@
 			`item( `id("_rpc_"), SuSEFirewall::GetProtocolTranslatedName("_rpc_")),
 		    ])),
 		    `InputField (`id("add_destination_port"), `opt (`hstretch), _("&Destination Port (Optional)")),
-		    `InputField (`id("add_source_port"), `opt (`hstretch), _("&Source Port (Optional)"))
+		    `InputField (`id("add_source_port"), `opt (`hstretch), _("&Source Port (Optional)")),
+		    `InputField (`id("add_options"), `opt (`hstretch), _("Additiona &Options (Optional)"))
 		)
 	    ),
 
