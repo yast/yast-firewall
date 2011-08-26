@@ -1244,7 +1244,8 @@ Stop the firewall after the new configuration is written?"))) {
 		    one_rule["network"]:"",
 		    SuSEFirewall::GetProtocolTranslatedName (one_rule["protocol"]:""),
 		    UserReadablePortName (one_rule["dport"]:"", one_rule["protocol"]:""),
-		    UserReadablePortName (one_rule["sport"]:"", "")
+		    UserReadablePortName (one_rule["sport"]:"", ""),
+		    one_rule["options"]:""
 		);
 	    });
 
@@ -1324,6 +1325,7 @@ Stop the firewall after the new configuration is written?"))) {
 		string add_protocol	    = (string) UI::QueryWidget(`id("add_protocol"),	    `Value);
 		string add_destination_port = (string) UI::QueryWidget(`id("add_destination_port"), `Value);
 		string add_source_port      = (string) UI::QueryWidget(`id("add_source_port"),      `Value);
+		string add_options          = (string) UI::QueryWidget(`id("add_options"),          `Value);
 
 		// network is mandatory
 		if (add_source_network == "" || ! CheckNetwork (add_source_network)) {
@@ -1367,8 +1369,9 @@ Stop the firewall after the new configuration is written?"))) {
 		    $[
 			"network"	: add_source_network,
 			"protocol"	: add_protocol,
-			"dport"	: add_destination_port,
-			"sport"	: add_source_port
+			"dport"		: add_destination_port,
+			"sport"		: add_source_port,
+			"options"	: add_options,
 		    ]
 		);
 		

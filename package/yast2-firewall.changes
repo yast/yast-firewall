@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Fri Aug 26 13:33:57 CEST 2011 - locilka@suse.cz
+
+- Fixed Custom Rules dialog to handle additional flags (bnc#712670)
+
+-------------------------------------------------------------------
 Fri Aug  5 12:32:00 CEST 2011 - tgoettlicher@suse.de
 
 - fixed .desktop file (bnc #681249)
