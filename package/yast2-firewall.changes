@@ -2,6 +2,7 @@
 Fri Aug 26 13:33:57 CEST 2011 - locilka@suse.cz
 
 - Fixed Custom Rules dialog to handle additional flags (bnc#712670)
+- 2.21.0
 
 -------------------------------------------------------------------
 Fri Aug  5 12:32:00 CEST 2011 - tgoettlicher@suse.de
