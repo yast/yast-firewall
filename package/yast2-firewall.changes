@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Nov  4 16:21:00 CET 2011 - locilka@suse.cz
+
+- Added function keys for buttons (bnc#595564)
+- 2.17.12
+
+-------------------------------------------------------------------
 Thu Oct 13 10:34:54 CEST 2011 - locilka@suse.cz
 
 - Fixed a typo in text marked for translation (bnc#722459).

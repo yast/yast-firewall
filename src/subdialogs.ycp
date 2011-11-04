@@ -75,9 +75,9 @@
 		),
 		`HBox (
 		    // TRANSLATORS: push button
-		    `PushButton(`id("change_firewall_interface"), _("&Change...")),
+		    `PushButton(`id("change_firewall_interface"), `opt(`key_F4), _("&Change...")),
 		    // TRANSLATORS: push button
-		    `PushButton(`id("user_defined_firewall_interface"), _("C&ustom...")),
+		    `PushButton(`id("user_defined_firewall_interface"), `opt(`key_F7), _("C&ustom...")),
 		    `HStretch ()
 		)
 	    )
@@ -225,14 +225,14 @@
 		),
 		`HSquash( `VBox (
 		    `VSpacing( 1.1 ),
-		    `PushButton ( `id ( "add_allowed_service" ), `opt ( `hstretch ), " " + Label::AddButton() + " "),
+		    `PushButton ( `id ( "add_allowed_service" ), `opt ( `hstretch, `key_F3 ), " " + Label::AddButton() + " "),
 
-		    `PushButton ( `id ( "remove_allowed_service" ), `opt ( `hstretch ), " " + Label::DeleteButton() + " "),
+		    `PushButton ( `id ( "remove_allowed_service" ), `opt ( `hstretch, `key_F5 ), " " + Label::DeleteButton() + " "),
 
 		    `Empty(`opt(`vstretch)),
 
 		    // TRANSLATORS: push button
-		    `PushButton ( `id ( "advanced_allowed_service" ), `opt ( `hstretch ), " " + _("A&dvanced...") + " ")
+		    `PushButton ( `id ( "advanced_allowed_service" ), `opt ( `hstretch, `key_F7 ), " " + _("A&dvanced...") + " ")
 		))
 	    )
 	);
@@ -264,8 +264,8 @@
 		    ), []
 		),
 		`HBox (
-		    `PushButton(`id("add_redirect_to_masquerade"), Label::AddButton()),
-		    `PushButton(`id("remove_redirect_to_masquerade"), Label::DeleteButton()),
+		    `PushButton(`id("add_redirect_to_masquerade"), `opt(`key_F3), Label::AddButton()),
+		    `PushButton(`id("remove_redirect_to_masquerade"), `opt(`key_F5), Label::DeleteButton()),
 		    `HStretch()
 		)
 	    )
@@ -408,8 +408,8 @@
 		    ), []
 		),
 		`HBox (
-		    `PushButton(`id("add_redirect_to_masquerade"), Label::AddButton()),
-		    `PushButton(`id("remove_redirect_to_masquerade"), Label::DeleteButton()),
+		    `PushButton(`id("add_redirect_to_masquerade"), `opt(`key_F3), Label::AddButton()),
+		    `PushButton(`id("remove_redirect_to_masquerade"), `opt(`key_F5), Label::DeleteButton()),
 		    `HStretch()
 		)
 	    )
@@ -772,8 +772,8 @@
 		[]
 	    ),
 	    `Left (`HBox (
-		`PushButton (`id (`add_br), _("&Add...")),
-		`PushButton (`id (`delete_br), _("&Delete"))
+		`PushButton (`id (`add_br), `opt(`key_F3), _("&Add...")),
+		`PushButton (`id (`delete_br), `opt(`key_F5), _("&Delete"))
 	    ))
 	);
 
@@ -909,8 +909,8 @@
 		    []
 		),
 		`HBox (
-		    `PushButton(`id("add_custom_rule"), Label::AddButton()),
-		    `PushButton(`id("remove_custom_rule"), Label::DeleteButton()),
+		    `PushButton(`id("add_custom_rule"), `opt(`key_F3), Label::AddButton()),
+		    `PushButton(`id("remove_custom_rule"), `opt(`key_F5), Label::DeleteButton()),
 		    `HStretch ()
 		)
 	    )
