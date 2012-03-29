@@ -1206,7 +1206,8 @@ Use the port number instead of the port name.
 	    if (Popup::YesNo (_("Firewall automatic starting has been disabled
 but firewall is currently running.
 
-Stop the firewall after the new configuration is written?"))) {
+Stop the firewall after the new configuration has been written?
+"))) {
 		y2milestone ("User decided to stop the firewall after it is disabled");
 		new_running = false;
 	    } else {

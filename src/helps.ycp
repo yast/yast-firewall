@@ -52,15 +52,16 @@ Network traffic through any unassigned interface is blocked.</p>
 
 	// TRANSLATORS: Allowed services dialog help 1/2
 	"allowed-services" : _("<p><b><big>Allowed Services</big></b>
-<br>Here, specify services or ports that should be accessible from the network.
+<br>Specify services or ports that should be accessible from the network.
 Networks are divided into firewall zones.</p>
 
 <p>To allow a service, select the <b>Zone</b> and the
 <b>Service to Allow</b> then press <b>Add</b>.
 To remove an allowed service, select the <b>Zone</b> and the <b>Allowed Service</b> then press <b>Delete</b>.</p>
 
-<p>By deselecting <b>Protect Firewall from Internal Zone</b>, remove 
-protection from the zone. All services and ports would be unprotected from this zone.</p>
+<p>By deselecting <b>Protect Firewall from Internal Zone</b>, you remove
+protection from the zone. All services and ports in your internal network will
+be unprotected.</p>
 ") +
 
 	// TRANSLATORS: Allowed services dialog help 2/2
@@ -191,18 +192,21 @@ the assignment currently in use in the <tt>/etc/services</tt> file.</p>"),
 
 	// TRANSLATORS: help for Installation Proposal Dialog
 	"installation_proposal" : _("<p><b><big>Firewall</big></b><br />
-Firewall is a defensive mechanism that protects your computer from network attacks.</p>"),
+A firewall is a defensive mechanism that protects your computer from network attacks.</p>
+"),
 
 	// TRANSLATORS: general help for Custom Rules 1/5
 	"custom-rules" : _("<p><b><big>Custom Rules</big></b><br>
-Here you can set special firewall rules that allow new connections
-matching these rules.</p>") +
+Set special firewall rules that allow new connections
+matching these rules.</p>
+") +
 
 	// TRANSLATORS: general help for Custom Rules 2/5
 	_("<p><b>Source Network</b><br>
-Network or IP where the connection comes from,
+Network or IP address where the connection comes from,
 e.g., <tt>192.168.0.1</tt> or <tt>192.168.0.0/255.255.255.0</tt>
-or <tt>192.168.0.0/24</tt> or <tt>0/0</tt> (which means <tt>all</tt>).</p>") +
+or <tt>192.168.0.0/24</tt> or <tt>0/0</tt> (which means <tt>all</tt>).</p>
+") +
 
 	// TRANSLATORS: general help for Custom Rules 3/5
 	_("<p><b>Protocol</b><br>
@@ -223,9 +227,10 @@ originates from. This entry is optional.</p>"),
 
 	// TRANSLATORS: help for Custom Rules - Adding new rule 1/4
 	"custom-rules-popup" : _("<p><b>Source Network</b><br>
-Network or IP where the connection comes from,
+Network or IP address where the connection comes from,
 e.g., <tt>192.168.0.1</tt> or <tt>192.168.0.0/255.255.255.0</tt>
-or <tt>192.168.0.0/24</tt> or <tt>0/0</tt> (which means <tt>all</tt>).</p>") +
+or <tt>192.168.0.0/24</tt> or <tt>0/0</tt> (which means <tt>all</tt>).</p>
+") +
 
 	// TRANSLATORS: help for Custom Rules - Adding new rule 2/4
 	_("<p><b>Protocol</b><br>
