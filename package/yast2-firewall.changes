@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Apr 15 15:37:01 CEST 2013 - locilka@suse.cz
+
+- Fixed checking for running firewall service (bnc#812606)
+- 2.21.2.1
+
+-------------------------------------------------------------------
 Fri Nov  4 15:50:22 CET 2011 - locilka@suse.cz
 
 - Added function keys for buttons (bnc#595564)
