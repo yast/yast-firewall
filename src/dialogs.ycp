@@ -68,7 +68,7 @@ you may find current contact information at www.novell.com
 	    )
 	]),
 	"start_stop" : CWMServiceStart::CreateStartStopWidget ($[
-	    "service_id"		: "SuSEfirewall2_setup",
+	    "service_id"		: "SuSEfirewall2",
 					  // TRANSLATORS: status information
 	    "service_running_label"	: _("Firewall is running"),
 					  // TRANSLATORS: status information
