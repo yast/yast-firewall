@@ -865,13 +865,15 @@ Use the port number instead of the port name.
 
     boolean CheckIP(string ui_id) {
 	string ip = (string) UI::QueryWidget(`id(ui_id), `Value);
-	if (!IP::Check4(ip)) {
+	if (!IP::Check(ip)) {
 	    UI::SetFocus(`id(ui_id));
 	    Popup::Error(
 		// TRANSLATORS: popup message, right definition is two lines below this message
 		_("Invalid IP definition.")
 		+ "\n\n" +
-		Address::Valid4()
+		IP::Valid4()
+		+ "\n" +
+		IP::Valid6()
 	    );
 	    return false;
 	}
