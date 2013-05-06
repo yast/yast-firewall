@@ -39,7 +39,6 @@ you may find current contact information at www.novell.com
     import "SuSEFirewallExpertRules";
     import "PortAliases";
     import "Popup";
-    import "Address";
     import "Wizard";
     import "Report";
     import "Label";
