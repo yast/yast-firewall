@@ -1,8 +1,9 @@
 -------------------------------------------------------------------
 Mon May  6 15:08:31 CEST 2013 - locilka@suse.cz
 
-- Using fixed checking for correct network definition (bnc#800592)
-- Using ValidNetwork from IP module.
+- Using fixed checking for correct network definition to correctly
+  support IPv6 (bnc#800592)
+- Using ValidNetwork from IP module
 - 2.17.13
 
 -------------------------------------------------------------------
