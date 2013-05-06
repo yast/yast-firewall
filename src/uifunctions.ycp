@@ -1280,7 +1280,7 @@ Stop the firewall after the new configuration is written?"))) {
 		// network is mandatory
 		if (add_source_network == "" || ! IP::CheckNetwork(add_source_network)) {
 		    UI::SetFocus (`id ("add_source_network"));
-		    Report::Error (sformat (_("Invalid network definition '%1'"), add_source_network) + "\n" + SuSEFirewallExpertRules::ValidNetwork());
+		    Report::Error (sformat (_("Invalid network definition '%1'"), add_source_network) + "\n" + IP::ValidNetwork());
 		    continue;
 		}
 
@@ -1440,7 +1440,7 @@ Stop the firewall after the new configuration is written?"))) {
 
 	if (! IP::CheckNetwork (network)) {
 	    UI::SetFocus (`id (`network));
-	    Report::Error (sformat (_("Invalid network definition '%1'"), network) + "\n" + SuSEFirewallExpertRules::ValidNetwork());
+	    Report::Error (sformat (_("Invalid network definition '%1'"), network) + "\n" + IP::ValidNetwork());
 	    return false;
 	}
 
