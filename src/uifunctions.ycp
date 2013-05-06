@@ -1459,7 +1459,7 @@ Stop the firewall after the new configuration has been written?
 	    return true;
 	}
 
-	if (! SuSEFirewallExpertRules::IsValidNetwork (network)) {
+	if (! IP::CheckNetwork (network)) {
 	    UI::SetFocus (`id (`network));
 	    Report::Error (sformat (_("Invalid network definition '%1'"), network) + "\n" + SuSEFirewallExpertRules::ValidNetwork());
 	    return false;
