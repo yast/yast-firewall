@@ -18,7 +18,6 @@
     import "SuSEFirewallExpertRules";
     import "PortAliases";
     import "Popup";
-    import "Address";
     import "Wizard";
     import "Report";
     import "Label";
