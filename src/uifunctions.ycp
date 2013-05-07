@@ -1280,7 +1280,9 @@ Stop the firewall after the new configuration is written?"))) {
 		// network is mandatory
 		if (add_source_network == "" || ! IP::CheckNetwork(add_source_network)) {
 		    UI::SetFocus (`id ("add_source_network"));
-		    Report::Error (sformat (_("Invalid network definition '%1'"), add_source_network) + "\n" + IP::ValidNetwork());
+		    Report::Error(
+		        sformat (_("Invalid network definition '%1'"), add_source_network) + "\n" +
+		        IP::ValidNetwork());
 		    continue;
 		}
 
@@ -1294,7 +1296,9 @@ Stop the firewall after the new configuration is written?"))) {
 			}
 		    } else if (! CheckPortNameOrNumber (add_destination_port)) {
 			UI::SetFocus (`id ("add_destination_port"));
-			Report::Error (sformat (_("Invalid port name or number '%1'"), add_destination_port) + "\n" + PortAliases::AllowedPortNameOrNumber());
+			Report::Error(
+			    sformat (_("Invalid port name or number '%1'"), add_destination_port) + "\n" +
+			    PortAliases::AllowedPortNameOrNumber());
 			continue;
 		    }
 		}
@@ -1309,7 +1313,9 @@ Stop the firewall after the new configuration is written?"))) {
 			}
 		    } else if (! CheckPortNameOrNumber (add_source_port)) {
 			UI::SetFocus (`id ("add_source_port"));
-			Report::Error (sformat (_("Invalid port name or number '%1'"), add_source_port) + "\n" + PortAliases::AllowedPortNameOrNumber());
+			Report::Error(
+			    sformat (_("Invalid port name or number '%1'"), add_source_port) + "\n" +
+			    PortAliases::AllowedPortNameOrNumber());
 			continue;
 		    }
 		}
