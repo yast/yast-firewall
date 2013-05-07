@@ -1440,13 +1440,17 @@ Stop the firewall after the new configuration is written?"))) {
 
 	if (! IP::CheckNetwork (network)) {
 	    UI::SetFocus (`id (`network));
-	    Report::Error (sformat (_("Invalid network definition '%1'"), network) + "\n" + IP::ValidNetwork());
+	    Report::Error(
+	        sformat (_("Invalid network definition '%1'"), network) + "\n" +
+	        IP::ValidNetwork());
 	    return false;
 	}
 
 	if (! PortAliases::IsAllowedPortName (port)) {
 	    UI::SetFocus (`id (`port));
-	    Report::Error (sformat (_("Invalid port name or number '%1'"), port) + "\n" + PortAliases::AllowedPortNameOrNumber());
+	    Report::Error(
+	        sformat (_("Invalid port name or number '%1'"), port) + "\n" +
+	        PortAliases::AllowedPortNameOrNumber());
 	    return false;
 	}
 
