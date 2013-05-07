@@ -2,10 +2,11 @@
 
 @HEADER@
 BuildRequires:	perl-XML-Writer update-desktop-files yast2-devtools yast2-testsuite
-BuildRequires:	yast2 >= 2.16.47
+# IP::CheckNetwork
+BuildRequires:	yast2 >= 2.17.125
 
-# SuSEFirewallServices::GetDescription
-Requires:	yast2 >= 2.17.76
+# IP::CheckNetwork
+Requires:	yast2 >= 2.17.125
 
 # ButtonBox widget
 Conflicts:	yast2-ycp-ui-bindings < 2.17.3
