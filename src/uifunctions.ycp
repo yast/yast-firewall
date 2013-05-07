@@ -39,7 +39,6 @@ you may find current contact information at www.novell.com
     import "SuSEFirewallExpertRules";
     import "PortAliases";
     import "Popup";
-    import "Address";
     import "Wizard";
     import "Report";
     import "Label";
@@ -73,57 +72,6 @@ you may find current contact information at www.novell.com
  *    }
  *
  */
-
-    /**
-     * Checks the network entry which can be defined in several formats.
-     *
-     * @example
-     *	CheckNetwork ("192.168.0.1") -> true
-     *	CheckNetwork ("192.168.0.0/20") -> true
-     *	CheckNetwork ("192.168.0.0/255.255.255.0") -> true
-     *	CheckNetwork ("0/0") -> true
-     */
-    boolean CheckNetwork (string network) {
-	boolean ret = nil;
-
-	if (network == nil || network == "") {
-	    ret = false;
-
-	} else if (network == "0/0") {
-	    ret = true;
-
-	// 192.168.0.1, 0.8.55.999
-	} else if (regexpmatch(network, "^[0123456789\.]+$")) {
-	    ret = IP::Check4 (network);
-
-	// 192.168.0.0/20, 0.8.55/158
-	} else if (regexpmatch(network, "^[0123456789\.]+/[0123456789]+$")) {
-	    string network_ip   = regexpsub (network, "^([0123456789\.]+)/[0123456789]+$", "\\1");
-	    string network_mask = regexpsub (network, "^[0123456789\.]+/([0123456789]+)$", "\\1");
-	    
-	    ret = (IP::Check4 (network_ip) && Netmask::CheckPrefix4 (network_mask));
-
-	// 192.168.0.0/255.255.255.0, 0.8.55/10.258.12
-	} else if (regexpmatch(network, "^[0123456789\.]+/[0123456789\.]+$")) {
-	    string network_ip   = regexpsub (network, "^([0123456789\.]+)/[0123456789\.]+$", "\\1");
-	    string network_mask = regexpsub (network, "^[0123456789\.]+/([0123456789\.]+)$", "\\1");
-	    
-	    ret = (IP::Check4 (network_ip) && Netmask::Check4 (network_mask));
-	}
-	
-	if (ret != true && ! Mode::testsuite()) {
-	    // TRANSLATORS: error message, %1 represents the erroneous network definition
-	    Report::Error (sformat (_("Invalid network definition '%1'.
-Network can be defined as an IP or IP with slash and netmask.
-
-For instance: 192.168.0.1
-or 192.168.0.0/20
-or 192.168.0.0/255.255.255.0
-or 0/0"), network));
-	}
-
-	return ret;
-    }
 
     // UI Functions
 
@@ -937,13 +885,15 @@ Use the port number instead of the port name.
 
     boolean CheckIP(string ui_id) {
 	string ip = (string) UI::QueryWidget(`id(ui_id), `Value);
-	if (!Address::Check4(ip)) {
+	if (!IP::Check(ip)) {
 	    UI::SetFocus(`id(ui_id));
 	    Popup::Error(
-		// TRANSLATORS: popup message, right definition is two lines belos this message
+		// TRANSLATORS: popup message, right definition is two lines below this message
 		_("Invalid IP definition.")
 		+ "\n\n" +
-		Address::Valid4()
+		IP::Valid4()
+		+ "\n" +
+		IP::Valid6()
 	    );
 	    return false;
 	}
@@ -1350,9 +1300,11 @@ Stop the firewall after the new configuration has been written?
 		string add_options          = (string) UI::QueryWidget(`id("add_options"),          `Value);
 
 		// network is mandatory
-		if (add_source_network == "" || ! CheckNetwork (add_source_network)) {
+		if (add_source_network == "" || ! IP::CheckNetwork(add_source_network)) {
 		    UI::SetFocus (`id ("add_source_network"));
-		    Report::Error (sformat (_("Invalid network definition '%1'"), add_source_network) + "\n" + SuSEFirewallExpertRules::ValidNetwork());
+		    Report::Error(
+		        sformat (_("Invalid network definition '%1'"), add_source_network) + "\n" +
+		        IP::ValidNetwork());
 		    continue;
 		}
 
@@ -1366,7 +1318,9 @@ Stop the firewall after the new configuration has been written?
 			}
 		    } else if (! CheckPortNameOrNumber (add_destination_port)) {
 			UI::SetFocus (`id ("add_destination_port"));
-			Report::Error (sformat (_("Invalid port name or number '%1'"), add_destination_port) + "\n" + PortAliases::AllowedPortNameOrNumber());
+			Report::Error(
+			    sformat (_("Invalid port name or number '%1'"), add_destination_port) + "\n" +
+			    PortAliases::AllowedPortNameOrNumber());
 			continue;
 		    }
 		}
@@ -1381,7 +1335,9 @@ Stop the firewall after the new configuration has been written?
 			}
 		    } else if (! CheckPortNameOrNumber (add_source_port)) {
 			UI::SetFocus (`id ("add_source_port"));
-			Report::Error (sformat (_("Invalid port name or number '%1'"), add_source_port) + "\n" + PortAliases::AllowedPortNameOrNumber());
+			Report::Error(
+			    sformat (_("Invalid port name or number '%1'"), add_source_port) + "\n" +
+			    PortAliases::AllowedPortNameOrNumber());
 			continue;
 		    }
 		}
@@ -1510,15 +1466,19 @@ Stop the firewall after the new configuration has been written?
 	    return true;
 	}
 
-	if (! SuSEFirewallExpertRules::IsValidNetwork (network)) {
+	if (! IP::CheckNetwork (network)) {
 	    UI::SetFocus (`id (`network));
-	    Report::Error (sformat (_("Invalid network definition '%1'"), network) + "\n" + SuSEFirewallExpertRules::ValidNetwork());
+	    Report::Error(
+	        sformat (_("Invalid network definition '%1'"), network) + "\n" +
+	        IP::ValidNetwork());
 	    return false;
 	}
 
 	if (! PortAliases::IsAllowedPortName (port)) {
 	    UI::SetFocus (`id (`port));
-	    Report::Error (sformat (_("Invalid port name or number '%1'"), port) + "\n" + PortAliases::AllowedPortNameOrNumber());
+	    Report::Error(
+	        sformat (_("Invalid port name or number '%1'"), port) + "\n" +
+	        PortAliases::AllowedPortNameOrNumber());
 	    return false;
 	}
 
