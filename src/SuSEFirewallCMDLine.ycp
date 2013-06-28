@@ -1006,6 +1006,30 @@ you may find current contact information at www.novell.com
 	}
     }
 
+    /**
+     * Overall firewall manual enabling handler
+     *
+     * @param map options   ignored (no special options)
+     * @return boolean      whether write call is needed
+     */
+    boolean FWCMDEnable( map options) 
+    {
+	SuSEFirewall::SetStartService(true);
+	return SuSEFirewall::StartServices();
+    }
+
+    /**
+     * Overall firewall manual disabling handler
+     *
+     * @param map options   ignored (no special options)
+     * @return boolean      whether write call is needed
+     */
+    boolean FWCMDDisable( map options)
+    {
+	SuSEFirewall::SetStartService(false);
+	return SuSEFirewall::StartServices();
+    }
+
     map cmdline = $[
 	"id" : "firewall",
 	// TRANSLATORS: CommandLine help 
@@ -1088,6 +1112,22 @@ you may find current contact information at www.novell.com
 		    "summary zone=EXT",
 		],
 	    ],
+            "enable" : $[
+                "handler" : FWCMDEnable,
+		// TRANSLATORS: CommandLine help
+		"help" : _("Enables firewall"),
+		"example" : [
+		    "enable",
+                ],
+            ],
+            "disable" : $[
+                "handler" : FWCMDDisable,
+		// TRANSLATORS: CommandLine help
+		"help" : _("Disables firewall"),
+		"example" : [
+		    "disable",
+                ],
+            ],
 	],
 	"options" : $[
 	    "show" : $[
@@ -1264,6 +1304,10 @@ you may find current contact information at www.novell.com
 	    "summary" : [
 		"zone"
 	    ],
+            "enable" : [
+            ],
+            "disable" : [
+            ],
 	],
     ];
 
