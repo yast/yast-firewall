@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Fri Jun 28 10:28:33 UTC 2013 - mfilka@suse.com
+
+- added Start / Stop commands into CLI
+- 2.24.1 
+
+-------------------------------------------------------------------
 Mon May  6 15:08:31 CEST 2013 - locilka@suse.cz
 
 - Using fixed checking for correct network definition to correctly
