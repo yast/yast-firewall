@@ -40,6 +40,8 @@ you may find current contact information at www.novell.com
     import "SuSEFirewall";
     import "Mode";
 
+    include "firewall/wizards.ycp";
+
     any ret = nil;
 
     // bnc #388773
@@ -53,7 +55,6 @@ you may find current contact information at www.novell.com
 	SuSEFirewallCMDLine::Run();
     // GUI or TextUI
     } else {
-	include "firewall/wizards.ycp";
 	// installation has other sequence
 	if (Mode::installation()) {
 	    ret = FirewallInstallationSequence();
