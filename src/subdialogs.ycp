@@ -454,8 +454,9 @@ you may find current contact information at www.novell.com
 			    `item( `id("0/0"), "0/0")
 			]),
 			// TRANSLATORS: text entry
-			`InputField (`id("add_requested_ip"), `opt (`hstretch), _("Re&quested IP"))
+			`InputField (`id("add_requested_ip"), `opt (`hstretch), _("Re&quested IP (Optional)"))
 		    ),
+		    `HSpacing(1),
 		    `VBox (
 			// TRANSLATORS: select box
 			`ComboBox (`id("add_protocol"), `opt(`hstretch), _("&Protocol"), [
@@ -472,8 +473,9 @@ you may find current contact information at www.novell.com
 		`HBox (
 		    // TRANSLATORS: text entry
 		    `InputField (`id("add_redirectto_ip"), `opt (`hstretch), _("Re&direct to Masqueraded IP")),
+		    `HSpacing(1),
 		    // TRANSLATORS: text entry
-		    `InputField (`id("add_redirectto_port"), `opt (`hstretch), _("&Redirect to Port"))
+		    `InputField (`id("add_redirectto_port"), `opt (`hstretch), _("&Redirect to Port (Optional)"))
 		),
 		`VSpacing(1),
 		`ButtonBox (
