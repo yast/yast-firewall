@@ -1000,6 +1000,9 @@ Use the port number instead of the port name.
 		    if (add_redirectto_port==nil) continue;
 		}
 
+		// Requested IP is optional
+		if (add_requested_ip != "" && !CheckIP("add_requested_ip")) continue;
+
 		SuSEFirewall::AddForwardIntoMasqueradeRule (add_source_network, add_redirectto_ip, add_protocol,
 		    add_requested_port, add_redirectto_port, add_requested_ip);
 
