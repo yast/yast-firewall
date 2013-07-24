@@ -939,8 +939,8 @@ you may find current contact information at www.novell.com
 	    string port_errors = "";
 	    foreach (string key, [ "req_port", "redir_port" ], {
 		if (new[key]:nil!=nil) {
-		    string port_number = GetPortNumber(new[key]:"");
-		    if (port_number!=nil) {
+		    string port_number = tostring(GetPortNumber(new[key]:""));
+		    if (port_number != nil) {
 			// internally using port numbers instead port names
 			new[key] = port_number;
 		    } else {

@@ -1,6 +1,6 @@
 /****************************************************************************
 
-Copyright (c) 2000 - 2012 Novell, Inc.
+Copyright (c) 2000 - 2013 Novell, Inc.
 All Rights Reserved.
 
 This program is free software; you can redistribute it and/or
@@ -430,10 +430,10 @@ you may find current contact information at www.novell.com
     /**
      * Function checks list of ports if they exist (are known).
      *
-     * @param string ui_id for the setfocus
+     * @param any ui_id for the setfocus
      * @param list <string> of ports to be checked
      */
-    boolean CheckIfTheyAreAllKnownPorts(string ui_id, list <string> ports) {
+    boolean CheckIfTheyAreAllKnownPorts(any ui_id, list <string> ports) {
 	boolean checked = true;
 
 	// begin of for~each
@@ -826,7 +826,14 @@ Really use the current settings?"), services_definition)
 	return nil;
     }
 
-    boolean CheckExistency(string ui_id) {
+    /**
+     * Validates existency of a value in a referenced UI entry
+     * and reports error otherwise
+     *
+     * @param any UI id
+     * @report boolean if value exists
+     */
+    boolean ValidateExistency(any ui_id) {
 	if (UI::QueryWidget(`id(ui_id), `Value) == "") {
 	    UI::SetFocus(`id(ui_id));
 	    // TRANSLATORS: popup message
@@ -836,7 +843,14 @@ Really use the current settings?"), services_definition)
 	return true;
     }
 
-    boolean CheckPort(string ui_id) {
+    /**
+     * Checks whether the referenced UI entry contains a valid
+     * port definition and reports an error otherwise
+     *
+     * @param any UI id
+     * @return boolean if entry is valid
+     */
+    boolean ValidatePortEntry(any ui_id) {
 	string port  = (string) UI::QueryWidget(`id(ui_id), `Value);
 	
 	// no port can be allowed
@@ -863,11 +877,16 @@ Really use the current settings?"), services_definition)
     /**
      * Function checks port number got as parameter.
      * If check fails SetFocus is called and an empty string is returned.
+     *
+     * @param any UI id
+     * @return integer port number (or nil)
      */
-    string CheckPortNumber (string port_to_be_checked, string widget_id) {
-	string port_number = GetPortNumber(port_to_be_checked);
+    integer GetPortNumber (any ui_id) {
+        string port_to_be_checked = (string) UI::QueryWidget(`id(ui_id), `Value);
+	integer port_number = PortAliases::GetPortNumber(port_to_be_checked);
+
 	// if port name wasn't found
-	if (port_number=="") {
+	if (port_number==nil) {
 	    Popup::Error(
 		// TRANSLATORS: popup error message
 		_("Wrong port definition.
@@ -877,13 +896,21 @@ Use the port number instead of the port name.
 	    );
 
 	    // setfocus for GUI
-	    if (widget_id!="" && widget_id!=nil) UI::SetFocus(`id(widget_id));
+	    if (ui_id != "" && ui_id != nil)
+		UI::SetFocus(`id(ui_id));
 	}
 
 	return port_number;
     }
 
-    boolean CheckIP(string ui_id) {
+    /**
+     * Checks whether the referenced UI entry contains a valid IPv4 or v6
+     * and reports error otherwise.
+     *
+     * @param any UI id
+     * @return boolean whether it's valid IP
+     */
+    boolean ValidateIPEntry(any ui_id) {
 	string ip = (string) UI::QueryWidget(`id(ui_id), `Value);
 	if (!IP::Check(ip)) {
 	    UI::SetFocus(`id(ui_id));
@@ -917,8 +944,8 @@ Use the port number instead of the port name.
 	    }
 	// not a port range
 	} else if (! regexpmatch (port, "^[0123456789]+:[0123456789]+$")) {
-	    string port_number = GetPortNumber (port);
-	    if (port_number != nil && port_number != port) {
+	    integer port_number = PortAliases::GetPortNumber(port);
+	    if (port_number != nil && tostring(port_number) != port) {
 		port = sformat("%1 (%2)", port, port_number);
 	    }
 	}
@@ -972,13 +999,13 @@ Use the port number instead of the port name.
 		break;
 	    } else if (ret == "ok") {
 
-		if (!CheckExistency("add_requested_port"))  continue;
-		if (!CheckExistency("add_source_network"))  continue;
-		if (!CheckExistency("add_redirectto_ip"))   continue;
+		if (!ValidateExistency("add_requested_port"))  continue;
+		if (!ValidateExistency("add_source_network"))  continue;
+		if (!ValidateExistency("add_redirectto_ip"))   continue;
 		
-		if (!CheckPort("add_requested_port"))	continue;
-		if (!CheckPort("add_redirectto_port"))	continue;
-		if (!CheckIP("add_redirectto_ip"))	continue;
+		if (!ValidatePortEntry("add_requested_port"))	continue;
+		if (!ValidatePortEntry("add_redirectto_port"))	continue;
+		if (!ValidateIPEntry("add_redirectto_ip"))	continue;
 
 		// FIXME: checking for spaces in sttrings
 		//        removing space from start or end of the string
@@ -992,16 +1019,16 @@ Use the port number instead of the port name.
 		
 		// Ports must be port numbers, getting port numbers from port names
 		if (add_requested_port!="" && add_requested_port!=nil) {
-		    add_requested_port  = CheckPortNumber (add_requested_port,  "add_requested_port");
+		    add_requested_port  = tostring(GetPortNumber("add_requested_port"));
 		    if (add_requested_port==nil)  continue;
 		}
 		if (add_redirectto_port!="" && add_redirectto_port!=nil) {
-		    add_redirectto_port = CheckPortNumber (add_redirectto_port, "add_redirectto_port");
+		    add_redirectto_port = tostring(GetPortNumber("add_redirectto_port"));
 		    if (add_redirectto_port==nil) continue;
 		}
 
 		// Requested IP is optional
-		if (add_requested_ip != "" && !CheckIP("add_requested_ip")) continue;
+		if (add_requested_ip != "" && !ValidateIPEntry("add_requested_ip")) continue;
 
 		SuSEFirewall::AddForwardIntoMasqueradeRule (add_source_network, add_redirectto_ip, add_protocol,
 		    add_requested_port, add_redirectto_port, add_requested_ip);
@@ -1293,8 +1320,8 @@ Stop the firewall after the new configuration has been written?
 	    if (ret == "cancel" || ret == `cancel) {
 		break;
 	    } else if (ret == "ok") {
-		if (!CheckExistency("add_source_network"))	continue;
-		if (!CheckExistency("add_protocol"))		continue;
+		if (!ValidateExistency("add_source_network"))	continue;
+		if (!ValidateExistency("add_protocol"))		continue;
 
 		string add_source_network   = (string) UI::QueryWidget(`id("add_source_network"),   `Value);
 		string add_protocol	    = (string) UI::QueryWidget(`id("add_protocol"),	    `Value);
@@ -1394,9 +1421,9 @@ Stop the firewall after the new configuration has been written?
 	    return _("All services using UDP");
 	} else if (protocol == "tcp" && sport == "") {
 	    return _("All services using TCP");
-	} else if (protocol == "udp" && PortAliases::GetPortNumber (sport) == 137) {
+	} else if (protocol == "udp" && PortAliases::GetPortNumber(sport) == 137) {
 	    return _("Samba browsing");
-	} else if (protocol == "udp" && PortAliases::GetPortNumber (sport) == 427) {
+	} else if (protocol == "udp" && PortAliases::GetPortNumber(sport) == 427) {
 	    return _("SLP browsing");
 	} else {
 	    return sformat ("%1/%2", SuSEFirewall::GetProtocolTranslatedName (protocol), sport);
