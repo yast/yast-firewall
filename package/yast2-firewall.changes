@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Wed Jul 24 11:38:10 CEST 2013 - locilka@suse.com
+
+- Added better checking and more understandable UI to dialog for
+  adding new masquerade rule (bnc#829706)
+- 2.24.2
+
+-------------------------------------------------------------------
 Fri Jun 28 10:28:33 UTC 2013 - mfilka@suse.com
 
 - added Start / Stop commands into CLI
