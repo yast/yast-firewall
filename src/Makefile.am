@@ -1,36 +1,32 @@
-# Makefile.am for firewall/src
+# Sources for firewall
+
+module_DATA = \
+  modules/SuSEFirewallUI.rb \
+  modules/SuSEFirewallCMDLine.rb
+
+client_DATA = \
+  clients/firewall_auto.rb \
+  clients/firewall_proposal.rb \
+  clients/firewall.rb
 
 yncludedir = @yncludedir@/firewall
+ynclude_DATA = \
+  include/firewall/wizards.rb \
+  include/firewall/uifunctions.rb \
+  include/firewall/subdialogs.rb \
+  include/firewall/summary.rb \
+  include/firewall/dialogs.rb \
+  include/firewall/complex.rb \
+  include/firewall/helps.rb \
+  include/firewall/generalfunctions.rb
 
-YCPCFLAGS = -M . -I .
+schemafilesdir = $(schemadir)/autoyast/rnc
+schemafiles_DATA = \
+  autoyast-rnc/firewall.rnc
 
-client_DATA =		\
-	firewall.ycp	\
-	firewall_auto.ycp	\
-	firewall_proposal.ycp
+desktop_DATA = \
+  desktop/firewall.desktop
 
-ynclude_DATA =		\
-	complex.ycp	\
-	dialogs.ycp	\
-	wizards.ycp	\
-	subdialogs.ycp	\
-	uifunctions.ycp	\
-	helps.ycp	\
-	summary.ycp	\
-	generalfunctions.ycp
-
-module_DATA =		\
-	SuSEFirewallUI.ycp \
-	SuSEFirewallCMDLine.ycp
-
-desktop_DATA = firewall.desktop
-
-
-EXTRA_DIST = $(client_DATA) $(ynclude_DATA) $(module_DATA) $(desktop_DATA)
-
-firewall:
-	test -L firewall || ln -s . firewall
-
-ycpchook = firewall
+EXTRA_DIST = $(module_DATA) $(client_DATA) $(ynclude_DATA) $(schemafiles_DATA) $(desktop_DATA)
 
 include $(top_srcdir)/Makefile.am.common
