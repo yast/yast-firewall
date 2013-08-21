@@ -49,10 +49,6 @@ module Yast
 
       Yast.include self, "firewall/helps.rb"
 
-      @enable_firewall_init_default = ProductFeatures.GetBooleanFeature(
-        "globals",
-        "enable_firewall"
-      )
       @enable_ssh = ProductFeatures.GetBooleanFeature(
         "globals",
         "firewall_enable_ssh"
