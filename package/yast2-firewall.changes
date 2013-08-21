@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Aug 21 07:21:20 UTC 2013 - mfilka@suse.com
+
+- moved firewall enabling / disabling from second stage to first stage
+- 3.0.1 
+
+-------------------------------------------------------------------
 Wed Jul 31 08:29:04 UTC 2013 - yast-devel@opensuse.org
 
 - converted from YCP to Ruby by YCP Killer
