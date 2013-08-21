@@ -49,46 +49,10 @@ module Yast
 
       Yast.include self, "firewall/helps.rb"
 
-      @enable_firewall_init_default = ProductFeatures.GetBooleanFeature(
-        "globals",
-        "enable_firewall"
-      )
       @enable_ssh = ProductFeatures.GetBooleanFeature(
         "globals",
         "firewall_enable_ssh"
       )
-
-      # run this only once
-      if !SuSEFirewallProposal.GetProposalInitialized
-        # Package must be installed
-        if SuSEFirewall.SuSEFirewallIsInstalled
-          # variables from control file
-          Builtins.y2milestone(
-            "Default firewall values: enable_firewall=%1, enable_ssh=%2",
-            ProductFeatures.GetBooleanFeature("globals", "enable_firewall"),
-            ProductFeatures.GetBooleanFeature("globals", "firewall_enable_ssh")
-          )
-          SuSEFirewall.SetEnableService(
-            ProductFeatures.GetBooleanFeature("globals", "enable_firewall")
-          )
-          SuSEFirewall.SetStartService(
-            ProductFeatures.GetBooleanFeature("globals", "enable_firewall")
-          ) 
-          # Package is missing
-        else
-          # variables from control file
-          Builtins.y2milestone(
-            "Default firewall values: enable_firewall=%1, enable_ssh=%2",
-            false,
-            false
-          )
-          SuSEFirewall.SetEnableService(false)
-          SuSEFirewall.SetStartService(false)
-        end
-
-
-        SuSEFirewallProposal.SetProposalInitialized(true)
-      end
 
       @func = Convert.to_string(WFM.Args(0))
       @param = Convert.to_map(WFM.Args(1))
