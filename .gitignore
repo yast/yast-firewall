@@ -12,7 +12,7 @@ config.log
 config.status
 config.sub
 configure
-configure.in
+configure.ac
 depcomp
 firewall.pot
 install-sh

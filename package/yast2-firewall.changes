@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Wed Sep 18 16:07:51 UTC 2013 - lslezak@suse.cz
+
+- do not use *.spec.in template, use *.spec file with RPM macros
+  instead
+- 3.0.2
+
+-------------------------------------------------------------------
 Wed Aug 21 07:21:20 UTC 2013 - mfilka@suse.com
 
 - moved firewall enabling / disabling from second stage to first stage
