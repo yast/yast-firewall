@@ -58,6 +58,8 @@ module Yast
       @param = Convert.to_map(WFM.Args(1))
       @ret = {}
 
+      init_firewall_proposals
+
       # create a textual proposal
       if @func == "MakeProposal"
         @progress_orig = Progress.set(false)
@@ -117,16 +119,18 @@ module Yast
           # Enable firewall
         elsif @chosen_id == "firewall--enable_firewall_in_proposal"
           Builtins.y2milestone("Firewall enabled by a single-click")
-          SuSEFirewall.SetEnableService(true)
-          SuSEFirewall.SetStartService(true)
+
+          enable_firewall
+
           @ret = { "workflow_sequence" => :next }
           SuSEFirewallProposal.SetChangedByUser(true) 
 
           # Disable firewall
         elsif @chosen_id == "firewall--disable_firewall_in_proposal"
           Builtins.y2milestone("Firewall disabled by a single-click")
-          SuSEFirewall.SetEnableService(false)
-          SuSEFirewall.SetStartService(false)
+
+          disable_firewall
+
           @ret = { "workflow_sequence" => :next }
           SuSEFirewallProposal.SetChangedByUser(true) 
 
@@ -249,6 +253,50 @@ module Yast
 
       # EOF
     end
+
+    private
+    def init_firewall_proposals
+      # run this only once
+      return if SuSEFirewallProposal.GetProposalInitialized
+
+      # Package must be installed
+      if SuSEFirewall.SuSEFirewallIsInstalled
+
+        # read target firewall configuration
+        SuSEFirewallProposal.Reset
+
+        product_enable_firewall = ProductFeatures.GetBooleanFeature("globals", "enable_firewall")
+        target_enable_firewall = SuSEFirewall.GetEnableService
+
+        Builtins.y2milestone("Firewall enabled by product defaults: #{product_enable_firewall}")
+        Builtins.y2milestone("Firewall enabled in 1st stage: #{target_enable_firewall}")
+
+        # check if user changed settings during first stage
+        SuSEFirewallProposal.SetChangedByUser(true) if product_enable_firewall != target_enable_firewall
+      else
+        Builtins.y2milestone(
+          "Default firewall values: enable_firewall=%1, enable_ssh=%2",
+          false,
+          false
+        )
+
+        disable_firewall
+      end
+
+
+      SuSEFirewallProposal.SetProposalInitialized(true)
+    end
+
+    def enable_firewall
+      SuSEFirewall.SetEnableService(true)
+      SuSEFirewall.SetStartService(true)
+    end
+
+    def disable_firewall
+      SuSEFirewall.SetEnableService(false)
+      SuSEFirewall.SetStartService(false)
+    end
+
   end
 end
 
