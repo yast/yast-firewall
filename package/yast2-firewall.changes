@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Thu Nov  7 21:01:38 UTC 2013 - mfilka@suse.com
+
+- bnc#843646
+  - fixed second stage proposal to reflect changes done during
+    first stage
+- 3.1.0 
+
+-------------------------------------------------------------------
 Wed Aug 21 07:21:20 UTC 2013 - mfilka@suse.com
 
 - moved firewall enabling / disabling from second stage to first stage
