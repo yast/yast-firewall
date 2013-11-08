@@ -114,7 +114,7 @@ module Yast
               "Firewall configuration cannot be changed.\nThe SuSEfirewall2 package is not installed."
             )
           )
-          @ret = { "workflow_sequence" => :next } 
+          @ret = { "workflow_sequence" => :next }
 
           # Enable firewall
         elsif @chosen_id == "firewall--enable_firewall_in_proposal"
@@ -123,7 +123,7 @@ module Yast
           enable_firewall
 
           @ret = { "workflow_sequence" => :next }
-          SuSEFirewallProposal.SetChangedByUser(true) 
+          SuSEFirewallProposal.SetChangedByUser(true)
 
           # Disable firewall
         elsif @chosen_id == "firewall--disable_firewall_in_proposal"
@@ -132,7 +132,7 @@ module Yast
           disable_firewall
 
           @ret = { "workflow_sequence" => :next }
-          SuSEFirewallProposal.SetChangedByUser(true) 
+          SuSEFirewallProposal.SetChangedByUser(true)
 
           # Enable SSH service
         elsif @chosen_id == "firewall--enable_ssh_in_proposal"
@@ -155,7 +155,7 @@ module Yast
           @enable_ssh = true
 
           @ret = { "workflow_sequence" => :next }
-          SuSEFirewallProposal.SetChangedByUser(true) 
+          SuSEFirewallProposal.SetChangedByUser(true)
 
           # Disable SSH service
         elsif @chosen_id == "firewall--disable_ssh_in_proposal"
@@ -187,7 +187,7 @@ module Yast
           @enable_ssh = false
 
           @ret = { "workflow_sequence" => :next }
-          SuSEFirewallProposal.SetChangedByUser(true) 
+          SuSEFirewallProposal.SetChangedByUser(true)
 
           # Enable VNC service
         elsif @chosen_id == "firewall--enable_vnc_in_proposal"
@@ -197,7 +197,7 @@ module Yast
             ["5801", "5901"]
           )
           @ret = { "workflow_sequence" => :next }
-          SuSEFirewallProposal.SetChangedByUser(true) 
+          SuSEFirewallProposal.SetChangedByUser(true)
 
           # Disable VNC service
         elsif @chosen_id == "firewall--disable_vnc_in_proposal"
@@ -208,7 +208,7 @@ module Yast
             false
           )
           @ret = { "workflow_sequence" => :next }
-          SuSEFirewallProposal.SetChangedByUser(true) 
+          SuSEFirewallProposal.SetChangedByUser(true)
 
           # Change the firewall settings in usual configuration dialogs
         else
@@ -249,7 +249,7 @@ module Yast
       Builtins.y2debug("ret=%1", @ret)
       Builtins.y2milestone("Firewall proposal finished")
       Builtins.y2milestone("----------------------------------------")
-      deep_copy(@ret) 
+      deep_copy(@ret)
 
       # EOF
     end
