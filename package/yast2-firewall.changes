@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Nov 27 15:04:21 CET 2013 - fehr@suse.de
+
+- make autoyast automatically install SuSEfirewall2 when 
+  yast2-firewall is installed (bnc#845294) 
+
+-------------------------------------------------------------------
 Thu Nov  7 21:01:38 UTC 2013 - mfilka@suse.com
 
 - bnc#843646
