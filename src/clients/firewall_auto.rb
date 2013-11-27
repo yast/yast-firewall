@@ -80,7 +80,7 @@ module Yast
         SuSEFirewall.SetEnableService(SuSEFirewall.GetStartService)
       # Return required packages for module to operate
       elsif @func == "Packages"
-        @ret = {}
+        @ret = { "install" => [ "SuSEfirewall2" ] }
       # Change configuration (run FirewallAutoSequence)
       elsif @func == "Change"
         @ret = FirewallAutoSequence()
