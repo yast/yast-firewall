@@ -1,5 +1,8 @@
 # YaST Firewall - Configures SuSEfirewall2 #
 
+[![Travis Build](https://travis-ci.org/yast/yast-firewall.svg?branch=master)](https://travis-ci.org/yast/yast-firewall)
+[![Jenkins Build](http://img.shields.io/jenkins/s/https/ci.opensuse.org/yast-firewall-master.svg)](https://ci.opensuse.org/view/Yast/job/yast-firewall-master/)
+
 This repository contains basic set of shared libraries and so-called SCR agents
 used for reading and writing configuration files and some even for executing
 commands on the system.
