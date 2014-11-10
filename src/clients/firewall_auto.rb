@@ -106,9 +106,9 @@ module Yast
       # Write given settings
       elsif @func == "Write"
         Yast.import "Progress"
-        Progress.off
+        old_progress = Progress.set(false)
         @ret = SuSEFirewall.Write
-        Progress.on
+        Progress.set(old_progress)
       else
         Builtins.y2error("Unknown function: %1", @func)
         @ret = false
@@ -118,7 +118,7 @@ module Yast
       Builtins.y2milestone("Firewall auto finished")
       Builtins.y2milestone("----------------------------------------")
 
-      deep_copy(@ret) 
+      deep_copy(@ret)
 
       # EOF
     end
