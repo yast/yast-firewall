@@ -1,8 +1,14 @@
 -------------------------------------------------------------------
+Mon Nov 10 14:26:46 UTC 2014 - jreidinger@suse.com
+
+- fix breakage of progress in autoinstallation (bnc#845826)
+- 3.1.2
+
+-------------------------------------------------------------------
 Wed Nov 27 15:04:21 CET 2013 - fehr@suse.de
 
-- make autoyast automatically install SuSEfirewall2 when 
-  yast2-firewall is installed (bnc#845294) 
+- make autoyast automatically install SuSEfirewall2 when
+  yast2-firewall is installed (bnc#845294)
 
 -------------------------------------------------------------------
 Thu Nov  7 21:01:38 UTC 2013 - mfilka@suse.com
@@ -23,7 +29,7 @@ Wed Sep 18 16:07:51 UTC 2013 - lslezak@suse.cz
 Wed Aug 21 07:21:20 UTC 2013 - mfilka@suse.com
 
 - moved firewall enabling / disabling from second stage to first stage
-- 3.0.1 
+- 3.0.1
 
 -------------------------------------------------------------------
 Wed Jul 31 08:29:04 UTC 2013 - yast-devel@opensuse.org
@@ -43,7 +49,7 @@ Wed Jul 24 11:38:10 CEST 2013 - locilka@suse.com
 Fri Jun 28 10:28:33 UTC 2013 - mfilka@suse.com
 
 - added Start / Stop commands into CLI
-- 2.24.1 
+- 2.24.1
 
 -------------------------------------------------------------------
 Mon May  6 15:08:31 CEST 2013 - locilka@suse.cz
@@ -68,7 +74,7 @@ Tue Nov 13 13:44:09 CET 2012 - tgoettlicher@suse.de
 -------------------------------------------------------------------
 Thu Mar 29 14:45:40 CEST 2012 - jsuchome@suse.cz
 
-- merged proofread texts 
+- merged proofread texts
 
 -------------------------------------------------------------------
 Fri Nov  4 15:50:22 CET 2011 - locilka@suse.cz
@@ -104,7 +110,7 @@ Fri Apr  2 15:24:40 CEST 2010 - locilka@suse.cz
 Wed Jan 13 18:56:03 CET 2010 - kmachalkova@suse.cz
 
 - Adjusted .desktop file(s) to wrap /sbin/yast2/ calls in xdg-su
-  where root privileges are needed, removed X-KDE-SubstituteUID key 
+  where root privileges are needed, removed X-KDE-SubstituteUID key
   (bnc#540627)
 
 -------------------------------------------------------------------
@@ -112,7 +118,7 @@ Thu Nov 26 19:20:16 CET 2009 - kmachalkova@suse.cz
 
 - Adapted to new Netmask API - prefix and netmask are now checked
   by two separate functions
-- 2.19.0 
+- 2.19.0
 
 -------------------------------------------------------------------
 Fri Nov 20 13:12:06 CET 2009 - locilka@suse.cz
@@ -124,7 +130,7 @@ Fri Oct 23 11:55:48 CEST 2009 - kmachalkova@suse.cz
 
 - Enable SSH service if user opts for opening SSH port in fw
   (bnc#537980)
-- 2.18.1 
+- 2.18.1
 
 -------------------------------------------------------------------
 Tue Jan 20 14:54:18 CET 2009 - locilka@suse.cz
@@ -258,7 +264,7 @@ Mon Jan 21 15:20:33 CET 2008 - locilka@suse.cz
 
 - UI adjusted to be possible to proceed with more services defined
   by package with the same name / translation.
-- Requires yast2 >= 2.16.22 
+- Requires yast2 >= 2.16.22
 
 -------------------------------------------------------------------
 Tue Dec  4 15:30:30 CET 2007 - locilka@suse.cz
@@ -449,7 +455,7 @@ Fri Jan 27 09:12:19 CET 2006 - locilka@suse.cz
 Fri Jan  6 15:27:07 CET 2006 - locilka@suse.cz
 
 - Adjusting for SLES10
-- 2.13.4 
+- 2.13.4
 
 -------------------------------------------------------------------
 Wed Jan  4 10:27:52 CET 2006 - locilka@suse.cz
@@ -494,7 +500,7 @@ Tue Aug 16 08:57:19 CEST 2005 - locilka@suse.cz
 - Fixing bug #104635
   From now, YaST doesn't complain when the additional allowed port
   is a numeric range of ports such as "550:570".
-- 2.12.4 
+- 2.12.4
 
 -------------------------------------------------------------------
 Wed Aug 10 09:30:10 CEST 2005 - locilka@suse.cz
@@ -547,7 +553,7 @@ Fri Mar  4 09:05:56 CET 2005 - locilka@suse.cz
 Wed Mar  2 12:51:51 CET 2005 - locilka@suse.cz
 
 - merged proofed texts
-- 2.11.10 
+- 2.11.10
 
 -------------------------------------------------------------------
 Wed Mar  2 10:40:40 CET 2005 - locilka@suse.cz
@@ -615,7 +621,7 @@ Mon Jan  3 10:23:53 CET 2005 - locilka@suse.cz
 - More informative Summarization
 - Support for new SuSEfirewall2's broadcast implementation
 - Added help texts
-- 2.11.4 
+- 2.11.4
 
 -------------------------------------------------------------------
 Tue Dec 21 09:09:09 CET 2004 - locilka@suse.cz
@@ -706,7 +712,7 @@ Mon Sep  6 09:01:35 CEST 2004 - locilka@suse.cz
 Fri Sep  3 12:44:38 CEST 2004 - locilka@suse.cz
 
 - fixed #44656 Firewall in install proposal is disabled by default
-  if there are any dial-up interfaces, they are proposed as 
+  if there are any dial-up interfaces, they are proposed as
   external interfaces, other interfaces as internal interfaces and
   the firewall is proposed to be enabled.
 
@@ -750,7 +756,7 @@ Fri Aug 27 16:50:39 CEST 2004 - locilka@suse.cz
 -------------------------------------------------------------------
 Fri Aug 27 11:23:55 CEST 2004 - visnov@suse.cz
 
-- fix HaveService() for any device (join separated by spaces) 
+- fix HaveService() for any device (join separated by spaces)
 
 -------------------------------------------------------------------
 Thu Aug 26 12:48:38 CEST 2004 - locilka@suse.cz
@@ -851,7 +857,7 @@ Wed Mar 31 17:57:23 CEST 2004 - msvec@suse.cz
 Wed Mar 10 01:47:00 CET 2004 - sh@suse.de
 
 - V 2.9.9
-- Migration to new wizard 
+- Migration to new wizard
 
 -------------------------------------------------------------------
 Tue Mar  9 11:30:07 CET 2004 - lnussel@suse.de
@@ -874,7 +880,7 @@ Fri Mar  5 11:28:58 CET 2004 - msvec@suse.cz
 -------------------------------------------------------------------
 Wed Mar  3 13:34:05 CET 2004 - visnov@suse.cz
 
-- fixed type info 
+- fixed type info
 
 -------------------------------------------------------------------
 Tue Mar  2 12:30:43 CET 2004 - lnussel@suse.de
@@ -905,7 +911,7 @@ Fri Feb  6 14:37:24 CET 2004 - msvec@suse.cz
 -------------------------------------------------------------------
 Tue Feb  3 10:27:44 CET 2004 - visnov@suse.cz
 
-- use Sequencer module instead of WizardSequencer 
+- use Sequencer module instead of WizardSequencer
 
 -------------------------------------------------------------------
 Mon Jan 26 15:31:04 CET 2004 - msvec@suse.cz
@@ -933,14 +939,14 @@ Sat Sep 13 18:46:58 CEST 2003 - nashif@suse.de
 -------------------------------------------------------------------
 Fri Aug 29 16:27:18 CEST 2003 - visnov@suse.de
 
-- fix #29659 (syntax errors) 
+- fix #29659 (syntax errors)
 - 2.8.11
 
 -------------------------------------------------------------------
 Mon Aug 25 15:35:42 CEST 2003 - visnov@suse.de
 
 - clarify a help text
-- 2.8.10 
+- 2.8.10
 
 -------------------------------------------------------------------
 Wed Aug 20 15:56:03 CEST 2003 - jsuchome@suse.de
@@ -951,13 +957,13 @@ Wed Aug 20 15:56:03 CEST 2003 - jsuchome@suse.de
 -------------------------------------------------------------------
 Mon Aug 11 10:04:29 CEST 2003 - visnov@suse.de
 
-- merged in proofread texts 
+- merged in proofread texts
 - 2.8.8
 
 -------------------------------------------------------------------
 Tue Aug  5 08:03:04 CEST 2003 - visnov@suse.de
 
-- read and write also DMZ/INT/EXT services and all interfaces 
+- read and write also DMZ/INT/EXT services and all interfaces
 - 2.8.7
 
 -------------------------------------------------------------------
@@ -971,8 +977,8 @@ Mon Aug  4 16:43:03 CEST 2003 - visnov@suse.de
 
 - added API for enabling and disabling services
 - added desktop file
-- 2.8.5 
- 
+- 2.8.5
+
 -------------------------------------------------------------------
 Wed Jul 30 17:51:37 CEST 2003 - msvec@suse.cz
 
