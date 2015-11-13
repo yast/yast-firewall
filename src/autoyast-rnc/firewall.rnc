@@ -54,6 +54,8 @@ y2_firewall =
   | FW_CONFIGURATIONS_INT
   | FW_LOAD_MODULES
   | FW_ALLOW_PING_FW
+  | FW_STOP_KEEP_ROUTING_STATE
+  | FW_BOOT_FULL_INIT
 
 firewall = element firewall { y2_firewall* }
 FW_CONFIGURATIONS_DMZ = element FW_CONFIGURATIONS_DMZ { text }
@@ -107,3 +109,5 @@ FW_SERVICES_INT_RPC = element FW_SERVICES_INT_RPC { text }
 FW_SERVICES_INT_TCP = element FW_SERVICES_INT_TCP { text }
 FW_SERVICES_INT_UDP = element FW_SERVICES_INT_UDP { text }
 FW_ALLOW_PING_FW = element FW_ALLOW_PING_FW { text }
+FW_STOP_KEEP_ROUTING_STATE = element FW_STOP_KEEP_ROUTING_STATE { "yes" | "no" }
+FW_BOOT_FULL_INIT = element FW_BOOT_FULL_INIT { "yes" | "no" }
