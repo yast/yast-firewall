@@ -59,7 +59,7 @@ describe Yast::FirewallAutoClient do
       let(:config) { { "start_firewall" => true } }
 
       it "imports configuration and returns nil" do
-        expect(Yast::SuSEFirewall).to receive(:read_and_import).with(config).and_return(nil)
+        expect(Yast::SuSEFirewall).to receive(:Import).with(config).and_return(nil)
         expect(subject.main).to be_nil
       end
     end
