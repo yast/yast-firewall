@@ -87,7 +87,9 @@ module Yast
         SuSEFirewall.SetStartService(SuSEFirewall.GetEnableService)
       # Import configuration
       elsif @func == "Import"
-        @ret = SuSEFirewall.read_and_import(@param)
+        @ret = SuSEFirewall.Import(
+          Convert.convert(@param, :from => "map", :to => "map <string, any>")
+        )
       # Read firewall data
       elsif @func == "Read"
         @ret = SuSEFirewall.Read
