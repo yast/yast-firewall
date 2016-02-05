@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Thu Feb  4 16:47:22 UTC 2016 - igonzalezsosa@suse.com
+
+- When importing firewall settings from an AutoYaST profile,
+  they're merged with the current system's configuration
+  (related with bnc#963585)
+- 3.1.5
+
+-------------------------------------------------------------------
 Fri Nov 13 09:15:40 UTC 2015 - igonzalezsosa@suse.com
 
 - fix validation of AutoYaST profiles (bnc#954412)
