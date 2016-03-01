@@ -1,7 +1,7 @@
 #!/usr/bin/env rspec
 
 require_relative "../test_helper"
-require_relative "../../src/clients/firewall_auto.rb"
+load File.expand_path("../../../src/clients/firewall_auto.rb", __FILE__)
 
 Yast.import "SuSEFirewall"
 
