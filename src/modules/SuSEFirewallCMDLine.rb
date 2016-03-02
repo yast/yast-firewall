@@ -1612,7 +1612,7 @@ module Yast
       return unless firewalld?
 
       # Actions not supported by FirewallD
-      firewalld_disabled = []
+      firewalld_disabled = ["broadcast"]
 
       firewalld_disabled.each do |opt|
         @cmdline["actions"].delete(opt)
