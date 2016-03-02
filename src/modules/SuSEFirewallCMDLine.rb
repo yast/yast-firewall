@@ -30,6 +30,7 @@
 #
 # $Id$
 require "yast"
+require "network/susefirewalld"
 
 module Yast
   class SuSEFirewallCMDLineClass < Module
@@ -1597,6 +1598,12 @@ module Yast
       Builtins.y2milestone("----------------------------------------")
 
       nil
+    end
+
+  private
+    # Returns true if FirewallD is the running backend
+    def firewalld?
+      SuSEFirewall.is_a?(Yast::SuSEFirewalldClass)
     end
 
     publish :function => :Run, :type => "void ()"
