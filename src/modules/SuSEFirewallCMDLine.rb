@@ -377,6 +377,9 @@ module Yast
           "disable"      => []
         }
       }
+
+      ConfigureFirewalld()
+
     end
 
     # Returns list of strings made from the comma-separated string got as param.
@@ -1603,6 +1606,19 @@ module Yast
     # Returns true if FirewallD is the running backend
     def firewalld?
       SuSEFirewall.is_a?(Yast::SuSEFirewalldClass)
+    end
+
+    def ConfigureFirewalld
+      return unless firewalld?
+
+      # Actions not supported by FirewallD
+      firewalld_disabled = []
+
+      firewalld_disabled.each do |opt|
+        @cmdline["actions"].delete(opt)
+        @cmdline["mappings"].delete(opt)
+      end
+
     end
 
     publish :function => :Run, :type => "void ()"
