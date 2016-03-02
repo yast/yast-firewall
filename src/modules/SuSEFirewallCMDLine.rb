@@ -490,7 +490,17 @@ module Yast
       # TRANSLATORS: CommandLine header
       CommandLine.Print(String.UnderlinedHeader(_("Summary:"), 0))
       CommandLine.Print("")
-      CommandLine.Print(InitBoxSummary(for_zones))
+      if firewalld?
+        if for_zones.empty?
+          CommandLine.Print(SuSEFirewall.fwd_api.list_all_zones.join("\n"))
+        else
+          for_zones.each do |zone|
+            CommandLine.Print(SuSEFirewall.fwd_api.list_all_zone(zone).join("\n"))
+          end
+        end
+      else
+        CommandLine.Print(InitBoxSummary(for_zones))
+      end
 
       # Do not call Write()
       false
