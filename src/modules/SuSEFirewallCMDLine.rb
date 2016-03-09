@@ -1547,6 +1547,22 @@ module Yast
     # @return [Boolean] whether write call is needed
     def FWCMDMasquerade(options)
       options = deep_copy(options)
+      zone = nil
+      if firewalld?
+        if options["zone"]
+          zone = options["zone"].downcase
+          if !SuSEFirewall.IsKnownZone(zone)
+            # TRANSLATORS: CommandLine error, %1 is zone
+            CommandLine.Error(Builtins.sformat(_("Unknown zone %1."), zone))
+            return false
+          end
+        else
+          # TRANSLATORS: CommandLine error
+          CommandLine.Error("Mandatory 'zone' parameter is missing")
+          return false
+        end
+      end
+
       if Ops.get(options, "show") != nil
         CommandLine.Print("")
         # TRANSLATORS: CommandLine header
@@ -1554,23 +1570,30 @@ module Yast
           String.UnderlinedHeader(_("Masquerading Settings:"), 0)
         )
         CommandLine.Print("")
+
+       # TRANSLATORS: CommandLine informative text, either "everywhere" or
+       # "in the %1 zone" where %1 is zone name.
+       zone_msg = zone == nil ? _("everywhere") :
+         Builtins.sformat(_("in the %1 zone"), zone)
+
         CommandLine.Print(
           Builtins.sformat(
             # TRANSLATORS: CommandLine informative text, %1 is "enabled" or "disabled"
-            _("Masquerading is %1"),
-            SuSEFirewall.GetMasquerade == true ?
+            # %2 is previously mentioned zone_msg
+            _("Masquerading is %1 %2"),
+            SuSEFirewall.GetMasquerade(zone) == true ?
               # TRANSLATORS: CommandLine masquerade status
               _("enabled") :
               # TRANSLATORS: CommandLine masquerade status
-              _("disabled")
+              _("disabled"), zone_msg
           )
         )
         CommandLine.Print("")
         return false
       elsif Ops.get(options, "enable") != nil
-        SuSEFirewall.SetMasquerade(true)
+        SuSEFirewall.SetMasquerade(true, zone)
       elsif Ops.get(options, "disable") != nil
-        SuSEFirewall.SetMasquerade(false)
+        SuSEFirewall.SetMasquerade(false, zone)
       end
 
       nil
@@ -1628,6 +1651,9 @@ module Yast
         @cmdline["actions"].delete(opt)
         @cmdline["mappings"].delete(opt)
       end
+
+      @cmdline["actions"]["masquerade"]["example"] << "masquerade zone=public enable"
+      @cmdline["mappings"]["masquerade"] <<  "zone"
 
     end
 
