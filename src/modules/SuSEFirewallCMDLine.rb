@@ -1655,6 +1655,16 @@ module Yast
       @cmdline["actions"]["masquerade"]["example"] << "masquerade zone=public enable"
       @cmdline["mappings"]["masquerade"] <<  "zone"
 
+      # protection from internal zone does not apply to FirewallD
+      @cmdline["actions"]["services"]["example"] = [
+        "services show detailed",
+        "services add service=service:dhcp-server zone=EXT",
+        "services remove ipprotocol=esp tcpport=12,13,ipp zone=DMZ"
+      ]
+      # Remove unsupported options for FirewallD
+      @cmdline["mappings"]["services"].delete("rpcport")
+      @cmdline["mappings"]["services"].delete("protect")
+
     end
 
     publish :function => :Run, :type => "void ()"
