@@ -30,6 +30,9 @@
 # $Id$
 #
 # File includes helps for yast2-firewall dialogs.
+#
+require "network/susefirewalld"
+
 module Yast
   class FirewallClient < Client
     def main
@@ -57,11 +60,27 @@ module Yast
         SuSEFirewallCMDLine.Run 
         # GUI or TextUI
       else
-        # installation has other sequence
-        if Mode.installation
-          @ret = FirewallInstallationSequence()
+        # If FirewallD then use it's UI
+        if SuSEFirewall.is_a?(Yast::SuSEFirewalldClass)
+          # We can't do ncurces. Lets see if the firewalld-config
+          # is installed
+          Yast.import "PackageSystem"
+          Yast.import "UI"
+          if UI.TextMode()
+            Yast::Popup.Error(_("Your display can't support the 'firewall-config' UI.\n") +
+                               _("Either use the Yast2 command line or the 'firewall-cmd' utility.") )
+            return false
+          end
+          if PackageSystem.CheckAndInstallPackages(["firewall-config"])
+            @ret = SCR.Execute(Yast::Path.new(".target.bash"), "/usr/bin/firewall-config")
+          end
         else
-          @ret = FirewallSequence()
+          # installation has other sequence
+          if Mode.installation
+            @ret = FirewallInstallationSequence()
+          else
+            @ret = FirewallSequence()
+          end
         end
       end
 
