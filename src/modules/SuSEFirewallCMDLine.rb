@@ -567,7 +567,6 @@ module Yast
         CommandLine.Print("")
 
         table_items = []
-        special_interfaces = {}
         Builtins.foreach(SuSEFirewall.GetKnownFirewallZones) do |zone|
           # for_zone defined but it is not current zone
           next if for_zone != nil && for_zone != zone
