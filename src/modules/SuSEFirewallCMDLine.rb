@@ -30,6 +30,7 @@
 #
 # $Id$
 require "yast"
+require "network/susefirewalld"
 
 module Yast
   class SuSEFirewallCMDLineClass < Module
@@ -376,6 +377,9 @@ module Yast
           "disable"      => []
         }
       }
+
+      ConfigureFirewalld()
+
     end
 
     # Returns list of strings made from the comma-separated string got as param.
@@ -486,7 +490,17 @@ module Yast
       # TRANSLATORS: CommandLine header
       CommandLine.Print(String.UnderlinedHeader(_("Summary:"), 0))
       CommandLine.Print("")
-      CommandLine.Print(InitBoxSummary(for_zones))
+      if firewalld?
+        if for_zones.empty?
+          CommandLine.Print(SuSEFirewall.fwd_api.list_all_zones.join("\n"))
+        else
+          for_zones.each do |zone|
+            CommandLine.Print(SuSEFirewall.fwd_api.list_all_zone(zone).join("\n"))
+          end
+        end
+      else
+        CommandLine.Print(InitBoxSummary(for_zones))
+      end
 
       # Do not call Write()
       false
@@ -566,7 +580,6 @@ module Yast
         CommandLine.Print("")
 
         table_items = []
-        special_interfaces = {}
         Builtins.foreach(SuSEFirewall.GetKnownFirewallZones) do |zone|
           # for_zone defined but it is not current zone
           next if for_zone != nil && for_zone != zone
@@ -1534,6 +1547,22 @@ module Yast
     # @return [Boolean] whether write call is needed
     def FWCMDMasquerade(options)
       options = deep_copy(options)
+      zone = nil
+      if firewalld?
+        if options["zone"]
+          zone = options["zone"].downcase
+          if !SuSEFirewall.IsKnownZone(zone)
+            # TRANSLATORS: CommandLine error, %1 is zone
+            CommandLine.Error(Builtins.sformat(_("Unknown zone %1."), zone))
+            return false
+          end
+        else
+          # TRANSLATORS: CommandLine error
+          CommandLine.Error("Mandatory 'zone' parameter is missing")
+          return false
+        end
+      end
+
       if Ops.get(options, "show") != nil
         CommandLine.Print("")
         # TRANSLATORS: CommandLine header
@@ -1541,23 +1570,30 @@ module Yast
           String.UnderlinedHeader(_("Masquerading Settings:"), 0)
         )
         CommandLine.Print("")
+
+       # TRANSLATORS: CommandLine informative text, either "everywhere" or
+       # "in the %1 zone" where %1 is zone name.
+       zone_msg = zone == nil ? _("everywhere") :
+         Builtins.sformat(_("in the %1 zone"), zone)
+
         CommandLine.Print(
           Builtins.sformat(
             # TRANSLATORS: CommandLine informative text, %1 is "enabled" or "disabled"
-            _("Masquerading is %1"),
-            SuSEFirewall.GetMasquerade == true ?
+            # %2 is previously mentioned zone_msg
+            _("Masquerading is %1 %2"),
+            SuSEFirewall.GetMasquerade(zone) == true ?
               # TRANSLATORS: CommandLine masquerade status
               _("enabled") :
               # TRANSLATORS: CommandLine masquerade status
-              _("disabled")
+              _("disabled"), zone_msg
           )
         )
         CommandLine.Print("")
         return false
       elsif Ops.get(options, "enable") != nil
-        SuSEFirewall.SetMasquerade(true)
+        SuSEFirewall.SetMasquerade(true, zone)
       elsif Ops.get(options, "disable") != nil
-        SuSEFirewall.SetMasquerade(false)
+        SuSEFirewall.SetMasquerade(false, zone)
       end
 
       nil
@@ -1597,6 +1633,38 @@ module Yast
       Builtins.y2milestone("----------------------------------------")
 
       nil
+    end
+
+  private
+    # Returns true if FirewallD is the running backend
+    def firewalld?
+      SuSEFirewall.is_a?(Yast::SuSEFirewalldClass)
+    end
+
+    def ConfigureFirewalld
+      return unless firewalld?
+
+      # Actions not supported by FirewallD
+      firewalld_disabled = ["broadcast", "masqredirect"]
+
+      firewalld_disabled.each do |opt|
+        @cmdline["actions"].delete(opt)
+        @cmdline["mappings"].delete(opt)
+      end
+
+      @cmdline["actions"]["masquerade"]["example"] << "masquerade zone=public enable"
+      @cmdline["mappings"]["masquerade"] <<  "zone"
+
+      # protection from internal zone does not apply to FirewallD
+      @cmdline["actions"]["services"]["example"] = [
+        "services show detailed",
+        "services add service=service:dhcp-server zone=EXT",
+        "services remove ipprotocol=esp tcpport=12,13,ipp zone=DMZ"
+      ]
+      # Remove unsupported options for FirewallD
+      @cmdline["mappings"]["services"].delete("rpcport")
+      @cmdline["mappings"]["services"].delete("protect")
+
     end
 
     publish :function => :Run, :type => "void ()"
