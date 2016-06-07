@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Jun  7 10:37:17 UTC 2016 - igonzalezsosa@suse.com
+
+- Stop generating autodocs (fate#320356)
+- 3.1.6
+
+-------------------------------------------------------------------
 Tue May 24 15:26:37 UTC 2016 - mchandras@suse.de
 
 - Add support for firewalld (fate#318356)
