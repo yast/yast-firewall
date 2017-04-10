@@ -123,7 +123,7 @@ module Yast
       Wizard.CreateDialog
       Wizard.RestoreHelp(HelpForDialog("saving_configuration"))
       success = SuSEFirewall.SaveAndRestartService
-      SuSEFirewall.SetStartService(true) if success
+      success ? SuSEFirewall.SetStartService(true) : report_problem(:start)
       Builtins.sleep(500)
       UI.CloseDialog
 
@@ -135,10 +135,11 @@ module Yast
     def StartNow
       UI.OpenDialog(Label(_("Starting firewall...")))
       SuSEFirewall.SetStartService(true)
-      ret = SuSEFirewall.StartServices
+      success = SuSEFirewall.StartServices
+      report_problem(:start) unless success
       UI.CloseDialog
 
-      ret
+      success
     end
 
     # Function stops Firewall services and sets firewall
@@ -146,10 +147,30 @@ module Yast
     def StopNow
       UI.OpenDialog(Label(_("Stopping firewall...")))
       SuSEFirewall.SetStartService(false)
-      ret = SuSEFirewall.StopServices
+      success = SuSEFirewall.StopServices
+      report_problem(:stop) unless success
       UI.CloseDialog
 
-      ret
+      success
+    end
+
+    def report_problem(action)
+      action_str = case action
+      when :stop
+        # TRANSLATORS: action which failed, used later
+        _("The firewall could not be stopped.")
+      when :start
+        # TRANSLATORS: action which failed, used later
+        _("The firewall could not be started.")
+      else
+        raise "invalid action #{action}"
+      end
+      # TRANSLATORS: %s is action that failed
+      msg = _(
+        "%s\n" +
+        "Please verify your system and try again."
+      ) % action_str
+      Popup.Error(msg)
     end
 
     # Function sets appropriate states for [Change] and [Custom] buttons
