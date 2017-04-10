@@ -158,16 +158,16 @@ module Yast
       action_str = case action
       when :stop
         # TRANSLATORS: action which failed, used later
-        _("The firewall could not be stopped")
+        _("The firewall could not be stopped.")
       when :start
         # TRANSLATORS: action which failed, used later
-        _("The firewall could not be started")
+        _("The firewall could not be started.")
       else
         raise "invalid action #{action}"
       end
       # TRANSLATORS: %s is action that failed
       msg = _(
-        "%s.\n" +
+        "%s\n" +
         "Please verify your system and try again."
       ) % action_str
       Popup.Error(msg)
