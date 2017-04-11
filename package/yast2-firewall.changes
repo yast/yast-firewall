@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Apr 11 16:13:34 UTC 2017 - gsouza@suse.com
+
+- Inform the user if start/stop/restart fails bsc#962713 
+- 3.1.5
+
+-------------------------------------------------------------------
 Fri Nov 13 09:15:40 UTC 2015 - igonzalezsosa@suse.com
 
 - fix validation of AutoYaST profiles (bnc#954412)
