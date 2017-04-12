@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Apr 11 13:04:29 UTC 2017 - gsouza@suse.com
+
+- Inform the user if start/stop/restart fails bsc#962713
+- 3.1.7 
+
+-------------------------------------------------------------------
 Tue Jun  7 10:37:17 UTC 2016 - igonzalezsosa@suse.com
 
 - Stop generating autodocs (fate#320356)
