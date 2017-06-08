@@ -24,3 +24,6 @@ mkinstalldirs
 stamp-h*
 autodocs-*
 pluglib-bindings.ami
+/.yardoc
+/doc
+
