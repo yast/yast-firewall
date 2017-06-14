@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Wed Jun 14 07:37:51 UTC 2017 - mfilka@suse.com
+
+- bnc#1044045
+  - do not raise an internal error when pushing Add button when
+    "Service to Allow" list is empty
+- 3.2.0
+
+-------------------------------------------------------------------
 Fri Apr  7 13:51:51 UTC 2017 - gsouza@suse.com
 
 - Inform the user if start/stop/restart fails bsc#962713
