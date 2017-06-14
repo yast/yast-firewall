@@ -950,6 +950,9 @@ module Yast
         add_service = Convert.to_string(
           UI.QueryWidget(Id("allow_service_names"), :Value)
         )
+
+        return nil if add_service.empty?
+
         SuSEFirewall.SetServicesForZones([add_service], [current_zone], true)
         RedrawAllowedServices(current_zone)
       elsif ret == "remove_allowed_service"
