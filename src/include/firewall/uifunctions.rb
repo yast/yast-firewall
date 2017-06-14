@@ -651,7 +651,6 @@ module Yast
     # @return [Boolean] whether everything was ok or whether user wants is despite the error
     def CheckAdditionalServicesDefinition(services_definition)
       if Builtins.regexpmatch(services_definition, ",")
-        ports = Builtins.splitstring(services_definition, ",")
         return Popup.YesNoHeadline(
           # TRANSLATORS: popup headline
           _("Invalid Additional Service Definition"),
