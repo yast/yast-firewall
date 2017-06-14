@@ -24,3 +24,18 @@ mkinstalldirs
 stamp-h*
 autodocs-*
 pluglib-bindings.ami
+
+# Doc stuff
+doc/
+.yardoc/*
+
+# Testsuite stuff
+testsuite/config/
+testsuite/run/
+testsuite/yast2-firewall.test/
+testsuite/*.err.*
+testsuite/*.out.*
+testsuite/*.log
+testsuite/*.sum
+testsuite/*.exp
+testsuite/*.bak

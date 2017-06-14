@@ -651,7 +651,6 @@ module Yast
     # @return [Boolean] whether everything was ok or whether user wants is despite the error
     def CheckAdditionalServicesDefinition(services_definition)
       if Builtins.regexpmatch(services_definition, ",")
-        ports = Builtins.splitstring(services_definition, ",")
         return Popup.YesNoHeadline(
           # TRANSLATORS: popup headline
           _("Invalid Additional Service Definition"),
@@ -950,6 +949,9 @@ module Yast
         add_service = Convert.to_string(
           UI.QueryWidget(Id("allow_service_names"), :Value)
         )
+
+        return nil if add_service.empty?
+
         SuSEFirewall.SetServicesForZones([add_service], [current_zone], true)
         RedrawAllowedServices(current_zone)
       elsif ret == "remove_allowed_service"
