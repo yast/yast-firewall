@@ -53,19 +53,21 @@ A YaST2 module to be used for configuring a firewall.
 %prep
 %setup -n %{name}-%{version}
 
+%check
+rake test:unit
+
 %build
-%yast_build
 
 %install
-%yast_install
-
+rake install DESTDIR="%{buildroot}"
 
 %files
 %defattr(-,root,root)
-%dir %{yast_yncludedir}/firewall
-%{yast_yncludedir}/firewall/*
-%{yast_moduledir}/SuSEFirewall*
-%{yast_clientdir}/firewall*
-%{yast_desktopdir}/firewall.desktop
+%{yast_dir}/client/*.rb
+%{yast_dir}/lib
+%{yast_desktopdir}/*.desktop
 %{yast_schemadir}/autoyast/rnc/firewall.rnc
-%doc %{yast_docdir}
+
+%doc COPYING
+%doc README.md
+%doc CONTRIBUTING.md
