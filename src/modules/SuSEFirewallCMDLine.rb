@@ -30,7 +30,6 @@
 #
 # $Id$
 require "yast"
-require "network/susefirewalld"
 
 module Yast
   class SuSEFirewallCMDLineClass < Module
@@ -490,16 +489,12 @@ module Yast
       # TRANSLATORS: CommandLine header
       CommandLine.Print(String.UnderlinedHeader(_("Summary:"), 0))
       CommandLine.Print("")
-      if firewalld?
-        if for_zones.empty?
-          CommandLine.Print(SuSEFirewall.fwd_api.list_all_zones.join("\n"))
-        else
-          for_zones.each do |zone|
-            CommandLine.Print(SuSEFirewall.fwd_api.list_all_zone(zone).join("\n"))
-          end
-        end
+      if for_zones.empty?
+        CommandLine.Print(SuSEFirewall.fwd_api.list_all_zones.join("\n"))
       else
-        CommandLine.Print(InitBoxSummary(for_zones))
+        for_zones.each do |zone|
+          CommandLine.Print(SuSEFirewall.fwd_api.list_all_zone(zone).join("\n"))
+        end
       end
 
       # Do not call Write()
@@ -1548,19 +1543,17 @@ module Yast
     def FWCMDMasquerade(options)
       options = deep_copy(options)
       zone = nil
-      if firewalld?
-        if options["zone"]
-          zone = options["zone"].downcase
-          if !SuSEFirewall.IsKnownZone(zone)
-            # TRANSLATORS: CommandLine error, %1 is zone
-            CommandLine.Error(Builtins.sformat(_("Unknown zone %1."), zone))
-            return false
-          end
-        else
-          # TRANSLATORS: CommandLine error
-          CommandLine.Error("Mandatory 'zone' parameter is missing")
+      if options["zone"]
+        zone = options["zone"].downcase
+        if !SuSEFirewall.IsKnownZone(zone)
+          # TRANSLATORS: CommandLine error, %1 is zone
+          CommandLine.Error(Builtins.sformat(_("Unknown zone %1."), zone))
           return false
         end
+      else
+        # TRANSLATORS: CommandLine error
+        CommandLine.Error("Mandatory 'zone' parameter is missing")
+        return false
       end
 
       if Ops.get(options, "show") != nil
@@ -1636,14 +1629,7 @@ module Yast
     end
 
   private
-    # Returns true if FirewallD is the running backend
-    def firewalld?
-      SuSEFirewall.is_a?(Yast::SuSEFirewalldClass)
-    end
-
     def ConfigureFirewalld
-      return unless firewalld?
-
       # Actions not supported by FirewallD
       firewalld_disabled = ["broadcast", "masqredirect"]
 
@@ -1664,7 +1650,6 @@ module Yast
       # Remove unsupported options for FirewallD
       @cmdline["mappings"]["services"].delete("rpcport")
       @cmdline["mappings"]["services"].delete("protect")
-
     end
 
     publish :function => :Run, :type => "void ()"
