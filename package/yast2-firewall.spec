@@ -29,6 +29,8 @@ BuildRequires:  perl-XML-Writer update-desktop-files yast2-testsuite
 BuildRequires:  yast2-devtools >= 3.1.10
 # IP::CheckNetwork
 BuildRequires:	yast2 >= 2.23.25
+BuildRequires:  rubygem(yast-rake)
+BuildRequires:  rubygem(rspec)
 
 # FirewallD backend
 Requires:	yast2 >= 3.1.191
@@ -63,8 +65,10 @@ rake install DESTDIR="%{buildroot}"
 
 %files
 %defattr(-,root,root)
-%{yast_dir}/client/*.rb
+%{yast_dir}/clients/*.rb
 %{yast_dir}/lib
+%{yast_dir}/include
+%{yast_dir}/modules
 %{yast_desktopdir}/*.desktop
 %{yast_schemadir}/autoyast/rnc/firewall.rnc
 

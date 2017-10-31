@@ -7,6 +7,7 @@ module_DATA = \
 client_DATA = \
   clients/firewall_auto.rb \
   clients/firewall_proposal.rb \
+  clients/firewall_finish.rb \
   clients/firewall.rb
 
 yncludedir = @yncludedir@/firewall
@@ -28,5 +29,6 @@ desktop_DATA = \
   desktop/firewall.desktop
 
 EXTRA_DIST = $(module_DATA) $(client_DATA) $(ynclude_DATA) $(schemafiles_DATA) $(desktop_DATA)
+#EXTRA_DIST = $(module_DATA) $(client_DATA) $(schemafiles_DATA) $(desktop_DATA)
 
 include $(top_srcdir)/Makefile.am.common

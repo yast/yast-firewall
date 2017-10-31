@@ -19,7 +19,36 @@
 # current contact information at www.suse.com.
 # ------------------------------------------------------------------------------
 
-require 'y2firewall/clients/proposal'
-require "y2firewall/dialogs/proposal"
+require "yast"
+require "y2firewall/firewalld"
+require "installation/finish_client"
 
-Y2Firewall::Clients::Proposal.new.run
+module Y2Firewall
+  module Clients
+    class InstallationFinish < ::Installation::FinishClient
+      attr_accessor :settings, :firewalld
+
+      def initialize
+        textdomain "firewall"
+        @settings = ProposalSettings.instance
+        @firewalld = Firewalld.instance
+      end
+
+      def title
+        "Writing Firewall Configuration..."
+      end
+
+      def modes
+        [:installation, :autoinst]
+      end
+
+      def write
+        Service.Enable("sshd") if @settings.enable_sshd
+        @firewalld.enable! if @settings.enable_firewall
+
+        @firewalld.api.add_service("public", "ssh") if @settings.open_ssh
+        @firewalld.api.add_service("public", "vnc-server") if @settings.open_vnc
+      end
+    end
+  end
+end
