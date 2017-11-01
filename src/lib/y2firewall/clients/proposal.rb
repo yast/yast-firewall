@@ -89,14 +89,16 @@ module Y2Firewall
         if SERVICES_LINKS.include?(chosen_link)
           call_proposal_action_for(chosen_link)
         elsif chosen_link == LINK_FIREWALL_DIALOG
-          log.info "Calling dialog proposal"
           result = Y2Firewall::Dialogs::Proposal.new(@settings).run
-          log.info "The result of the proposal dialog is: #{result}"
         else
           raise "INTERNAL ERROR: unknown action '#{chosen_link}' for proposal client"
         end
 
         { "workflow_sequence" => result }
+      end
+
+      def write
+        { "success" => true }
       end
 
     private

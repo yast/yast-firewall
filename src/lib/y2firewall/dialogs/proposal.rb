@@ -25,6 +25,7 @@ require "y2firewall/widgets/proposal"
 
 Yast.import "Hostname"
 Yast.import "Linuxrc"
+Yast.import "Mode"
 
 module Y2Firewall
   module Dialogs
@@ -60,6 +61,23 @@ module Y2Firewall
         )
       end
 
+      def abort_button
+        ""
+      end
+
+      def back_button
+        # do not show back button when running on running system. See CWM::Dialog.back_button
+        Yast::Mode.installation ? nil : ""
+      end
+
+      def next_button
+        Yast::Mode.installation ? Yast::Label.OKButton : Yast::Label.FinishButton
+      end
+
+      def disable_buttons
+        [:abort]
+      end
+
     protected
 
       # Hostname of the current system.
@@ -80,6 +98,10 @@ module Y2Firewall
         return Empty() unless Yast::Linuxrc.vnc
 
         Left(Widgets::OpenVNCPorts.new(@settings))
+      end
+
+      def should_open_dialog?
+        true
       end
     end
   end
