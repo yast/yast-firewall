@@ -24,6 +24,7 @@ require "cwm"
 
 module Y2Firewall
   module Widgets
+    # Enable firewall service checkbox
     class EnableFirewall < CWM::CheckBox
       def initialize(settings)
         @settings = settings
@@ -44,8 +45,25 @@ module Y2Firewall
       def store
         value ? @settings.enable_firewall! : @settings.disable_firewall!
       end
+
+      def help
+        _(
+          "<p><b><big>Firewall and SSH</big></b><br>\n" \
+            "Firewall is a defensive mechanism that protects " \
+            "your computer from network attacks.\n" \
+            "SSH is a service that allows logging into this " \
+            "computer remotely via dedicated\n" \
+            "SSH client</p>"
+        ) +
+        _(
+          "<p>Here you can choose whether the firewall will be " \
+          "enabled or disabled after\nthe installation. It is " \
+          "recommended to keep it enabled.</p>"
+        )
+      end
     end
 
+    # Enable sshd service checkbox
     class EnableSSHD < CWM::CheckBox
       def initialize(settings)
         @settings = settings
@@ -66,8 +84,18 @@ module Y2Firewall
       def store
         value ? @settings.enable_sshd! : @settings.disable_sshd!
       end
+
+      def help
+        _(
+          "<p>With enabled firewall, you can decide whether to open " \
+          "firewall port for SSH\n service and allow remote SSH logins. " \
+          "Independently you can also enable SSH service (i.e. it\n" \
+          "will be started on computer boot).</p>"
+        )
+      end
     end
 
+    # Open ssh port checkbox
     class OpenSSHPort < CWM::CheckBox
       def initialize(settings)
         @settings = settings
@@ -90,6 +118,7 @@ module Y2Firewall
       end
     end
 
+    # Open vnc port checkbox
     class OpenVNCPorts < CWM::CheckBox
       def initialize(settings)
         @settings = settings
@@ -109,6 +138,14 @@ module Y2Firewall
 
       def store
         value ? @settings.open_vnc! : @settings.close_vnc!
+      end
+
+      def help
+        _(
+          "<p>You can also open VNC ports in firewall. It will not enable\n" \
+            "the remote administration service on a running system but it is\n" \
+            "started by the installer automatically if needed.</p>"
+        )
       end
     end
   end

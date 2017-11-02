@@ -46,7 +46,12 @@ module Y2Firewall
         Service.Enable("sshd") if @settings.enable_sshd
         @firewalld.enable! if @settings.enable_firewall
 
-        @firewalld.api.add_service("public", "ssh") if @settings.open_ssh
+        if @settings.open_ssh
+          @firewalld.api.add_service("public", "ssh")
+        else
+          @firewalld.api.remove_service("public", "ssh")
+        end
+
         @firewalld.api.add_service("public", "vnc-server") if @settings.open_vnc
       end
     end

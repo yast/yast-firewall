@@ -134,7 +134,7 @@ module Y2Firewall
       # Returns nil if this part should be skipped
       # @return [String] proposal html text
       def ssh_port_proposal
-        return nil unless @settings.open_ssh
+        return nil unless @settings.enable_sshd
 
         if @settings.open_ssh
           _("SSH port will be open (<a href=\"%s\">block</a>)") % LINK_BLOCK_SSH_PORT
