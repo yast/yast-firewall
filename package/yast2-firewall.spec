@@ -32,8 +32,8 @@ BuildRequires:	yast2 >= 2.23.25
 BuildRequires:  rubygem(yast-rake)
 BuildRequires:  rubygem(rspec)
 
-# FirewallD backend
-Requires:	yast2 >= 3.1.191
+# FirewallD API
+Requires:       yast2 >= 4.0.12
 
 # ButtonBox widget
 Conflicts:	yast2-ycp-ui-bindings < 2.17.3
