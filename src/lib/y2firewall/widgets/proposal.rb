@@ -39,7 +39,7 @@ module Y2Firewall
       end
 
       def opt
-        %i(notify)
+        [:notify]
       end
 
       def store
@@ -78,7 +78,7 @@ module Y2Firewall
       end
 
       def opt
-        %i(notify)
+        [:notify]
       end
 
       def store
@@ -110,7 +110,7 @@ module Y2Firewall
       end
 
       def opt
-        %i(notify)
+        [:notify]
       end
 
       def store
@@ -133,7 +133,7 @@ module Y2Firewall
       end
 
       def opt
-        %i(notify)
+        [:notify]
       end
 
       def store
