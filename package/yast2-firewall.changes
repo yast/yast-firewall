@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Oct 26 11:34:59 UTC 2017 - knut.anderssen@suse.com
+
+- Remove support for SuSEFirewall2 in firewall client supporting
+  only firewalld (fate#323460)
+- 4.0.0
+
+-------------------------------------------------------------------
 Wed Jun 14 07:37:51 UTC 2017 - mfilka@suse.com
 
 - bnc#1044045

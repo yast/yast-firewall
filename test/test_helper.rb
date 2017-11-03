@@ -19,7 +19,28 @@
 # current contact information at www.suse.com.
 # ------------------------------------------------------------------------------
 
-require 'y2firewall/clients/proposal'
-require "y2firewall/dialogs/proposal"
+# Set the paths
+src_path = File.expand_path("../../src", __FILE__)
+ENV["Y2DIR"] = src_path
 
-Y2Firewall::Clients::Proposal.new.run
+require "yast"
+require "yast/rspec"
+
+if ENV["COVERAGE"]
+  require "simplecov"
+  SimpleCov.start do
+    add_filter "/test/"
+  end
+
+  # for coverage we need to load all ruby files
+  Dir["#{src_path}/{modules,lib}/**/*.rb"].each { |f| require_relative f }
+
+  # use coveralls for on-line code coverage reporting at Travis CI
+  if ENV["TRAVIS"]
+    require "coveralls"
+    SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
+      SimpleCov::Formatter::HTMLFormatter,
+      Coveralls::SimpleCov::Formatter
+    ]
+  end
+end

@@ -17,7 +17,7 @@
 
 
 Name:           yast2-firewall
-Version:        3.2.0
+Version:        4.0.0
 Release:        0
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
@@ -29,9 +29,11 @@ BuildRequires:  perl-XML-Writer update-desktop-files yast2-testsuite
 BuildRequires:  yast2-devtools >= 3.1.10
 # IP::CheckNetwork
 BuildRequires:	yast2 >= 2.23.25
+BuildRequires:  rubygem(yast-rake)
+BuildRequires:  rubygem(rspec)
 
-# FirewallD backend
-Requires:	yast2 >= 3.1.191
+# FirewallD API
+Requires:       yast2 >= 4.0.12
 
 # ButtonBox widget
 Conflicts:	yast2-ycp-ui-bindings < 2.17.3
@@ -53,19 +55,23 @@ A YaST2 module to be used for configuring a firewall.
 %prep
 %setup -n %{name}-%{version}
 
+%check
+rake test:unit
+
 %build
-%yast_build
 
 %install
-%yast_install
-
+rake install DESTDIR="%{buildroot}"
 
 %files
 %defattr(-,root,root)
-%dir %{yast_yncludedir}/firewall
-%{yast_yncludedir}/firewall/*
-%{yast_moduledir}/SuSEFirewall*
-%{yast_clientdir}/firewall*
-%{yast_desktopdir}/firewall.desktop
+%{yast_dir}/clients/*.rb
+%{yast_dir}/lib
+%{yast_dir}/include
+%{yast_dir}/modules
+%{yast_desktopdir}/*.desktop
 %{yast_schemadir}/autoyast/rnc/firewall.rnc
-%doc %{yast_docdir}
+
+%doc COPYING
+%doc README.md
+%doc CONTRIBUTING.md
