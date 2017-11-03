@@ -77,7 +77,7 @@ module Yast
       elsif @func == "Reset"
         SuSEFirewall.Import({})
         @ret = {}
-        SuSEFirewall.SetEnableService(SuSEFirewall.GetStartService)
+        SuSEFirewall.SetEnableService(SuSEFirewall.GetStartService || false)
       # Return required packages for module to operate
       elsif @func == "Packages"
         @ret = { "install" => [ "SuSEfirewall2" ] }
