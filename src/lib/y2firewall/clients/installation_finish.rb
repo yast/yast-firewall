@@ -21,6 +21,7 @@
 
 require "yast"
 require "y2firewall/firewalld"
+require "y2firewall/proposal_settings"
 require "installation/finish_client"
 
 module Y2Firewall

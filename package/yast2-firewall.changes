@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Wed Nov  8 13:55:31 UTC 2017 - knut.anderssen@suse.com
+
+- Added missing require (bsc#1067180)
+- 4.0.1
+
+-------------------------------------------------------------------
 Thu Oct 26 11:34:59 UTC 2017 - knut.anderssen@suse.com
 
 - Remove support for SuSEFirewall2 in firewall client supporting
