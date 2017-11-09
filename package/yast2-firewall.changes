@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Nov  9 09:16:14 UTC 2017 - knut.anderssen@suse.com
+
+- ProposalSettings: fixed method name when vnc is enable by Linuxrc
+  (bsc#1067320)
+- 4.0.2
+
+-------------------------------------------------------------------
 Wed Nov  8 13:55:31 UTC 2017 - knut.anderssen@suse.com
 
 - Added missing require (bsc#1067180)
