@@ -13,16 +13,8 @@ describe Y2Firewall::Clients::InstallationFinish do
   end
 
   describe "#modes" do
-    it "runs in installation" do
-      expect(subject.modes).to include(:installation)
-    end
-
-    it "runs in autoinstallation" do
-      expect(subject.modes).to include(:autoinst)
-    end
-
-    it "does not run in update" do
-      expect(subject.modes).to_not include(:update)
+    it "runs on installation and autoinstallation" do
+      expect(subject.modes).to eq([:installation, :autoinst])
     end
   end
 
