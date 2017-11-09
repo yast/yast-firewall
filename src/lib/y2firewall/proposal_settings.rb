@@ -13,9 +13,9 @@ module Y2Firewall
 
       load_features
       enable_firewall! if @enable_firewall
-      enable_vnc! if Yast::Linuxrc.vnc
       enable_sshd! if Yast::Linuxrc.usessh || @enable_sshd
       open_ssh! if Yast::Linuxrc.usessh || @open_ssh
+      open_vnc! if Yast::Linuxrc.vnc
     end
 
     def load_features
