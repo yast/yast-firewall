@@ -68,14 +68,14 @@ module Y2Firewall
 
     def close_vnc!
       log.info "Close VNC port"
-      self.close_vnc = true
+      self.open_vnc = false
     end
 
   private
 
     def load_feature(feature, to, source: global_section)
       value = Yast::Ops.get(source, feature.to_s)
-      self.send("#{to}=", value) unless value.nil?
+      public_send("#{to}=", value) unless value.nil?
     end
 
     def global_section
