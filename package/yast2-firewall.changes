@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Nov  9 22:22:15 UTC 2017 - knut.anderssen@suse.com
+
+- ProposalSettings: fixed an attribute name error when trying to
+  block vnc port (bsc#1067320)
+- 4.0.3
+
+-------------------------------------------------------------------
 Thu Nov  9 09:16:14 UTC 2017 - knut.anderssen@suse.com
 
 - ProposalSettings: fixed method name when vnc is enable by Linuxrc
