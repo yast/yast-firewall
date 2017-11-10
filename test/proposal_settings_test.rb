@@ -160,8 +160,7 @@ describe Y2Firewall::ProposalSettings do
 
   describe "#open_ssh!" do
     it "sets the ssh port to be opened" do
-      subject.close_ssh!
-      expect(subject.open_ssh).to be(false)
+      subject.open_ssh = false
       subject.open_ssh!
       expect(subject.open_ssh).to be(true)
     end
@@ -169,8 +168,7 @@ describe Y2Firewall::ProposalSettings do
 
   describe "#close_ssh!" do
     it "sets the ssh port to be closed" do
-      subject.open_ssh!
-      expect(subject.open_ssh).to be(true)
+      subject.open_ssh = true
       subject.close_ssh!
       expect(subject.open_ssh).to be(false)
     end
@@ -178,8 +176,7 @@ describe Y2Firewall::ProposalSettings do
 
   describe "#open_vnc!" do
     it "sets the vnc port to be opened" do
-      subject.close_vnc!
-      expect(subject.open_vnc).to be(false)
+      subject.open_vnc = false
       subject.open_vnc!
       expect(subject.open_vnc).to be(true)
     end
@@ -187,8 +184,7 @@ describe Y2Firewall::ProposalSettings do
 
   describe "#close_vnc!" do
     it "sets the vnc port to be closed" do
-      subject.open_vnc!
-      expect(subject.open_vnc).to be(true)
+      subject.open_vnc = true
       subject.close_vnc!
       expect(subject.open_vnc).to be(false)
     end

@@ -43,8 +43,8 @@ module Y2Firewall
         LINK_ENABLE_SSHD = "firewall--enable_sshd".freeze,
         LINK_DISABLE_SSHD = "firewall--disable_sshd".freeze,
         LINK_OPEN_VNC = "firewall--open_vnc".freeze,
-        LINK_CLOSE_VNC = "firewall--close_vnc".freeze,
-      ]
+        LINK_CLOSE_VNC = "firewall--close_vnc".freeze
+      ].freeze
 
       LINK_FIREWALL_DIALOG = "firewall".freeze
 
@@ -69,7 +69,7 @@ module Y2Firewall
         }
       end
 
-      def make_proposal(attrs)
+      def make_proposal(_attrs)
         {
           "preformatted_proposal" => preformatted_proposal,
           "warning_level"         => :warning,
@@ -104,8 +104,8 @@ module Y2Firewall
     private
 
       def call_proposal_action_for(link)
-        action = link.gsub("firewall--","")
-        @settings.send("#{action}!")
+        action = link.gsub("firewall--", "")
+        @settings.public_send("#{action}!")
       end
 
       def proposals
