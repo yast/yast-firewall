@@ -34,17 +34,24 @@ describe Y2Firewall::Clients::InstallationFinish do
       allow(proposal_settings).to receive("open_ssh").and_return false
     end
 
-    context "when sshd service is enabled in the proposal" do
-      let(:enable_sshd) { true }
+    it "enables the sshd service if enabled in the proposal" do
+      allow(proposal_settings).to receive("enable_sshd").and_return(true)
+      expect(Yast::Service).to receive(:Enable).with("sshd")
 
-      it "enables the sshd service" do
-        expect(Yast::Service).to receive(:Enable).with("sshd")
+      subject.write
+    end
+
+    context "when firewalld is enabled in the proposal" do
+      let(:enable_firewall) { true }
+
+      it "enables the firewalld service" do
+        expect(firewalld).to receive("enable!")
 
         subject.write
       end
 
       it "adds the ssh service to the public zone if opened in the proposal" do
-        allow(proposal_settings).to receive("open_ssh").and_return true
+        expect(proposal_settings).to receive("open_ssh").and_return(true)
         expect(firewalld.api).to receive(:add_service).with("public", "ssh")
 
         subject.write
@@ -55,22 +62,19 @@ describe Y2Firewall::Clients::InstallationFinish do
 
         subject.write
       end
+
+      it "adds the vnc service to the public zone if opened in the proposal" do
+        allow(proposal_settings).to receive("open_vnc").and_return true
+        expect(firewalld.api).to receive(:add_service).with("public", "vnc-server")
+
+        subject.write
+      end
     end
+    context "when firewalld is enabled in the proposal" do
+      it "returns true" do
 
-    it "enables the firewalld service if enabled in the proposal" do
-      allow(proposal_settings).to receive("enable_sshd").and_return false
-      allow(proposal_settings).to receive("enable_firewall").and_return true
-      allow(proposal_settings).to receive("open_ssh").and_return false
-      allow(firewalld).to receive("api").and_return api
-
-      expect(firewalld).to receive("enable!")
-
-      subject.write
-    end
-
-    it "adds the vnc service to the public zone if opened in the proposal" do
-      allow(proposal_settings).to receive("enable_sshd").and_return true
-      allow(proposal_settings).to receive("enable_firewall").and_return true
+        subject.write
+      end
     end
   end
 end
