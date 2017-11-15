@@ -26,9 +26,16 @@ require "installation/finish_client"
 
 module Y2Firewall
   module Clients
+    # This is a step of base installation finish and it is responsible of write
+    # the firewall proposal configuration for installation and autoinstallation
+    # modes.
     class InstallationFinish < ::Installation::FinishClient
-      attr_accessor :settings, :firewalld
+      # Y2Firewall::ProposalSettings instance
+      attr_accessor :settings
+      # Y2Firewall::Firewalld instance
+      attr_accessor :firewalld
 
+      # Constuctor
       def initialize
         textdomain "firewall"
         @settings = ProposalSettings.instance
@@ -45,15 +52,20 @@ module Y2Firewall
 
       def write
         Service.Enable("sshd") if @settings.enable_sshd
-        @firewalld.enable! if @settings.enable_firewall
+
+        return true unless @settings.enable_firewall
+
+        @firewalld.enable!
 
         if @settings.open_ssh
-          @firewalld.api.add_service("public", "ssh")
+          @firewalld.api.add_service(@settings.default_zone, "ssh")
         else
-          @firewalld.api.remove_service("public", "ssh")
+          @firewalld.api.remove_service(@settings.default_zone, "ssh")
         end
 
-        @firewalld.api.add_service("public", "vnc-server") if @settings.open_vnc
+        @firewalld.api.add_service(@settings.default_zone, "vnc-server") if @settings.open_vnc
+
+        true
       end
     end
   end

@@ -24,11 +24,14 @@ require "yast2/execute"
 
 module Y2Firewall
   module Clients
+    # Firewalld client which is responsible of run the cmdline or the gui
+    # client depending on the given arguments.
     class Firewall
       include Yast::I18n
       include Yast::Logger
       include Yast::UIShortcuts
 
+      # Constructor
       def initialize
         Yast.import "UI"
         Yast.import "Popup"
@@ -57,6 +60,8 @@ module Y2Firewall
 
     private
 
+      # It logs the start and finish of the given block call returning the
+      # result of the call.
       def log_and_return(&block)
         log.info("----------------------------------------")
         log.info("Firewall client started")
@@ -67,6 +72,8 @@ module Y2Firewall
 
         log.info("Firewall client finished")
         log.info("----------------------------------------")
+
+        ret
       end
     end
   end

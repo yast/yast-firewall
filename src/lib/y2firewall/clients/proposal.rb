@@ -29,11 +29,13 @@ require "installation/proposal_client"
 
 module Y2Firewall
   module Clients
+    # Firewall and SSH installation proposal client
     class Proposal < ::Installation::ProposalClient
       include Yast::I18n
       include Yast::Logger
 
-      attr_accessor :settings, :firewalld
+      # [Y2Firwall::ProposalSettings] Stores the proposal settings
+      attr_accessor :settings
 
       SERVICES_LINKS = [
         LINK_ENABLE_FIREWALL = "firewall--enable_firewall".freeze,
@@ -48,16 +50,14 @@ module Y2Firewall
 
       LINK_FIREWALL_DIALOG = "firewall".freeze
 
+      # Constructor
       def initialize
         Yast.import "UI"
         Yast.import "HTML"
         textdomain "installation"
 
-        @firewalld = Y2Firewall::Firewalld.new
         @settings ||= ProposalSettings.instance
       end
-
-    protected
 
       def description
         {
@@ -103,11 +103,15 @@ module Y2Firewall
 
     private
 
+      # Obtain and call the corresponding method for the clicked link.
       def call_proposal_action_for(link)
         action = link.gsub("firewall--", "")
         @settings.public_send("#{action}!")
       end
 
+      # Array with the available proposal descriptions.
+      #
+      # @return [Array<String>] services and ports descriptions
       def proposals
         # Filter proposals with content and sort them
         [firewall_proposal, ssh_port_proposal, sshd_proposal, vnc_fw_proposal].compact
@@ -143,6 +147,8 @@ module Y2Firewall
         end
       end
 
+      # Returns the Firewalld service part of the firewall proposal description
+      # @return [String] proposal html text
       def firewall_proposal
         if @settings.enable_firewall
           _(
@@ -155,6 +161,8 @@ module Y2Firewall
         end
       end
 
+      # Returns the SSH service part of the firewall proposal description
+      # @return [String] proposal html text
       def sshd_proposal
         if @settings.enable_sshd
           _(
