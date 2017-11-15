@@ -29,8 +29,8 @@ BuildRequires:  perl-XML-Writer update-desktop-files yast2-testsuite
 BuildRequires:  yast2-devtools >= 3.1.10
 # IP::CheckNetwork
 BuildRequires:	yast2 >= 2.23.25
-BuildRequires:  rubygem(yast-rake)
-BuildRequires:  rubygem(rspec)
+BuildRequires:  rubygem(%rb_default_ruby_abi:yast-rake)
+BuildRequires:  rubygem(%rb_default_ruby_abi:rspec)
 
 # FirewallD API
 Requires:       yast2 >= 4.0.12
