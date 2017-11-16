@@ -19,6 +19,6 @@
 # current contact information at www.suse.com.
 # ------------------------------------------------------------------------------
 
-require 'y2firewall/clients/installation_finish'
+require "y2firewall/clients/installation_finish"
 
 Y2Firewall::Clients::InstallationFinish.run
