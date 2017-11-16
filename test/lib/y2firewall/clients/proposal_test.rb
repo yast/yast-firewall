@@ -20,7 +20,7 @@
 # To contact SUSE LLC about this file by physical or electronic mail, you may
 # find current contact information at www.suse.com.
 
-require_relative "../test_helper.rb"
+require_relative "../../../test_helper.rb"
 require "y2firewall/clients/proposal"
 
 describe Y2Firewall::Clients::Proposal do

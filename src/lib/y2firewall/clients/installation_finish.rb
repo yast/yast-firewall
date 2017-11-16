@@ -53,9 +53,9 @@ module Y2Firewall
       def write
         Service.Enable("sshd") if @settings.enable_sshd
 
-        return true unless @settings.enable_firewall
+        return true if !@firewalld.installed?
 
-        @firewalld.enable!
+        @settings.enable_firewall ? @firewalld.enable! : @firewalld.disable!
 
         if @settings.open_ssh
           @firewalld.api.add_service(@settings.default_zone, "ssh")
