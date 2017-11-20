@@ -55,11 +55,11 @@ module Y2Firewall
             "computer remotely via dedicated\n" \
             "SSH client</p>"
         ) +
-        _(
-          "<p>Here you can choose whether the firewall will be " \
-          "enabled or disabled after\nthe installation. It is " \
-          "recommended to keep it enabled.</p>"
-        )
+          _(
+            "<p>Here you can choose whether the firewall will be " \
+            "enabled or disabled after\nthe installation. It is " \
+            "recommended to keep it enabled.</p>"
+          )
       end
     end
 

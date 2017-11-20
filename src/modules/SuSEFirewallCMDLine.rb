@@ -490,10 +490,10 @@ module Yast
       CommandLine.Print(String.UnderlinedHeader(_("Summary:"), 0))
       CommandLine.Print("")
       if for_zones.empty?
-        CommandLine.Print(SuSEFirewall.fwd_api.list_all_zones.join("\n"))
+        CommandLine.Print(SuSEFirewall.api.list_all_zones.join("\n"))
       else
         for_zones.each do |zone|
-          CommandLine.Print(SuSEFirewall.fwd_api.list_all_zone(zone).join("\n"))
+          CommandLine.Print(SuSEFirewall.api.list_all_zone(zone).join("\n"))
         end
       end
 
