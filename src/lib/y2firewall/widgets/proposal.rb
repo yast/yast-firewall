@@ -30,8 +30,6 @@ module Y2Firewall
     # open/close checkbox widgets when the firewall is disable
     class FirewallSSHProposal < CWM::CustomWidget
       def initialize(settings)
-        self.handle_all_events = true
-
         @settings = settings
 
         @port_widgets = [Widgets::OpenSSHPort.new(@settings)]
@@ -83,14 +81,14 @@ module Y2Firewall
 
       def handle
         @widgets.map do |widget|
-          value ? widget.enable : widget.disable
+          checked? ? widget.enable : widget.disable
         end
 
         nil
       end
 
       def store
-        value ? @settings.enable_firewall! : @settings.disable_firewall!
+        checked? ? @settings.enable_firewall! : @settings.disable_firewall!
       end
 
       def help
@@ -129,7 +127,7 @@ module Y2Firewall
       end
 
       def store
-        value ? @settings.enable_sshd! : @settings.disable_sshd!
+        checked? ? @settings.enable_sshd! : @settings.disable_sshd!
       end
 
       def help
@@ -162,7 +160,7 @@ module Y2Firewall
       end
 
       def store
-        value ? @settings.open_ssh! : @settings.close_ssh!
+        checked? ? @settings.open_ssh! : @settings.close_ssh!
       end
     end
 
@@ -187,7 +185,7 @@ module Y2Firewall
       end
 
       def store
-        value ? @settings.open_vnc! : @settings.close_vnc!
+        checked? ? @settings.open_vnc! : @settings.close_vnc!
       end
 
       def help
