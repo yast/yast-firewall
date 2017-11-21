@@ -24,7 +24,6 @@ require "cwm/dialog"
 require "y2firewall/widgets/proposal"
 
 Yast.import "Hostname"
-Yast.import "Linuxrc"
 Yast.import "Mode"
 
 module Y2Firewall
@@ -50,10 +49,7 @@ module Y2Firewall
                 0.5,
                 0.5,
                 VBox(
-                  Left(Widgets::EnableFirewall.new(@settings)),
-                  Left(Widgets::EnableSSHD.new(@settings)),
-                  sshd_port_ui,
-                  vnc_ports_ui
+                  Widgets::FirewallSSHProposal.new(@settings)
                 )
               )
             )
@@ -88,16 +84,6 @@ module Y2Firewall
       # @return [String]
       def hostname
         @hostname ||= Yast::Hostname.CurrentHostname
-      end
-
-      def sshd_port_ui
-        Left(Widgets::OpenSSHPort.new(@settings))
-      end
-
-      def vnc_ports_ui
-        return Empty() unless Yast::Linuxrc.vnc
-
-        Left(Widgets::OpenVNCPorts.new(@settings))
       end
 
       def should_open_dialog?

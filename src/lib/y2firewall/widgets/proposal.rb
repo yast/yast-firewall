@@ -22,12 +22,51 @@
 require "yast"
 require "cwm"
 
+Yast.import "Linuxrc"
+
 module Y2Firewall
   module Widgets
+    # Custom widget for Firewall and SSH proposal responsible of disabling
+    # open/close checkbox widgets when the firewall is disable
+    class FirewallSSHProposal < CWM::CustomWidget
+      def initialize(settings)
+        self.handle_all_events = true
+
+        @settings = settings
+
+        @port_widgets = [Widgets::OpenSSHPort.new(@settings)]
+        @port_widgets << Widgets::OpenVNCPorts.new(@settings) if Yast::Linuxrc.vnc
+
+        @service_widgets = [
+          Widgets::EnableFirewall.new(@settings, @port_widgets),
+          Widgets::EnableSSHD.new(@settings)
+        ]
+      end
+
+      def contents
+        VBox(
+          *widgets_term
+        )
+      end
+
+    private
+
+      def widgets
+        @service_widgets + @port_widgets
+      end
+
+      def widgets_term
+        widgets.map do |widget|
+          Left(widget)
+        end
+      end
+    end
+
     # Enable firewall service checkbox
     class EnableFirewall < CWM::CheckBox
-      def initialize(settings)
+      def initialize(settings, widgets)
         @settings = settings
+        @widgets = widgets
       end
 
       def init
@@ -40,6 +79,14 @@ module Y2Firewall
 
       def opt
         [:notify]
+      end
+
+      def handle
+        @widgets.map do |widget|
+          value ? widget.enable : widget.disable
+        end
+
+        nil
       end
 
       def store
@@ -103,6 +150,7 @@ module Y2Firewall
 
       def init
         self.value = @settings.open_ssh
+        @settings.enable_firewall ? enable : disable
       end
 
       def label
@@ -126,6 +174,8 @@ module Y2Firewall
 
       def init
         self.value = @settings.open_vnc
+
+        @settings.enable_firewall ? enable : disable
       end
 
       def label

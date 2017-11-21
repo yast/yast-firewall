@@ -25,6 +25,7 @@ require "y2firewall/clients/proposal"
 
 describe Y2Firewall::Clients::Proposal do
   let(:client) { described_class.new }
+  let(:proposal_settings) { Y2Firewall::ProposalSettings.instance }
 
   describe "#initialize" do
     it "instantiates a new proposal settings" do
@@ -86,14 +87,35 @@ describe Y2Firewall::Clients::Proposal do
   end
 
   describe "#make_proposal" do
+    let(:firewall_enabled) { false }
     before do
-      allow(Yast::HTML).to receive("List").and_return("<ul><li>Proposal link</li></ul>")
+      allow(proposal_settings).to receive("enable_firewall").and_return(firewall_enabled)
     end
 
     it "returns a hash with 'preformatted_proposal', 'links' and 'warning_level'" do
+      allow(Yast::HTML).to receive("List").and_return("<ul><li>Proposal link</li></ul>")
+
       proposal = client.make_proposal({})
       expect(proposal).to be_a Hash
       expect(proposal).to include("preformatted_proposal", "links", "warning_level")
+    end
+
+    context "when firewalld is disabled" do
+      it "returns the 'preformatted_proposal' without links to open/close ports" do
+        proposal = client.make_proposal({})
+
+        expect(proposal["preformatted_proposal"]).to_not include("port")
+      end
+    end
+
+    context "when firewalld is enabled" do
+      let(:firewall_enabled) { true }
+
+      it "returns the 'preformatted_proposal' with links to open/close ports" do
+        proposal = client.make_proposal({})
+
+        expect(proposal["preformatted_proposal"]).to include("port")
+      end
     end
   end
 end
