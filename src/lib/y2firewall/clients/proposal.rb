@@ -114,7 +114,7 @@ module Y2Firewall
       # @return [Array<String>] services and ports descriptions
       def proposals
         # Filter proposals with content and sort them
-        [firewall_proposal, ssh_port_proposal, sshd_proposal, vnc_fw_proposal].compact
+        [firewall_proposal, sshd_proposal, ssh_port_proposal, vnc_fw_proposal].compact
       end
 
       # Returns the VNC-port part of the firewall proposal description
@@ -138,7 +138,7 @@ module Y2Firewall
       # Returns nil if this part should be skipped
       # @return [String] proposal html text
       def ssh_port_proposal
-        return nil unless @settings.enable_sshd
+        return nil unless @settings.enable_firewall
 
         if @settings.open_ssh
           _("SSH port will be open (<a href=\"%s\">block</a>)") % LINK_BLOCK_SSH_PORT
