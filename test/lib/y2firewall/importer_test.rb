@@ -29,7 +29,7 @@ describe Y2Firewall::Importer do
     context "when the given profile uses a SuSEFirewall2 schema" do
       it "imports the given profile using the SuSEFirewall strategy" do
         expect(subject).to receive(:strategy_for).with(profile).and_call_original
-        expect_any_instance_of(Y2Firewall::ImporterStrategies::SuSEFirewall).to receive(:import)
+        expect_any_instance_of(Y2Firewall::ImporterStrategies::SuseFirewall).to receive(:import)
 
         subject.import(profile)
       end
@@ -51,7 +51,7 @@ describe Y2Firewall::Importer do
   describe "#strategy_for" do
     context "when the given profile uses a SuSEFirewall2 schema" do
       it "returns Y2Firewall::ImporterStrategies::SuSEFirewall" do
-        expect(subject.strategy_for(profile)).to eq(Y2Firewall::ImporterStrategies::SuSEFirewall)
+        expect(subject.strategy_for(profile)).to eq(Y2Firewall::ImporterStrategies::SuseFirewall)
       end
     end
 
