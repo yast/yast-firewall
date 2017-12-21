@@ -36,7 +36,7 @@ describe Y2Firewall::Importer do
     end
 
     context "when the given profile does not use a SuSEFirewall2 schema" do
-      let(:profile) { { "zones" => [ { "name" => "public", "interfaces" => "eth0" } ] } }
+      let(:profile) { { "zones" => [{ "name" => "public", "interfaces" => "eth0" }] } }
 
       it "imports the given profile using the Firewalld strategy" do
         expect(subject).to receive(:strategy_for).with(profile).and_call_original
@@ -56,7 +56,7 @@ describe Y2Firewall::Importer do
     end
 
     context "when the given profile does not use a SuSEFirewall2 schema" do
-      let(:profile) { { "zones" => [ { "name" => "public", "interfaces" => "eth0" } ] } }
+      let(:profile) { { "zones" => [{ "name" => "public", "interfaces" => "eth0" }] } }
 
       it "returns Y2Firewall::ImporterStrategies::Firewalld" do
         expect(subject.strategy_for(profile)).to eq(Y2Firewall::ImporterStrategies::Firewalld)

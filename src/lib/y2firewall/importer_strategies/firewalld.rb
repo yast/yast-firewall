@@ -23,13 +23,21 @@ require "y2firewall/firewalld"
 
 module Y2Firewall
   module ImporterStrategies
+    # This class is reponsible of parsing firewall profile's section when
+    # firewalld schema is used configuring the Y2Firewall::Firewalld instance
+    # according to it.
     class Firewalld
+      # [Hash] AutoYaST profile firewall's section
       attr_accessor :profile
 
+      # Constructor
+      #
+      # @param [Hash] AutoYaST profile firewall's section
       def initialize(profile = {})
         @profile = profile
       end
 
+      # It process the profile configuring the present firewalld zones
       def import
         return if profile.empty?
 
@@ -40,6 +48,11 @@ module Y2Firewall
 
     private
 
+      # Configures Y2Firewall::Firewalld::Zone that correspond with the
+      # profile's firewall zone definition
+      #
+      # @param [Hash] AutoYaST profile firewall's section
+      # @return [Boolean] true if the zone exist; nil otherwise
       def process_zone(zone_definition)
         zone = firewalld.find_zone(zone_definition["name"])
 
@@ -49,6 +62,9 @@ module Y2Firewall
         zone.interfaces = zone_definition["interfaces"] if zone_definition["interfaces"]
         zone.protocols  = zone_definition["protocols"]  if zone_definition["protocols"]
         zone.ports      = zone_definition["ports"]      if zone_definition["ports"]
+        zone.masquerade = zone_definition["masquerade"] if zone_definition["masquerade"]
+
+        true
       end
 
       def firewalld

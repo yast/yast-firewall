@@ -23,21 +23,31 @@ require "y2firewall/firewalld"
 
 module Y2Firewall
   module ImporterStrategies
+    # This class is reponsible of parsing SuSEFirewall2 firewalld profile's
+    # section configuring the Y2Firewall::Firewalld instance according to it.
     class SuseFirewall
+      # [Hash] AutoYaST profile firewall's section
       attr_accessor :profile
 
+      # SuSEFirewall2 zones
       ZONES = ["DMZ", "INT", "EXT"].freeze
 
+      # @return [Array<string>] list of zones
       def zones
         ZONES
       end
 
+      # Constructor
+      #
+      # @param [Hash] AutoYaST profile firewall's section
       def initialize(profile)
         @profile = profile
       end
 
+      # It process the profile configuring the firewalld zones that match
+      # better with the SuSEFirewalld ones.
       def import
-        return if profile.empty?
+        return true if profile.empty?
 
         zones.each { |z| process_zone(z) }
 
@@ -46,9 +56,15 @@ module Y2Firewall
           zone.services << "ipsec"
         end
 
-        firewalld.log_denied_packets = logging_level
+        firewalld.log_denied_packets = log_denied_packets
+
+        true
       end
 
+      # Given a SuSEFirewall2 zone name it process the profile's configuration
+      # corresponding to that zone configuring the equivalent firewalld zone
+      # object.
+      # @param name [String] SuSEFirewall2 zone name
       def process_zone(name)
         zone = firewalld.find_zone(zone_equivalent(name))
 
@@ -57,48 +73,91 @@ module Y2Firewall
         zone.ports      = ports(name)      if ports(name)
       end
 
-      def services(zone)
-        services = profile["FW_CONFIGURATIONS_#{zone}"]
+      # Obtain the services for the given SuSEFIrewall2 zone name from the
+      # profile.
+      #
+      # @param zone_name [String]
+      def services(zone_name)
+        services = profile["FW_CONFIGURATIONS_#{zone_name}"]
 
         services ? services.split(" ") : nil
       end
 
-      def interfaces(zone)
-        interfaces = profile["FW_DEV_#{zone}"]
+      # Obtain the interfaces for the given SuSEFIrewall2 zone name from the
+      # profile.
+      #
+      # @param zone_name [String]
+      def interfaces(zone_name)
+        interfaces = profile["FW_DEV_#{zone_name}"]
 
         interfaces ? interfaces.split(" ") : nil
       end
 
+      # Obtain the ports for the given SuSEFIrewall2 zone name from the
+      # profile.
+      #
+      # @param zone_name [String]
       def ports(zone)
         return nil unless ip_ports(zone) || rpc_ports(zone) || tcp_ports(zone) || udp_ports(zone)
 
         [ip_ports(zone), rpc_ports(zone), tcp_ports(zone), udp_ports(zone)].compact.flatten
       end
 
+    private
+
+      # Obtain the IP ports for the given SuSEFIrewall2 zone name from the
+      # profile.
+      #
+      # @param zone_name [String]
+      # @return [Array<Strint>, nil] list of configured IPP ports; nil if no
+      # configured
       def ip_ports(zone)
         ports = profile["FW_SERVICES_#{zone}_IP"]
 
         ports ? ports.split(" ") : nil
       end
 
+      # Obtain the TCP ports for the given SuSEFIrewall2 zone name from the
+      # profile.
+      #
+      # @param zone_name [String]
+      # @return [Array<Strint>, nil] list of configured TCP ports; nil if no
+      # configured
       def tcp_ports(zone)
         ports = profile["FW_SERVICES_#{zone}_TCP"]
 
         ports ? ports.split(" ").map { |p| "#{p}/tcp" } : nil
       end
 
+      # Obtain the UDP ports for the given SuSEFIrewall2 zone name from the
+      # profile.
+      #
+      # @param zone_name [String]
+      # @return [Array<Strint>, nil] list of configured UDP ports; nil if no
+      # configured
       def udp_ports(zone)
         ports = profile["FW_SERVICES_#{zone}_UDP"]
 
         ports ? ports.split(" ").map { |p| "#{p}/udp" } : nil
       end
 
+      # Obtain the RPC ports for the given SuSEFIrewall2 zone name from the
+      # profile.
+      #
+      # @param zone_name [String]
+      # @return [Array<Strint>, nil] list of configured RPC ports; nil if no
+      # configured
       def rpc_ports(zone)
         ports = profile["FW_SERVICES_#{zone}_RPC"]
 
         ports ? ports.split(" ").map { |p| ["#{p}/udp", "#{p}/tcp"] }.flatten : nil
       end
 
+      # Given a SuSEFirewall2 zone name return the firewalld zone equivalent
+      # name. It takes in account whether masquerade is enable or not.
+      #
+      # @param name [String] SuSEFirewall2 zone name
+      # @return [String] equivalent firewalld zone name
       def zone_equivalent(name)
         case name.upcase
         when "INT"
@@ -110,20 +169,30 @@ module Y2Firewall
         end
       end
 
+      # Return whether masquerade is configured or not
+      #
+      # @return [Boolean] true if configured; false otherwise
       def masquerade?
         profile.fetch("FW_MASQUERADE", "no") == "yes"
       end
 
+      # Return the ipsec trust zone name if configured or nil
+      #
+      # @return [Boolean] true if configured; false otherwise
       def ipsec_trust_zone
-        zone = profile.fetch("FW_IPSEC_TRUST", "no").downcase
+        zone_name = profile.fetch("FW_IPSEC_TRUST", "no").downcase
 
-        return if zone == "no"
-        return "int" if zone == "yes"
+        return if zone_name == "no"
+        return "int" if zone_name == "yes"
 
-        zone
+        zone_name
       end
 
-      def logging_level
+      # Return which denied packets to log that match better with the
+      # SuSEFirewall logging config.
+      #
+      # @return [String] all, unicast or none depending on the log config
+      def log_denied_packets
         accept_crit = profile.fetch("FW_LOG_ACCEPT_CRIT", "no") == "yes"
         drop_all = profile.fetch("FW_LOG_DROPT_ALL", "no") == "yes"
         drop_crit = profile.fetch("FW_LOG_ACCEPT_CRIT", "no") == "yes"
@@ -136,8 +205,6 @@ module Y2Firewall
           "none"
         end
       end
-
-    private
 
       def firewalld
         @firewalld ||= Y2Firewall::Firewalld.instance

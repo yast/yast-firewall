@@ -26,9 +26,14 @@ describe Y2Firewall::Clients::Auto do
   let(:firewalld) { Y2Firewall::Firewalld.instance }
   let(:importer) { double("Y2Firewall::Importer", import: true) }
 
+  before do
+    allow(firewalld).to receive(:read)
+    allow(subject).to receive(:importer).and_return(importer)
+  end
+
   describe "#summary" do
     it "returns the summary of all the configured zones" do
-      expect(firewalld.api).to receive(:list_all_zones).and_return(["zone1","zone2"])
+      expect(firewalld.api).to receive(:list_all_zones).and_return(["zone1", "zone2"])
 
       expect(subject.summary).to eq("zone1\nzone2")
     end
@@ -38,11 +43,12 @@ describe Y2Firewall::Clients::Auto do
     let(:arguments) { { "FW_MASQUERADE" => "yes" } }
 
     it "reads the current firewalld configuration" do
+      expect(firewalld).to receive(:read)
+
       subject.import(arguments)
     end
 
     it "pass its arguments to the firewalld importer" do
-
       expect(subject).to receive(:importer).and_return(importer)
       expect(importer).to receive(:import).with(arguments)
 
@@ -50,8 +56,6 @@ describe Y2Firewall::Clients::Auto do
     end
 
     it "returns true if import success" do
-      expect(subject).to receive(:importer).and_return(importer)
-
       expect(subject.import(arguments)).to eq(true)
     end
   end
