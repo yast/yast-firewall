@@ -47,7 +47,7 @@ module Y2Firewall
         "rsync-server"      => ["rsyncd"],
         "sshd"              => ["ssh"],
         "samba-server"      => ["samba"]
-      }
+      }.freeze
 
       # @return [Array<string>] list of zones
       def zones
