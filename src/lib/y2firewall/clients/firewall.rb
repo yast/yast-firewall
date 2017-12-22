@@ -24,7 +24,7 @@ require "yast2/execute"
 
 module Y2Firewall
   module Clients
-    # Firewalld client which is responsible of run the cmdline or the gui
+    # Firewalld client which is responsible for running the cmdline or the gui
     # client depending on the given arguments.
     class Firewall
       include Yast::I18n

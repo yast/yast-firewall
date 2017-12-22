@@ -20,6 +20,5 @@
 # ------------------------------------------------------------------------------
 
 require "y2firewall/clients/proposal"
-require "y2firewall/dialogs/proposal"
 
 Y2Firewall::Clients::Proposal.new.run

@@ -58,7 +58,7 @@ y2_firewall =
   | FW_BOOT_FULL_INIT
 
 YESNO = "yes" | "no"
-firewall = element firewall { y2_firewall* }
+firewall = element firewall { y2_firewall* | y2_firewalld* }
 FW_CONFIGURATIONS_DMZ = element FW_CONFIGURATIONS_DMZ { text }
 FW_CONFIGURATIONS_EXT = element FW_CONFIGURATIONS_EXT { text }
 FW_CONFIGURATIONS_INT = element FW_CONFIGURATIONS_INT { text }
@@ -112,3 +112,52 @@ FW_SERVICES_INT_UDP = element FW_SERVICES_INT_UDP { text }
 FW_ALLOW_PING_FW = element FW_ALLOW_PING_FW { YESNO }
 FW_STOP_KEEP_ROUTING_STATE = element FW_STOP_KEEP_ROUTING_STATE { YESNO }
 FW_BOOT_FULL_INIT = element FW_BOOT_FULL_INIT { YESNO }
+
+
+y2_firewalld =
+  zones
+  | enable_firewall
+  | start_firewall
+
+zones =
+  element zones {
+    LIST,
+    zone*
+  }
+
+zone =
+  element zone {
+    interfaces
+    | services
+    | ports
+    | protocols
+    | masquerade
+    | log_denied_packets
+  }
+
+services =
+  element services {
+    LIST,
+    element service {text}+
+  }
+
+interfaces =
+  element interfaces {
+    LIST,
+    element interface {text}+
+  }
+
+ports =
+  element ports {
+    LIST,
+    element ports {text}+
+  }
+
+protocols =
+  element protocols {
+    LIST,
+    element protocols {text}+
+  }
+
+masquerade = element masquerade { BOOLEAN }
+log_denied_packets = element log_denied_packets { text }
