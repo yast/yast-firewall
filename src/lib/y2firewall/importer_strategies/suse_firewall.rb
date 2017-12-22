@@ -32,6 +32,23 @@ module Y2Firewall
       # SuSEFirewall2 zones
       ZONES = ["DMZ", "INT", "EXT"].freeze
 
+      # Best effort conversion of SuSEFirewall2 services into firewalld
+      # predefined ones.
+      SERVICE_MAP = {
+        "apache2"           => ["http"],
+        "apache2-ssl"       => ["https"],
+        "bind"              => ["dns"],
+        "dhcp-server"       => ["dhcp"],
+        "dhcp6-server"      => ["dhcpv6"],
+        "nfs-client"        => ["nfs"],
+        "nfs-kernel-server" => ["mountd", "nfs", "rpc-bind"],
+        "netbios-server"    => ["samba"],
+        "openldap"          => ["ldap", "ldaps"],
+        "rsync-server"      => ["rsyncd"],
+        "sshd"              => ["ssh"],
+        "samba-server"      => ["samba"]
+      }
+
       # @return [Array<string>] list of zones
       def zones
         ZONES
@@ -80,7 +97,7 @@ module Y2Firewall
       def services(zone_name)
         services = profile["FW_CONFIGURATIONS_#{zone_name}"]
 
-        services ? services.split(" ") : nil
+        services ? map_services(services.split(" ")) : nil
       end
 
       # Obtain the interfaces for the given SuSEFIrewall2 zone name from the
@@ -103,6 +120,12 @@ module Y2Firewall
         [ip_ports(zone), rpc_ports(zone), tcp_ports(zone), udp_ports(zone)].compact.flatten
       end
 
+      def map_services(services)
+        services.map do |service|
+          SERVICE_MAP[service] || service
+        end.flatten.compact.uniq
+      end
+
     private
 
       # Obtain the IP ports for the given SuSEFIrewall2 zone name from the
@@ -114,7 +137,7 @@ module Y2Firewall
       def ip_ports(zone)
         ports = profile["FW_SERVICES_#{zone}_IP"]
 
-        ports ? ports.split(" ") : nil
+        ports ? ports.split(" ").map { |p| ["#{p}/udp", "#{p}/tcp"] }.flatten : nil
       end
 
       # Obtain the TCP ports for the given SuSEFIrewall2 zone name from the

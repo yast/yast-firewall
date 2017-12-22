@@ -57,7 +57,7 @@ module Y2Firewall
       end
 
       def change
-        log.info "#{self.class}#packages not implemented, returning :next."
+        log.info "#{self.class}#change not implemented yet, returning :next."
 
         :next
       end
