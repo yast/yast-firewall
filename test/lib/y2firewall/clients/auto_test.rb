@@ -49,7 +49,6 @@ describe Y2Firewall::Clients::Auto do
     end
 
     it "pass its arguments to the firewalld importer" do
-      expect(subject).to receive(:importer).and_return(importer)
       expect(importer).to receive(:import).with(arguments)
 
       subject.import(arguments)
@@ -68,7 +67,6 @@ describe Y2Firewall::Clients::Auto do
 
   describe "#reset" do
     it "import empty hash to set defaults" do
-      expect(subject).to receive(:importer).and_return(importer)
       expect(importer).to receive(:import).with({})
 
       subject.reset

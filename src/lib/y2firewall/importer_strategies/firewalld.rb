@@ -28,7 +28,7 @@ module Y2Firewall
     # according to it.
     class Firewalld
       # [Hash] AutoYaST profile firewall's section
-      attr_accessor :profile
+      attr_reader :profile
 
       # Constructor
       #
@@ -40,7 +40,6 @@ module Y2Firewall
       # It process the profile configuring the present firewalld zones
       def import
         return if profile.empty?
-
         profile.fetch("zones", []).each do |zone|
           process_zone(zone)
         end
@@ -55,20 +54,18 @@ module Y2Firewall
       # @return [Boolean] true if the zone exist; nil otherwise
       def process_zone(zone_definition)
         zone = firewalld.find_zone(zone_definition["name"])
-
         return unless zone
-
-        zone.services   = zone_definition["services"]   if zone_definition["services"]
-        zone.interfaces = zone_definition["interfaces"] if zone_definition["interfaces"]
-        zone.protocols  = zone_definition["protocols"]  if zone_definition["protocols"]
-        zone.ports      = zone_definition["ports"]      if zone_definition["ports"]
-        zone.masquerade = zone_definition["masquerade"] if zone_definition["masquerade"]
-
+        ["services", "interfaces", "protocols", "ports", "masquerade"].each do |section|
+          zone.public_send("#{section}=", zone_definition[section]) if zone_definition[section]
+        end
         true
       end
 
+      # Convenience method which return an instance of Y2Firewall::Firewalld
+      #
+      # @return [Y2Firewall::Firewalld] a firewalld instance
       def firewalld
-        @firewalld ||= Y2Firewall::Firewalld.instance
+        Y2Firewall::Firewalld.instance
       end
     end
   end

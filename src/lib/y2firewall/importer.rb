@@ -25,7 +25,7 @@ require "y2firewall/importer_strategies/suse_firewall"
 require "y2firewall/importer_strategies/firewalld"
 
 module Y2Firewall
-  # This class is responsible of import firewalld AutoYaST configuration
+  # This class is responsible for importing firewalld AutoYaST configuration
   # supporting the new firewalld schema but also the SuSEFirewall one.
   class Importer
     # Import the given configuration

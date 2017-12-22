@@ -89,7 +89,7 @@ module Y2Firewall
       end
 
       def firewalld
-        @firewalld ||= ::Y2Firewall::Firewalld.instance
+        ::Y2Firewall::Firewalld.instance
       end
     end
   end

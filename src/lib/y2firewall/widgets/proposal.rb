@@ -26,7 +26,7 @@ Yast.import "Linuxrc"
 
 module Y2Firewall
   module Widgets
-    # Custom widget for Firewall and SSH proposal responsible of disabling
+    # Custom widget for Firewall and SSH proposal responsible for disabling
     # open/close checkbox widgets when the firewall is disable
     class FirewallSSHProposal < CWM::CustomWidget
       def initialize(settings)

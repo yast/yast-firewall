@@ -26,7 +26,7 @@ module Y2Firewall
     # This class is reponsible of parsing SuSEFirewall2 firewalld profile's
     # section configuring the Y2Firewall::Firewalld instance according to it.
     class SuseFirewall
-      # [Hash] AutoYaST profile firewall's section
+      # @return [Hash] AutoYaST profile firewall's section
       attr_accessor :profile
 
       # SuSEFirewall2 zones
@@ -61,22 +61,20 @@ module Y2Firewall
         @profile = profile
       end
 
-      # It process the profile configuring the firewalld zones that match
-      # better with the SuSEFirewalld ones.
+      # It processes the profile configuring the firewalld zones that match
+      # better with the SuSEFirewall2 ones.
       def import
         return true if profile.empty?
-
         zones.each { |z| process_zone(z) }
-
         if ipsec_trust_zone
           zone = firewalld.find_zone(zone.equivalent(ipsec_trust_zone))
           zone.services << "ipsec"
         end
-
         firewalld.log_denied_packets = log_denied_packets
-
         true
       end
+
+    private
 
       # Given a SuSEFirewall2 zone name it process the profile's configuration
       # corresponding to that zone configuring the equivalent firewalld zone
@@ -96,7 +94,6 @@ module Y2Firewall
       # @param zone_name [String]
       def services(zone_name)
         services = profile["FW_CONFIGURATIONS_#{zone_name}"]
-
         services ? map_services(services.split(" ")) : nil
       end
 
@@ -106,7 +103,6 @@ module Y2Firewall
       # @param zone_name [String]
       def interfaces(zone_name)
         interfaces = profile["FW_DEV_#{zone_name}"]
-
         interfaces ? interfaces.split(" ") : nil
       end
 
@@ -116,17 +112,22 @@ module Y2Firewall
       # @param zone_name [String]
       def ports(zone)
         return nil unless ip_ports(zone) || rpc_ports(zone) || tcp_ports(zone) || udp_ports(zone)
-
         [ip_ports(zone), rpc_ports(zone), tcp_ports(zone), udp_ports(zone)].compact.flatten
       end
 
+      # Map over the given list of SuSEFIrewall2 service names converting the
+      # ones that are known have changed using the corresponding firewalld
+      # service name.
+      #
+      # @param [Array<String>] list of SuSEFirewall2 services names.
+      # @return [Array<String] list of given services converted to firewalld
+      # when known.
       def map_services(services)
         services.map do |service|
           SERVICE_MAP[service] || service
         end.flatten.compact.uniq
       end
 
-    private
 
       # Obtain the IP ports for the given SuSEFIrewall2 zone name from the
       # profile.
@@ -136,7 +137,6 @@ module Y2Firewall
       # configured
       def ip_ports(zone)
         ports = profile["FW_SERVICES_#{zone}_IP"]
-
         ports ? ports.split(" ").map { |p| ["#{p}/udp", "#{p}/tcp"] }.flatten : nil
       end
 
@@ -148,7 +148,6 @@ module Y2Firewall
       # configured
       def tcp_ports(zone)
         ports = profile["FW_SERVICES_#{zone}_TCP"]
-
         ports ? ports.split(" ").map { |p| "#{p}/tcp" } : nil
       end
 
@@ -160,7 +159,6 @@ module Y2Firewall
       # configured
       def udp_ports(zone)
         ports = profile["FW_SERVICES_#{zone}_UDP"]
-
         ports ? ports.split(" ").map { |p| "#{p}/udp" } : nil
       end
 
@@ -172,7 +170,6 @@ module Y2Firewall
       # configured
       def rpc_ports(zone)
         ports = profile["FW_SERVICES_#{zone}_RPC"]
-
         ports ? ports.split(" ").map { |p| ["#{p}/udp", "#{p}/tcp"] }.flatten : nil
       end
 
@@ -204,10 +201,8 @@ module Y2Firewall
       # @return [Boolean] true if configured; false otherwise
       def ipsec_trust_zone
         zone_name = profile.fetch("FW_IPSEC_TRUST", "no").downcase
-
         return if zone_name == "no"
         return "int" if zone_name == "yes"
-
         zone_name
       end
 
@@ -229,8 +224,11 @@ module Y2Firewall
         end
       end
 
+      # Convenience method which return an instance of Y2Firewall::Firewalld
+      #
+      # @return [Y2Firewall::Firewalld] a firewalld instance
       def firewalld
-        @firewalld ||= Y2Firewall::Firewalld.instance
+        Y2Firewall::Firewalld.instance
       end
     end
   end
