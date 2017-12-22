@@ -75,7 +75,7 @@ module Y2Firewall
     #
     # @return [Y2Firewall::Firewalld] a firewalld instance
     def firewalld
-      @firewalld ||= Y2Firewall::Firewalld.instance
+      Y2Firewall::Firewalld.instance
     end
   end
 end

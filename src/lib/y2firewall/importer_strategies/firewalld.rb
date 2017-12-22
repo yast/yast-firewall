@@ -30,6 +30,9 @@ module Y2Firewall
       # [Hash] AutoYaST profile firewall's section
       attr_reader :profile
 
+      ATTRIBUTES = ["log_denied_packets"].freeze
+      ZONE_ATTRIBUTES = ["services", "interfaces", "protocols", "ports", "masquerade"].freeze
+
       # Constructor
       #
       # @param [Hash] AutoYaST profile firewall's section
@@ -45,6 +48,11 @@ module Y2Firewall
         profile.fetch("zones", []).each do |zone|
           process_zone(zone)
         end
+
+        ATTRIBUTES.each do |attr|
+          firewalld.send("#{attr}=", profile[attr]) if profile[attr]
+        end
+
         true
       end
 
@@ -58,8 +66,8 @@ module Y2Firewall
       def process_zone(zone_definition)
         zone = firewalld.find_zone(zone_definition["name"])
         return unless zone
-        ["services", "interfaces", "protocols", "ports", "masquerade"].each do |section|
-          zone.public_send("#{section}=", zone_definition[section]) if zone_definition[section]
+        ZONE_ATTRIBUTES.each do |attr|
+          zone.public_send("#{attr}=", zone_definition[attr]) if zone_definition[attr]
         end
         true
       end
