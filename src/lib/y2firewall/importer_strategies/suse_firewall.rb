@@ -128,7 +128,6 @@ module Y2Firewall
         end.flatten.compact.uniq
       end
 
-
       # Obtain the IP ports for the given SuSEFIrewall2 zone name from the
       # profile.
       #

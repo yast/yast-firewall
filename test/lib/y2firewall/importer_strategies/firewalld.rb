@@ -24,13 +24,23 @@ require "cwm/rspec"
 require "y2firewall/importer_strategies/firewalld"
 
 describe Y2Firewall::ImporterStrategies::Firewalld do
+  let(:firewalld) { Y2Firewall::Firewalld.instance }
+  let(:known_zones) { Y2Firewall::Firewalld::Zone.known_zones.keys }
+  let(:empty_zones) { known_zones.map { |name| Y2Firewall::Firewalld::Zone.new(name: name) } }
+
+  before do
+    firewalld.zones = empty_zones
+  end
+
   describe "#import" do
     subject { described_class.new(profile) }
 
     let(:profile) do
       {
         "zones" => [
-          { "name" => "external", "interfaces" => ["eth0"], "services" => ["dhcp"] }
+          { "name" => "dmz", "interfaces" => ["eth0.12"], "services" => ["samba"] },
+          { "name" => "external", "interfaces" => ["eth0"], "services" => ["dhcp"] },
+          { "name" => "internal", "interfaces" => ["eth1"], "protocols" => ["icmp"] }
         ]
       }
     end
@@ -38,8 +48,24 @@ describe Y2Firewall::ImporterStrategies::Firewalld do
     context "when the profile is empty" do
       let(:profile) { {} }
 
-      it "returns nil" do
-        expect(subject.import).to eq(nil)
+      it "returns true" do
+        expect(subject.import).to eq(true)
+      end
+    end
+
+    context "when the profile is not empty" do
+      it "configures the zones according to the profile" do
+        subject.import
+
+        dmz      = firewalld.find_zone("dmz")
+        external = firewalld.find_zone("external")
+        internal = firewalld.find_zone("internal")
+
+        expect(dmz.interfaces).to eq(["eth0.12"])
+        expect(external.interfaces).to eq(["eth0"])
+        expect(internal.interfaces).to eq(["eth1"])
+        expect(external.services).to eq(["dhcp"])
+        expect(internal.protocols).to eq(["icmp"])
       end
     end
   end

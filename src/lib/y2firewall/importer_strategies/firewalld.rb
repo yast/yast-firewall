@@ -23,7 +23,7 @@ require "y2firewall/firewalld"
 
 module Y2Firewall
   module ImporterStrategies
-    # This class is reponsible of parsing firewall profile's section when
+    # This class is reponsible for parsing firewall profile's section when
     # firewalld schema is used configuring the Y2Firewall::Firewalld instance
     # according to it.
     class Firewalld
@@ -37,12 +37,15 @@ module Y2Firewall
         @profile = profile
       end
 
-      # It process the profile configuring the present firewalld zones
+      # It processes the profile configuring the present firewalld zones
+      #
+      # @return [Boolean] true if imported correctly
       def import
-        return if profile.empty?
+        return true if profile.empty?
         profile.fetch("zones", []).each do |zone|
           process_zone(zone)
         end
+        true
       end
 
     private
