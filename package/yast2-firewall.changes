@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Fri Dec 22 08:52:21 UTC 2017 - knut.anderssen@suse.com
+
+- AutoYaST: Firewalld schema is now the default but SuSEFirewall2
+  based profiles will still work although not all the properties
+  are supported (#fate#323460)
+- 4.0.6
+
+-------------------------------------------------------------------
 Tue Nov 21 00:15:55 UTC 2017 - knut.anderssen@suse.com
 
 - Proposal: When the Firewall is disabled, open/close port links
