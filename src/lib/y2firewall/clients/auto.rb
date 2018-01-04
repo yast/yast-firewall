@@ -67,7 +67,7 @@ module Y2Firewall
       end
 
       def read
-        firewalld.read
+        firewalld.read if firewalld.installed?
       end
 
       def packages

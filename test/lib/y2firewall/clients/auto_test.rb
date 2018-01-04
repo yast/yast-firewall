@@ -39,6 +39,15 @@ describe Y2Firewall::Clients::Auto do
     end
   end
 
+  describe "#read" do
+    it "reads the current firewalld configuration if firewalld is installed" do
+      expect(firewalld).to receive(:installed?).and_return(true)
+      expect(firewalld).to receive(:read)
+
+      subject.read
+    end
+  end
+
   describe "#import" do
     let(:arguments) { { "FW_MASQUERADE" => "yes" } }
 
