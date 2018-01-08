@@ -30,15 +30,14 @@ module Y2Firewall
       # [Hash] AutoYaST profile firewall's section
       attr_reader :profile
 
-      ATTRIBUTES = ["log_denied_packets"].freeze
-      ZONE_ATTRIBUTES = ["services", "interfaces", "protocols", "ports", "masquerade"].freeze
-
       # Constructor
       #
       # @param [Hash] AutoYaST profile firewall's section
       def initialize(profile = {})
         @profile = profile
       end
+
+      ATTRIBUTES = ["default_zone", "log_denied_packets"].freeze
 
       # It processes the profile configuring the present firewalld zones
       #
@@ -57,6 +56,8 @@ module Y2Firewall
       end
 
     private
+
+      ZONE_ATTRIBUTES = ["services", "interfaces", "protocols", "ports", "masquerade"].freeze
 
       # Configures Y2Firewall::Firewalld::Zone that correspond with the
       # profile's firewall zone definition

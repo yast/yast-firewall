@@ -83,8 +83,13 @@ module Y2Firewall
       def process_zone(name)
         zone = firewalld.find_zone(zone_equivalent(name))
 
-        zone.interfaces = interfaces(name) if interfaces(name)
+        if interfaces(name)
+          zone.interfaces = interfaces(name)
+          firewalld.default_zone = zone_equivalent(name) if default_zone?(name)
+        end
+
         zone.services   = services(name)   if services(name)
+        zone.protocols  = protocols(name)  if protocols(name)
         zone.ports      = ports(name)      if ports(name)
       end
 
@@ -101,18 +106,39 @@ module Y2Firewall
       # profile.
       #
       # @param zone_name [String]
+      # @return [Array<String>, nil]
       def interfaces(zone_name)
         interfaces = profile["FW_DEV_#{zone_name}"]
-        interfaces ? interfaces.split(" ") : nil
+        interfaces ? interfaces.split(" ").reject { |i| i == "any" } : nil
+      end
+
+      # Return whether the given zone name is the default one.
+      #
+      # @param zone_name [String
+      # @return [Boolean] true if the zone name is the default one; false
+      # otherwise
+      def default_zone?(zone_name)
+        profile.fetch("FW_DEV_#{zone_name}", []).include?("any")
+      end
+
+      # Obtain the protocols for the given SuSEFIrewall2 zone name from the
+      # profile.
+      #
+      # @param zone_name [String]
+      # @return [Array<String>, nil]
+      def protocols(zone)
+        protocols = profile["FW_SERVICES_#{zone}_IP"]
+        protocols ? protocols.split(" ") : nil
       end
 
       # Obtain the ports for the given SuSEFIrewall2 zone name from the
       # profile.
       #
       # @param zone_name [String]
+      # @return [Array<String>, nil]
       def ports(zone)
-        return nil unless ip_ports(zone) || rpc_ports(zone) || tcp_ports(zone) || udp_ports(zone)
-        [ip_ports(zone), rpc_ports(zone), tcp_ports(zone), udp_ports(zone)].compact.flatten
+        return nil unless rpc_ports(zone) || tcp_ports(zone) || udp_ports(zone)
+        [rpc_ports(zone), tcp_ports(zone), udp_ports(zone)].compact.flatten
       end
 
       # Map over the given list of SuSEFIrewall2 service names converting the
@@ -126,17 +152,6 @@ module Y2Firewall
         services.map do |service|
           SERVICE_MAP[service] || service
         end.flatten.compact.uniq
-      end
-
-      # Obtain the IP ports for the given SuSEFIrewall2 zone name from the
-      # profile.
-      #
-      # @param zone_name [String]
-      # @return [Array<Strint>, nil] list of configured IPP ports; nil if no
-      # configured
-      def ip_ports(zone)
-        ports = profile["FW_SERVICES_#{zone}_IP"]
-        ports ? ports.split(" ").map { |p| ["#{p}/udp", "#{p}/tcp"] }.flatten : nil
       end
 
       # Obtain the TCP ports for the given SuSEFIrewall2 zone name from the
