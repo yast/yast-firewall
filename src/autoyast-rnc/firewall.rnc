@@ -118,6 +118,8 @@ y2_firewalld =
   zones
   | enable_firewall
   | start_firewall
+  | default_zone
+  | log_denied_packets
 
 zones =
   element zones {
@@ -132,7 +134,6 @@ zone =
     | ports
     | protocols
     | masquerade
-    | log_denied_packets
   }
 
 services =

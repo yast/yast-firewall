@@ -49,7 +49,7 @@ module Y2Firewall
       end
 
       def export
-        {}
+        firewalld.export
       end
 
       def reset

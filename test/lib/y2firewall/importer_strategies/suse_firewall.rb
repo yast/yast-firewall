@@ -84,6 +84,7 @@ describe Y2Firewall::ImporterStrategies::SuseFirewall do
           public_zone = firewalld.find_zone("public")
 
           expect(public_zone.interfaces).to eq(["eth0"])
+          expect(public_zone.services).to eq(["dhcp", "ssh", "samba", "vnc-server"])
           expect(public_zone.protocols).to eq(["esp"])
         end
       end

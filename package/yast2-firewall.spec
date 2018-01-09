@@ -32,8 +32,8 @@ BuildRequires:  yast2 >= 4.0.12
 BuildRequires:  rubygem(%rb_default_ruby_abi:yast-rake)
 BuildRequires:  rubygem(%rb_default_ruby_abi:rspec)
 
-# FirewallD API
-Requires:       yast2 >= 4.0.12
+# FirewallD default zone & export support
+Requires:       yast2 >= 4.0.32
 
 # ButtonBox widget
 Conflicts:	yast2-ycp-ui-bindings < 2.17.3
