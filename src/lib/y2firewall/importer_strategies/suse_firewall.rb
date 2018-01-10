@@ -103,10 +103,12 @@ module Y2Firewall
       end
 
       # Obtain the interfaces for the given SuSEFIrewall2 zone name from the
-      # profile.
+      # profile. It removes 'any' from the list of interfaces as it is an
+      # especial case for SuSEFirewall2.
       #
       # @param zone_name [String]
-      # @return [Array<String>, nil]
+      # @return [Array<String>, nil] return the list of interfaces without
+      # especial wildcards like 'any' or nil in case the key is not defined
       def interfaces(zone_name)
         interfaces = profile["FW_DEV_#{zone_name}"]
         interfaces ? interfaces.split(" ").reject { |i| i == "any" } : nil
