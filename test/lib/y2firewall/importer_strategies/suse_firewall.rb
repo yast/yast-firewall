@@ -40,7 +40,7 @@ describe Y2Firewall::ImporterStrategies::SuseFirewall do
       {
         "FW_DEV_EXT"            => "eth0",
         "FW_DEV_INT"            => "eth1",
-        "FW_DEV_DMZ"            => "eth2",
+        "FW_DEV_DMZ"            => "eth2 any",
         "FW_CONFIGURATIONS_EXT" => "dhcp-server sshd netbios-server vnc-server",
         "FW_SERVICES_EXT_TCP"   => "80 443",
         "FW_SERVICES_EXT_IP"    => "esp",
@@ -73,6 +73,10 @@ describe Y2Firewall::ImporterStrategies::SuseFirewall do
         expect(dmz.interfaces).to eq(["eth2"])
       end
 
+      it "sets the default zone as the one with the 'any' interface" do
+        expect(firewalld.default_zone).to eql("dmz")
+      end
+
       context "and masquerade is disabled" do
         let(:masquerade) { "no" }
 
@@ -81,6 +85,7 @@ describe Y2Firewall::ImporterStrategies::SuseFirewall do
 
           expect(public_zone.interfaces).to eq(["eth0"])
           expect(public_zone.services).to eq(["dhcp", "ssh", "samba", "vnc-server"])
+          expect(public_zone.protocols).to eq(["esp"])
         end
       end
 

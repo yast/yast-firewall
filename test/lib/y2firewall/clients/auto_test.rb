@@ -69,6 +69,11 @@ describe Y2Firewall::Clients::Auto do
   end
 
   describe "#export" do
+    before do
+      allow(firewalld).to receive(:export)
+        .and_return("zones" => {}, "default_zone" => "public", "log_denied_packets" => "unicast")
+    end
+
     it "returns hash with options" do
       expect(subject.export).to be_a(::Hash)
     end

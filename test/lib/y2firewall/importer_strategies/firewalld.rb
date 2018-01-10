@@ -37,7 +37,8 @@ describe Y2Firewall::ImporterStrategies::Firewalld do
 
     let(:profile) do
       {
-        "zones" => [
+        "default_zone" => "dmz",
+        "zones"        => [
           { "name" => "dmz", "interfaces" => ["eth0.12"], "services" => ["samba"] },
           { "name" => "external", "interfaces" => ["eth0"], "services" => ["dhcp"] },
           { "name" => "internal", "interfaces" => ["eth1"], "protocols" => ["icmp"] }
@@ -66,6 +67,7 @@ describe Y2Firewall::ImporterStrategies::Firewalld do
         expect(internal.interfaces).to eq(["eth1"])
         expect(external.services).to eq(["dhcp"])
         expect(internal.protocols).to eq(["icmp"])
+        expect(firewalld.default_zone).to eq("dmz")
       end
     end
   end
