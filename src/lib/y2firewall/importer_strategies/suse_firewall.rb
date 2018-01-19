@@ -116,7 +116,7 @@ module Y2Firewall
 
       # Return whether the given zone name is the default one.
       #
-      # @param zone_name [String
+      # @param zone_name [String]
       # @return [Boolean] true if the zone name is the default one; false
       # otherwise
       def default_zone?(zone_name)
@@ -225,7 +225,7 @@ module Y2Firewall
       # Return which denied packets to log that match better with the
       # SuSEFirewall logging config.
       #
-      # @return [String] all, unicast or none depending on the log config
+      # @return [String] all, unicast or off depending on the log config
       def log_denied_packets
         accept_crit = profile.fetch("FW_LOG_ACCEPT_CRIT", "no") == "yes"
         drop_all = profile.fetch("FW_LOG_DROPT_ALL", "no") == "yes"
@@ -236,7 +236,7 @@ module Y2Firewall
         elsif accept_crit || drop_crit
           "unicast"
         else
-          "none"
+          "off"
         end
       end
 
