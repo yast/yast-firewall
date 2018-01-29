@@ -32,10 +32,15 @@ module Y2Firewall
     class Auto < ::Installation::AutoClient
       class << self
         attr_accessor :changed
+        attr_accessor :enable
+        attr_accessor :start
       end
 
       def initialize
         textdomain "firewall"
+
+        self.class.enable = false
+        self.class.start = false
       end
 
       def summary
@@ -44,7 +49,8 @@ module Y2Firewall
 
       def import(profile)
         firewalld.read
-
+        self.class.enable = true if profile.fetch("enable_firewall", true)
+        self.class.start = true if profile.fetch("start_firewall", true)
         importer.import(profile)
       end
 
@@ -64,6 +70,8 @@ module Y2Firewall
 
       def write
         firewalld.write
+        self.class.enable ? firewalld.enable! : firewalld.disable!
+        self.class.start ? firewalld.start! : firewalld.stop!
       end
 
       def read

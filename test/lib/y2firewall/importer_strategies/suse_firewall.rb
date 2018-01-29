@@ -42,7 +42,8 @@ describe Y2Firewall::ImporterStrategies::SuseFirewall do
         "FW_DEV_INT"            => "eth1",
         "FW_DEV_DMZ"            => "eth2 any",
         "FW_CONFIGURATIONS_EXT" => "dhcp-server sshd netbios-server vnc-server",
-        "FW_SERVICES_EXT_TCP"   => "80 443",
+        "FW_SERVICES_EXT_TCP"   => "80 443 8080:8084",
+        "FW_SERVICES_EXT_UDP"   => "53",
         "FW_SERVICES_EXT_IP"    => "esp",
         "FW_MASQUERADE"         => masquerade
       }
@@ -85,6 +86,7 @@ describe Y2Firewall::ImporterStrategies::SuseFirewall do
 
           expect(public_zone.interfaces).to eq(["eth0"])
           expect(public_zone.services).to eq(["dhcp", "ssh", "samba", "vnc-server"])
+          expect(public_zone.ports).to eq(["80/tcp", "443/tcp", "8080-8084/tcp", "53/udp"])
           expect(public_zone.protocols).to eq(["esp"])
         end
       end

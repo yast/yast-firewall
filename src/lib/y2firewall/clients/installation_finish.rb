@@ -47,7 +47,7 @@ module Y2Firewall
       end
 
       def modes
-        [:installation, :autoinst]
+        [:installation]
       end
 
       def write

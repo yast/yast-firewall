@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Jan 26 01:44:25 UTC 2018 - knut.anderssen@suse.com
+
+- Enable or disable firewalld depending on the profile.
+  (fate#323460)
+- 4.0.10
+
+-------------------------------------------------------------------
 Fri Jan 19 08:44:25 UTC 2018 - knut.anderssen@suse.com
 
 - AutoYaST: fixed default valur for log denied packets when using

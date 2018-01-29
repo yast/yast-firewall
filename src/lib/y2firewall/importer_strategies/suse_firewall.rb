@@ -164,7 +164,7 @@ module Y2Firewall
       # configured
       def tcp_ports(zone)
         ports = profile["FW_SERVICES_#{zone}_TCP"]
-        ports ? ports.split(" ").map { |p| "#{p}/tcp" } : nil
+        ports ? ports.split(" ").map { |p| "#{p.sub(":", "-")}/tcp" } : nil
       end
 
       # Obtain the UDP ports for the given SuSEFIrewall2 zone name from the
@@ -175,7 +175,7 @@ module Y2Firewall
       # configured
       def udp_ports(zone)
         ports = profile["FW_SERVICES_#{zone}_UDP"]
-        ports ? ports.split(" ").map { |p| "#{p}/udp" } : nil
+        ports ? ports.split(" ").map { |p| "#{p.sub(":", "-")}/udp" } : nil
       end
 
       # Obtain the RPC ports for the given SuSEFIrewall2 zone name from the
