@@ -40,8 +40,10 @@ module Y2Firewall
         # successfully or not
         attr_accessor :imported
         # @return [Boolean] whether the firewalld service has to be enabled
+        # after writing the configuration
         attr_accessor :enable
         # @return [Boolean] whether the firewalld service has to be started
+        # after writing the configuration
         attr_accessor :start
         # @return [Hash]
         attr_accessor :profile
@@ -117,7 +119,7 @@ module Y2Firewall
       end
 
       # A map with the packages that needs to be installed or removed for
-      # configuring properly firewalld
+      # configuring firewalld properly
       #
       # @return packages [Hash{String => Array<String>} ] of packages to be
       # installed or removed
@@ -142,41 +144,57 @@ module Y2Firewall
         start? ? firewalld.start : firewalld.stop
       end
 
+      # Return a firewall importer
+      #
+      # @return [Y2Firewall::Importer]
       def importer
-        @importer ||= ::Y2Firewall::Importer.new
+        @importer ||= Importer.new
       end
 
+      # Return a firewalld singleton instance
+      #
+      # @return [Y2Firewall::Firewalld] singleton instance
       def firewalld
-        ::Y2Firewall::Firewalld.instance
+        Firewalld.instance
       end
 
+      # @return [Y2Firewall::ProposalSettings]
       def settings
         ProposalSettings.instance
       end
 
-      # Whether the firewalld service has to be enable or not
+      # Set that the firewall has to be enabled when writing
       def enable
         self.class.enable = true
       end
 
-      # Whether the firewalld service has to be enable or not
+      # Whether the firewalld service has to be enable or disable when writing
+      #
+      # @return [Boolean] true if has to be enabled; false otherwise
       def enable?
         !!self.class.enable
       end
 
+      # Set that the firewall has to be started when writing
       def start
         self.class.start = true
       end
 
+      # Whether the firewalld service has to be started or stopped when writing
+      #
+      # @return [Boolean] true if has to be started; false otherwise
       def start?
         !!self.class.start
       end
 
+      # Set that the firewalld configuration has been completely imported
       def imported
         self.class.imported = true
       end
 
-      # @return [Boolean] whether the configuration has been imported or not
+      # Whether the firewalld configuration has been already imported or not
+      #
+      # @return [Boolean] true if has been imported; false otherwise
       def imported?
         !!self.class.imported
       end
