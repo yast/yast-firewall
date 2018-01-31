@@ -28,6 +28,7 @@ module Y2Firewall
   # This class is responsible for importing firewalld AutoYaST configuration
   # supporting the new firewalld schema but also the SuSEFirewall one.
   class Importer
+    include Yast::Logger
     # Import the given configuration
     #
     # @param [Hash] AutoYaST profile firewall's section
