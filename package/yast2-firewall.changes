@@ -1,8 +1,10 @@
 -------------------------------------------------------------------
-Fri Jan 26 01:44:25 UTC 2018 - knut.anderssen@suse.com
+Wed Jan 31 07:41:26 UTC 2018 - knut.anderssen@suse.com
 
-- Enable or disable firewalld depending on the profile.
-  (fate#323460)
+- AutoYaST: (fate#323460)
+  * Try to import again during writing in case it was not completed
+  previously (ex: firewalld was not installed).
+  *  Enable or disable firewalld depending on the profile
 - 4.0.10
 
 -------------------------------------------------------------------
