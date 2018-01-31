@@ -33,10 +33,17 @@ module Y2Firewall
     class Auto < ::Installation::AutoClient
       include Yast::Logger
       class << self
+        # @return [Boolean] whether the AutoYaST configuration has been
+        # modified or not
         attr_accessor :changed
+        # @return [Boolean] whether the AutoYaST configuration was imported
+        # successfully or not
         attr_accessor :imported
+        # @return [Boolean] whether the firewalld service has to be enabled
         attr_accessor :enable
+        # @return [Boolean] whether the firewalld service has to be started
         attr_accessor :start
+        # @return [Hash]
         attr_accessor :profile
       end
 
@@ -63,16 +70,15 @@ module Y2Firewall
         return false unless read
 
         # Obtains the default from the control file (settings) if not present.
-        self.class.enable = true if profile.fetch("enable_firewall", settings.enable_firewall)
-        self.class.start = true if profile.fetch("start_firewall", false)
+        enable if profile.fetch("enable_firewall", settings.enable_firewall)
+        start if profile.fetch("start_firewall", false)
         importer.import(profile)
-        self.class.imported = true
+        imported
       end
 
       # Export the current firewalld configuration
       #
-      # @param profile [Hash] firewall profile section to be imported
-      # @return [Boolean]
+      # @return [Hash] with the current firewalld configuration
       def export
         firewalld.export
       end
@@ -95,8 +101,8 @@ module Y2Firewall
       # it again.
       def write
         return false if !firewalld.installed?
-        import(self.class.profile) unless self.class.imported
-        return false unless self.class.imported
+        import(self.class.profile) unless imported?
+        return false unless imported?
 
         firewalld.write
         activate_service
@@ -105,13 +111,16 @@ module Y2Firewall
       # Read the currnet firewalld configuration
       def read
         return false if !firewalld.installed?
+        return true if firewalld.read?
+
         firewalld.read
       end
 
       # A map with the packages that needs to be installed or removed for
       # configuring properly firewalld
       #
-      # @return packages [Hash] of packages to be installed or removed
+      # @return packages [Hash{String => Array<String>} ] of packages to be
+      # installed or removed
       def packages
         { "install" => ["firewalld"], "remove" => [] }
       end
@@ -121,15 +130,16 @@ module Y2Firewall
       end
 
       def modified?
-        self.class.changed
+        !!self.class.changed
       end
 
     private
 
-      # Depending on the profile it activate or not the firewalld service
+      # Depending on the profile it activates or deactivates the firewalld
+      # service
       def activate_service
-        self.class.enable ? firewalld.enable! : firewalld.disable!
-        self.class.start ? firewalld.start : firewalld.stop
+        enable? ? firewalld.enable! : firewalld.disable!
+        start? ? firewalld.start : firewalld.stop
       end
 
       def importer
@@ -142,6 +152,33 @@ module Y2Firewall
 
       def settings
         ProposalSettings.instance
+      end
+
+      # Whether the firewalld service has to be enable or not
+      def enable
+        self.class.enable = true
+      end
+
+      # Whether the firewalld service has to be enable or not
+      def enable?
+        !!self.class.enable
+      end
+
+      def start
+        self.class.start = true
+      end
+
+      def start?
+        !!self.class.start
+      end
+
+      def imported
+        self.class.imported = true
+      end
+
+      # @return [Boolean] whether the configuration has been imported or not
+      def imported?
+        !!self.class.imported
       end
     end
   end

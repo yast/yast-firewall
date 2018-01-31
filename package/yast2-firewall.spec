@@ -27,13 +27,14 @@ Group:	        System/YaST
 License:        GPL-2.0
 BuildRequires:  perl-XML-Writer update-desktop-files yast2-testsuite
 BuildRequires:  yast2-devtools >= 3.1.10
-# IP::CheckNetwork
-BuildRequires:  yast2 >= 4.0.12
+
+# Firewalld read?
+BuildRequires:  yast2 >= 4.0.45
 BuildRequires:  rubygem(%rb_default_ruby_abi:yast-rake)
 BuildRequires:  rubygem(%rb_default_ruby_abi:rspec)
 
-# FirewallD default zone & export support
-Requires:       yast2 >= 4.0.32
+# Firewalld read?
+Requires:       yast2 >= 4.0.45
 
 # ButtonBox widget
 Conflicts:	yast2-ycp-ui-bindings < 2.17.3

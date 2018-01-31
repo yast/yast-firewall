@@ -76,7 +76,7 @@ describe Y2Firewall::Clients::Auto do
         expect(subject.import(arguments)).to eq(true)
       end
 
-      it "marks the importation as done or completed" do
+      it "marks the importation as done" do
         subject.import(arguments)
         expect(subject.class.imported).to eq(true)
       end
@@ -126,14 +126,14 @@ describe Y2Firewall::Clients::Auto do
       expect(subject.write).to eq(false)
     end
 
-    it "tries to import again the profile if was not imported" do
+    it "tries to import again the profile if it was not imported" do
       allow(subject.class).to receive(:profile).and_return(arguments)
       expect(subject).to receive(:import).with(arguments).and_return(false)
 
       subject.write
     end
 
-    it "writes the configuration imported" do
+    it "writes the imported configuration" do
       allow(subject.class).to receive(:imported).and_return(true)
       allow(subject).to receive(:activate_service)
       expect(firewalld).to receive(:write)
