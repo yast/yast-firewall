@@ -6,11 +6,11 @@ Status](https://coveralls.io/repos/github/yast/yast-firewall/badge.svg?branch=ma
 [![Jenkins Build](http://img.shields.io/jenkins/s/https/ci.opensuse.org/yast-firewall-master.svg)](https://ci.opensuse.org/view/Yast/job/yast-firewall-master/)
 
 
-Since the adoption of `firewalld` this repository contains just some usefull 
+Since the adoption of `firewalld` this repository contains just some useful
 clients and libraries for installation and autoinstallation.
 
-The YaST Firewall GUI has been replaced by firewalld-config and the ncurses 
-client is not supported by now.
+The YaST Firewall GUI has been replaced by firewalld-config (a Gtk application)
+and the text mode interface is not supported by now.
 
 An **API** to configure `Firewalld` is available in this repository:
 
