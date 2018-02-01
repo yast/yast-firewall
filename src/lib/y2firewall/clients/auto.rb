@@ -22,6 +22,7 @@
 require "yast"
 require "y2firewall/firewalld"
 require "y2firewall/importer"
+require "y2firewall/proposal_settings"
 require "installation/auto_client"
 
 module Y2Firewall
@@ -30,28 +31,63 @@ module Y2Firewall
     # goes through the configuration and return the setting.
     # Does not do any changes to the configuration.
     class Auto < ::Installation::AutoClient
+      include Yast::Logger
       class << self
+        # @return [Boolean] whether the AutoYaST configuration has been
+        # modified or not
         attr_accessor :changed
+        # @return [Boolean] whether the AutoYaST configuration was imported
+        # successfully or not
+        attr_accessor :imported
+        # @return [Boolean] whether the firewalld service has to be enabled
+        # after writing the configuration
+        attr_accessor :enable
+        # @return [Boolean] whether the firewalld service has to be started
+        # after writing the configuration
+        attr_accessor :start
+        # @return [Hash]
+        attr_accessor :profile
       end
 
+      # Constructor
       def initialize
         textdomain "firewall"
       end
 
+      # Configuration summary
+      #
+      # @return [String]
       def summary
+        return "" if !firewalld.installed?
+
         firewalld.api.list_all_zones.join("\n")
       end
 
+      # Import the firewall configuration
+      #
+      # @param profile [Hash] firewall profile section to be imported
+      # @return [Boolean]
       def import(profile)
-        firewalld.read
+        self.class.profile = profile
+        return false unless read
 
+        # Obtains the default from the control file (settings) if not present.
+        enable if profile.fetch("enable_firewall", settings.enable_firewall)
+        start if profile.fetch("start_firewall", false)
         importer.import(profile)
+        imported
       end
 
+      # Export the current firewalld configuration
+      #
+      # @return [Hash] with the current firewalld configuration
       def export
         firewalld.export
       end
 
+      # Reset the current firewalld configuration.
+      #
+      # @return [Boolean]
       def reset
         importer.import({})
       end
@@ -62,16 +98,33 @@ module Y2Firewall
         :next
       end
 
+      # Write the imported configuration to firewalld. If for some reason the
+      # configuration was not imported from the profile, it tries to import
+      # it again.
       def write
+        return false if !firewalld.installed?
+        import(self.class.profile) unless imported?
+        return false unless imported?
+
         firewalld.write
+        activate_service
       end
 
+      # Read the currnet firewalld configuration
       def read
-        firewalld.read if firewalld.installed?
+        return false if !firewalld.installed?
+        return true if firewalld.read?
+
+        firewalld.read
       end
 
+      # A map with the packages that needs to be installed or removed for
+      # configuring firewalld properly
+      #
+      # @return packages [Hash{String => Array<String>} ] of packages to be
+      # installed or removed
       def packages
-        ["firewalld"]
+        { "install" => ["firewalld"], "remove" => [] }
       end
 
       def modified
@@ -79,17 +132,71 @@ module Y2Firewall
       end
 
       def modified?
-        self.class.changed
+        !!self.class.changed
       end
 
     private
 
-      def importer
-        @importer ||= ::Y2Firewall::Importer.new
+      # Depending on the profile it activates or deactivates the firewalld
+      # service
+      def activate_service
+        enable? ? firewalld.enable! : firewalld.disable!
+        start? ? firewalld.start : firewalld.stop
       end
 
+      # Return a firewall importer
+      #
+      # @return [Y2Firewall::Importer]
+      def importer
+        @importer ||= Importer.new
+      end
+
+      # Return a firewalld singleton instance
+      #
+      # @return [Y2Firewall::Firewalld] singleton instance
       def firewalld
-        ::Y2Firewall::Firewalld.instance
+        Firewalld.instance
+      end
+
+      # @return [Y2Firewall::ProposalSettings]
+      def settings
+        ProposalSettings.instance
+      end
+
+      # Set that the firewall has to be enabled when writing
+      def enable
+        self.class.enable = true
+      end
+
+      # Whether the firewalld service has to be enable or disable when writing
+      #
+      # @return [Boolean] true if has to be enabled; false otherwise
+      def enable?
+        !!self.class.enable
+      end
+
+      # Set that the firewall has to be started when writing
+      def start
+        self.class.start = true
+      end
+
+      # Whether the firewalld service has to be started or stopped when writing
+      #
+      # @return [Boolean] true if has to be started; false otherwise
+      def start?
+        !!self.class.start
+      end
+
+      # Set that the firewalld configuration has been completely imported
+      def imported
+        self.class.imported = true
+      end
+
+      # Whether the firewalld configuration has been already imported or not
+      #
+      # @return [Boolean] true if has been imported; false otherwise
+      def imported?
+        !!self.class.imported
       end
     end
   end

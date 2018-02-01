@@ -1,4 +1,13 @@
 -------------------------------------------------------------------
+Wed Jan 31 07:41:26 UTC 2018 - knut.anderssen@suse.com
+
+- AutoYaST: (fate#323460)
+  * Try to import again during writing in case it was not completed
+  previously (ex: firewalld was not installed).
+  *  Enable or disable firewalld depending on the profile
+- 4.0.10
+
+-------------------------------------------------------------------
 Fri Jan 19 08:44:25 UTC 2018 - knut.anderssen@suse.com
 
 - AutoYaST: fixed default valur for log denied packets when using

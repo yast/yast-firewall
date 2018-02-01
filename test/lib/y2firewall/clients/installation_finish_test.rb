@@ -14,7 +14,7 @@ describe Y2Firewall::Clients::InstallationFinish do
 
   describe "#modes" do
     it "runs on installation and autoinstallation" do
-      expect(subject.modes).to eq([:installation, :autoinst])
+      expect(subject.modes).to eq([:installation])
     end
   end
 

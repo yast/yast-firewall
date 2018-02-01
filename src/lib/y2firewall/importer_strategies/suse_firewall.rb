@@ -26,6 +26,7 @@ module Y2Firewall
     # This class is reponsible of parsing SuSEFirewall2 firewalld profile's
     # section configuring the Y2Firewall::Firewalld instance according to it.
     class SuseFirewall
+      include Yast::Logger
       # @return [Hash] AutoYaST profile firewall's section
       attr_accessor :profile
 
@@ -64,11 +65,14 @@ module Y2Firewall
       # It processes the profile configuring the firewalld zones that match
       # better with the SuSEFirewall2 ones.
       def import
-        return true if profile.empty?
+        if profile.empty?
+          log.info "The profile is empty, there is nothing to import"
+          return true
+        end
         zones.each { |z| process_zone(z) }
         if ipsec_trust_zone
           zone = firewalld.find_zone(zone.equivalent(ipsec_trust_zone))
-          zone.services << "ipsec"
+          (zone.services << "ipsec") if zone
         end
         firewalld.log_denied_packets = log_denied_packets
         true
@@ -81,7 +85,12 @@ module Y2Firewall
       # object.
       # @param name [String] SuSEFirewall2 zone name
       def process_zone(name)
+        log.info "Processing zone #{name}"
         zone = firewalld.find_zone(zone_equivalent(name))
+        if !zone
+          log.error "There is no zone for #{name}"
+          return
+        end
 
         if interfaces(name)
           zone.interfaces = interfaces(name)
@@ -164,7 +173,7 @@ module Y2Firewall
       # configured
       def tcp_ports(zone)
         ports = profile["FW_SERVICES_#{zone}_TCP"]
-        ports ? ports.split(" ").map { |p| "#{p}/tcp" } : nil
+        ports ? ports.split(" ").map { |p| "#{p.sub(":", "-")}/tcp" } : nil
       end
 
       # Obtain the UDP ports for the given SuSEFIrewall2 zone name from the
@@ -175,7 +184,7 @@ module Y2Firewall
       # configured
       def udp_ports(zone)
         ports = profile["FW_SERVICES_#{zone}_UDP"]
-        ports ? ports.split(" ").map { |p| "#{p}/udp" } : nil
+        ports ? ports.split(" ").map { |p| "#{p.sub(":", "-")}/udp" } : nil
       end
 
       # Obtain the RPC ports for the given SuSEFIrewall2 zone name from the

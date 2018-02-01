@@ -27,7 +27,9 @@ describe Y2Firewall::Clients::Auto do
   let(:importer) { double("Y2Firewall::Importer", import: true) }
 
   before do
+    subject.class.imported = false
     allow(firewalld).to receive(:read)
+    allow(firewalld).to receive(:installed?).and_return(true)
     allow(subject).to receive(:importer).and_return(importer)
   end
 
@@ -49,7 +51,9 @@ describe Y2Firewall::Clients::Auto do
   end
 
   describe "#import" do
-    let(:arguments) { { "FW_MASQUERADE" => "yes" } }
+    let(:arguments) do
+      { "FW_MASQUERADE" => "yes", "enable_firewall" => false, "start_firewall" => false }
+    end
 
     it "reads the current firewalld configuration" do
       expect(firewalld).to receive(:read)
@@ -57,14 +61,38 @@ describe Y2Firewall::Clients::Auto do
       subject.import(arguments)
     end
 
-    it "pass its arguments to the firewalld importer" do
-      expect(importer).to receive(:import).with(arguments)
+    context "when the current configuration was read correctly" do
+      before do
+        allow(firewalld).to receive(:read).and_return(true)
+      end
 
-      subject.import(arguments)
+      it "pass its arguments to the firewalld importer" do
+        expect(importer).to receive(:import).with(arguments)
+
+        subject.import(arguments)
+      end
+
+      it "returns true if import success" do
+        expect(subject.import(arguments)).to eq(true)
+      end
+
+      it "marks the importation as done" do
+        subject.import(arguments)
+        expect(subject.class.imported).to eq(true)
+      end
     end
 
-    it "returns true if import success" do
-      expect(subject.import(arguments)).to eq(true)
+    context "when the current configuration was not read" do
+      it "returns false" do
+        expect(firewalld).to receive(:read).and_return(false)
+        expect(subject.import(arguments)).to eq(false)
+      end
+
+      it "does not mark the importation as done or completed" do
+        expect(firewalld).to receive(:read).and_return(false)
+        subject.import(arguments)
+        expect(subject.class.imported).to eq(false)
+      end
     end
   end
 
@@ -84,6 +112,41 @@ describe Y2Firewall::Clients::Auto do
       expect(importer).to receive(:import).with({})
 
       subject.reset
+    end
+  end
+
+  describe "#write" do
+    let(:arguments) do
+      { "FW_MASQUERADE" => "yes", "enable_firewall" => false, "start_firewall" => false }
+    end
+
+    it "returns false if firewalld is not installed" do
+      expect(firewalld).to receive(:installed?).and_return(false)
+
+      expect(subject.write).to eq(false)
+    end
+
+    it "tries to import again the profile if it was not imported" do
+      allow(subject.class).to receive(:profile).and_return(arguments)
+      expect(subject).to receive(:import).with(arguments).and_return(false)
+
+      subject.write
+    end
+
+    it "writes the imported configuration" do
+      allow(subject.class).to receive(:imported).and_return(true)
+      allow(subject).to receive(:activate_service)
+      expect(firewalld).to receive(:write)
+
+      subject.write
+    end
+
+    it "activates or deactives the firewalld service based on the profile" do
+      allow(subject.class).to receive(:imported).and_return(true)
+      expect(firewalld).to receive(:write)
+      expect(subject).to receive(:activate_service)
+
+      subject.write
     end
   end
 end
