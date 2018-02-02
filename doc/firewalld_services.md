@@ -80,4 +80,4 @@ If a `firewalld service` is not defined, then the `CWMFirewallInterfaces` widget
 
 New `services` can be created through the **API** or by a custom `XML` file although the preferred way is to define them in the `RPM` specification**. Please refer to this [link](https://en.opensuse.org/Firewalld/RPM_Packaging) for further information.
 
-Find a complete example including all the needed changes in this yast2-cluster [PR]((https://github.com/yast/yast-cluster/pull/34))
+Find a complete example including all the needed changes in this yast2-cluster [PR](https://github.com/yast/yast-cluster/pull/34)
