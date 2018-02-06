@@ -22,8 +22,6 @@
 require_relative "../../../test_helper"
 require "y2firewall/clients/firewall"
 
-Yast.import "CommandLine"
-
 describe Y2Firewall::Clients::Firewall do
   describe "#run" do
     context "when the client is called with some argument" do
