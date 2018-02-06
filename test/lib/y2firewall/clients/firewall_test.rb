@@ -22,7 +22,7 @@
 require_relative "../../../test_helper"
 require "y2firewall/clients/firewall"
 
-Yast.import "SuSEFirewallCMDLine"
+Yast.import "CommandLine"
 
 describe Y2Firewall::Clients::Firewall do
   describe "#run" do
@@ -31,16 +31,9 @@ describe Y2Firewall::Clients::Firewall do
         allow(Yast::WFM).to receive("Args").and_return(["list"])
       end
 
-      it "runs the yast firewall cmdline" do
-        expect(Yast::SuSEFirewallCMDLine).to receive("Run")
+      it "returns false" do
 
-        subject.run
-      end
-
-      it "returns nil" do
-        expect(Yast::SuSEFirewallCMDLine).to receive("Run")
-
-        expect(subject.run).to eql(nil)
+        expect(subject.run).to eql(false)
       end
     end
 

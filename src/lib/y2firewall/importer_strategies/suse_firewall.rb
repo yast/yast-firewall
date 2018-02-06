@@ -19,7 +19,9 @@
 # current contact information at www.suse.com.
 # ------------------------------------------------------------------------------
 
+require "yast"
 require "y2firewall/firewalld"
+require "ui/text_helpers"
 
 module Y2Firewall
   module ImporterStrategies
@@ -27,8 +29,12 @@ module Y2Firewall
     # section configuring the Y2Firewall::Firewalld instance according to it.
     class SuseFirewall
       include Yast::Logger
+      include Yast::I18n
+      include UI::TextHelpers
       # @return [Hash] AutoYaST profile firewall's section
       attr_accessor :profile
+
+      Yast.import "Report"
 
       # SuSEFirewall2 zones
       ZONES = ["DMZ", "INT", "EXT"].freeze
@@ -50,6 +56,27 @@ module Y2Firewall
         "samba-server"      => ["samba"]
       }.freeze
 
+      SUPPORTED_PROPERTIES = [
+        "FW_CONFIGURATIONS_DMZ",
+        "FW_CONFIGURATIONS_EXT",
+        "FW_CONFIGURATIONS_INT",
+        "FW_DEV_DMZ",
+        "FW_DEV_EXT",
+        "FW_DEV_INT",
+        "FW_SERVICES_DMZ_TCP",
+        "FW_SERVICES_EXT_TCP",
+        "FW_SERVICES_INT_TCP",
+        "FW_SERVICES_DMZ_UDP",
+        "FW_SERVICES_EXT_UDP",
+        "FW_SERVICES_INT_UDP",
+        "FW_SERVICES_DMZ_IP",
+        "FW_SERVICES_EXT_IP",
+        "FW_SERVICES_INT_IP",
+        "FW_LOG_ACCEPT_CRIT",
+        "FW_LOG_DROPT_ALL",
+        "FW_MASQUERADE"
+      ].freeze
+
       # @return [Array<string>] list of zones
       def zones
         ZONES
@@ -62,6 +89,22 @@ module Y2Firewall
         @profile = profile
       end
 
+      # Return whether some of the profile properties are not supported
+      #
+      # @return [Boolean] true if all the profiles properties are supported;
+      # false otherwise
+      def completely_supported?
+        unsupported_properties.empty?
+      end
+
+      # Return the list of not supported properties that are defined in the
+      # profile
+      #
+      # @return [Array<String>] not supported properties
+      def unsupported_properties
+        @profile.keys.select { |k| !SUPPORTED_PROPERTIES.include?(k) }
+      end
+
       # It processes the profile configuring the firewalld zones that match
       # better with the SuSEFirewall2 ones.
       def import
@@ -69,6 +112,9 @@ module Y2Firewall
           log.info "The profile is empty, there is nothing to import"
           return true
         end
+
+        completely_supported? ? warn_supported : report_unsupported
+
         zones.each { |z| process_zone(z) }
         if ipsec_trust_zone
           zone = firewalld.find_zone(zone.equivalent(ipsec_trust_zone))
@@ -79,6 +125,32 @@ module Y2Firewall
       end
 
     private
+
+      # Convenience method for reporting a warning message to the user
+      # recommending the use of firewalld schema.
+      def warn_supported
+        Yast::Report.Warning(
+          _(
+            "The profile in use is based on SuSEFirewall2 configuration.\n\n" \
+            "Although all the declared properties are supported, it is recommended \n" \
+            "the use of the new 'firewalld' schema. \n\n" \
+            "Please, check carefully the configuration applied once the installation \n" \
+            "is finished."
+          )
+        )
+      end
+
+      # Convenience method for reporting an error message to the user with the
+      # unsupported SuSEFirewall2 properties.
+      def report_unsupported
+        Yast::Report.Error(
+          _(
+            "Unfortunately, these SuSEFirewall2 properties are not supported:\n\n%s\n\n" \
+            "Check carefully the configuration applied once the installation \n" \
+            "is finished."
+          ) % wrap_text(unsupported_properties.join(", "))
+        )
+      end
 
       # Given a SuSEFirewall2 zone name it process the profile's configuration
       # corresponding to that zone configuring the equivalent firewalld zone
