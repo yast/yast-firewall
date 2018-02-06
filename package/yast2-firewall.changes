@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Mon Feb  5 21:02:57 UTC 2018 - knut.anderssen@suse.com
+
+- AutoYaST: When a profile using the SuSEFirewall2 schema is used,
+  the user is reported with an error if some property is not
+  supported or with a warning in other case. (fate#323460)
+- 4.0.11
+
+-------------------------------------------------------------------
 Wed Jan 31 07:41:26 UTC 2018 - knut.anderssen@suse.com
 
 - AutoYaST: (fate#323460)

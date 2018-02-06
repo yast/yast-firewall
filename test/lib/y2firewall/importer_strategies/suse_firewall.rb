@@ -23,6 +23,8 @@ require_relative "../../../test_helper.rb"
 require "cwm/rspec"
 require "y2firewall/importer_strategies/suse_firewall"
 
+Yast.import "Report"
+
 describe Y2Firewall::ImporterStrategies::SuseFirewall do
   let(:firewalld) { Y2Firewall::Firewalld.instance }
   let(:known_zones) { Y2Firewall::Firewalld::Zone.known_zones.keys }
@@ -96,6 +98,23 @@ describe Y2Firewall::ImporterStrategies::SuseFirewall do
           external = firewalld.find_zone("external")
 
           expect(external.services).to eq(["dhcp", "ssh", "samba", "vnc-server"])
+        end
+      end
+
+      context "and all the properties can be translated to firewalld" do
+        it "recommends to the user the use of firewalld schema" do
+          expect(Yast::Report).to receive(:Warning)
+
+          subject.import
+        end
+      end
+
+      context "and some of the properties can not be translated to firewalld" do
+        it "reports to the user an error with all the unsupported properties" do
+          profile["FW_UNSUPPORTED_PROPERTY"] = true
+          expect(Yast::Report).to receive(:Error)
+
+          subject.import
         end
       end
     end
