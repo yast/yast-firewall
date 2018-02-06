@@ -60,7 +60,20 @@ module Y2Firewall
       def summary
         return "" if !firewalld.installed?
 
-        firewalld.api.list_all_zones.join("\n")
+        default_zone = firewalld.api.default_zone
+        zones = firewalld.api.zones
+
+        summary = "<p>"
+        summary << "<b>Default ZONE:</b> #{default_zone}"
+        summary << "<b>Defined zones:</b>"
+        summary << "<ul>" + zones.map { |z| "<li />#{z}" }.join("\n") + "</ul>"
+        summary << "</p>"
+
+        zones.each do |zone|
+          summary << zone_summary(zone)
+        end
+
+        summary
       end
 
       # Import the firewall configuration
@@ -197,6 +210,38 @@ module Y2Firewall
       # @return [Boolean] true if has been imported; false otherwise
       def imported?
         !!self.class.imported
+      end
+
+
+      FIREWALLD_ATTRS = [
+        "interfaces".freeze,
+        "services".freeze,
+        "ports".freeze,
+        "protocols".freeze
+      ]
+      FIREWALLD_ATTRS.each do |attr|
+        define_method("#{attr}_summary") do |zone|
+          status = firewalld.api.send("list_#{attr}", zone)
+          return "" if status.empty?
+
+          status.map! { |s| "<li />#{s}" }
+          "<li /><b>#{attr.capitalize}:</b> " + "<ul>" + status.join("\n") + "</ul>"
+        end
+      end
+
+      # Creates a summary for the given zone
+      #
+      # @param [String] zone name of zone
+      # @return [String] HTML formated zone description
+      def zone_summary(zone)
+        return "" if zone.nil? || zone.empty?
+
+        desc = ""
+        FIREWALLD_ATTRS.each { |attr| desc << send("#{attr}_summary", zone) }
+        return "" if desc.empty?
+
+        summary = "<h3>#{zone}</h3>"
+        summary << "<ul>#{desc}</ul>"
       end
     end
   end
