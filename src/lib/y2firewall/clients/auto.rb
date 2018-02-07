@@ -61,7 +61,7 @@ module Y2Firewall
       #
       # @return [String]
       def summary
-        return "" if !firewalld.installed?
+        return Yast::HTML.Para(_("Firewalld is not available")) if !firewalld.installed?
 
         # general overview
         summary = general_summary
@@ -246,12 +246,15 @@ module Y2Firewall
       # @return [String] HTML formated firewall description
       def general_summary
         zones = firewalld.api.zones
+        html = Yast::HTML
 
-        summary = Yast::HTML.Bold("Default ZONE:") + " #{firewalld.api.default_zone}"
-        summary << Yast::HTML.Bold("Defined zones:")
-        summary << Yast::HTML.List(zones)
+        summary = html.Bold(_("Running:")) + " " + (firewalld.running? ? _("yes") : _("no")) + html.Newline
+        summary << html.Bold(_("Enabled:")) + " " + (firewalld.enabled? ? _("yes") : _("no")) + html.Newline
+        summary << html.Bold(_("Default zone:")) + " " + firewalld.api.default_zone + html.Newline
+        summary << html.Bold(_("Defined zones:"))
+        summary << html.List(zones)
 
-        Yast::HTML.Para(summary)
+        html.Para(summary)
       end
     end
   end
