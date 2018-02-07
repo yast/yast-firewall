@@ -63,12 +63,13 @@ module Y2Firewall
       def summary
         return Yast::HTML.Para(_("Firewalld is not available")) if !firewalld.installed?
 
+        firewalld.read if !firewalld.read?
+
         # general overview
         summary = general_summary
 
         # per zone details
-        zones = firewalld.api.zones
-        zones.each do |zone|
+        firewalld.zones.each do |zone|
           summary << zone_summary(zone)
         end
 
@@ -211,33 +212,32 @@ module Y2Firewall
         !!self.class.imported
       end
 
+      # Set of methods for formating all types of relations defined via
+      # has_many (@see Y2Firewall::Firewalld::Relations#has_many) in
+      # Y2Firewall::Firewalld::Zone
+      Firewalld::Zone.relations.each do |relation|
+        define_method("#{relation}_summary") do |zone|
+          raise ArgumentError, "zone parameter has to be defined" if zone.nil?
 
-      FIREWALLD_ATTRS = [
-        "interfaces".freeze,
-        "services".freeze,
-        "ports".freeze,
-        "protocols".freeze
-      ]
-      FIREWALLD_ATTRS.each do |attr|
-        define_method("#{attr}_summary") do |zone|
-          status = firewalld.api.send("list_#{attr}", zone)
-          return "" if status.empty?
+          names = zone.send(relation)
+          return "" if names.empty?
 
-          Yast::HTML.Bold("#{attr.capitalize}:") + Yast::HTML.List(status)
+          Yast::HTML.Bold("#{relation.capitalize}:") + Yast::HTML.List(names)
         end
       end
 
       # Creates a summary for the given zone
       #
-      # @param [String] zone name of zone
+      # @param [Firewalld::Zone] zone object defining a zone
       # @return [String] HTML formated zone description
       def zone_summary(zone)
-        return "" if zone.nil? || zone.empty?
+        raise ArgumentError, "zone parameter has to be defined" if zone.nil?
 
-        desc = FIREWALLD_ATTRS.map { |attr| send("#{attr}_summary", zone) }.delete_if(&:empty?)
+        relations = Firewalld::Zone.relations.map(&:to_s)
+        desc = relations.map { |attr| send("#{attr}_summary", zone) }.delete_if(&:empty?)
         return "" if desc.empty?
 
-        summary = Yast::HTML.Heading(zone)
+        summary = Yast::HTML.Heading(zone.name)
         summary << Yast::HTML.List(desc)
       end
 
@@ -245,12 +245,12 @@ module Y2Firewall
       #
       # @return [String] HTML formated firewall description
       def general_summary
-        zones = firewalld.api.zones
         html = Yast::HTML
+        zones = firewalld.zones.map(&:name)
 
         summary = html.Bold(_("Running:")) + " " + (firewalld.running? ? _("yes") : _("no")) + html.Newline
         summary << html.Bold(_("Enabled:")) + " " + (firewalld.enabled? ? _("yes") : _("no")) + html.Newline
-        summary << html.Bold(_("Default zone:")) + " " + firewalld.api.default_zone + html.Newline
+        summary << html.Bold(_("Default zone:")) + " " + firewalld.default_zone + html.Newline
         summary << html.Bold(_("Defined zones:"))
         summary << html.List(zones)
 
