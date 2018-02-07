@@ -32,6 +32,9 @@ module Y2Firewall
     # Does not do any changes to the configuration.
     class Auto < ::Installation::AutoClient
       include Yast::Logger
+
+      Yast.import "HTML"
+
       class << self
         # @return [Boolean] whether the AutoYaST configuration has been
         # modified or not
@@ -63,12 +66,13 @@ module Y2Firewall
         default_zone = firewalld.api.default_zone
         zones = firewalld.api.zones
 
-        summary = "<p>"
-        summary << "<b>Default ZONE:</b> #{default_zone}"
-        summary << "<b>Defined zones:</b>"
-        summary << "<ul>" + zones.map { |z| "<li />#{z}" }.join("\n") + "</ul>"
-        summary << "</p>"
+        # general overview
+        summary = Yast::HTML.Bold("Default ZONE:") + " #{default_zone}"
+        summary << Yast::HTML.Bold("Defined zones:")
+        summary << Yast::HTML.List(zones)
+        summary = Yast::HTML.Para(summary)
 
+        # per zone overview
         zones.each do |zone|
           summary << zone_summary(zone)
         end
@@ -224,8 +228,7 @@ module Y2Firewall
           status = firewalld.api.send("list_#{attr}", zone)
           return "" if status.empty?
 
-          status.map! { |s| "<li />#{s}" }
-          "<li /><b>#{attr.capitalize}:</b> " + "<ul>" + status.join("\n") + "</ul>"
+          Yast::HTML.Bold("#{attr.capitalize}:") + Yast::HTML.List(status)
         end
       end
 
@@ -236,12 +239,11 @@ module Y2Firewall
       def zone_summary(zone)
         return "" if zone.nil? || zone.empty?
 
-        desc = ""
-        FIREWALLD_ATTRS.each { |attr| desc << send("#{attr}_summary", zone) }
+        desc = FIREWALLD_ATTRS.map { |attr| send("#{attr}_summary", zone) }.delete_if(&:empty?)
         return "" if desc.empty?
 
-        summary = "<h3>#{zone}</h3>"
-        summary << "<ul>#{desc}</ul>"
+        summary = Yast::HTML.Heading(zone)
+        summary << Yast::HTML.List(desc)
       end
     end
   end
