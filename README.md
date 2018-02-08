@@ -9,8 +9,10 @@ Status](https://coveralls.io/repos/github/yast/yast-firewall/badge.svg?branch=ma
 Since the adoption of `firewalld` this repository contains just some useful
 clients and libraries for installation and autoinstallation.
 
-The YaST Firewall GUI has been replaced by firewalld-config (a Gtk application)
-and the text mode interface is not supported by now.
+YaST currently does not have a module to configure the firewall.
+
+If you are looking for a new option, we recommend to use firewall-config to
+configure your firewall via a user interface or firewall-cmd for the command line.
 
 An **API** to configure `Firewalld` is available in this repository:
 
@@ -21,7 +23,7 @@ https://github.com/yast/yast-yast2/tree/master/library/network/src/lib/y2firewal
 For modules that just need to open a custom or predefined port in firewalld
 the
 [CWMFirewallInterfaces](https://github.com/yast/yast-yast2/tree/master/library/network/src/modules/CWMFirewallInterfaces.rb)
-module has been adapted to work properly with the new **API.** 
+module has been adapted to work properly with the new **API.**
 
 For more documentation refer to this [link](doc/firewalld_services.md)
 

@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 # ------------------------------------------------------------------------------
 # Copyright (c) 2017 SUSE LLC
 #
@@ -21,6 +19,7 @@
 
 require "yast"
 require "yast2/execute"
+require "ui/text_helpers"
 
 module Y2Firewall
   module Clients
@@ -28,6 +27,8 @@ module Y2Firewall
     # client depending on the given arguments.
     class Firewall
       include Yast::I18n
+      extend Yast::I18n
+      include UI::TextHelpers
       include Yast::Logger
       include Yast::UIShortcuts
 
@@ -40,16 +41,20 @@ module Y2Firewall
         textdomain "firewall"
       end
 
+      # TRANSLATORS: firewall-config and firewall-cmd are the names of software utilities,
+      # so they should not be translated.
+      NOT_SUPPORTED = N_("YaST currently does not have a module for configuring" \
+        " firewall. Please, either use \"firewall-config\" to configure your firewall" \
+        " via a user interface or \"firewall-cmd\" for the command line.").freeze
+
       def run
         log_and_return do
           if !Yast::WFM.Args.empty?
-            Yast.import "SuSEFirewallCMDLine"
-            Yast::SuSEFirewallCMDLine.Run
-            nil
+            $stderr.puts wrap_text(_(NOT_SUPPORTED))
+            false
           elsif Yast::UI.TextMode()
             Yast::Popup.Error(
-              _("Your display can't support the 'firewall-config' UI.\n") +
-              _("Either use the Yast2 command line or the 'firewall-cmd' utility.")
+              wrap_text(_(NOT_SUPPORTED))
             )
             false
           elsif Yast::PackageSystem.CheckAndInstallPackages(["firewall-config"])
