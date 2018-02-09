@@ -233,7 +233,9 @@ module Y2Firewall
       def zone_summary(zone)
         raise ArgumentError, "zone parameter has to be defined" if zone.nil?
 
-        desc = zone.relations.map { |relation| zone_detail_summary(relation, zone.send(relation)) }.delete_if(&:empty?)
+        desc = zone.relations.map do |relation|
+          zone_detail_summary(relation, zone.send(relation))
+        end.delete_if(&:empty?)
         return "" if desc.empty?
 
         summary = Yast::HTML.Heading(zone.name)
@@ -243,18 +245,21 @@ module Y2Firewall
       # Creates a general summary for firewalld
       #
       # @return [String] HTML formated firewall description
+      # rubocop:disable Metrics/AbcSize
       def general_summary
         html = Yast::HTML
-        zones = firewalld.zones.map(&:name)
+        running = " " + (firewalld.running? ? _("yes") : _("no"))
+        enabled = " " + (firewalld.enabled? ? _("yes") : _("no"))
 
-        summary = html.Bold(_("Running:")) + " " + (firewalld.running? ? _("yes") : _("no")) + html.Newline
-        summary << html.Bold(_("Enabled:")) + " " + (firewalld.enabled? ? _("yes") : _("no")) + html.Newline
+        summary = html.Bold(_("Running:")) + running + html.Newline
+        summary << html.Bold(_("Enabled:")) + enabled + html.Newline
         summary << html.Bold(_("Default zone:")) + " " + firewalld.default_zone + html.Newline
         summary << html.Bold(_("Defined zones:"))
-        summary << html.List(zones)
+        summary << html.List(firewalld.zones.map(&:name))
 
         html.Para(summary)
       end
+      # rubocop:enable Metrics/AbcSize
     end
   end
 end
