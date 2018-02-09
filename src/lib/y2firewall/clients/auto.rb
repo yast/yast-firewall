@@ -212,18 +212,18 @@ module Y2Firewall
         !!self.class.imported
       end
 
-      # Set of methods for formating all types of relations defined via
-      # has_many (@see Y2Firewall::Firewalld::Relations#has_many) in
-      # Y2Firewall::Firewalld::Zone
-      Firewalld::Zone.relations.each do |relation|
-        define_method("#{relation}_summary") do |zone|
-          raise ArgumentError, "zone parameter has to be defined" if zone.nil?
+      # Creates a piece for summary for zone detail
+      #
+      # See has_many (@see Y2Firewall::Firewalld::Relations#has_many) in
+      # Y2Firewall::Firewalld::Zone for known detail / relations
+      #
+      # @param [String] relation is name of relation (used as a caption for generated blob)
+      # @param [Array<String>] names details to be formated
+      # @return [<String>] A string formated using Yast::HTML methods
+      def zone_detail_summary(relation, names)
+        return "" if names.nil? || names.empty?
 
-          names = zone.send(relation)
-          return "" if names.empty?
-
-          Yast::HTML.Bold("#{relation.capitalize}:") + Yast::HTML.List(names)
-        end
+        Yast::HTML.Bold("#{relation.capitalize}:") + Yast::HTML.List(names)
       end
 
       # Creates a summary for the given zone
@@ -233,8 +233,7 @@ module Y2Firewall
       def zone_summary(zone)
         raise ArgumentError, "zone parameter has to be defined" if zone.nil?
 
-        relations = Firewalld::Zone.relations.map(&:to_s)
-        desc = relations.map { |attr| send("#{attr}_summary", zone) }.delete_if(&:empty?)
+        desc = zone.relations.map { |relation| zone_detail_summary(relation, zone.send(relation)) }.delete_if(&:empty?)
         return "" if desc.empty?
 
         summary = Yast::HTML.Heading(zone.name)
