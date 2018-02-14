@@ -50,11 +50,11 @@ describe Y2Firewall::Clients::Auto do
 
   describe "#zone_summary" do
     RELATIONS = {
-      :interfaces => ["eth0", "eth1"],
-      :services   => ["ssh", "ftp"],
-      :protocols  => ["udp", "tcp"],
-      :ports      => ["80"]
-    }
+      interfaces: ["eth0", "eth1"],
+      services:   ["ssh", "ftp"],
+      protocols:  ["udp", "tcp"],
+      ports:      ["80"]
+    }.freeze
 
     def define_zone(name: nil, relation: nil, values: nil)
       return nil if name.nil? || name.empty?
