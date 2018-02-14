@@ -33,52 +33,63 @@ describe Y2Firewall::Clients::Auto do
     allow(subject).to receive(:importer).and_return(importer)
   end
 
-  describe "#general_summary" do
-    it "creates a text which includes firewalld overview" do
-      expect(firewalld).to receive(:running?).and_return(true)
-      expect(firewalld).to receive(:enabled?).and_return(true)
-      expect(firewalld).to receive(:default_zone).and_return("public")
-
-      summary = subject.send(:general_summary)
-
-      expect(summary).to match(/Running/)
-      expect(summary).to match(/Enabled/)
-      expect(summary).to match(/Default zone/)
-      expect(summary).to match(/Defined zones/)
-    end
-  end
-
   describe "#zone_summary" do
-    RELATIONS = {
-      interfaces: ["eth0", "eth1"],
-      services:   ["ssh", "ftp"],
-      protocols:  ["udp", "tcp"],
-      ports:      ["80"]
-    }.freeze
-
-    def define_zone(name: nil, relation: nil, values: nil)
-      return nil if name.nil? || name.empty?
-      return nil if !Y2Firewall::Firewalld::Zone.instance_methods(false).include?(relation)
-
-      zone = Y2Firewall::Firewalld::Zone.new(name: name)
-      expect(zone).to receive(relation).and_return(values)
-
-      zone
-    end
-
     it "empty zone returns empty description" do
       summary = subject.send(:zone_summary, Y2Firewall::Firewalld::Zone.new(name: "test_zone"))
 
       expect(summary).to be_empty
     end
+  end
 
-    RELATIONS.each_pair do |relation, values|
-      it "mentions #{relation} if any is assigned to the non-empty zone" do
-        zone = define_zone(name: "test_zone", relation: relation, values: values)
-        summary = subject.send(:zone_summary, zone)
+  describe "#summary" do
+    context "when firewalld is not installed" do
+      before(:each) do
+        allow(firewalld).to receive(:installed?).and_return(false)
+      end
 
-        values.each do |value|
-          expect(summary).to match(/#{value}/)
+      it "reports when firewalld is not available" do
+        expect(subject.summary).to match(/not available/)
+      end
+    end
+
+    context "when firewalld is installed" do
+      let(:relations_stub) do
+        {
+          interfaces: ["eth0", "eth1"],
+          services:   ["ssh", "ftp"],
+          protocols:  ["udp", "tcp"],
+          ports:      ["80"]
+        }
+      end
+
+      before(:each) do
+        zones = []
+        relations_stub.each_pair do |relation, values|
+          zone = Y2Firewall::Firewalld::Zone.new(name: "zone_#{relation}")
+          allow(zone).to receive(relation).and_return(values)
+          zones << zone
+        end
+
+        allow(firewalld).to receive(:zones).and_return(zones)
+      end
+
+      it "builds a summary when firewall is installed" do
+        allow(firewalld).to receive(:read).and_return(true)
+
+        expect(firewalld).to receive(:installed?).and_return(true)
+        expect(firewalld).to receive(:default_zone).and_return("public")
+
+        summary = subject.summary
+
+        # general stuff
+        expect(summary).to match(/Running/)
+        expect(summary).to match(/Enabled/)
+        expect(summary).to match(/Default zone/)
+        expect(summary).to match(/Defined zones/)
+
+        # zone details
+        relations_stub.each_pair do |_relation, values|
+          values.each { |value| expect(summary).to match(/#{value}/) }
         end
       end
     end
