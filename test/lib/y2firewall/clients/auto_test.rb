@@ -33,13 +33,54 @@ describe Y2Firewall::Clients::Auto do
     allow(subject).to receive(:importer).and_return(importer)
   end
 
-  describe "#summary" do
-    it "returns the summary of all the configured zones" do
-      pending "disabled until new summary is done"
+  describe "#general_summary" do
+    it "creates a text which includes firewalld overview" do
+      expect(firewalld).to receive(:running?).and_return(true)
+      expect(firewalld).to receive(:enabled?).and_return(true)
+      expect(firewalld).to receive(:default_zone).and_return("public")
 
-      expect(firewalld.api).to receive(:list_all_zones).and_return(["zone1", "zone2"])
+      summary = subject.send(:general_summary)
 
-      expect(subject.summary).to eq("zone1\nzone2")
+      expect(summary).to match(/Running/)
+      expect(summary).to match(/Enabled/)
+      expect(summary).to match(/Default zone/)
+      expect(summary).to match(/Defined zones/)
+    end
+  end
+
+  describe "#zone_summary" do
+    RELATIONS = {
+      :interfaces => ["eth0", "eth1"],
+      :services   => ["ssh", "ftp"],
+      :protocols  => ["udp", "tcp"],
+      :ports      => ["80"]
+    }
+
+    def define_zone(name: nil, relation: nil, values: nil)
+      return nil if name.nil? || name.empty?
+      return nil if !Y2Firewall::Firewalld::Zone.instance_methods(false).include?(relation)
+
+      zone = Y2Firewall::Firewalld::Zone.new(name: name)
+      expect(zone).to receive(relation).and_return(values)
+
+      zone
+    end
+
+    it "empty zone returns empty description" do
+      summary = subject.send(:zone_summary, Y2Firewall::Firewalld::Zone.new(name: "test_zone"))
+
+      expect(summary).to be_empty
+    end
+
+    RELATIONS.each_pair do |relation, values|
+      it "mentions #{relation} if any is assigned to the non-empty zone" do
+        zone = define_zone(name: "test_zone", relation: relation, values: values)
+        summary = subject.send(:zone_summary, zone)
+
+        values.each do |value|
+          expect(summary).to match(/#{value}/)
+        end
+      end
     end
   end
 
