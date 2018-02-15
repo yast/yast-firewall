@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Thu Feb 15 10:58:14 UTC 2018 - mfilka@suse.com
+
+- fate#323460
+  - updated summary in autoyast client to work with new firewalld
+    api
+- 4.0.14
+
+-------------------------------------------------------------------
 Wed Feb 14 17:23:32 UTC 2018 - knut.anderssen@suse.com
 
 - AutoYaST: added 'enable_firewall', 'start_firewall' and

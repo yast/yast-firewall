@@ -33,11 +33,65 @@ describe Y2Firewall::Clients::Auto do
     allow(subject).to receive(:importer).and_return(importer)
   end
 
-  describe "#summary" do
-    it "returns the summary of all the configured zones" do
-      expect(firewalld.api).to receive(:list_all_zones).and_return(["zone1", "zone2"])
+  describe "#zone_summary" do
+    it "empty zone returns empty description" do
+      summary = subject.send(:zone_summary, Y2Firewall::Firewalld::Zone.new(name: "test_zone"))
 
-      expect(subject.summary).to eq("zone1\nzone2")
+      expect(summary).to be_empty
+    end
+  end
+
+  describe "#summary" do
+    context "when firewalld is not installed" do
+      before(:each) do
+        allow(firewalld).to receive(:installed?).and_return(false)
+      end
+
+      it "reports when firewalld is not available" do
+        expect(subject.summary).to match(/not available/)
+      end
+    end
+
+    context "when firewalld is installed" do
+      let(:relations_stub) do
+        {
+          interfaces: ["eth0", "eth1"],
+          services:   ["ssh", "ftp"],
+          protocols:  ["udp", "tcp"],
+          ports:      ["80"]
+        }
+      end
+
+      before(:each) do
+        zones = []
+        relations_stub.each_pair do |relation, values|
+          zone = Y2Firewall::Firewalld::Zone.new(name: "zone_#{relation}")
+          allow(zone).to receive(relation).and_return(values)
+          zones << zone
+        end
+
+        allow(firewalld).to receive(:zones).and_return(zones)
+      end
+
+      it "builds a summary when firewall is installed" do
+        allow(firewalld).to receive(:read).and_return(true)
+
+        expect(firewalld).to receive(:installed?).and_return(true)
+        expect(firewalld).to receive(:default_zone).and_return("public")
+
+        summary = subject.summary
+
+        # general stuff
+        expect(summary).to match(/Running/)
+        expect(summary).to match(/Enabled/)
+        expect(summary).to match(/Default zone/)
+        expect(summary).to match(/Defined zones/)
+
+        # zone details
+        relations_stub.each_pair do |_relation, values|
+          values.each { |value| expect(summary).to match(/#{value}/) }
+        end
+      end
     end
   end
 

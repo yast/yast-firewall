@@ -17,7 +17,7 @@
 
 
 Name:           yast2-firewall
-Version:        4.0.13
+Version:        4.0.14
 Release:        0
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
@@ -33,8 +33,8 @@ BuildRequires:  yast2 >= 4.0.45
 BuildRequires:  rubygem(%rb_default_ruby_abi:yast-rake)
 BuildRequires:  rubygem(%rb_default_ruby_abi:rspec)
 
-# Firewalld read?
-Requires:       yast2 >= 4.0.45
+# Firewalld - extended API
+Requires:       yast2 >= 4.0.49
 
 # ButtonBox widget
 Conflicts:	yast2-ycp-ui-bindings < 2.17.3

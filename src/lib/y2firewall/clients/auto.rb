@@ -32,6 +32,9 @@ module Y2Firewall
     # Does not do any changes to the configuration.
     class Auto < ::Installation::AutoClient
       include Yast::Logger
+
+      Yast.import "HTML"
+
       class << self
         # @return [Boolean] whether the AutoYaST configuration has been
         # modified or not
@@ -58,9 +61,19 @@ module Y2Firewall
       #
       # @return [String]
       def summary
-        return "" if !firewalld.installed?
+        return Yast::HTML.Para(_("Firewalld is not available")) if !firewalld.installed?
 
-        firewalld.api.list_all_zones.join("\n")
+        firewalld.read if !firewalld.read?
+
+        # general overview
+        summary = general_summary
+
+        # per zone details
+        firewalld.zones.each do |zone|
+          summary << zone_summary(zone)
+        end
+
+        summary
       end
 
       # Import the firewall configuration
@@ -198,6 +211,55 @@ module Y2Firewall
       def imported?
         !!self.class.imported
       end
+
+      # Creates a piece for summary for zone detail
+      #
+      # See has_many (@see Y2Firewall::Firewalld::Relations#has_many) in
+      # Y2Firewall::Firewalld::Zone for known detail / relations
+      #
+      # @param [String] relation is name of relation (used as a caption for generated blob)
+      # @param [Array<String>] names details to be formated
+      # @return [<String>] A string formated using Yast::HTML methods
+      def zone_detail_summary(relation, names)
+        return "" if names.nil? || names.empty?
+
+        Yast::HTML.Bold("#{relation.capitalize}:") + Yast::HTML.List(names)
+      end
+
+      # Creates a summary for the given zone
+      #
+      # @param [Firewalld::Zone] zone object defining a zone
+      # @return [String] HTML formated zone description
+      def zone_summary(zone)
+        raise ArgumentError, "zone parameter has to be defined" if zone.nil?
+
+        desc = zone.relations.map do |relation|
+          zone_detail_summary(relation, zone.send(relation))
+        end.delete_if(&:empty?)
+        return "" if desc.empty?
+
+        summary = Yast::HTML.Heading(zone.name)
+        summary << Yast::HTML.List(desc)
+      end
+
+      # Creates a general summary for firewalld
+      #
+      # @return [String] HTML formated firewall description
+      # rubocop:disable Metrics/AbcSize
+      def general_summary
+        html = Yast::HTML
+        running = " " + (firewalld.running? ? _("yes") : _("no"))
+        enabled = " " + (firewalld.enabled? ? _("yes") : _("no"))
+
+        summary = html.Bold(_("Running:")) + running + html.Newline
+        summary << html.Bold(_("Enabled:")) + enabled + html.Newline
+        summary << html.Bold(_("Default zone:")) + " " + firewalld.default_zone + html.Newline
+        summary << html.Bold(_("Defined zones:"))
+        summary << html.List(firewalld.zones.map(&:name))
+
+        html.Para(summary)
+      end
+      # rubocop:enable Metrics/AbcSize
     end
   end
 end
