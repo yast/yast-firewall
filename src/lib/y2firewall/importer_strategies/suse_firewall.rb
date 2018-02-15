@@ -57,6 +57,8 @@ module Y2Firewall
       }.freeze
 
       SUPPORTED_PROPERTIES = [
+        "enable_firewall",
+        "start_firewall",
         "FW_CONFIGURATIONS_DMZ",
         "FW_CONFIGURATIONS_EXT",
         "FW_CONFIGURATIONS_INT",
@@ -73,7 +75,8 @@ module Y2Firewall
         "FW_SERVICES_EXT_IP",
         "FW_SERVICES_INT_IP",
         "FW_LOG_ACCEPT_CRIT",
-        "FW_LOG_DROPT_ALL",
+        "FW_LOG_DROP_CRIT",
+        "FW_LOG_DROP_ALL",
         "FW_MASQUERADE"
       ].freeze
 
@@ -309,8 +312,8 @@ module Y2Firewall
       # @return [String] all, unicast or off depending on the log config
       def log_denied_packets
         accept_crit = profile.fetch("FW_LOG_ACCEPT_CRIT", "no") == "yes"
-        drop_all = profile.fetch("FW_LOG_DROPT_ALL", "no") == "yes"
-        drop_crit = profile.fetch("FW_LOG_ACCEPT_CRIT", "no") == "yes"
+        drop_all = profile.fetch("FW_LOG_DROP_ALL", "no") == "yes"
+        drop_crit = profile.fetch("FW_LOG_DROP_CRIT", "no") == "yes"
 
         if drop_all
           "all"
