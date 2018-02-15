@@ -40,6 +40,8 @@ describe Y2Firewall::ImporterStrategies::SuseFirewall do
 
     let(:profile) do
       {
+        "enable_firewall"       => true,
+        "start_firewall"        => false,
         "FW_DEV_EXT"            => "eth0",
         "FW_DEV_INT"            => "eth1",
         "FW_DEV_DMZ"            => "eth2 any",
@@ -47,7 +49,10 @@ describe Y2Firewall::ImporterStrategies::SuseFirewall do
         "FW_SERVICES_EXT_TCP"   => "80 443 8080:8084",
         "FW_SERVICES_EXT_UDP"   => "53",
         "FW_SERVICES_EXT_IP"    => "esp",
-        "FW_MASQUERADE"         => masquerade
+        "FW_MASQUERADE"         => masquerade,
+        "FW_LOG_DROP_CRIT"      => "yes",
+        "FW_LOG_DROP_ALL"       => "no",
+        "FW_LOG_ACCEPT_CRIT"    => "no"
       }
     end
 
