@@ -109,6 +109,7 @@ describe Y2Firewall::ImporterStrategies::SuseFirewall do
       context "and all the properties can be translated to firewalld" do
         it "recommends to the user the use of firewalld schema" do
           expect(Yast::Report).to receive(:Warning)
+          expect(Yast::Report).to_not receive(:Error)
 
           subject.import
         end
