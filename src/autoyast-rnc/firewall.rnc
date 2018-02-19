@@ -24,6 +24,7 @@ y2_firewall =
   | FW_SERVICES_EXT_IP
   | start_firewall
   | enable_firewall
+  | default_zone
   | FW_ALLOW_FW_BROADCAST_DMZ
   | FW_ALLOW_FW_BROADCAST_INT
   | FW_ALLOW_FW_BROADCAST_EXT
@@ -84,6 +85,7 @@ FW_SERVICES_EXT_TCP = element FW_SERVICES_EXT_TCP { text }
 FW_SERVICES_EXT_IP = element FW_SERVICES_EXT_IP { text }
 start_firewall = element start_firewall { BOOLEAN }
 enable_firewall = element enable_firewall { BOOLEAN }
+default_zone = element default_zone { text }
 FW_ALLOW_FW_BROADCAST_DMZ = element FW_ALLOW_FW_BROADCAST_DMZ { text }
 FW_ALLOW_FW_BROADCAST_EXT = element FW_ALLOW_FW_BROADCAST_EXT { text }
 FW_ALLOW_FW_BROADCAST_INT = element FW_ALLOW_FW_BROADCAST_INT { text }
