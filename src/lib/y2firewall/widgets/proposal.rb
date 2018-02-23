@@ -63,6 +63,7 @@ module Y2Firewall
     # Enable firewall service checkbox
     class EnableFirewall < CWM::CheckBox
       def initialize(settings, widgets)
+        textdomain "firewall"
         @settings = settings
         @widgets = widgets
       end
@@ -111,6 +112,7 @@ module Y2Firewall
     # Enable sshd service checkbox
     class EnableSSHD < CWM::CheckBox
       def initialize(settings)
+        textdomain "firewall"
         @settings = settings
       end
 
@@ -143,6 +145,7 @@ module Y2Firewall
     # Open ssh port checkbox
     class OpenSSHPort < CWM::CheckBox
       def initialize(settings)
+        textdomain "firewall"
         @settings = settings
       end
 
@@ -167,6 +170,7 @@ module Y2Firewall
     # Open vnc port checkbox
     class OpenVNCPorts < CWM::CheckBox
       def initialize(settings)
+        textdomain "firewall"
         @settings = settings
       end
 
