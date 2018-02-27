@@ -89,6 +89,7 @@ module Y2Firewall
       #
       # @param [Hash] AutoYaST profile firewall's section
       def initialize(profile)
+        textdomain "firewall"
         @profile = profile
       end
 
