@@ -81,6 +81,16 @@ describe Y2Firewall::ImporterStrategies::SuseFirewall do
         expect(firewalld.default_zone).to eql("dmz")
       end
 
+      context "and protection from INT zone is not defined" do
+        let(:profile) { { "FW_DEV_INT" => "eth1" } }
+
+        it "configures the INT zone as the trusted" do
+          trusted = firewalld.find_zone("trusted")
+
+          expect(trusted.interfaces).to eq(["eth1"])
+        end
+      end
+
       context "and protection from INT zone is disabled" do
         it "configures the INT zone as the trusted" do
           trusted = firewalld.find_zone("trusted")
