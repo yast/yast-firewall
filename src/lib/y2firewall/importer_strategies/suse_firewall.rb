@@ -42,8 +42,6 @@ module Y2Firewall
       # Best effort conversion of SuSEFirewall2 services into firewalld
       # predefined ones.
       SERVICE_MAP = {
-        "apache2"           => ["http"],
-        "apache2-ssl"       => ["https"],
         "bind"              => ["dns"],
         "dhcp-server"       => ["dhcp"],
         "dhcp6-server"      => ["dhcpv6"],
@@ -77,7 +75,8 @@ module Y2Firewall
         "FW_LOG_ACCEPT_CRIT",
         "FW_LOG_DROP_CRIT",
         "FW_LOG_DROP_ALL",
-        "FW_MASQUERADE"
+        "FW_MASQUERADE",
+        "FW_PROTECT_FROM_INT"
       ].freeze
 
       # @return [Array<string>] list of zones
@@ -282,12 +281,19 @@ module Y2Firewall
       def zone_equivalent(name)
         case name.upcase
         when "INT"
-          "trusted"
+          trusted? ? "trusted" : "internal"
         when "EXT"
           masquerade? ? "external" : "public"
         when "DMZ"
           "dmz"
         end
+      end
+
+      # Return whether internal network is trusted or not
+      #
+      # @return [Boolean] true if trusted; false otherwise
+      def trusted?
+        profile.fetch("FW_PROTECT_FROM_INT", "no") == "no"
       end
 
       # Return whether masquerade is configured or not
