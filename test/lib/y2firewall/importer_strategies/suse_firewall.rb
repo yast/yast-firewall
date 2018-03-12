@@ -30,6 +30,7 @@ describe Y2Firewall::ImporterStrategies::SuseFirewall do
   let(:known_zones) { Y2Firewall::Firewalld::Zone.known_zones.keys }
   let(:empty_zones) { known_zones.map { |name| Y2Firewall::Firewalld::Zone.new(name: name) } }
   let(:masquerade) { "yes" }
+  let(:int_protected) { "no" }
 
   before do
     firewalld.zones = empty_zones
@@ -52,7 +53,8 @@ describe Y2Firewall::ImporterStrategies::SuseFirewall do
         "FW_MASQUERADE"         => masquerade,
         "FW_LOG_DROP_CRIT"      => "yes",
         "FW_LOG_DROP_ALL"       => "no",
-        "FW_LOG_ACCEPT_CRIT"    => "no"
+        "FW_LOG_ACCEPT_CRIT"    => "no",
+        "FW_PROTECT_FROM_INT"   => int_protected
       }
     end
 
@@ -69,12 +71,6 @@ describe Y2Firewall::ImporterStrategies::SuseFirewall do
         subject.import
       end
 
-      it "configures the INT zone as the trusted" do
-        trusted = firewalld.find_zone("trusted")
-
-        expect(trusted.interfaces).to eq(["eth1"])
-      end
-
       it "configures the DMZ zone as the dmz" do
         dmz = firewalld.find_zone("dmz")
 
@@ -83,6 +79,34 @@ describe Y2Firewall::ImporterStrategies::SuseFirewall do
 
       it "sets the default zone as the one with the 'any' interface" do
         expect(firewalld.default_zone).to eql("dmz")
+      end
+
+      context "and protection from INT zone is not defined" do
+        let(:profile) { { "FW_DEV_INT" => "eth1" } }
+
+        it "configures the INT zone as the trusted" do
+          trusted = firewalld.find_zone("trusted")
+
+          expect(trusted.interfaces).to eq(["eth1"])
+        end
+      end
+
+      context "and protection from INT zone is disabled" do
+        it "configures the INT zone as the trusted" do
+          trusted = firewalld.find_zone("trusted")
+
+          expect(trusted.interfaces).to eq(["eth1"])
+        end
+      end
+
+      context "and protection from INT zone is enabled" do
+        let(:int_protected) { "yes" }
+
+        it "configures the INT zone as the internal" do
+          internal = firewalld.find_zone("internal")
+
+          expect(internal.interfaces).to eq(["eth1"])
+        end
       end
 
       context "and masquerade is disabled" do
