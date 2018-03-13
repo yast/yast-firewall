@@ -24,7 +24,6 @@ y2_firewall =
   | FW_SERVICES_EXT_IP
   | start_firewall
   | enable_firewall
-  | default_zone
   | FW_ALLOW_FW_BROADCAST_DMZ
   | FW_ALLOW_FW_BROADCAST_INT
   | FW_ALLOW_FW_BROADCAST_EXT
@@ -85,7 +84,6 @@ FW_SERVICES_EXT_TCP = element FW_SERVICES_EXT_TCP { text }
 FW_SERVICES_EXT_IP = element FW_SERVICES_EXT_IP { text }
 start_firewall = element start_firewall { BOOLEAN }
 enable_firewall = element enable_firewall { BOOLEAN }
-default_zone = element default_zone { text }
 FW_ALLOW_FW_BROADCAST_DMZ = element FW_ALLOW_FW_BROADCAST_DMZ { text }
 FW_ALLOW_FW_BROADCAST_EXT = element FW_ALLOW_FW_BROADCAST_EXT { text }
 FW_ALLOW_FW_BROADCAST_INT = element FW_ALLOW_FW_BROADCAST_INT { text }
@@ -131,36 +129,39 @@ zones =
 
 zone =
   element zone {
-    interfaces
-    | services
-    | ports
-    | protocols
-    | masquerade
+    zone_name &
+    fwd_interfaces? &
+    fwd_services? &
+    fwd_ports? &
+    fwd_protocols? &
+    masquerade?
   }
 
-services =
+fwd_services =
   element services {
     LIST,
-    element service {text}+
+    element service {text}*
   }
 
-interfaces =
+fwd_interfaces =
   element interfaces {
     LIST,
-    element interface {text}+
+    element interface {text}*
   }
 
-ports =
+fwd_ports =
   element ports {
     LIST,
-    element ports {text}+
+    element port {text}*
   }
 
-protocols =
+fwd_protocols =
   element protocols {
     LIST,
-    element protocols {text}+
+    element protocol {text}*
   }
 
+zone_name = element name { text }
+default_zone = element default_zone { text }
 masquerade = element masquerade { BOOLEAN }
 log_denied_packets = element log_denied_packets { text }

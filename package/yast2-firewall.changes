@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Tue Mar 13 07:24:55 UTC 2018 - knut.anderssen@suse.com
+
+- Some fixes to the firewall AY schema (bsc#1013047)
+  - Use "name" in zones
+  - "default_zone" is a firewall attribute
+- 4.0.19
+
+-------------------------------------------------------------------
 Tue Mar  6 07:04:46 UTC 2018 - knut.anderssen@suse.com
 
 - SuSEFirewall2 importer changes (fate#323460)
