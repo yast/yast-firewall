@@ -134,6 +134,7 @@ zone =
     fwd_services? &
     fwd_ports? &
     fwd_protocols? &
+    fwd_sources? &
     masquerade?
   }
 
@@ -159,6 +160,12 @@ fwd_protocols =
   element protocols {
     LIST,
     element protocol {text}*
+  }
+
+fwd_sources =
+  element sources {
+    LIST,
+    element sources {text}*
   }
 
 zone_name = element name { text }
