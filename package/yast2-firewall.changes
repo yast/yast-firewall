@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Wed Mar 21 23:42:21 UTC 2018 - knut.anderssen@suse.com
+
+- Added zone 'sources' element to the AutoYaST schema file
+  (bsc#1013047)
+- 4.0.20
+
+-------------------------------------------------------------------
 Tue Mar 13 07:24:55 UTC 2018 - knut.anderssen@suse.com
 
 - Some fixes to the firewall AY schema (bsc#1013047)
