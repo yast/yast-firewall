@@ -124,48 +124,45 @@ y2_firewalld =
 zones =
   element zones {
     LIST,
-    zone*
-  }
-
-zone =
-  element zone {
-    zone_name &
-    fwd_interfaces? &
-    fwd_services? &
-    fwd_ports? &
-    fwd_protocols? &
-    fwd_sources? &
-    masquerade?
+    element (zone | listentry) {
+      zone_name &
+      fwd_interfaces? &
+      fwd_services? &
+      fwd_ports? &
+      fwd_protocols? &
+      fwd_sources? &
+      masquerade?
+    }*
   }
 
 fwd_services =
   element services {
     LIST,
-    element service {text}*
+    element (service | listentry) {text}*
   }
 
 fwd_interfaces =
   element interfaces {
     LIST,
-    element interface {text}*
+    element (interface | listentry) {text}*
   }
 
 fwd_ports =
   element ports {
     LIST,
-    element port {text}*
+    element (port | listentry) {text}*
   }
 
 fwd_protocols =
   element protocols {
     LIST,
-    element protocol {text}*
+    element (protocol | listentry) {text}*
   }
 
 fwd_sources =
   element sources {
     LIST,
-    element sources {text}*
+    element (source | listentry) {text}*
   }
 
 zone_name = element name { text }
