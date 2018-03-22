@@ -1,8 +1,9 @@
 -------------------------------------------------------------------
 Wed Mar 21 23:42:21 UTC 2018 - knut.anderssen@suse.com
 
-- Added zone 'sources' element to the AutoYaST schema file
-  (bsc#1013047)
+- More fixes to the firewall AY schema (bsc#1013047)
+  - Added zone 'sources' element to the AutoYaST schema file.
+  - Permitted the use of 'listentry' element in list entries.
 - 4.0.20
 
 -------------------------------------------------------------------
