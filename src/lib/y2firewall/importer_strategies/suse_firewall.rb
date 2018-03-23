@@ -72,7 +72,6 @@ module Y2Firewall
         "FW_SERVICES_DMZ_IP",
         "FW_SERVICES_EXT_IP",
         "FW_SERVICES_INT_IP",
-        "FW_LOG_ACCEPT_CRIT",
         "FW_LOG_DROP_CRIT",
         "FW_LOG_DROP_ALL",
         "FW_MASQUERADE",
@@ -318,17 +317,10 @@ module Y2Firewall
       #
       # @return [String] all, unicast or off depending on the log config
       def log_denied_packets
-        accept_crit = profile.fetch("FW_LOG_ACCEPT_CRIT", "no") == "yes"
-        drop_all = profile.fetch("FW_LOG_DROP_ALL", "no") == "yes"
-        drop_crit = profile.fetch("FW_LOG_DROP_CRIT", "no") == "yes"
+        return "all" if profile.fetch("FW_LOG_DROP_ALL", "no") == "yes"
+        return "unicast" if profile.fetch("FW_LOG_DROP_CRIT", "no") == "yes"
 
-        if drop_all
-          "all"
-        elsif accept_crit || drop_crit
-          "unicast"
-        else
-          "off"
-        end
+        "off"
       end
 
       # Convenience method which return an instance of Y2Firewall::Firewalld
