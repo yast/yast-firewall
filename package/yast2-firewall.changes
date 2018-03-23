@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Fri Mar 23 11:38:40 UTC 2018 - knut.anderssen@suse.com
+
+- Do not support FW_LOG_ACCEP_CRIT tag as firewalld only log
+  dropped packages and for accepted ones rich rules should be
+  used instead (bsc#1086655)
+- 4.0.21
+
+-------------------------------------------------------------------
 Wed Mar 21 23:42:21 UTC 2018 - knut.anderssen@suse.com
 
 - More fixes to the firewall AY schema (bsc#1013047)
