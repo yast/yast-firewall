@@ -30,6 +30,8 @@ module Y2Firewall
     # the firewall proposal configuration for installation and autoinstallation
     # modes.
     class InstallationFinish < ::Installation::FinishClient
+      include Yast::I18n
+
       # Y2Firewall::ProposalSettings instance
       attr_accessor :settings
       # Y2Firewall::Firewalld instance
@@ -43,7 +45,7 @@ module Y2Firewall
       end
 
       def title
-        "Writing Firewall Configuration..."
+        _("Writing Firewall Configuration...")
       end
 
       def modes
