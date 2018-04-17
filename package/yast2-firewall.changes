@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Tue Apr 17 11:55:47 CEST 2018 - snwint@suse.de
+
+- consistent wording (open/block) also for VNC ports (bsc#1089789)
+- 4.0.23
+
+-------------------------------------------------------------------
 Tue Mar 27 12:02:55 UTC 2018 - knut.anderssen@suse.com
 
 - Translate the installation finish client title (bsc#1084136)

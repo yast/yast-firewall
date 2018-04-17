@@ -128,7 +128,7 @@ module Y2Firewall
         return nil unless Linuxrc.vnc
 
         if @settings.open_vnc
-          _("VNC ports will be open (<a href=\"%s\">close</a>)") % LINK_CLOSE_VNC
+          _("VNC ports will be open (<a href=\"%s\">block</a>)") % LINK_CLOSE_VNC
         else
           _("VNC ports will be blocked (<a href=\"%s\">open</a>)") % LINK_OPEN_VNC
         end
