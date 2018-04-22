@@ -54,9 +54,15 @@ module Y2Firewall
 
       def write
         Service.Enable("sshd") if @settings.enable_sshd
+        configure_firewall if @firewalld.installed?
+        true
+      end
 
-        return true if !@firewalld.installed?
+    private
 
+      # Modifies the configuration of the firewall according to the current
+      # settings
+      def configure_firewall
         @settings.enable_firewall ? @firewalld.enable! : @firewalld.disable!
 
         if @settings.open_ssh
@@ -65,9 +71,14 @@ module Y2Firewall
           @firewalld.api.remove_service(@settings.default_zone, "ssh")
         end
 
-        @firewalld.api.add_service(@settings.default_zone, "vnc-server") if @settings.open_vnc
-
-        true
+        if @settings.open_vnc
+          if @firewalld.api.service_supported?("tigervnc")
+            @firewalld.api.add_service(@settings.default_zone, "tigervnc")
+            @firewalld.api.add_service(@settings.default_zone, "tigervnc-https")
+          else
+            log.error "tigervnc service definition is not available"
+          end
+        end
       end
     end
   end
