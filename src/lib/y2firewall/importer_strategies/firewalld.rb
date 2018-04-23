@@ -19,6 +19,7 @@
 # current contact information at www.suse.com.
 # ------------------------------------------------------------------------------
 
+require "yast"
 require "y2firewall/firewalld"
 
 module Y2Firewall
@@ -27,6 +28,7 @@ module Y2Firewall
     # firewalld schema is used configuring the Y2Firewall::Firewalld instance
     # according to it.
     class Firewalld
+      include Yast::Logger
       # [Hash] AutoYaST profile firewall's section
       attr_reader :profile
 
@@ -45,6 +47,7 @@ module Y2Firewall
       def import
         return true if profile.empty?
         profile.fetch("zones", []).each do |zone|
+          log.debug "Proccesing zone: #{zone.inspect}"
           process_zone(zone)
         end
 
