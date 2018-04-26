@@ -89,18 +89,7 @@ module Y2Firewall
         enable if profile.fetch("enable_firewall", settings.enable_firewall)
         start if profile.fetch("start_firewall", false)
         importer.import(profile)
-
-        # Checking if an interface has been defined for different zones
-        zones = firewalld.export["zones"] || []
-        all_interfaces = zones.collect { |zone| zone["interfaces"] || [] }
-        all_interfaces.flatten!
-        double_entries =  all_interfaces.select{ |i| all_interfaces.count(i) > 1 }.uniq
-        unless double_entries.empty?
-          AutoInstall.issues_list.add(:invalid_value, "firewall", "interfaces",
-            double_entries.join(","),
-            _("This interface has been defined for more than one zone."))
-        end
-
+        check_profile_for_errors
         imported
       end
 
@@ -162,6 +151,22 @@ module Y2Firewall
       end
 
     private
+
+      # Semantic AutoYaST profile check
+      #
+      # Problems will be stored in AutoInstall.issues_list.
+      def check_profile_for_errors
+        # Checking if an interface has been defined for different zones
+        zones = firewalld.export["zones"] || []
+        all_interfaces = zones.collect { |zone| zone["interfaces"] || [] }
+        all_interfaces.flatten!
+        double_entries =  all_interfaces.select{ |i| all_interfaces.count(i) > 1 }.uniq
+        unless double_entries.empty?
+          AutoInstall.issues_list.add(:invalid_value, "firewall", "interfaces",
+            double_entries.join(","),
+            _("This interface has been defined for more than one zone."))
+        end
+      end
 
       # Depending on the profile it activates or deactivates the firewalld
       # service
