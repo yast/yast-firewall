@@ -34,6 +34,7 @@ module Y2Firewall
       include Yast::Logger
 
       Yast.import "HTML"
+      Yast.import "AutoInstall"
 
       class << self
         # @return [Boolean] whether the AutoYaST configuration has been
@@ -88,6 +89,18 @@ module Y2Firewall
         enable if profile.fetch("enable_firewall", settings.enable_firewall)
         start if profile.fetch("start_firewall", false)
         importer.import(profile)
+
+        # Checking if an interface has been defined for different zones
+        zones = firewalld.export["zones"] || []
+        all_interfaces = zones.collect { |zone| zone["interfaces"] || [] }
+        all_interfaces.flatten!
+        double_entries =  all_interfaces.select{ |i| all_interfaces.count(i) > 1 }.uniq
+        unless double_entries.empty?
+          AutoInstall.issues_list.add(:invalid_value, "firewall", "interfaces",
+            double_entries.join(","),
+            _("This interface has been defined for more than one zone."))
+        end
+
         imported
       end
 
