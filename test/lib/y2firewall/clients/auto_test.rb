@@ -106,7 +106,9 @@ describe Y2Firewall::Clients::Auto do
 
   describe "#import" do
     let(:arguments) do
-      { "FW_MASQUERADE" => "yes", "enable_firewall" => false, "start_firewall" => false }
+      { "FW_MASQUERADE" => "yes",
+        "enable_firewall" => false,
+        "start_firewall" => false}
     end
 
     it "reads the current firewalld configuration" do
@@ -134,6 +136,17 @@ describe Y2Firewall::Clients::Auto do
         subject.import(arguments)
         expect(subject.class.imported).to eq(true)
       end
+
+      it "reports that an interface has been defined twice in zones" do
+        expect(firewalld).to receive(:export).and_return({
+          "zones" => [{"interfaces" => ["eth0"], "name" => "public"},
+          {"interfaces" => ["eth0","eth0"], "name" => "trusted"}]})
+        expect(Yast::AutoInstall.issues_list).to receive(:add).
+          with(:invalid_value, "firewall", "interfaces",
+            "eth0",
+            "This interface has been defined for more than one zone.")
+        subject.import(arguments)
+      end
     end
 
     context "when the current configuration was not read" do
@@ -143,6 +156,7 @@ describe Y2Firewall::Clients::Auto do
       end
 
       it "does not mark the importation as done or completed" do
+        
         expect(firewalld).to receive(:read).and_return(false)
         subject.import(arguments)
         expect(subject.class.imported).to eq(false)
