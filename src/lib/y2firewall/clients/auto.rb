@@ -160,7 +160,7 @@ module Y2Firewall
         zones = firewalld.export["zones"] || []
         all_interfaces = zones.collect { |zone| zone["interfaces"] || [] }
         all_interfaces.flatten!
-        double_entries =  all_interfaces.select{ |i| all_interfaces.count(i) > 1 }.uniq
+        double_entries = all_interfaces.select { |i| all_interfaces.count(i) > 1 }.uniq
         unless double_entries.empty?
           AutoInstall.issues_list.add(:invalid_value, "firewall", "interfaces",
             double_entries.join(","),
