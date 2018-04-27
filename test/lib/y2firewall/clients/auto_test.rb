@@ -138,8 +138,9 @@ describe Y2Firewall::Clients::Auto do
       end
 
       it "reports that an interface has been defined twice in zones" do
-        expect(firewalld).to receive(:export).and_return("zones" => [{ "interfaces" => ["eth0"], "name" => "public" },
-                                                                     { "interfaces" => ["eth0", "eth0"], "name" => "trusted" }])
+        expect(firewalld).to receive(:export)
+          .and_return("zones" => [{ "interfaces" => ["eth0"], "name" => "public" },
+                                  { "interfaces" => ["eth0", "eth0"], "name" => "trusted" }])
         expect(Yast::AutoInstall.issues_list).to receive(:add)
           .with(:invalid_value, "firewall", "interfaces",
             "eth0",
