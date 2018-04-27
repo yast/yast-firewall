@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Apr 27 16:35:19 CEST 2018 - schubi@suse.de
+
+- AutoYaST: Reporting warning if an interface has been defined
+  in more than one zone (bnc#1099855).
+- 4.0.25
+
+-------------------------------------------------------------------
 Sat Apr 21 07:35:42 UTC 2018 - knut.anderssen@suse.com
 
 - During installation, open services defined by (Tigervnc) instead
