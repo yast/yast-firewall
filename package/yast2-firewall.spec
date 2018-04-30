@@ -28,9 +28,6 @@ License:        GPL-2.0
 BuildRequires:  perl-XML-Writer update-desktop-files yast2-testsuite
 BuildRequires:  yast2-devtools >= 3.1.10
 
-# AutoInstall.issues_list needed
-BuildRequires: autoyast2-installation >= 4.0.50
-
 # Firewalld read?
 BuildRequires:  yast2 >= 4.0.45
 BuildRequires:  rubygem(%rb_default_ruby_abi:yast-rake)
