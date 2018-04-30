@@ -111,7 +111,7 @@ describe Y2Firewall::Clients::Auto do
       end
     end
 
-    let(:i_list) { IssueList.new() }
+    let(:i_list) { IssueList.new }
 
     let(:arguments) do
       { "FW_MASQUERADE"   => "yes",
