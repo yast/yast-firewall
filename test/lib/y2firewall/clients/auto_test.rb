@@ -105,6 +105,14 @@ describe Y2Firewall::Clients::Auto do
   end
 
   describe "#import" do
+
+    class IssueList
+      def add
+      end
+    end
+
+    let(:i_list) { IssueList.new() }
+
     let(:arguments) do
       { "FW_MASQUERADE"   => "yes",
         "enable_firewall" => false,
@@ -141,7 +149,8 @@ describe Y2Firewall::Clients::Auto do
         expect(firewalld).to receive(:export)
           .and_return("zones" => [{ "interfaces" => ["eth0"], "name" => "public" },
                                   { "interfaces" => ["eth0", "eth0"], "name" => "trusted" }])
-        expect(Yast::AutoInstall.issues_list).to receive(:add)
+        expect(Yast::AutoInstall).to receive(:issues_list).and_return(i_list)
+        expect_any_instance_of(IssueList).to receive(:add)
           .with(:invalid_value, "firewall", "interfaces",
             "eth0",
             "This interface has been defined for more than one zone.")
