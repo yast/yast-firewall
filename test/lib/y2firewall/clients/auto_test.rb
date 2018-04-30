@@ -165,7 +165,6 @@ describe Y2Firewall::Clients::Auto do
       end
 
       it "does not mark the importation as done or completed" do
-
         expect(firewalld).to receive(:read).and_return(false)
         subject.import(arguments)
         expect(subject.class.imported).to eq(false)
