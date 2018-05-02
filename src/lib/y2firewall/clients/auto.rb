@@ -158,8 +158,7 @@ module Y2Firewall
       def check_profile_for_errors
         # Checking if an interface has been defined for different zones
         zones = firewalld.export["zones"] || []
-        all_interfaces = zones.collect { |zone| zone["interfaces"] || [] }
-        all_interfaces.flatten!
+        all_interfaces = zones.flat_map { |zone| zone["interfaces"] || [] }
         double_entries = all_interfaces.select { |i| all_interfaces.count(i) > 1 }.uniq
         unless double_entries.empty?
           AutoInstall.issues_list.add(:invalid_value, "firewall", "interfaces",

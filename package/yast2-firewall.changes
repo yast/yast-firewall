@@ -1,7 +1,7 @@
 -------------------------------------------------------------------
 Fri Apr 27 16:35:19 CEST 2018 - schubi@suse.de
 
-- AutoYaST: Reporting warning if an interface has been defined
+- AutoYaST: Report whether an interface has been defined
   in more than one zone (bnc#1099855).
 - 4.0.25
 
