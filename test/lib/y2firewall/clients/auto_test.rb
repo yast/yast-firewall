@@ -128,6 +128,7 @@ describe Y2Firewall::Clients::Auto do
     context "when the current configuration was read correctly" do
       before do
         allow(firewalld).to receive(:read).and_return(true)
+        allow(Yast::AutoInstall).to receive(:issues_list).and_return(i_list)
       end
 
       it "pass its arguments to the firewalld importer" do
@@ -149,8 +150,7 @@ describe Y2Firewall::Clients::Auto do
         expect(firewalld).to receive(:export)
           .and_return("zones" => [{ "interfaces" => ["eth0"], "name" => "public" },
                                   { "interfaces" => ["eth0", "eth0"], "name" => "trusted" }])
-        expect(Yast::AutoInstall).to receive(:issues_list).and_return(i_list)
-        expect_any_instance_of(IssueList).to receive(:add)
+        expect(i_list).to receive(:add)
           .with(:invalid_value, "firewall", "interfaces",
             "eth0",
             "This interface has been defined for more than one zone.")
