@@ -105,13 +105,7 @@ describe Y2Firewall::Clients::Auto do
   end
 
   describe "#import" do
-
-    class IssueList
-      def add
-      end
-    end
-
-    let(:i_list) { IssueList.new }
+    let(:i_list) { double("IssuesList", add: nil) }
 
     let(:arguments) do
       { "FW_MASQUERADE"   => "yes",
