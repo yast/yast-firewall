@@ -2,7 +2,8 @@
 Fri Apr 27 16:35:19 CEST 2018 - schubi@suse.de
 
 - AutoYaST: Report whether an interface has been defined
-  in more than one zone (bnc#1089855).
+  in more than one zone (bnc#1099855).
+  Checking semantic while importing AY settings (#61)
 - 4.0.25
 
 -------------------------------------------------------------------
