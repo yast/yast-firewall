@@ -26,6 +26,15 @@ ENV["Y2DIR"] = src_path
 require "yast"
 require "yast/rspec"
 
+# stub module to prevent its Import
+# Useful for modules from different yast packages, to avoid build dependencies
+def stub_module(name)
+  Yast.const_set name.to_sym, Class.new { def self.fake_method; end }
+end
+
+# stub classes from other modules to speed up a build
+stub_module("AutoInstall")
+
 if ENV["COVERAGE"]
   require "simplecov"
   SimpleCov.start do
