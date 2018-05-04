@@ -27,8 +27,6 @@ Group:	        System/YaST
 License:        GPL-2.0
 BuildRequires:  perl-XML-Writer update-desktop-files yast2-testsuite
 BuildRequires:  yast2-devtools >= 3.1.10
-# running testcases while build
-BuildRequires:  autoyast2-installation
 
 # Firewalld read?
 BuildRequires:  yast2 >= 4.0.45
