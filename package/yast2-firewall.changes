@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Jun 28 15:43:21 CEST 2018 - schubi@suse.de
+
+- Added additional searchkeys to desktop file (fate#321043).
+- 4.0.26
+
+-------------------------------------------------------------------
 Fri Apr 27 16:35:19 CEST 2018 - schubi@suse.de
 
 - AutoYaST: Report whether an interface has been defined
