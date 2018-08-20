@@ -24,7 +24,7 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 Source0:        %{name}-%{version}.tar.bz2
 
 Group:	        System/YaST
-License:        GPL-2.0
+License:        GPL-2.0-only
 BuildRequires:  perl-XML-Writer update-desktop-files yast2-testsuite
 BuildRequires:  yast2-devtools >= 3.1.10
 
@@ -73,6 +73,6 @@ rake install DESTDIR="%{buildroot}"
 %{yast_desktopdir}/*.desktop
 %{yast_schemadir}/autoyast/rnc/firewall.rnc
 
-%doc COPYING
+%license COPYING
 %doc README.md
 %doc CONTRIBUTING.md
