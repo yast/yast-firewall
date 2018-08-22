@@ -24,7 +24,7 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 Source0:        %{name}-%{version}.tar.bz2
 
 Group:	        System/YaST
-License:        GPL-2.0
+License:        GPL-2.0-only
 BuildRequires:  perl-XML-Writer update-desktop-files yast2-testsuite
 BuildRequires:  yast2-devtools >= 3.1.10
 
@@ -64,6 +64,11 @@ rake test:unit
 %install
 rake install DESTDIR="%{buildroot}"
 
+# Remove the license from the /usr/share/doc/packages directory,
+# it is also included in the /usr/share/licenses directory by using
+# the %license tag.
+rm -f $RPM_BUILD_ROOT/%{yast_docdir}/COPYING
+
 %files
 %defattr(-,root,root)
 %{yast_dir}/clients/*.rb
@@ -73,6 +78,6 @@ rake install DESTDIR="%{buildroot}"
 %{yast_desktopdir}/*.desktop
 %{yast_schemadir}/autoyast/rnc/firewall.rnc
 
-%doc COPYING
+%license COPYING
 %doc README.md
 %doc CONTRIBUTING.md
