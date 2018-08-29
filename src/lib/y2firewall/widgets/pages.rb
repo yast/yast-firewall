@@ -21,6 +21,7 @@
 
 require "yast"
 require "ui/service_status"
+require "y2firewall/firewalld"
 
 module Y2Firewall
   module Widgets
@@ -59,37 +60,61 @@ module Y2Firewall
         # @param pager [CWM::TreePager]
         def initialize(pager)
           textdomain "firewall"
+          @fw = Y2Firewall::Firewalld.instance
+          @fw.read # FIXME when?
         end
 
         # @macro seeAbstractWidget
         def label
-          "FIXME Services"
+          "Services" # FIXME
         end
 
         # @macro seeCustomWidget
         def contents
-          Label("HELLO 2")
+          Label("nothing here? select zone? or zones here?")
         end
       end
 
       class AllowedServicesForZone < CWM::Page
         # Constructor
         #
+        # @param zone [Y2Firewall::Firewalld::Zone]
         # @param pager [CWM::TreePager]
         def initialize(zone, pager)
           textdomain "firewall"
           @zone = zone
-          self.widget_id = "asz:" + zone
+          @sb = ServiceBox.new(zone)
+          self.widget_id = "asz:" + zone.name
         end
 
         # @macro seeAbstractWidget
         def label
-          "FIXME Services for #{@zone}"
+          "Services for #{@zone.name}" # FIXME
         end
 
         # @macro seeCustomWidget
         def contents
-          Label("HELLO #{@zone}")
+          VBox(@sb)
+        end
+
+        class ServiceBox < CWM::MultiSelectionBox
+          # @param zone [Y2Firewall::Firewalld::Zone]
+          def initialize(zone)
+            @zone = zone
+          end
+
+          def label
+            _("Services")
+          end
+
+          def items
+            all_known_services = Y2Firewall::Firewalld.instance.api.services
+            all_known_services.map { |s| [s, s] }
+          end
+
+          def init
+            self.value = @zone.services
+          end
         end
       end
     end
