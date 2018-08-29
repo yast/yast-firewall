@@ -19,6 +19,9 @@
 # current contact information at www.suse.com.
 # ------------------------------------------------------------------------------
 
+require "yast"
+require "ui/service_status"
+
 module Y2Firewall
   module Widgets
     module Pages
@@ -28,16 +31,25 @@ module Y2Firewall
         # @param pager [CWM::TreePager]
         def initialize(pager)
           textdomain "firewall"
+          Yast.import "SystemdService"
+
+          @service = Yast::SystemdService.find("firewalld")
+          # This is a generic widget in SLE15; may not be appropriate.
+          # For SLE15-SP1, use CWM::ServiceWidget
+          @status_widget = ::UI::ServiceStatus.new(@service)
         end
 
         # @macro seeAbstractWidget
         def label
-          "FIXME Startup"
+          "Startup" # FIXME
         end
 
         # @macro seeCustomWidget
         def contents
-          Label("HELLO 1")
+          VBox(
+            @status_widget.widget,
+            VStretch()
+          )
         end
       end
 
