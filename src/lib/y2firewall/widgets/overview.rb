@@ -51,6 +51,8 @@ module Y2Firewall
       def initialize
         textdomain "firewall"
 
+        @fw = Y2Firewall::Firewalld.instance
+        @fw.read # FIXME when?
         super(OverviewTree.new(items))
       end
 
@@ -78,7 +80,7 @@ module Y2Firewall
 
       # @return [CWM::PagerTreeItem]
       def allowed_services_items
-        zones = ["red", "green", "blue"]
+        zones = @fw.zones
         children = zones.map { |z| allowed_services_for_zone(z) }
         page = Pages::AllowedServices.new(self)
         CWM::PagerTreeItem.new(page, children: children)
