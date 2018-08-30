@@ -22,6 +22,7 @@
 require "yast"
 require "ui/service_status"
 require "y2firewall/firewalld"
+require "y2partitioner/widgets/tabs"
 
 module Y2Firewall
   module Widgets
@@ -32,12 +33,12 @@ module Y2Firewall
         # @param pager [CWM::TreePager]
         def initialize(pager)
           textdomain "firewall"
-          Yast.import "SystemdService"
+          # Yast.import "SystemdService"
 
-          @service = Yast::SystemdService.find("firewalld")
-          # This is a generic widget in SLE15; may not be appropriate.
-          # For SLE15-SP1, use CWM::ServiceWidget
-          @status_widget = ::UI::ServiceStatus.new(@service)
+          # @service = Yast::SystemdService.find("firewalld")
+          # # This is a generic widget in SLE15; may not be appropriate.
+          # # For SLE15-SP1, use CWM::ServiceWidget
+          # @status_widget = ::UI::ServiceStatus.new(@service)
         end
 
         # @macro seeAbstractWidget
@@ -47,10 +48,11 @@ module Y2Firewall
 
         # @macro seeCustomWidget
         def contents
-          VBox(
-            @status_widget.widget,
-            VStretch()
-          )
+          Label("Service")
+          # VBox(
+          #   @status_widget.widget,
+          #   VStretch()
+          # )
         end
       end
 
@@ -66,7 +68,7 @@ module Y2Firewall
 
         # @macro seeAbstractWidget
         def label
-          "Services" # FIXME
+          "Zones" # FIXME
         end
 
         # @macro seeCustomWidget
@@ -74,6 +76,40 @@ module Y2Firewall
           Label("nothing here? select zone? or zones here?")
         end
       end
+
+      class ServicesTab < CWM::Tab
+        def initialize(zone)
+          textdomain "firewall"
+          @zone = zone
+          self.widget_id = "services:#{zone.name}"
+        end
+
+        def label
+          _("Services")
+        end
+
+        def contents
+          VBox(Label("Services"))
+          VBox(AllowedServicesForZone::ServiceBox.new(@zone))
+        end
+      end
+
+      class PortsTab < CWM::Tab
+        def initialize(zone)
+          textdomain "firewall"
+          @zone = zone
+          self.widget_id = "ports:#{zone.name}"
+        end
+
+        def label
+          _("Ports")
+        end
+
+        def contents
+          VBox(Label("Ports"))
+        end
+      end
+
 
       class AllowedServicesForZone < CWM::Page
         # Constructor
@@ -89,12 +125,21 @@ module Y2Firewall
 
         # @macro seeAbstractWidget
         def label
-          "Services for #{@zone.name}" # FIXME
+          "#{@zone.name}" # FIXME
         end
 
         # @macro seeCustomWidget
         def contents
-          VBox(@sb)
+          # VBox(@sb)
+
+          VBox(
+            # Left(
+            #   HBox(
+            #     Heading("Services")
+            #   )
+            # ),
+            tabs
+          )
         end
 
         class ServiceBox < CWM::MultiSelectionBox
@@ -115,6 +160,16 @@ module Y2Firewall
           def init
             self.value = @zone.services
           end
+        end
+
+      private
+
+        def tabs
+          tabs = [
+            ServicesTab.new(@zone),
+            PortsTab.new(@zone)
+          ]
+          ::CWM::Tabs.new(*tabs)
         end
       end
     end
