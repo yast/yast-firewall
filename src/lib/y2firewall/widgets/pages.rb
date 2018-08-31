@@ -54,7 +54,7 @@ module Y2Firewall
         end
       end
 
-      class AllowedServices < CWM::Page
+      class Interfaces < CWM::Page
         # Constructor
         #
         # @param pager [CWM::TreePager]
@@ -66,16 +66,81 @@ module Y2Firewall
 
         # @macro seeAbstractWidget
         def label
-          "Services" # FIXME
+          "Interfaces" # FIXME
         end
 
         # @macro seeCustomWidget
         def contents
-          Label("nothing here? select zone? or zones here?")
+          Label("TODO: List of interfaces here")
         end
       end
 
-      class AllowedServicesForZone < CWM::Page
+      class Interface < CWM::Page
+        # Constructor
+        #
+        # @param interface [String]
+        # @param pager [CWM::TreePager]
+        def initialize(interface, pager)
+          textdomain "firewall"
+          @interface = interface
+          @sb = ZoneBox.new(interface)
+          self.widget_id = "ifc:" + interface
+        end
+
+        # @macro seeAbstractWidget
+        def label
+          @interface
+        end
+
+        # @macro seeCustomWidget
+        def contents
+          VBox(@sb)
+        end
+
+        class ZoneBox < CWM::SelectionBox
+          # @param zone [Y2Firewall::Firewalld::Zone]
+          def initialize(interface)
+            @interface = interface
+            @zones = Y2Firewall::Firewalld.instance.zones
+          end
+
+          def label
+            format(_("Zone for Interface %s"), @interface)
+          end
+
+          def items
+            @zones.map { |z| [z.name, z.name] }
+          end
+
+          def init
+            zone = @zones.sample # FIXME
+            self.value = zone.name
+          end
+        end
+      end
+
+      class Zones < CWM::Page
+        # Constructor
+        #
+        # @param pager [CWM::TreePager]
+        def initialize(pager)
+          textdomain "firewall"
+          @fw = Y2Firewall::Firewalld.instance
+          @fw.read # FIXME when?
+        end
+
+        # @macro seeAbstractWidget
+        def label
+          "Zones" # FIXME
+        end
+
+        # @macro seeCustomWidget
+        def contents
+          Label("TODO: List of zones here")
+        end
+      end
+
+      class Zone < CWM::Page
         # Constructor
         #
         # @param zone [Y2Firewall::Firewalld::Zone]
@@ -84,12 +149,12 @@ module Y2Firewall
           textdomain "firewall"
           @zone = zone
           @sb = ServiceBox.new(zone)
-          self.widget_id = "asz:" + zone.name
+          self.widget_id = "z:" + zone.name
         end
 
         # @macro seeAbstractWidget
         def label
-          "Services for #{@zone.name}" # FIXME
+          @zone.name
         end
 
         # @macro seeCustomWidget
@@ -104,7 +169,8 @@ module Y2Firewall
           end
 
           def label
-            _("Services")
+            # TRANSLATORS: %s is a zone name
+            format(_("Services for %s") % @zone.name)
           end
 
           def items

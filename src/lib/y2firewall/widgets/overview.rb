@@ -60,8 +60,8 @@ module Y2Firewall
       def items
         [
           startup_item,
-          #interface_items,
-          allowed_services_items,
+          interfaces_item,
+          zones_item,
           #masquerade_item,
           #broadcast_item,
           #logging_item,
@@ -79,16 +79,30 @@ module Y2Firewall
       end
 
       # @return [CWM::PagerTreeItem]
-      def allowed_services_items
-        zones = @fw.zones
-        children = zones.map { |z| allowed_services_for_zone(z) }
-        page = Pages::AllowedServices.new(self)
+      def interfaces_item
+        ifcs = ["eth0", "wlan0", "tun_moon", "tun_mars", "fake"] # FIXME
+        children = ifcs.map { |i| interface_item(i) }
+        page = Pages::Interfaces.new(self)
         CWM::PagerTreeItem.new(page, children: children)
       end
 
       # @return [CWM::PagerTreeItem]
-      def allowed_services_for_zone(z)
-        page = Pages::AllowedServicesForZone.new(z, self)
+      def interface_item(i)
+        page = Pages::Interface.new(i, self)
+        CWM::PagerTreeItem.new(page)
+      end
+
+      # @return [CWM::PagerTreeItem]
+      def zones_item
+        zones = @fw.zones
+        children = zones.map { |z| zone_item(z) }
+        page = Pages::Zones.new(self)
+        CWM::PagerTreeItem.new(page, children: children)
+      end
+
+      # @return [CWM::PagerTreeItem]
+      def zone_item(z)
+        page = Pages::Zone.new(z, self)
         CWM::PagerTreeItem.new(page)
       end
     end
