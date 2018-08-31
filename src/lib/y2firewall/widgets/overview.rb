@@ -60,11 +60,11 @@ module Y2Firewall
       def items
         [
           startup_item,
-          #interface_items,
+          interface_item,
           allowed_services_items,
           #masquerade_item,
           #broadcast_item,
-          #logging_item,
+          logging_item,
           #custom_rules_item
         ]
       end
@@ -75,6 +75,11 @@ module Y2Firewall
       # @return [CWM::PagerTreeItem]
       def startup_item
         page = Pages::Startup.new(self)
+        CWM::PagerTreeItem.new(page)
+      end
+
+      def interface_item
+        page = Pages::Interfaces.new(self)
         CWM::PagerTreeItem.new(page)
       end
 
@@ -89,6 +94,11 @@ module Y2Firewall
       # @return [CWM::PagerTreeItem]
       def allowed_services_for_zone(z)
         page = Pages::AllowedServicesForZone.new(z, self)
+        CWM::PagerTreeItem.new(page)
+      end
+
+      def logging_item
+        page = Pages::Logging.new(self)
         CWM::PagerTreeItem.new(page)
       end
     end

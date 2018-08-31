@@ -172,6 +172,64 @@ module Y2Firewall
           ::CWM::Tabs.new(*tabs)
         end
       end
+
+      class Interfaces < CWM::Page
+         # Constructor
+        #
+        # @param pager [CWM::TreePager]
+        def initialize(pager)
+          textdomain "firewall"
+          # Yast.import "SystemdService"
+
+          # @service = Yast::SystemdService.find("firewalld")
+          # # This is a generic widget in SLE15; may not be appropriate.
+          # # For SLE15-SP1, use CWM::ServiceWidget
+          # @status_widget = ::UI::ServiceStatus.new(@service)
+        end
+
+        # @macro seeAbstractWidget
+        def label
+          "Interfaces" # FIXME
+        end
+
+        # @macro seeCustomWidget
+        def contents
+          Label("Interfaces table")
+          # VBox(
+          #   @status_widget.widget,
+          #   VStretch()
+          # )
+        end
+      end
+
+      class Logging < CWM::Page
+         # Constructor
+        #
+        # @param pager [CWM::TreePager]
+        def initialize(pager)
+          textdomain "firewall"
+          # Yast.import "SystemdService"
+
+          # @service = Yast::SystemdService.find("firewalld")
+          # # This is a generic widget in SLE15; may not be appropriate.
+          # # For SLE15-SP1, use CWM::ServiceWidget
+          # @status_widget = ::UI::ServiceStatus.new(@service)
+        end
+
+        # @macro seeAbstractWidget
+        def label
+          "Logging Level" # FIXME
+        end
+
+        # @macro seeCustomWidget
+        def contents
+          Label("Logging Level")
+          # VBox(
+          #   @status_widget.widget,
+          #   VStretch()
+          # )
+        end
+      end
     end
   end
 end
