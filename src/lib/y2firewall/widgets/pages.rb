@@ -283,6 +283,7 @@ module Y2Firewall
         end
       end
 
+      # old style
       class PortsTab < CWM::Tab
         def initialize(zone)
           textdomain "firewall"
@@ -295,10 +296,58 @@ module Y2Firewall
         end
 
         def contents
-          VBox(Label("Ports"))
+          VBox(
+            HBox(
+              VBox(
+                InputField(Id("tcp_ports"), Opt(:hstretch), "TCP Ports", "7000,8000-8010"),
+                InputField(Id("udp_ports"), Opt(:hstretch), "UDP Ports"),
+                InputField(Id("rpc_ports"), Opt(:hstretch), "RPC Ports"),
+                InputField(Id("ip_ports"), Opt(:hstretch), "IP Ports"),
+              )
+            ),
+            VStretch()
+          )
         end
       end
 
+      class PortsTab2 < CWM::Tab
+        def initialize(zone)
+          textdomain "firewall"
+          @zone = zone
+          self.widget_id = "ports:#{zone.name}"
+        end
+
+        def label
+          _("Ports")
+        end
+
+        def contents
+          HBox(
+            VBox(
+              HBox(
+                InputField(Id("port"), Opt(:hstretch), "Port"),
+                ComboBox(
+                  Id("proto_combo"),
+                  "Protocol",
+                  [Item(Id("tcp"), "TCP")]
+                )
+              ),
+              Table(
+                Id("ports_table_2"),
+                Header('Ports', 'Protocol'),
+                [Item(Id("port7000"), "7000", "TCP"),
+                 Item(Id("port8000_8010"), "8000-8010", "TCP")]
+              ),
+            ),
+            VBox(
+              PushButton(Id("add"), "Add"),
+              PushButton(Id("remove"), "Delete"),
+              VStretch()
+            ),
+            HStretch()
+          )
+        end
+      end
 
       class AllowedServicesForZone < CWM::Page
         # Constructor
@@ -358,7 +407,7 @@ module Y2Firewall
           tabs = [
             # ServicesTab.new(@zone),
             ServicesTab4.new(@zone),
-            PortsTab.new(@zone)
+            PortsTab2.new(@zone)
           ]
           ::CWM::Tabs.new(*tabs)
         end
