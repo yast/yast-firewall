@@ -24,6 +24,13 @@ require "ui/service_status"
 require "y2firewall/firewalld"
 require "y2partitioner/widgets/tabs"
 
+def all_known_services
+  names = Y2Firewall::Firewalld.instance.api.services
+  # services = names.map { |n| Y2Firewall::Firewalld.instance.find_service(n) }
+  # services.map { |s| Item(Id(s.name), s.name) }
+  names.map { |s| Item(Id(s), s) }
+end
+
 module Y2Firewall
   module Widgets
     module Pages
@@ -77,6 +84,7 @@ module Y2Firewall
         end
       end
 
+      # long list
       class ServicesTab < CWM::Tab
         def initialize(zone)
           textdomain "firewall"
@@ -91,6 +99,122 @@ module Y2Firewall
         def contents
           VBox(Label("Services"))
           VBox(AllowedServicesForZone::ServiceBox.new(@zone))
+        end
+      end
+
+      # two lists (horizontal layout)
+      class ServicesTab2 < CWM::Tab
+        def initialize(zone)
+          textdomain "firewall"
+          @zone = zone
+          self.widget_id = "services2:#{zone.name}"
+        end
+
+        def label
+          _("Services")
+        end
+
+        def contents
+          HBox(
+            VBox(
+              Left(Label("Available Services")),
+              Table(
+                Id("services_table"),
+                Header(
+                  "Name"
+                ),
+                all_known_services,
+              ),
+            ),
+            VBox(
+              PushButton(Id("add"), ">>"),
+              PushButton(Id("remove"), "<<")
+            ),
+            VBox(
+              Left(Label("Allowed Services")),
+              Table(
+                Id("services_table_2"),
+                Header('Name'),
+                [Item(Id("ssh"), "ssh")]
+              )
+            )
+          )
+        end
+      end
+
+      # old style
+      class ServicesTab3 < CWM::Tab
+        def initialize(zone)
+          textdomain "firewall"
+          @zone = zone
+          self.widget_id = "services3:#{zone.name}"
+        end
+
+        def label
+          _("Services")
+        end
+
+        def contents
+          HBox(
+            VBox(
+              Left(ComboBox(
+                Id("services_combo"),
+                "Service to Allow",
+                all_known_services
+              )),
+              Table(
+                Id("services_table_2"),
+                Header('Name'),
+                [Item(Id("ssh"), "ssh")]
+              )
+            ),
+            VBox(
+              PushButton(Id("add"), "Add"),
+              PushButton(Id("remove"), "Delete"),
+              VStretch()
+            ),
+            HStretch()
+          )
+        end
+      end
+
+      # two lists (vertical layout)
+      class ServicesTab4 < CWM::Tab
+        def initialize(zone)
+          textdomain "firewall"
+          @zone = zone
+          self.widget_id = "services2:#{zone.name}"
+        end
+
+        def label
+          _("Services")
+        end
+
+        def contents
+          VBox(
+            VBox(
+              Left(Label("Available Services")),
+              Table(
+                Id("services_table"),
+                Header(
+                  "Name"
+                ),
+                all_known_services,
+              ),
+            ),
+            HBox(
+              PushButton(Id("add"), "↓"),
+              PushButton(Id("remove"), "↑")
+            ),
+            VBox(
+              Left(Label("Allowed Services")),
+              Table(
+                Id("services_table_2"),
+                Header('Name'),
+                [Item(Id("ssh"), "ssh")]
+              )
+            )
+          )
         end
       end
 
@@ -166,7 +290,8 @@ module Y2Firewall
 
         def tabs
           tabs = [
-            ServicesTab.new(@zone),
+            # ServicesTab.new(@zone),
+            ServicesTab4.new(@zone),
             PortsTab.new(@zone)
           ]
           ::CWM::Tabs.new(*tabs)
