@@ -27,11 +27,12 @@ require "y2firewall/firewalld"
 module Y2Firewall
   module Widgets
     module Pages
+      # A page for firewall service startup
       class Startup < CWM::Page
-         # Constructor
+        # Constructor
         #
         # @param pager [CWM::TreePager]
-        def initialize(pager)
+        def initialize(_pager)
           textdomain "firewall"
           Yast.import "SystemdService"
 
@@ -55,14 +56,15 @@ module Y2Firewall
         end
       end
 
+      # A page for network interfaces, has {Interface} as subpages
       class Interfaces < CWM::Page
         # Constructor
         #
         # @param pager [CWM::TreePager]
-        def initialize(pager)
+        def initialize(_pager)
           textdomain "firewall"
           @fw = Y2Firewall::Firewalld.instance
-          @fw.read # FIXME when?
+          @fw.read # FIXME: when?
         end
 
         # @macro seeAbstractWidget
@@ -76,12 +78,13 @@ module Y2Firewall
         end
       end
 
+      # A page for one network interface
       class Interface < CWM::Page
         # Constructor
         #
         # @param interface [Hash<String,String>] "id", "name" and "zone"
         # @param pager [CWM::TreePager]
-        def initialize(interface, pager)
+        def initialize(interface, _pager)
           textdomain "firewall"
           @interface = interface
           @sb = ZoneBox.new(interface)
@@ -98,6 +101,7 @@ module Y2Firewall
           VBox(@sb)
         end
 
+        # Selecting a zone to which an interface belongs
         class ZoneBox < CWM::SelectionBox
           # @param interface [Hash<String,String>] "id", "name" and "zone"
           def initialize(interface)
@@ -119,14 +123,15 @@ module Y2Firewall
         end
       end
 
+      # A page for firewall zones, has {Zone} as subpages
       class Zones < CWM::Page
         # Constructor
         #
         # @param pager [CWM::TreePager]
-        def initialize(pager)
+        def initialize(_pager)
           textdomain "firewall"
           @fw = Y2Firewall::Firewalld.instance
-          @fw.read # FIXME when?
+          @fw.read # FIXME: when?
         end
 
         # @macro seeAbstractWidget
@@ -140,6 +145,7 @@ module Y2Firewall
         end
       end
 
+      # A page for a firewall zone
       class Zone < CWM::Page
         # Constructor
         #
@@ -168,6 +174,7 @@ module Y2Firewall
         end
       end
 
+      # A Tab for ports in a firewall zone
       class PortsTab < CWM::Tab
         def label
           _("Ports")
@@ -181,12 +188,13 @@ module Y2Firewall
         end
       end
 
+      # A Tab for services in a firewall zone
       class ServicesTab < CWM::Tab
         # Constructor
         #
         # @param zone [Y2Firewall::Firewalld::Zone]
         # @param pager [CWM::TreePager]
-        def initialize(zone, pager)
+        def initialize(zone, _pager)
           textdomain "firewall"
           @zone = zone
           @sb = ServiceBox.new(zone)
@@ -202,6 +210,7 @@ module Y2Firewall
           VBox(@sb)
         end
 
+        # A list of services in a firewall zone
         class ServiceBox < CWM::MultiSelectionBox
           # @param zone [Y2Firewall::Firewalld::Zone]
           def initialize(zone)
