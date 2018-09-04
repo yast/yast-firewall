@@ -23,7 +23,7 @@ require "yast"
 require "cwm/widget"
 require "cwm/tree"
 require "y2firewall/widgets/pages"
-
+require "y2firewall/helpers/interfaces"
 
 module Y2Firewall
   module Widgets
@@ -47,6 +47,8 @@ module Y2Firewall
     #
     # It has replace point where it displays more details about selected element in firewall.
     class OverviewTreePager < CWM::TreePager
+      include Y2Firewall::Helpers::Interfaces
+
       # Constructor
       def initialize
         textdomain "firewall"
@@ -80,7 +82,7 @@ module Y2Firewall
 
       # @return [CWM::PagerTreeItem]
       def interfaces_item
-        ifcs = ["eth0", "wlan0", "tun_moon", "tun_mars", "fake"] # FIXME
+        ifcs = known_interfaces
         children = ifcs.map { |i| interface_item(i) }
         page = Pages::Interfaces.new(self)
         CWM::PagerTreeItem.new(page, children: children)

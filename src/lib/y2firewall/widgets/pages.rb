@@ -78,18 +78,18 @@ module Y2Firewall
       class Interface < CWM::Page
         # Constructor
         #
-        # @param interface [String]
+        # @param interface [Hash<String,String>] "id", "name" and "zone"
         # @param pager [CWM::TreePager]
         def initialize(interface, pager)
           textdomain "firewall"
           @interface = interface
           @sb = ZoneBox.new(interface)
-          self.widget_id = "ifc:" + interface
+          self.widget_id = "ifc:" + label
         end
 
         # @macro seeAbstractWidget
         def label
-          @interface
+          @interface["id"]
         end
 
         # @macro seeCustomWidget
@@ -98,14 +98,14 @@ module Y2Firewall
         end
 
         class ZoneBox < CWM::SelectionBox
-          # @param zone [Y2Firewall::Firewalld::Zone]
+          # @param interface [Hash<String,String>] "id", "name" and "zone"
           def initialize(interface)
             @interface = interface
             @zones = Y2Firewall::Firewalld.instance.zones
           end
 
           def label
-            format(_("Zone for Interface %s"), @interface)
+            format(_("Zone for Interface %s"), @interface["id"])
           end
 
           def items
@@ -113,8 +113,7 @@ module Y2Firewall
           end
 
           def init
-            zone = @zones.sample # FIXME
-            self.value = zone.name
+            self.value = @interface["zone"]
           end
         end
       end

@@ -34,6 +34,7 @@ BuildRequires:  rubygem(%rb_default_ruby_abi:yast-rake)
 BuildRequires:  rubygem(%rb_default_ruby_abi:rspec)
 
 # Firewalld - extended API
+# FIXME: need a fixed Y2Firewall::Helpers::Interfaces
 Requires:       yast2 >= 4.0.49
 
 # ButtonBox widget
