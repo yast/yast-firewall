@@ -22,12 +22,15 @@
 require "yast"
 require "ui/service_status"
 require "y2firewall/firewalld"
+require "y2firewall/helpers/interfaces"
 require "y2partitioner/widgets/tabs"
 
+def firewalld
+  Y2Firewall::Firewalld.instance
+end
+
 def all_known_services
-  names = Y2Firewall::Firewalld.instance.api.services
-  # services = names.map { |n| Y2Firewall::Firewalld.instance.find_service(n) }
-  # services.map { |s| Item(Id(s.name), s.name) }
+  names = firewalld.current_service_names
   names.map { |s| Item(Id(s), s) }
 end
 
@@ -64,13 +67,18 @@ module Y2Firewall
       end
 
       class Interfaces < CWM::Page
+        include Helpers::Interfaces
+
         # Constructor
         #
         # @param pager [CWM::TreePager]
         def initialize(pager)
           textdomain "firewall"
-          @fw = Y2Firewall::Firewalld.instance
-          @fw.read # FIXME when?
+          Yast::NetworkInterfaces.Read
+        end
+
+        def table_entries
+          known_interfaces.map { |i| Item(Id(i["id"]), i["id"], i["name"], i["zone"]) }
         end
 
         # @macro seeAbstractWidget
@@ -80,7 +88,18 @@ module Y2Firewall
 
         # @macro seeCustomWidget
         def contents
-          Label("TODO: List of interfaces here")
+          VBox(
+            Left(Label("Interfaces bindings")),
+            Table(
+              Id("interfaces_table"),
+              Header(
+                "Id",
+                "Name",
+                "Zone"
+              ),
+              table_entries
+            )
+          )
         end
       end
 
@@ -134,8 +153,6 @@ module Y2Firewall
         # @param pager [CWM::TreePager]
         def initialize(pager)
           textdomain "firewall"
-          @fw = Y2Firewall::Firewalld.instance
-          @fw.read # FIXME when?
         end
 
         # @macro seeAbstractWidget
@@ -163,7 +180,7 @@ module Y2Firewall
 
         def contents
           VBox(Label("Services"))
-          VBox(AllowedServicesForZone::ServiceBox.new(@zone))
+          VBox(Zone::ServiceBox.new(@zone))
         end
       end
 
@@ -176,7 +193,7 @@ module Y2Firewall
         end
 
         def label
-          _("Services")
+          _("Services Proposal 2")
         end
 
         def contents
@@ -252,7 +269,7 @@ module Y2Firewall
         end
 
         def label
-          _("Services")
+          _("Services Proposal 4")
         end
 
         def contents
@@ -349,10 +366,9 @@ module Y2Firewall
         end
       end
 
-      class AllowedServicesForZone < CWM::Page
+      class Zone < CWM::Page
         # Constructor
         #
-        # @param zone [Y2Firewall::Firewalld::Zone]
         # @param pager [CWM::TreePager]
         def initialize(zone, pager)
           textdomain "firewall"
@@ -380,6 +396,17 @@ module Y2Firewall
           )
         end
 
+      private
+
+        def tabs
+          tabs = [
+            ServicesTab.new(@zone),
+            ServicesTab4.new(@zone),
+            PortsTab2.new(@zone)
+          ]
+          ::CWM::Tabs.new(*tabs)
+        end
+
         class ServiceBox < CWM::MultiSelectionBox
           # @param zone [Y2Firewall::Firewalld::Zone]
           def initialize(zone)
@@ -392,53 +419,12 @@ module Y2Firewall
           end
 
           def items
-            all_known_services = Y2Firewall::Firewalld.instance.api.services
-            all_known_services.map { |s| [s, s] }
+            firewalld.current_service_names.map { |s| [s, s] }
           end
 
           def init
             self.value = @zone.services
           end
-        end
-
-      private
-
-        def tabs
-          tabs = [
-            # ServicesTab.new(@zone),
-            ServicesTab4.new(@zone),
-            PortsTab2.new(@zone)
-          ]
-          ::CWM::Tabs.new(*tabs)
-        end
-      end
-
-      class Interfaces < CWM::Page
-         # Constructor
-        #
-        # @param pager [CWM::TreePager]
-        def initialize(pager)
-          textdomain "firewall"
-          # Yast.import "SystemdService"
-
-          # @service = Yast::SystemdService.find("firewalld")
-          # # This is a generic widget in SLE15; may not be appropriate.
-          # # For SLE15-SP1, use CWM::ServiceWidget
-          # @status_widget = ::UI::ServiceStatus.new(@service)
-        end
-
-        # @macro seeAbstractWidget
-        def label
-          "Interfaces" # FIXME
-        end
-
-        # @macro seeCustomWidget
-        def contents
-          Label("Interfaces table")
-          # VBox(
-          #   @status_widget.widget,
-          #   VStretch()
-          # )
         end
       end
 
