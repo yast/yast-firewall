@@ -20,6 +20,7 @@
 # ------------------------------------------------------------------------------
 
 require "yast"
+require "cwm/tabs"
 require "ui/service_status"
 require "y2firewall/firewalld"
 
@@ -147,13 +148,53 @@ module Y2Firewall
         def initialize(zone, pager)
           textdomain "firewall"
           @zone = zone
-          @sb = ServiceBox.new(zone)
+          @pager = pager
           self.widget_id = "z:" + zone.name
         end
 
         # @macro seeAbstractWidget
         def label
           @zone.name
+        end
+
+        # @macro seeCustomWidget
+        def contents
+          VBox(
+            CWM::Tabs.new(
+              ServicesTab.new(@zone, @pager),
+              PortsTab.new
+            )
+          )
+        end
+      end
+
+      class PortsTab < CWM::Tab
+        def label
+          _("Ports")
+        end
+
+        def contents
+          VBox(
+            VStretch(),
+            HStretch()
+          )
+        end
+      end
+
+      class ServicesTab < CWM::Tab
+        # Constructor
+        #
+        # @param zone [Y2Firewall::Firewalld::Zone]
+        # @param pager [CWM::TreePager]
+        def initialize(zone, pager)
+          textdomain "firewall"
+          @zone = zone
+          @sb = ServiceBox.new(zone)
+          self.widget_id = "zs:" + zone.name
+        end
+
+        def label
+          _("Services")
         end
 
         # @macro seeCustomWidget
