@@ -96,7 +96,7 @@ module Y2Firewall
       def zones_item
         zones = @fw.zones
         children = zones.map { |z| zone_item(z) }
-        page = Pages::Zones.new(self)
+        page = Y2Firewall::Widgets::Pages::Zones.new(self)
         CWM::PagerTreeItem.new(page, children: children)
       end
 

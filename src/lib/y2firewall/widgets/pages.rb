@@ -22,6 +22,7 @@
 require "yast"
 require "ui/service_status"
 require "y2firewall/firewalld"
+require "y2firewall/widgets/pages/zones"
 
 module Y2Firewall
   module Widgets
@@ -116,27 +117,6 @@ module Y2Firewall
             zone = @zones.sample # FIXME
             self.value = zone.name
           end
-        end
-      end
-
-      class Zones < CWM::Page
-        # Constructor
-        #
-        # @param pager [CWM::TreePager]
-        def initialize(pager)
-          textdomain "firewall"
-          @fw = Y2Firewall::Firewalld.instance
-          @fw.read # FIXME when?
-        end
-
-        # @macro seeAbstractWidget
-        def label
-          "Zones" # FIXME
-        end
-
-        # @macro seeCustomWidget
-        def contents
-          Label("TODO: List of zones here")
         end
       end
 
