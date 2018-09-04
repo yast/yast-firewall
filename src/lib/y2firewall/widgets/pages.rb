@@ -22,8 +22,10 @@
 require "yast"
 require "ui/service_status"
 require "y2firewall/firewalld"
-require "y2firewall/helpers/interfaces"
 require "y2partitioner/widgets/tabs"
+require "y2firewall/widgets/pages/startup"
+require "y2firewall/widgets/pages/zones"
+require "y2firewall/widgets/pages/interfaces"
 
 def firewalld
   Y2Firewall::Firewalld.instance
@@ -37,135 +39,6 @@ end
 module Y2Firewall
   module Widgets
     module Pages
-      class Startup < CWM::Page
-         # Constructor
-        #
-        # @param pager [CWM::TreePager]
-        def initialize(pager)
-          textdomain "firewall"
-          # Yast.import "SystemdService"
-
-          # @service = Yast::SystemdService.find("firewalld")
-          # # This is a generic widget in SLE15; may not be appropriate.
-          # # For SLE15-SP1, use CWM::ServiceWidget
-          # @status_widget = ::UI::ServiceStatus.new(@service)
-        end
-
-        # @macro seeAbstractWidget
-        def label
-          "Startup" # FIXME
-        end
-
-        # @macro seeCustomWidget
-        def contents
-          Label("Service")
-          # VBox(
-          #   @status_widget.widget,
-          #   VStretch()
-          # )
-        end
-      end
-
-      class Interfaces < CWM::Page
-        include Helpers::Interfaces
-
-        # Constructor
-        #
-        # @param pager [CWM::TreePager]
-        def initialize(pager)
-          textdomain "firewall"
-          Yast::NetworkInterfaces.Read
-        end
-
-        def table_entries
-          known_interfaces.map { |i| Item(Id(i["id"]), i["id"], i["name"], i["zone"]) }
-        end
-
-        # @macro seeAbstractWidget
-        def label
-          "Interfaces" # FIXME
-        end
-
-        # @macro seeCustomWidget
-        def contents
-          VBox(
-            Left(Label("Interfaces bindings")),
-            Table(
-              Id("interfaces_table"),
-              Header(
-                "Id",
-                "Name",
-                "Zone"
-              ),
-              table_entries
-            )
-          )
-        end
-      end
-
-      class Interface < CWM::Page
-        # Constructor
-        #
-        # @param interface [String]
-        # @param pager [CWM::TreePager]
-        def initialize(interface, pager)
-          textdomain "firewall"
-          @interface = interface
-          @sb = ZoneBox.new(interface)
-          self.widget_id = "ifc:" + interface
-        end
-
-        # @macro seeAbstractWidget
-        def label
-          @interface
-        end
-
-        # @macro seeCustomWidget
-        def contents
-          VBox(@sb)
-        end
-
-        class ZoneBox < CWM::SelectionBox
-          # @param zone [Y2Firewall::Firewalld::Zone]
-          def initialize(interface)
-            @interface = interface
-            @zones = Y2Firewall::Firewalld.instance.zones
-          end
-
-          def label
-            format(_("Zone for Interface %s"), @interface)
-          end
-
-          def items
-            @zones.map { |z| [z.name, z.name] }
-          end
-
-          def init
-            zone = @zones.sample # FIXME
-            self.value = zone.name
-          end
-        end
-      end
-
-      class Zones < CWM::Page
-        # Constructor
-        #
-        # @param pager [CWM::TreePager]
-        def initialize(pager)
-          textdomain "firewall"
-        end
-
-        # @macro seeAbstractWidget
-        def label
-          "Zones" # FIXME
-        end
-
-        # @macro seeCustomWidget
-        def contents
-          Label("TODO: List of zones here")
-        end
-      end
-
       # long list
       class ServicesTab < CWM::Tab
         def initialize(zone)
@@ -205,8 +78,8 @@ module Y2Firewall
                 Header(
                   "Name"
                 ),
-                all_known_services,
-              ),
+                all_known_services
+              )
             ),
             VBox(
               PushButton(Id("add"), ">>"),
@@ -216,7 +89,7 @@ module Y2Firewall
               Left(Label("Allowed Services")),
               Table(
                 Id("services_table_2"),
-                Header('Name'),
+                Header("Name"),
                 [Item(Id("ssh"), "ssh")]
               )
             )
@@ -240,13 +113,13 @@ module Y2Firewall
           HBox(
             VBox(
               Left(ComboBox(
-                Id("services_combo"),
+                     Id("services_combo"),
                 "Service to Allow",
                 all_known_services
               )),
               Table(
                 Id("services_table_2"),
-                Header('Name'),
+                Header("Name"),
                 [Item(Id("ssh"), "ssh")]
               )
             ),
@@ -281,8 +154,8 @@ module Y2Firewall
                 Header(
                   "Name"
                 ),
-                all_known_services,
-              ),
+                all_known_services
+              )
             ),
             HBox(
               PushButton(Id("add"), "↓"),
@@ -292,7 +165,7 @@ module Y2Firewall
               Left(Label("Allowed Services")),
               Table(
                 Id("services_table_2"),
-                Header('Name'),
+                Header("Name"),
                 [Item(Id("ssh"), "ssh")]
               )
             )
@@ -319,7 +192,7 @@ module Y2Firewall
                 InputField(Id("tcp_ports"), Opt(:hstretch), "TCP Ports", "7000,8000-8010"),
                 InputField(Id("udp_ports"), Opt(:hstretch), "UDP Ports"),
                 InputField(Id("rpc_ports"), Opt(:hstretch), "RPC Ports"),
-                InputField(Id("ip_ports"), Opt(:hstretch), "IP Ports"),
+                InputField(Id("ip_ports"), Opt(:hstretch), "IP Ports")
               )
             ),
             VStretch()
@@ -351,10 +224,10 @@ module Y2Firewall
               ),
               Table(
                 Id("ports_table_2"),
-                Header('Ports', 'Protocol'),
+                Header("Ports", "Protocol"),
                 [Item(Id("port7000"), "7000", "TCP"),
                  Item(Id("port8000_8010"), "8000-8010", "TCP")]
-              ),
+              )
             ),
             VBox(
               PushButton(Id("add"), "Add"),
@@ -370,7 +243,7 @@ module Y2Firewall
         # Constructor
         #
         # @param pager [CWM::TreePager]
-        def initialize(zone, pager)
+        def initialize(zone, _pager)
           textdomain "firewall"
           @zone = zone
           @sb = ServiceBox.new(zone)
@@ -429,10 +302,10 @@ module Y2Firewall
       end
 
       class Logging < CWM::Page
-         # Constructor
+        # Constructor
         #
         # @param pager [CWM::TreePager]
-        def initialize(pager)
+        def initialize(_pager)
           textdomain "firewall"
           # Yast.import "SystemdService"
 
