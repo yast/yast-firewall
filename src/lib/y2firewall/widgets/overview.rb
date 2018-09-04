@@ -22,6 +22,7 @@
 require "yast"
 require "cwm/widget"
 require "cwm/tree"
+require "cwm/tree_pager"
 require "y2firewall/widgets/pages"
 require "y2firewall/helpers/interfaces"
 
@@ -54,7 +55,7 @@ module Y2Firewall
         textdomain "firewall"
 
         @fw = Y2Firewall::Firewalld.instance
-        @fw.read # FIXME when?
+        @fw.read # FIXME: when?
         super(OverviewTree.new(items))
       end
 
@@ -64,15 +65,14 @@ module Y2Firewall
           startup_item,
           interfaces_item,
           zones_item,
-          #masquerade_item,
-          #broadcast_item,
-          #logging_item,
-          #custom_rules_item
+          # masquerade_item,
+          # broadcast_item,
+          # logging_item,
+          # custom_rules_item
         ]
       end
 
-      private
-
+    private
 
       # @return [CWM::PagerTreeItem]
       def startup_item
