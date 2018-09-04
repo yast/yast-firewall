@@ -35,6 +35,9 @@ end
 # stub classes from other modules to speed up a build
 stub_module("AutoInstall")
 
+# some tests have translatable messages
+ENV["LANG"] = "en_US.UTF-8"
+
 if ENV["COVERAGE"]
   require "simplecov"
   SimpleCov.start do
