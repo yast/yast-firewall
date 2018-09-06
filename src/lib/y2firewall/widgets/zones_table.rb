@@ -19,41 +19,32 @@
 # To contact SUSE LLC about this file by physical or electronic mail, you may
 # find current contact information at www.suse.com.
 
-require "y2firewall/firewalld"
-require "y2firewall/widgets/zones_table"
-
 module Y2Firewall
   module Widgets
-    module Pages
-      class Zones < CWM::Page
-        # Constructor
-        #
-        # @param pager [CWM::TreePager]
-        def initialize(pager)
-          textdomain "firewall"
-          @fw = Y2Firewall::Firewalld.instance
-          @fw.read # FIXME when?
-        end
+    class ZonesTable < ::CWM::Table
+      # @!attribute [r] zone
+      #   @return [Array<Y2Firewall::Firewalld::Zone>] Zones
+      attr_reader :zones
 
-        # @macro seeAbstractWidget
-        def label
-          _("Zones")
-        end
+      # Constructor
+      #
+      # @param zones [Array<Y2Firewall::Firewalld::Zone>] Zones
+      def initialize(zones)
+        textdomain "firewall"
+        @zones = zones
+      end
 
-        # @macro seeCustomWidget
-        def contents
-          return @contents if @contents
-          @contents = VBox(
-            Left(Heading(_("Zones"))),
-            ZonesTable.new(Y2Firewall::Firewalld.instance.zones)
-          )
-        end
+      # @see CWM::Table#header
+      def header
+        [
+          _("Name"),
+          _("Interfaces")
+        ]
+      end
 
-      private
-
-        def firewalld
-          Y2Firewall::Firewalld.instance
-        end
+      # @see CWM::Table#items
+      def items
+        zones.map { |z| [z.name.to_sym, z.name, z.interfaces.join(", ")] }
       end
     end
   end
