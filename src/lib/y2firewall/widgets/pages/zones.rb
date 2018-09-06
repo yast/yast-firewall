@@ -23,29 +23,38 @@ require "yast"
 require "cwm/page"
 require "cwm/tabs"
 require "y2firewall/firewalld"
+require "y2firewall/widgets/zones_table"
 
 module Y2Firewall
   module Widgets
     module Pages
-      # A page for firewall zones, has {Zone} as subpages
       class Zones < CWM::Page
         # Constructor
         #
         # @param pager [CWM::TreePager]
-        def initialize(_pager)
+        def initialize(pager)
           textdomain "firewall"
-          @fw = Y2Firewall::Firewalld.instance
-          @fw.read # FIXME: when?
+          firewall.read # FIXME when?
         end
 
         # @macro seeAbstractWidget
         def label
-          "Zones" # FIXME
+          _("Zones")
         end
 
         # @macro seeCustomWidget
         def contents
-          Label("TODO: List of zones here")
+          return @contents if @contents
+          @contents = VBox(
+            Left(Heading(_("Zones"))),
+            ZonesTable.new(firewall.zones)
+          )
+        end
+
+      private
+
+        def firewall
+          Y2Firewall::Firewalld.instance
         end
       end
 
