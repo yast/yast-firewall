@@ -24,6 +24,7 @@ require "cwm/page"
 require "cwm/tabs"
 require "y2firewall/firewalld"
 require "y2firewall/widgets/zones_table"
+require "y2firewall/widgets/allowed_services"
 
 module Y2Firewall
   module Widgets
@@ -110,8 +111,9 @@ module Y2Firewall
         def initialize(zone, _pager)
           textdomain "firewall"
           @zone = zone
-          @sb = ServiceBox.new(zone)
-          self.widget_id = "zs:" + zone.name
+
+          @allowed_services_widget = Y2Firewall::Widgets::AllowedServices.new(zone)
+          self.widget_id = "st:" + zone.name
         end
 
         def label
@@ -120,7 +122,7 @@ module Y2Firewall
 
         # @macro seeCustomWidget
         def contents
-          VBox(@sb)
+          VBox(@allowed_services_widget)
         end
 
         # A list of services in a firewall zone
