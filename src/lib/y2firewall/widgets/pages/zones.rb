@@ -82,7 +82,7 @@ module Y2Firewall
           VBox(
             CWM::Tabs.new(
               ServicesTab.new(@zone, @pager),
-              PortsTab.new
+              PortsTab.new(@zone)
             )
           )
         end
@@ -90,15 +90,75 @@ module Y2Firewall
 
       # A Tab for ports in a firewall zone
       class PortsTab < CWM::Tab
+        # Constructor
+        #
+        # @param zone [Y2Firewall::Firewalld::Zone]
+        def initialize(zone)
+          textdomain "firewall"
+          @zone = zone
+        end
+
         def label
           _("Ports")
         end
 
         def contents
           VBox(
-            VStretch(),
-            HStretch()
+            # TRANSLATORS: TCP is the Transmission Control Protocol
+            PortsForProtocol.new(@zone, _("TCP Ports"), :tcp),
+            # TRANSLATORS: UDP is the User Datagram Protocol
+            PortsForProtocol.new(@zone, _("UDP Ports"), :udp),
+            # TRANSLATORS: SCTP is the Stream Control Transmission Protocol
+            PortsForProtocol.new(@zone, _("SCTP Ports"), :sctp),
+            # TRANSLATORS: DCCP is the Datagram Congestion Control Protocol
+            PortsForProtocol.new(@zone, _("DCCP Ports"), :dccp),
+            VStretch()
           )
+        end
+
+        def help
+          "FIXME: ports or port ranges, separated by spaces and/or commas <br>" \
+          "a port is an integer <br>" \
+          "a port range is port-dash-port (with no spaces)"
+        end
+
+        def init
+          log.info "INIT #{widget_id}"
+        end
+
+        def store
+          log.info "STORE #{widget_id}"
+        end
+
+        # FIXME: separate objects like this do not work well with the
+        # single zone.ports attribute mixing all protos. Rather make a
+        # CustomWidget that handles it all
+        class PortsForProtocol < CWM::InputField
+          # @param proto [:tcp,:udp,:sctp,:dccp]
+          def initialize(zone, label, proto)
+            @zone = zone
+            @proto = proto
+            @label = label
+            self.widget_id = "#{proto}_ports"
+          end
+
+          attr_reader :label
+
+          def init
+            log.info "INIT #{widget_id}"
+            # FIXME: factor out and test
+            self.value = @zone.ports
+              .map { |p| p.split("/") }
+              .find_all { |_port, proto| proto == @proto.to_s }
+              .map { |port, _proto| port }
+              .join(", ")
+          end
+
+          def store
+            # FIXME: do modify immediately?
+            # DUH, clumsy
+            log.info "STORE #{widget_id}"
+          end
         end
       end
 
