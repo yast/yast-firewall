@@ -55,7 +55,6 @@ module Y2Firewall
         textdomain "firewall"
 
         @fw = Y2Firewall::Firewalld.instance
-        @fw.read # FIXME: when?
         super(OverviewTree.new(items))
       end
 
@@ -70,6 +69,19 @@ module Y2Firewall
           # logging_item,
           # custom_rules_item
         ]
+      end
+
+      # Overrides default behavior of TreePager to register the new state with
+      # {UIState} before jumping to the tree node
+      def switch_page(page)
+        UIState.instance.go_to_tree_node(page)
+        super
+      end
+
+      # Ensures the tree is properly initialized according to {UIState} after
+      # a redraw.
+      def initial_page
+        UIState.instance.find_tree_node(@pages) || super
       end
 
     private

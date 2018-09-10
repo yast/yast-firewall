@@ -19,40 +19,46 @@
 # To contact SUSE LLC about this file by physical or electronic mail, you may
 # find current contact information at www.suse.com.
 
-require "y2firewall/ui_state"
+require "cwm/dialog"
+require "y2partitioner/dialogs/popup"
+require "y2firewall/widgets/zone"
 
 module Y2Firewall
-  module Widgets
-    class ZonesTable < ::CWM::Table
-      # @!attribute [r] zone
-      #   @return [Array<Y2Firewall::Firewalld::Zone>] Zones
-      attr_reader :zones
-
-      # Constructor
-      #
-      # @param zones [Array<Y2Firewall::Firewalld::Zone>] Zones
-      def initialize(zones)
+  module Dialogs
+    class Zone < Y2Partitioner::Dialogs::Popup
+      def initialize(zone, new_zone = false)
         textdomain "firewall"
-        @zones = zones
+        @zone = zone
+        @new_zone = new_zone
       end
 
-      def init
-        initial_id = UIState.instance.row_id
-        self.value = initial_id.to_sym if initial_id
+      def title
+        @new_zone ? _("Adding new zone") : format(_("Editing zone '%s'") % @zone.name)
       end
 
-      # @see CWM::Table#header
-      def header
-        [
-          _("Name"),
-          _("Short"),
-          _("Interfaces")
-        ]
+      def contents
+        MinWidth(70,
+          VBox(
+            Left(NameWidget.new(@zone)),
+            VSpacing(1),
+            Left(ShortWidget.new(@zone)),
+            VSpacing(1),
+            Left(DescriptionWidget.new(@zone)),
+            VSpacing(1),
+            Left(TargetWidget.new(@zone)),
+            VSpacing(1),
+            Left(MasqueradeWidget.new(@zone))
+          ))
       end
 
-      # @see CWM::Table#items
-      def items
-        zones.map { |z| [z.name.to_sym, z.name, z.short, z.interfaces.join(", ")] }
+      def abort_button
+        Yast::Label.CancelButton
+      end
+
+    private
+
+      def min_height
+        10
       end
     end
   end
