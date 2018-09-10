@@ -34,7 +34,6 @@ module Y2Firewall
         def initialize(_pager)
           textdomain "firewall"
           @fw = Y2Firewall::Firewalld.instance
-          @fw.read # FIXME: when?
         end
 
         # @macro seeAbstractWidget
