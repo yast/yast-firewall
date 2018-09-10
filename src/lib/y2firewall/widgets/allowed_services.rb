@@ -31,6 +31,7 @@ module Y2Firewall
       #
       # @param zone [Y2Firewall::Firewalld::Zone] Zone
       def initialize(zone)
+        textdomain "firewall"
         @zone = zone
         self.widget_id = "allowed_services"
         @available_svcs_table = ServicesTable.new
