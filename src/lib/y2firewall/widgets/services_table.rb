@@ -44,7 +44,7 @@ module Y2Firewall
 
       # @see CWM::Table#items
       def items
-        @items ||= services.sort_by { |s| s.downcase }.map { |s| [s, s] }
+        @items ||= services.sort_by(&:downcase).map { |s| [s, s] }
       end
 
       # Updates the list of services
@@ -54,9 +54,7 @@ module Y2Firewall
         old_index = items.map(&:first).index(value) unless items.empty?
         @services = services
         refresh
-        if old_index && !items.empty?
-          self.value = items[old_index].first
-        end
+        self.value = items[old_index].first if old_index && !items.empty?
       end
 
       def selected_service

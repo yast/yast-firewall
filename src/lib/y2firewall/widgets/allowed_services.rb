@@ -65,6 +65,7 @@ module Y2Firewall
       end
 
     private
+
       # @!attribute [r] available_svcs_table
       #   @return [ServicesTable]
       #

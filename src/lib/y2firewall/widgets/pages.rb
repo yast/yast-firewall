@@ -22,3 +22,4 @@
 require "y2firewall/widgets/pages/interfaces"
 require "y2firewall/widgets/pages/startup"
 require "y2firewall/widgets/pages/zones"
+require "y2firewall/widgets/pages/zone"
