@@ -23,6 +23,7 @@ require "cwm/table"
 
 module Y2Firewall
   module Widgets
+    # A table with all firewall services.
     class ServicesTable < ::CWM::Table
       # @!attribute [r] services
       #   @return [Array<String>] Services to be displayed

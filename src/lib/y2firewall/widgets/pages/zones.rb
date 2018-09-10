@@ -27,6 +27,8 @@ require "y2firewall/widgets/zones_table"
 module Y2Firewall
   module Widgets
     module Pages
+      # A page for firewall zones:
+      #   contains {ZonesTable}, has {Zone} as subpages.
       class Zones < CWM::Page
         # Constructor
         #
