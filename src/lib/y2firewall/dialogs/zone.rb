@@ -26,13 +26,14 @@ require "y2firewall/widgets/zone"
 module Y2Firewall
   module Dialogs
     class Zone < Y2Partitioner::Dialogs::Popup
-      def initialize(zone)
+      def initialize(zone, new_zone = false)
         textdomain "firewall"
         @zone = zone
+        @new_zone = new_zone
       end
 
       def title
-        _("New Zone")
+        @new_zone ? _("Adding new zone") : format(_("Editing zone '%s'") % @zone.name)
       end
 
       def contents
@@ -44,7 +45,9 @@ module Y2Firewall
             VSpacing(1),
             Left(DescriptionWidget.new(@zone)),
             VSpacing(1),
-            HBox(TargetWidget.new(@zone), MasqueradeWidget.new(@zone))
+            Left(TargetWidget.new(@zone)),
+            VSpacing(1),
+            Left(MasqueradeWidget.new(@zone))
           ))
       end
 

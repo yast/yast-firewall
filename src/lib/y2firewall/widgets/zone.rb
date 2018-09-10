@@ -46,6 +46,10 @@ module Y2Firewall
         false
       end
 
+      def store
+        @zone.name = value
+      end
+
       # Sets the focus into this widget
       def focus
         Yast::UI.SetFocus(Id(widget_id))

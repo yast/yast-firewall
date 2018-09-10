@@ -67,7 +67,7 @@ module Y2Firewall
 
           def handle
             zone = Y2Firewall::Firewalld::Zone.new(name: "draft")
-            result = Dialogs::Zone.run(zone)
+            result = Dialogs::Zone.run(zone, true)
             if result == :ok
               zone.relations.map { |r| zone.send("#{r}=", []) }
               fw.zones << zone
