@@ -31,6 +31,9 @@ module Y2Firewall
     class Main < CWM::Dialog
       def initialize
         textdomain "firewall"
+
+        fw = Y2Firewall::Firewalld.instance
+        fw.read
       end
 
       def title
@@ -43,6 +46,17 @@ module Y2Firewall
           0.5,
           Widgets::OverviewTreePager.new
         )
+      end
+
+      def run
+        loop do
+          result = super
+          break unless result == :redraw
+        end
+      end
+
+      def skip_store_for
+        [:redraw]
       end
 
       def back_button

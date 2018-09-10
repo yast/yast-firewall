@@ -55,7 +55,6 @@ module Y2Firewall
         textdomain "firewall"
 
         @fw = Y2Firewall::Firewalld.instance
-        @fw.read # FIXME: when?
         super(OverviewTree.new(items))
       end
 
