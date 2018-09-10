@@ -89,7 +89,7 @@ module Y2Firewall
             zone = fw.find_zone(@table.value.to_s)
             name = zone.name
             result = Dialogs::Zone.run(zone)
-            UIState.instance.select_row(name) if result == :redraw
+            UIState.instance.select_row(name) if result == :ok
 
             result == :ok ? :redraw : nil
           end
@@ -103,7 +103,6 @@ module Y2Firewall
           def handle
             zone = fw.find_zone(@table.value.to_s)
             fw.remove_zone(zone.name)
-            UIState.instance.select_row(zone.name)
 
             :redraw
           end

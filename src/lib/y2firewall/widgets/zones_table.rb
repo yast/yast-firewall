@@ -38,7 +38,7 @@ module Y2Firewall
 
       def init
         initial_id = UIState.instance.row_id
-        self.value = initial_id if initial_id
+        self.value = initial_id.to_sym if initial_id
       end
 
       # @see CWM::Table#header
