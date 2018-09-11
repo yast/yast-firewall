@@ -21,6 +21,7 @@
 
 module Y2Firewall
   module Widgets
+    # A table with all {Y2Firewall::Firewalld::Zone}s.
     class ZonesTable < ::CWM::Table
       # @!attribute [r] zone
       #   @return [Array<Y2Firewall::Firewalld::Zone>] Zones

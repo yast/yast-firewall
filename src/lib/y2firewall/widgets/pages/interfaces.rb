@@ -73,6 +73,7 @@ module Y2Firewall
         class ZoneBox < CWM::SelectionBox
           # @param interface [Hash<String,String>] "id", "name" and "zone"
           def initialize(interface)
+            textdomain "firewall"
             @interface = interface
             @zones = Y2Firewall::Firewalld.instance.zones
           end
