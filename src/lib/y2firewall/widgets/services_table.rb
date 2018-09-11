@@ -19,23 +19,31 @@
 # To contact SUSE LLC about this file by physical or electronic mail, you may
 # find current contact information at www.suse.com.
 
+require "cwm"
 require "cwm/table"
+
+Yast.import "UI"
 
 module Y2Firewall
   module Widgets
-    # A table with all firewall services.
     class ServicesTable < ::CWM::Table
       # @!attribute [r] services
       #   @return [Array<String>] Services to be displayed
       attr_reader :services
 
+      alias_method :selected_services, :value
+
       # Constructor
       #
       # @param services [Array<String>] Services to be displayed
-      def initialize(services = [])
+      def initialize(services: [], widget_id: nil)
         textdomain "firewall"
         @services = services
-        self.widget_id = "services_table:#{object_id}"
+        self.widget_id = widget_id || "services_table:#{object_id}"
+      end
+
+      def opt
+        [:multiSelection]
       end
 
       # @see CWM::Table#header
@@ -45,29 +53,20 @@ module Y2Firewall
 
       # @see CWM::Table#items
       def items
-        @items ||= services.sort_by(&:downcase).map { |s| [s, s] }
+        services.sort_by { |s| s.downcase }.map { |s| [s, s] }
       end
 
       # Updates the list of services
       #
       # @param services [Array<String>] New list of services
       def update(services)
-        old_index = items.map(&:first).index(value) unless items.empty?
+        old_services = @services
         @services = services
-        refresh
-        self.value = items[old_index].first if old_index && !items.empty?
-      end
-
-      def selected_service
-        value.to_s
-      end
-
-    private
-
-      # Refreshes the table content
-      def refresh
-        @items = nil
         change_items(items)
+        unless Yast::UI.TextMode
+          new_services = services - old_services
+          self.value = new_services
+        end
       end
     end
   end

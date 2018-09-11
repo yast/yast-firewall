@@ -34,11 +34,17 @@ module Y2Firewall
         textdomain "firewall"
         @zone = zone
         self.widget_id = "allowed_services"
-        @available_svcs_table = ServicesTable.new
-        @allowed_svcs_table = ServicesTable.new
+        @available_svcs_table = ServicesTable.new(widget_id: "available:#{zone.name}")
+        @allowed_svcs_table = ServicesTable.new(widget_id: "allowed:#{zone.name}")
         refresh_services
       end
 
+      # @macro seeAbstractWidget
+      def label
+        _("Allowed Services")
+      end
+
+      # @macro seeCustomWidget
       def contents
         return @contents if @contents
 
@@ -54,6 +60,7 @@ module Y2Firewall
         )
       end
 
+      # @macro seeAbstractWidget
       def handle(event)
         case event["ID"]
         when :add
@@ -79,20 +86,25 @@ module Y2Firewall
 
       # Adds a service to the list of allowed ones
       def add_service
-        zone.add_service(available_svcs_table.selected_service)
+        available_svcs_table.selected_services.each { |s| zone.add_service(s) }
       end
 
       # Removes a service from the list of allowed ones
       def remove_service
-        zone.remove_service(allowed_svcs_table.selected_service)
+        allowed_svcs_table.selected_services.each { |s| zone.remove_service(s) }
       end
 
       # Refresh the content of the services tables
       def refresh_services
-        available_svcs_table.update(firewall.api.services - zone.services)
+        available_svcs_table.update(firewall.current_service_names - zone.services)
         allowed_svcs_table.update(zone.services.clone)
       end
 
+      # Return the current `Y2Firewall::Firewalld` instance
+      #
+      # This is just a convenience method.
+      #
+      # @return [Y2Firewall::Firewalld]
       def firewall
         Y2Firewall::Firewalld.instance
       end
