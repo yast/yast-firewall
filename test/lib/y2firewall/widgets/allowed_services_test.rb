@@ -26,6 +26,8 @@ require "cwm/rspec"
 require "y2firewall/widgets/allowed_services"
 
 describe Y2Firewall::Widgets::AllowedServices do
+  include_examples "CWM::CustomWidget"
+
   AVAILABLE_SERVICES = ["dhcp", "https", "ssh"].freeze
 
   subject(:widget) { described_class.new(zone) }
@@ -39,11 +41,11 @@ describe Y2Firewall::Widgets::AllowedServices do
   end
 
   let(:available_svcs_table) do
-    instance_double(Y2Firewall::Widgets::ServicesTable, update: nil, selected_service: "ssh")
+    instance_double(Y2Firewall::Widgets::ServicesTable, update: nil, selected_services: ["ssh"])
   end
 
   let(:allowed_svcs_table) do
-    instance_double(Y2Firewall::Widgets::ServicesTable, update: nil, selected_service: "dhcp")
+    instance_double(Y2Firewall::Widgets::ServicesTable, update: nil, selected_services: ["dhcp"])
   end
 
   before do
@@ -54,29 +56,63 @@ describe Y2Firewall::Widgets::AllowedServices do
       .with(widget_id: "allowed:#{zone.name}").and_return(allowed_svcs_table)
   end
 
-  include_examples "CWM::CustomWidget"
-
   describe "#handle" do
-    context "adding a service to the list of allowed ones" do
+    context "when it receives an event to add a service" do
       let(:event) { {"ID" => :add} }
 
-      it "adds the selected service to the zone and updates both tables" do
-        expect(zone).to receive(:add_service).with("ssh").and_call_original
+      it "adds the selected service to the zone" do
+        widget.handle(event)
+        expect(zone.services).to contain_exactly("dhcp", "ssh")
+      end
+
+      it "updates services tables" do
         expect(allowed_svcs_table).to receive(:update).with(["dhcp", "ssh"])
         expect(available_svcs_table).to receive(:update).with(["https"])
-
         widget.handle(event)
       end
     end
 
-    context "removing a service from the list of allowed ones" do
+    context "when it receives an event to remove a service" do
       let(:event) { {"ID" => :remove} }
 
-      it "removes the selected service from the zone and updates both tables" do
-        expect(zone).to receive(:remove_service).with("dhcp").and_call_original
+      it "removes the selected service from the zone" do
+        widget.handle(event)
+        expect(zone.services).to be_empty
+      end
+
+      it "updates the services tables" do
         expect(available_svcs_table).to receive(:update).with(["dhcp", "https", "ssh"])
         expect(allowed_svcs_table).to receive(:update).with([])
+        widget.handle(event)
+      end
+    end
 
+    context "when it receives an event to add all available services" do
+      let(:event) { {"ID" => :add_all} }
+
+      it "adds all services to the zone" do
+        widget.handle(event)
+        expect(zone.services).to eq(AVAILABLE_SERVICES)
+      end
+
+      it "updates the services tables" do
+        expect(allowed_svcs_table).to receive(:update).with(AVAILABLE_SERVICES)
+        expect(available_svcs_table).to receive(:update).with([])
+        widget.handle(event)
+      end
+    end
+
+    context "when it receives an event to remove all available services" do
+      let(:event) { {"ID" => :remove_all} }
+
+      it "removes all services from the zone" do
+        widget.handle(event)
+        expect(zone.services).to be_empty
+      end
+
+      it "updates the services tables" do
+        expect(available_svcs_table).to receive(:update).with(AVAILABLE_SERVICES)
+        expect(allowed_svcs_table).to receive(:update).with([])
         widget.handle(event)
       end
     end

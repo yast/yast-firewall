@@ -51,10 +51,7 @@ module Y2Firewall
         VBox(
           HBox(
             available_svcs_table,
-            VBox(
-              PushButton(Id(:add), _("Add")),
-              PushButton(Id(:remove), _("Remove"))
-            ),
+            VBox(*add_remove_buttons),
             allowed_svcs_table
           )
         )
@@ -62,11 +59,17 @@ module Y2Firewall
 
       # @macro seeAbstractWidget
       def handle(event)
+        return unless event["ID"]
+
         case event["ID"]
         when :add
           add_service
+        when :add_all
+          add_all_services
         when :remove
           remove_service
+        when :remove_all
+          remove_all_services
         end
         refresh_services
         nil
@@ -89,15 +92,52 @@ module Y2Firewall
         available_svcs_table.selected_services.each { |s| zone.add_service(s) }
       end
 
+      def add_all_services
+        firewall.current_service_names.each { |s| zone.add_service(s) }
+      end
+
       # Removes a service from the list of allowed ones
       def remove_service
         allowed_svcs_table.selected_services.each { |s| zone.remove_service(s) }
+      end
+
+      def remove_all_services
+        zone.services.clone.each { |s| zone.remove_service(s) }
       end
 
       # Refresh the content of the services tables
       def refresh_services
         available_svcs_table.update(firewall.current_service_names - zone.services)
         allowed_svcs_table.update(zone.services.clone)
+      end
+
+      # Return a list of buttons to add/remove elements
+      #
+      # @return [Array<Yast::Term>] Array containing add/remove buttons terms
+      def add_remove_buttons
+        [
+          PushButton(
+            Id(:add),
+            Opt(:hstretch),
+            _("Add") + "#{Yast::UI.Glyph(:ArrowRight)}"
+          ),
+          PushButton(
+            Id(:add_all),
+            Opt(:hstretch),
+            _("Add All") + "#{Yast::UI.Glyph(:ArrowRight)}"
+          ),
+          VSpacing(1),
+          PushButton(
+            Id(:remove),
+            Opt(:hstretch),
+            "#{Yast::UI.Glyph} " + _("<- Remove")
+          ),
+          PushButton(
+            Id(:remove_all),
+            Opt(:hstretch),
+            "#{Yast::UI.Glyph} " + _("<- Remove All")
+          )
+        ]
       end
 
       # Return the current `Y2Firewall::Firewalld` instance

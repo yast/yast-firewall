@@ -26,6 +26,8 @@ require "cwm/rspec"
 require "y2firewall/widgets/services_table"
 
 describe Y2Firewall::Widgets::ServicesTable do
+  include_examples "CWM::CustomWidget"
+
   subject(:widget) { described_class.new(services: ["dhcp"], widget_id: "table") }
 
   before do
@@ -39,12 +41,12 @@ describe Y2Firewall::Widgets::ServicesTable do
       expect(widget.items).to eq([["ssh", "ssh"]])
     end
 
-    context "when some items are added in graphical mode" do
+    context "when some items are added" do
       before do
         allow(Yast::UI).to receive(:TextMode).and_return(textmode)
       end
 
-      context "and running in graphical mode" do
+      context "and YaST is running in graphical mode" do
         let(:textmode) { false }
 
         it "sets new items as selected" do
@@ -53,7 +55,7 @@ describe Y2Firewall::Widgets::ServicesTable do
         end
       end
 
-      context "and running in text mode" do
+      context "and YaST is running in text mode" do
         let(:textmode) { true }
 
         it "does not set any item as selected" do

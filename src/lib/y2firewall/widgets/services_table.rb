@@ -42,6 +42,7 @@ module Y2Firewall
         self.widget_id = widget_id || "services_table:#{object_id}"
       end
 
+      # @macro seeAbstractWidget
       def opt
         [:multiSelection]
       end
