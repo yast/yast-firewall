@@ -48,7 +48,7 @@ module Y2Firewall
       def contents
         return @contents if @contents
 
-        VBox(
+        @contents = VBox(
           HBox(
             VBox(
               Left(Label(_("Known"))),
@@ -136,12 +136,12 @@ module Y2Firewall
           PushButton(
             Id(:remove),
             Opt(:hstretch),
-            "#{Yast::UI.Glyph} " + _("<- Remove")
+            "#{Yast::UI.Glyph(:ArrowLeft)} " + _("Remove")
           ),
           PushButton(
             Id(:remove_all),
             Opt(:hstretch),
-            "#{Yast::UI.Glyph} " + _("<- Remove All")
+            "#{Yast::UI.Glyph(:ArrowLeft)} " + _("Remove All")
           )
         ]
       end
