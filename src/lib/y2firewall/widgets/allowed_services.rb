@@ -50,9 +50,15 @@ module Y2Firewall
 
         VBox(
           HBox(
-            available_svcs_table,
+            VBox(
+              Left(Label(_("Available"))),
+              available_svcs_table,
+            ),
             VBox(*add_remove_buttons),
-            allowed_svcs_table
+            VBox(
+              Left(Label(_("Allowed"))),
+              allowed_svcs_table
+            )
           )
         )
       end
