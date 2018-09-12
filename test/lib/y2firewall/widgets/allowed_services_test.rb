@@ -41,11 +41,15 @@ describe Y2Firewall::Widgets::AllowedServices do
   end
 
   let(:available_svcs_table) do
-    instance_double(Y2Firewall::Widgets::ServicesTable, update: nil, selected_services: ["ssh"])
+    instance_double(
+      Y2Firewall::Widgets::ServicesTable, :services= => nil, selected_services: ["ssh"]
+    )
   end
 
   let(:allowed_svcs_table) do
-    instance_double(Y2Firewall::Widgets::ServicesTable, update: nil, selected_services: ["dhcp"])
+    instance_double(
+      Y2Firewall::Widgets::ServicesTable, :services= => nil, selected_services: ["dhcp"]
+    )
   end
 
   before do
@@ -66,8 +70,8 @@ describe Y2Firewall::Widgets::AllowedServices do
       end
 
       it "updates services tables" do
-        expect(allowed_svcs_table).to receive(:update).with(["dhcp", "ssh"])
-        expect(available_svcs_table).to receive(:update).with(["https"])
+        expect(allowed_svcs_table).to receive(:services=).with(["dhcp", "ssh"])
+        expect(available_svcs_table).to receive(:services=).with(["https"])
         widget.handle(event)
       end
     end
@@ -81,8 +85,8 @@ describe Y2Firewall::Widgets::AllowedServices do
       end
 
       it "updates the services tables" do
-        expect(available_svcs_table).to receive(:update).with(["dhcp", "https", "ssh"])
-        expect(allowed_svcs_table).to receive(:update).with([])
+        expect(available_svcs_table).to receive(:services=).with(["dhcp", "https", "ssh"])
+        expect(allowed_svcs_table).to receive(:services=).with([])
         widget.handle(event)
       end
     end
@@ -96,8 +100,8 @@ describe Y2Firewall::Widgets::AllowedServices do
       end
 
       it "updates the services tables" do
-        expect(allowed_svcs_table).to receive(:update).with(AVAILABLE_SERVICES)
-        expect(available_svcs_table).to receive(:update).with([])
+        expect(allowed_svcs_table).to receive(:services=).with(AVAILABLE_SERVICES)
+        expect(available_svcs_table).to receive(:services=).with([])
         widget.handle(event)
       end
     end
@@ -111,8 +115,8 @@ describe Y2Firewall::Widgets::AllowedServices do
       end
 
       it "updates the services tables" do
-        expect(available_svcs_table).to receive(:update).with(AVAILABLE_SERVICES)
-        expect(allowed_svcs_table).to receive(:update).with([])
+        expect(available_svcs_table).to receive(:services=).with(AVAILABLE_SERVICES)
+        expect(allowed_svcs_table).to receive(:services=).with([])
         widget.handle(event)
       end
     end

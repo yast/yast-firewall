@@ -107,13 +107,13 @@ module Y2Firewall
 
       # Refresh the content of the services tables
       def refresh_services
-        available_svcs_table.update(firewall.current_service_names - zone.services)
-        allowed_svcs_table.update(zone.services.clone)
+        available_svcs_table.services = (firewall.current_service_names - zone.services)
+        allowed_svcs_table.services = zone.services.clone
       end
 
       # Return a list of buttons to add/remove elements
       #
-      # @return [Array<Yast::Term>] Array containing add/remove buttons terms
+      # @return [Array<Yast::Term>] Buttons set UI terms
       def add_remove_buttons
         [
           PushButton(

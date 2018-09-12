@@ -26,6 +26,14 @@ Yast.import "UI"
 
 module Y2Firewall
   module Widgets
+    # Table containing a set of firewalld services
+    #
+    # @example Creating a new table
+    #   names = Y2Firewall::Firewalld.instance.current_service_names
+    #   table = Y2Firewall::Widgets::Services.new(names)
+    #
+    # @example Updating content
+    #   table.services = ["dhcp", "dhcpv6", "dhcpv6-client"]
     class ServicesTable < ::CWM::Table
       # @!attribute [r] services
       #   @return [Array<String>] Services to be displayed
@@ -59,8 +67,10 @@ module Y2Firewall
 
       # Updates the list of services
       #
+      # @note When running on graphical mode, the new elements are kept selected.
+      #
       # @param services [Array<String>] New list of services
-      def update(services)
+      def services=(services)
         old_services = @services
         @services = services
         change_items(items)

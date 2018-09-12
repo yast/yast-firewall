@@ -35,10 +35,11 @@ describe Y2Firewall::Widgets::ServicesTable do
       .and_return(["dhcp"])
   end
 
-  describe "#update" do
+  describe "#services" do
     it "updates the list of items" do
-      subject.update(["ssh"])
+      subject.services = ["ssh"]
       expect(widget.items).to eq([["ssh", "ssh"]])
+      expect(widget.services).to eq(["ssh"])
     end
 
     context "when some items are added" do
@@ -51,7 +52,7 @@ describe Y2Firewall::Widgets::ServicesTable do
 
         it "sets new items as selected" do
           expect(widget).to receive(:value=).with(["ssh"])
-          subject.update(["ssh"])
+          subject.services = ["ssh"]
         end
       end
 
@@ -60,7 +61,7 @@ describe Y2Firewall::Widgets::ServicesTable do
 
         it "does not set any item as selected" do
           expect(widget).to_not receive(:value=)
-          subject.update(["ssh"])
+          subject.services = ["ssh"]
         end
       end
     end
