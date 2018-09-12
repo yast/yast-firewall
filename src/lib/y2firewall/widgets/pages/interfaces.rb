@@ -22,12 +22,16 @@
 require "yast"
 require "cwm/page"
 require "y2firewall/firewalld"
+require "y2firewall/helpers/interfaces"
+require "y2firewall/widgets/interfaces_table"
 
 module Y2Firewall
   module Widgets
     module Pages
       # A page for network interfaces, has {Interface} as subpages
       class Interfaces < CWM::Page
+        include Y2Firewall::Helpers::Interfaces
+
         # Constructor
         #
         # @param pager [CWM::TreePager]
@@ -37,12 +41,16 @@ module Y2Firewall
 
         # @macro seeAbstractWidget
         def label
-          "Interfaces" # FIXME
+          _("Interfaces")
         end
 
         # @macro seeCustomWidget
         def contents
-          Label("TODO: List of interfaces here")
+          return @contents if @contents
+          @contents = VBox(
+            Left(Heading(_("Interfaces"))),
+            InterfacesTable.new(known_interfaces)
+          )
         end
       end
 
