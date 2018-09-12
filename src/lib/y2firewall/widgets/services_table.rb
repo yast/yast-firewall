@@ -62,7 +62,7 @@ module Y2Firewall
 
       # @see CWM::Table#items
       def items
-        services.sort_by { |s| s.downcase }.map { |s| [s, s] }
+        services.sort_by(&:downcase).map { |s| [s, s] }
       end
 
       # Updates the list of services

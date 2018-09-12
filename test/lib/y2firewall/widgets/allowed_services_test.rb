@@ -62,7 +62,7 @@ describe Y2Firewall::Widgets::AllowedServices do
 
   describe "#handle" do
     context "when it receives an event to add a service" do
-      let(:event) { {"ID" => :add} }
+      let(:event) { { "ID" => :add } }
 
       it "adds the selected service to the zone" do
         widget.handle(event)
@@ -77,7 +77,7 @@ describe Y2Firewall::Widgets::AllowedServices do
     end
 
     context "when it receives an event to remove a service" do
-      let(:event) { {"ID" => :remove} }
+      let(:event) { { "ID" => :remove } }
 
       it "removes the selected service from the zone" do
         widget.handle(event)
@@ -92,7 +92,7 @@ describe Y2Firewall::Widgets::AllowedServices do
     end
 
     context "when it receives an event to add all available services" do
-      let(:event) { {"ID" => :add_all} }
+      let(:event) { { "ID" => :add_all } }
 
       it "adds all services to the zone" do
         widget.handle(event)
@@ -107,7 +107,7 @@ describe Y2Firewall::Widgets::AllowedServices do
     end
 
     context "when it receives an event to remove all available services" do
-      let(:event) { {"ID" => :remove_all} }
+      let(:event) { { "ID" => :remove_all } }
 
       it "removes all services from the zone" do
         widget.handle(event)

@@ -52,7 +52,7 @@ module Y2Firewall
           HBox(
             VBox(
               Left(Label(_("Available"))),
-              available_svcs_table,
+              available_svcs_table
             ),
             VBox(*add_remove_buttons),
             VBox(
@@ -125,12 +125,12 @@ module Y2Firewall
           PushButton(
             Id(:add),
             Opt(:hstretch),
-            _("Add") + "#{Yast::UI.Glyph(:ArrowRight)}"
+            _("Add") + Yast::UI.Glyph(:ArrowRight).to_s
           ),
           PushButton(
             Id(:add_all),
             Opt(:hstretch),
-            _("Add All") + "#{Yast::UI.Glyph(:ArrowRight)}"
+            _("Add All") + Yast::UI.Glyph(:ArrowRight).to_s
           ),
           VSpacing(1),
           PushButton(
