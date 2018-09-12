@@ -55,7 +55,7 @@ describe Y2Firewall::Widgets::AllowedServices do
   before do
     allow(Y2Firewall::Firewalld).to receive(:instance).and_return(firewall)
     allow(Y2Firewall::Widgets::ServicesTable).to receive(:new)
-      .with(widget_id: "available:#{zone.name}").and_return(available_svcs_table)
+      .with(widget_id: "known:#{zone.name}").and_return(available_svcs_table)
     allow(Y2Firewall::Widgets::ServicesTable).to receive(:new)
       .with(widget_id: "allowed:#{zone.name}").and_return(allowed_svcs_table)
   end
