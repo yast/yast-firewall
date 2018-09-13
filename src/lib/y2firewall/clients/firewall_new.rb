@@ -33,13 +33,20 @@ module Y2Firewall
       include Yast::I18n
       include Yast::Logger
 
+      # Constructor
       def initialize
         textdomain "firewall"
+
+        Yast.import "UI"
+        Yast.import "Popup"
+        Yast.import "PackageSystem"
       end
 
       # Runs the client
       def run
-        Dialogs::Main.new.run
+        if Yast::PackageSystem.CheckAndInstallPackages(["firewalld"])
+          Dialogs::Main.new.run
+        end
       end
     end
   end
