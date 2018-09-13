@@ -190,28 +190,6 @@ module Y2Firewall
         def contents
           VBox(@allowed_services_widget)
         end
-
-        # A list of services in a firewall zone
-        class ServiceBox < CWM::MultiSelectionBox
-          # @param zone [Y2Firewall::Firewalld::Zone]
-          def initialize(zone)
-            @zone = zone
-          end
-
-          def label
-            # TRANSLATORS: %s is a zone name
-            format(_("Services for %s") % @zone.name)
-          end
-
-          def items
-            all_known_services = Y2Firewall::Firewalld.instance.api.services
-            all_known_services.map { |s| [s, s] }
-          end
-
-          def init
-            self.value = @zone.services
-          end
-        end
       end
     end
   end
