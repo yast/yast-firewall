@@ -56,9 +56,7 @@ module Y2Firewall
 
         def handle(input)
           result = @status_widget.handle_input(input["ID"])
-
-          return :redraw if result == :start
-          return :redraw if result == :stop
+          return :swap_mode if result == :start || result == :stop
 
           nil
         end

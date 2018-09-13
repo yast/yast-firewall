@@ -39,7 +39,8 @@ module Y2Firewall
       end
 
       def title
-        _("Firewall")
+        #FIXME: the api mode is temporal, should be removed
+        format(_("Firewall %s"), fw.api.mode)
       end
 
       def contents
@@ -58,7 +59,8 @@ module Y2Firewall
 
         loop do
           result = super
-          break unless result == :redraw
+          swap_api if result == :swap_mode
+          break unless result == :redraw || result == :swap_mode
         end
 
         result
@@ -99,6 +101,10 @@ module Y2Firewall
 
       def fw
         Y2Firewall::Firewalld.instance
+      end
+
+      def swap_api
+        fw.api = Y2Firewall::Firewalld::Api.new
       end
     end
   end
