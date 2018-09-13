@@ -23,8 +23,73 @@ require_relative "../../../../test_helper.rb"
 require "cwm/rspec"
 require "y2firewall/widgets/pages/zone"
 
+describe Y2Firewall::Widgets do
+  let(:fake_zone) { double("fake zone", name: "zoe") }
+  subject(:widget) { described_class.new(fake_zone, double("fake pager")) }
+  before do
+    allow(Y2Firewall::Widgets::AllowedServices)
+      .to receive(:new).and_return(double("Allowed Services widget"))
+  end
+
+  describe Y2Firewall::Widgets::Pages::Zone do
+    include_examples "CWM::Page"
+  end
+
+  describe Y2Firewall::Widgets::Pages::ServicesTab do
+    include_examples "CWM::Tab"
+  end
+
+  describe Y2Firewall::Widgets::Pages::PortsTab do
+    subject(:widget) { described_class.new(fake_zone) }
+    include_examples "CWM::Tab"
+  end
+end
+
 describe Y2Firewall::Widgets::Pages::PortsTab::PortsForProtocols do
-  subject { described_class.new(double("fake zone")) }
+  let(:fake_zone) { double("fake zone", name: "zoe") }
+  subject(:widget) { described_class.new(fake_zone) }
+  include_examples "CWM::CustomWidget"
+
+  describe "#init" do
+    it "works" do
+      expect(fake_zone).to receive(:ports).and_return(["22-80/tcp"])
+      expect(Yast::UI).to receive(:ChangeWidget).with(Id(:tcp), :Value, "22-80")
+      expect(Yast::UI).to receive(:ChangeWidget).with(Id(:udp), :Value, "")
+      expect(Yast::UI).to receive(:ChangeWidget).with(Id(:sctp), :Value, "")
+      expect(Yast::UI).to receive(:ChangeWidget).with(Id(:dccp), :Value, "")
+      expect { widget.init }.to_not raise_error
+    end
+  end
+
+  describe "#store" do
+    before do
+      expect(Yast::UI).to receive(:QueryWidget)
+        .with(Id(:udp), :Value).and_return("")
+      expect(Yast::UI).to receive(:QueryWidget)
+        .with(Id(:sctp), :Value).and_return("")
+      expect(Yast::UI).to receive(:QueryWidget)
+        .with(Id(:dccp), :Value).and_return("")
+    end
+
+    context "input is clean" do
+      it "works" do
+        expect(Yast::UI).to receive(:QueryWidget)
+          .with(Id(:tcp), :Value).and_return("22-80")
+        expect(fake_zone).to receive(:ports=).with(["22-80/tcp"])
+        expect { widget.store }.to_not raise_error
+      end
+    end
+
+    context "input is nonsense" do
+      xit "works" do
+        expect(Yast::UI).to receive(:QueryWidget)
+          .with(Id(:tcp), :Value).and_return("- - - - -")
+
+        expect(fake_zone).to_not receive(:ports=)
+        expect { widget.store }.to_not raise_error
+      end
+    end
+  end
 
   describe "#items_from_ui" do
     let(:expected) do

@@ -38,7 +38,9 @@ describe Y2Firewall::Widgets do
   end
 
   describe Y2Firewall::Widgets::FirewallSSHProposal do
-    let(:widget) { described_class.new(proposal_settings) }
+    subject(:widget) { described_class.new(proposal_settings) }
+
+    include_examples "CWM::CustomWidget"
 
     describe "#initialize" do
       let(:vnc) { true }
