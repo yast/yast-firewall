@@ -53,6 +53,15 @@ module Y2Firewall
             VStretch()
           )
         end
+
+        def handle(input)
+          result = @status_widget.handle_input(input["ID"])
+
+          return :redraw if result == :start
+          return :redraw if result == :stop
+
+          nil
+        end
       end
     end
   end
