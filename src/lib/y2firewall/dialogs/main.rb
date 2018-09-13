@@ -29,10 +29,12 @@ module Y2Firewall
   module Dialogs
     # Main entry point to Firewall showing tree pager with all content
     class Main < CWM::Dialog
+      # Constructor
       def initialize
+        Yast.import "NetworkInterfaces"
         textdomain "firewall"
 
-        fw = Y2Firewall::Firewalld.instance
+        Yast::NetworkInterfaces.Read
         fw.read
       end
 
@@ -48,11 +50,18 @@ module Y2Firewall
         )
       end
 
+      # Runs the dialog
+      #
+      # @return [Symbol] result of the dialog
       def run
+        result = nil
+
         loop do
           result = super
           break unless result == :redraw
         end
+
+        result
       end
 
       def skip_store_for
@@ -62,6 +71,10 @@ module Y2Firewall
       def back_button
         # do not show back button when running on running system. See CWM::Dialog.back_button
         ""
+      end
+
+      def next_handler
+        fw.write
       end
 
       def next_button
@@ -80,6 +93,12 @@ module Y2Firewall
       # @return [Boolean] it goes back if returns true
       def back_handler
         true
+      end
+
+    private
+
+      def fw
+        Y2Firewall::Firewalld.instance
       end
     end
   end

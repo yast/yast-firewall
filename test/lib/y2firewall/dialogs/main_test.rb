@@ -1,0 +1,82 @@
+#!/usr/bin/env rspec
+
+# ------------------------------------------------------------------------------
+# Copyright (c) 2018 SUSE LLC
+#
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of version 2 of the GNU General Public License as published by the
+# Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, contact SUSE.
+#
+# To contact SUSE about this file by physical or electronic mail, you may find
+# current contact information at www.suse.com.
+# ------------------------------------------------------------------------------
+
+require_relative "../../../test_helper.rb"
+require "cwm/rspec"
+require "y2firewall/dialogs/main"
+
+describe Y2Firewall::Dialogs::Main do
+  subject { described_class.new }
+  let(:firewall) { Y2Firewall::Firewalld.instance }
+
+  before do
+    allow(firewall).to receive(:read)
+  end
+
+  include_examples "CWM::Dialog"
+
+  describe ".initialize" do
+    it "reads the firewall configuration" do
+      expect(firewall).to receive(:read)
+      described_class.new
+    end
+  end
+
+  describe "#contents" do
+    it "containts a firewall overview pager widget" do
+      widget = subject.contents.nested_find do |item|
+        item.is_a?(Y2Firewall::Widgets::OverviewTreePager)
+      end
+
+      expect(widget).to_not be(nil)
+    end
+  end
+
+  describe "#run" do
+    let(:result) { :next }
+
+    before do
+      allow_any_instance_of(CWM::Dialog).to receive(:run).and_return(result)
+    end
+
+    context "when the user accepts the changes" do
+      it "returns :next" do
+        expect(subject.run).to eql(:next)
+      end
+    end
+
+    context "when the user cancel" do
+      let(:result) { :abort }
+
+      it "returns :abort" do
+        expect(subject.run).to eql(:abort)
+      end
+    end
+  end
+
+  describe "#next_handler" do
+    it "writes the firewall configuration" do
+      expect(firewall).to receive(:write)
+
+      subject.next_handler
+    end
+  end
+end
