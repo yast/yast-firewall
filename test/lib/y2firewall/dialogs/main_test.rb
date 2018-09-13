@@ -29,11 +29,13 @@ describe Y2Firewall::Dialogs::Main do
 
   before do
     allow(firewall).to receive(:read)
+    allow_any_instance_of(Y2Firewall::Widgets::OverviewTreePager)
+      .to receive(:items).and_return([])
   end
 
   include_examples "CWM::Dialog"
 
-  describe ".initialize" do
+  describe ".new" do
     it "reads the firewall configuration" do
       expect(firewall).to receive(:read)
       described_class.new
@@ -63,7 +65,7 @@ describe Y2Firewall::Dialogs::Main do
       end
     end
 
-    context "when the user cancel" do
+    context "when the user cancels" do
       let(:result) { :abort }
 
       it "returns :abort" do
