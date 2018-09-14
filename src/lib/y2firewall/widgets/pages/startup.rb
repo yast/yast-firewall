@@ -63,6 +63,10 @@ module Y2Firewall
           system_service.reload if status_widget.reload_flag?
         end
 
+        def help
+          status_widget.help
+        end
+
       private
 
         # This is a generic widget in SLE15; may not be appropriate.
