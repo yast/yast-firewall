@@ -63,6 +63,8 @@ module Y2Firewall
           break unless result == :redraw || result == :swap_mode
         end
 
+        fw.write_only
+        fw.system_service.save
         result
       end
 
@@ -73,10 +75,6 @@ module Y2Firewall
       def back_button
         # do not show back button when running on running system. See CWM::Dialog.back_button
         ""
-      end
-
-      def next_handler
-        fw.write
       end
 
       def next_button

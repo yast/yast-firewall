@@ -44,9 +44,8 @@ module Y2Firewall
 
       # Runs the client
       def run
-        if Yast::PackageSystem.CheckAndInstallPackages(["firewalld"])
-          Dialogs::Main.new.run
-        end
+        return :abort unless Yast::PackageSystem.CheckAndInstallPackages(["firewalld"])
+        Dialogs::Main.new.run
       end
     end
   end
