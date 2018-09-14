@@ -51,7 +51,7 @@ describe Y2Firewall::Widgets::Pages::PortsTab::PortsForProtocols do
   include_examples "CWM::CustomWidget"
 
   describe "#init" do
-    it "works" do
+    it "initializes the widgets correctly" do
       expect(fake_zone).to receive(:ports).and_return(["22-80/tcp"])
       expect(Yast::UI).to receive(:ChangeWidget).with(Id(:tcp), :Value, "22-80")
       expect(Yast::UI).to receive(:ChangeWidget).with(Id(:udp), :Value, "")
@@ -72,7 +72,7 @@ describe Y2Firewall::Widgets::Pages::PortsTab::PortsForProtocols do
     end
 
     context "input is clean" do
-      it "works" do
+      it "assigns the ports correctly" do
         expect(Yast::UI).to receive(:QueryWidget)
           .with(Id(:tcp), :Value).and_return("22-80")
         expect(fake_zone).to receive(:ports=).with(["22-80/tcp"])
@@ -81,7 +81,7 @@ describe Y2Firewall::Widgets::Pages::PortsTab::PortsForProtocols do
     end
 
     context "input is nonsense" do
-      xit "works" do
+      xit "FIXME: fails validation" do
         expect(Yast::UI).to receive(:QueryWidget)
           .with(Id(:tcp), :Value).and_return("- - - - -")
 
