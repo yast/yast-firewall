@@ -28,7 +28,9 @@ module Y2Firewall
     class ZoneOptions < ::CWM::ComboBox
       DEFAULT_ZONE_OPTION = ["", "default"].freeze
 
-      # @return interface [Hash] Interface to act on
+      # Constructor
+      #
+      # @param interface [Hash] Interface to act on
       def initialize(interface)
         textdomain "firewall"
         @interface = interface
