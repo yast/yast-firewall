@@ -35,7 +35,9 @@ module Y2Firewall
 
       # Constructor
       #
-      # @param zones [Array<Y2Firewall::Firewalld::Zone>] Zones
+      # @param interfaces [Array<Hash>] Interfaces to include in the table
+      # @param change_zone_button [Y2Firewall::Widgets::ChangeZoneButton] Button to change assigned
+      #   zone
       def initialize(interfaces, change_zone_button)
         textdomain "firewall"
         @interfaces = interfaces
