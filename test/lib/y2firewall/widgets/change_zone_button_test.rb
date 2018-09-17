@@ -23,10 +23,10 @@
 require_relative "../../../test_helper"
 
 require "cwm/rspec"
-require "y2firewall/widgets/zone_options"
+require "y2firewall/widgets/change_zone_button"
 
-describe Y2Firewall::Widgets::ZoneOptions do
-  include_examples "CWM::ComboBox"
+describe Y2Firewall::Widgets::ChangeZoneButton do
+  include_examples "CWM::PushButton"
 
   subject(:widget) { described_class.new(eth0) }
 
@@ -34,28 +34,37 @@ describe Y2Firewall::Widgets::ZoneOptions do
     { "id" => "eth0", "zone" => "public", "name" => "Intel Ethernet Connection I217-LM" }
   end
 
-  describe "#init" do
-    it "sets the current value to the zone for the given zone" do
-      expect(widget).to receive(:value=).with(eth0["zone"])
-      widget.init
-    end
+  let(:result) { :next }
+
+  before do
+    allow(Y2Firewall::Dialogs::ChangeZone).to receive(:run).and_return(result)
   end
 
-  describe "#items" do
-    let(:public_zone) { instance_double(Y2Firewall::Firewalld::Zone, name: "public") }
-    let(:dmz_zone) { instance_double(Y2Firewall::Firewalld::Zone, name: "dmz") }
-
-    before do
-      allow(Y2Firewall::Firewalld.instance).to receive(:zones).and_return([public_zone, dmz_zone])
+  describe "#handle" do
+    it "selects the current row in the UI state" do
+      expect(Y2Firewall::UIState.instance).to receive(:select_row).with("eth0")
+      widget.handle
     end
 
-    it "returns a list of selectable items including all known zones" do
-      expect(widget.items).to eq(
-        [
-          ["public", "public"],
-          ["dmz", "dmz"]
-        ]
-      )
+    it "opens a dialog to change the zone" do
+      expect(Y2Firewall::Dialogs::ChangeZone).to receive(:run)
+      widget.handle
+    end
+
+    context "when the dialog is accepted" do
+      let(:result) { :next }
+
+      it "returns :redraw in order to redraw the interface" do
+        expect(widget.handle).to eq(:redraw)
+      end
+    end
+
+    context "when the dialog is not accepted" do
+      let(:result) { :other }
+
+      it "returns nil" do
+        expect(widget.handle).to be_nil
+      end
     end
   end
 end
