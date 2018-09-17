@@ -125,12 +125,12 @@ module Y2Firewall
           PushButton(
             Id(:add),
             Opt(:hstretch),
-            _("Add") + Yast::UI.Glyph(:ArrowRight).to_s
+            _("Add") + " #{Yast::UI.Glyph(:ArrowRight)}"
           ),
           PushButton(
             Id(:add_all),
             Opt(:hstretch),
-            _("Add All") + Yast::UI.Glyph(:ArrowRight).to_s
+            _("Add All") + " #{Yast::UI.Glyph(:ArrowRight)}"
           ),
           VSpacing(1),
           PushButton(
