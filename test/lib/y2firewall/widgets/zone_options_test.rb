@@ -1,0 +1,61 @@
+#!/usr/bin/env rspec
+# encoding: utf-8
+
+# Copyright (c) [2018] SUSE LLC
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of version 2 of the GNU General Public License as published
+# by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, contact SUSE LLC.
+#
+# To contact SUSE LLC about this file by physical or electronic mail, you may
+# find current contact information at www.suse.com.
+
+require_relative "../../../test_helper"
+
+require "cwm/rspec"
+require "y2firewall/widgets/zone_options"
+
+describe Y2Firewall::Widgets::ZoneOptions do
+  include_examples "CWM::ComboBox"
+
+  subject(:widget) { described_class.new(eth0) }
+
+  let(:eth0) do
+    { "id" => "eth0", "zone" => "public", "name" => "Intel Ethernet Connection I217-LM" }
+  end
+
+  describe "#init" do
+    it "sets the current value to the zone for the given zone" do
+      expect(widget).to receive(:value=).with(eth0["zone"])
+      widget.init
+    end
+  end
+
+  describe "#items" do
+    let(:public_zone) { instance_double(Y2Firewall::Firewalld::Zone, name: "public") }
+    let(:dmz_zone) { instance_double(Y2Firewall::Firewalld::Zone, name: "dmz") }
+
+    before do
+      allow(Y2Firewall::Firewalld.instance).to receive(:zones).and_return([public_zone, dmz_zone])
+    end
+
+    it "returns a list of selectable items including all known zones" do
+      expect(widget.items).to eq(
+        [
+           ["public", "public"],
+           ["dmz", "dmz"]
+        ]
+      )
+    end
+  end
+end
