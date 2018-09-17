@@ -40,7 +40,7 @@ describe Y2Firewall::Dialogs::ChangeZone do
 
   describe "#selected_zone" do
     let(:zone_options) do
-      instance_double(Y2Firewall::Widgets::ZoneOptions, value: "public")
+      instance_double(Y2Firewall::Widgets::ZoneOptions, value: zone_name)
     end
 
     before do
@@ -50,8 +50,20 @@ describe Y2Firewall::Dialogs::ChangeZone do
         .and_return(zone_options)
     end
 
-    it "returns the selected zone" do
-      expect(widget.selected_zone).to eq(public_zone)
+    context "when a zone was selected" do
+      let(:zone_name) { "public" }
+
+      it "returns the selected zone" do
+        expect(widget.selected_zone).to eq(public_zone)
+      end
+    end
+
+    context "when no zone is selected" do
+      let(:zone_name) { "" }
+
+      it "returns true" do
+        expect(widget.selected_zone).to be_nil
+      end
     end
   end
 
@@ -94,7 +106,15 @@ describe Y2Firewall::Dialogs::ChangeZone do
     end
 
     context "when the interface is assigned to the default zone" do
-      it "removes the interface from all zones"
+      before do
+        allow(widget).to receive(:selected_zone).and_return(nil)
+      end
+
+      it "removes the interface from all zones" do
+        expect(dmz_zone).to receive(:remove_interface).with("eth0")
+        expect(public_zone).to_not receive(:add_interface)
+        widget.next_handler
+      end
     end
   end
 end

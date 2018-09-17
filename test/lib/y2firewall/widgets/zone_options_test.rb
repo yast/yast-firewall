@@ -52,6 +52,7 @@ describe Y2Firewall::Widgets::ZoneOptions do
     it "returns a list of selectable items including all known zones" do
       expect(widget.items).to eq(
         [
+          ["", "default"],
           ["public", "public"],
           ["dmz", "dmz"]
         ]

@@ -49,8 +49,9 @@ module Y2Firewall
 
       # Returns the selected zone
       #
-      # @return [Y2Firewall::Firewalld::Zone] selected zone
+      # @return [Y2Firewall::Firewalld::Zone,nil] selected zone
       def selected_zone
+        return nil if zone_options.value.empty?
         Y2Firewall::Firewalld.instance.find_zone(zone_options.value)
       end
 
@@ -58,12 +59,13 @@ module Y2Firewall
       #
       # @note This method assigns the interface to the selected zone.
       def next_handler
-        return true if selected_zone.interfaces.include?(interface["id"])
+        new_zone = selected_zone
+        return true if new_zone && new_zone.interfaces.include?(interface["id"])
 
         Y2Firewall::Firewalld.instance.zones.each do |zone|
           zone.remove_interface(interface["id"])
         end
-        selected_zone.add_interface(interface["id"])
+        new_zone.add_interface(interface["id"]) if new_zone
 
         true
       end

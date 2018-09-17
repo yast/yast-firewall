@@ -26,6 +26,8 @@ module Y2Firewall
   module Widgets
     # ComboBox which allows to select a zone
     class ZoneOptions < ::CWM::ComboBox
+      DEFAULT_ZONE_OPTION = ["", "default"].freeze
+
       # @return interface [Hash] Interface to act on
       def initialize(interface)
         @interface = interface
@@ -43,10 +45,12 @@ module Y2Firewall
 
       # @see CWM::ComboBox#items
       def items
-        zones.map { |z| [z.name, z.name] }
+        [DEFAULT_ZONE_OPTION] + zones.map { |z| [z.name, z.name] }
       end
 
     private
+
+      alias_method :orig_value, :value
 
       # Returns the list of known zones
       #

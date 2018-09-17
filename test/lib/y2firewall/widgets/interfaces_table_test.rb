@@ -33,7 +33,7 @@ describe Y2Firewall::Widgets::InterfacesTable do
   end
 
   let(:eth1) do
-    { "id" => "eth1", "name" => "Intel Ethernet Connection I217-LM", "zone" => "external" }
+    { "id" => "eth1", "name" => "Intel Ethernet Connection I217-LM", "zone" => nil }
   end
 
   let(:interfaces) { [eth0, eth1] }
@@ -49,7 +49,7 @@ describe Y2Firewall::Widgets::InterfacesTable do
       expect(widget.items).to eq(
         [
           [:eth0, "eth0", "public", "Intel Ethernet Connection I217-LM"],
-          [:eth1, "eth1", "external", "Intel Ethernet Connection I217-LM"]
+          [:eth1, "eth1", "default", "Intel Ethernet Connection I217-LM"]
         ]
       )
     end

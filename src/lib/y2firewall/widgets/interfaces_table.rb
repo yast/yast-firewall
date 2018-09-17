@@ -27,6 +27,8 @@ module Y2Firewall
   module Widgets
     # A table with all {Y2Firewall::Firewalld::Zone}s.
     class InterfacesTable < ::CWM::Table
+      DEFAULT_ZONE_NAME = "default".freeze
+
       # @!attribute [r] interfaces
       #   @return [Array<Hash>] Interfaces
       attr_reader :interfaces
@@ -64,7 +66,12 @@ module Y2Firewall
       # @see CWM::Table#items
       def items
         interfaces.map do |iface|
-          [iface["id"].to_sym, iface["id"], iface["zone"], iface["name"]]
+          [
+            iface["id"].to_sym,
+            iface["id"],
+            iface["zone"] || DEFAULT_ZONE_NAME,
+            iface["name"]
+          ]
         end
       end
 
