@@ -24,6 +24,7 @@ require "cwm/page"
 require "y2firewall/firewalld"
 require "y2firewall/helpers/interfaces"
 require "y2firewall/widgets/interfaces_table"
+require "y2firewall/widgets/change_zone_button"
 
 module Y2Firewall
   module Widgets
@@ -49,8 +50,21 @@ module Y2Firewall
           return @contents if @contents
           @contents = VBox(
             Left(Heading(_("Interfaces"))),
-            InterfacesTable.new(known_interfaces)
+            interfaces_table,
+            known_interfaces.empty? ? Empty() : change_zone_button
           )
+        end
+
+      private
+
+        # @return [Y2Firewall::Widgets::InterfacesTable] Table containing all interfaces
+        def interfaces_table
+          @interfaces_table ||= InterfacesTable.new(known_interfaces, change_zone_button)
+        end
+
+        # @return [Y2Firewall::Widgets::ChangeZoneButton] Buttton to change the zone
+        def change_zone_button
+          @change_zone_button ||= ChangeZoneButton.new(known_interfaces.first)
         end
       end
 

@@ -21,21 +21,35 @@
 
 require "cwm"
 require "cwm/table"
+require "y2firewall/ui_state"
 
 module Y2Firewall
   module Widgets
     # A table with all {Y2Firewall::Firewalld::Zone}s.
     class InterfacesTable < ::CWM::Table
       # @!attribute [r] interfaces
-      #   @return [Array<Hash>] Zones
+      #   @return [Array<Hash>] Interfaces
       attr_reader :interfaces
 
       # Constructor
       #
       # @param zones [Array<Y2Firewall::Firewalld::Zone>] Zones
-      def initialize(interfaces)
+      def initialize(interfaces, change_zone_button)
         textdomain "firewall"
         @interfaces = interfaces
+        @change_zone_button = change_zone_button
+      end
+
+      def opt
+        [:notify, :immediate]
+      end
+
+      def init
+        interface = UIState.instance.row_id
+        if interface && interfaces.include?(interface)
+          self.value = interface.to_sym
+        end
+        change_zone_button.interface = selected_interface
       end
 
       # @see CWM::Table#header
@@ -50,9 +64,26 @@ module Y2Firewall
       # @see CWM::Table#items
       def items
         interfaces.map do |iface|
-          [Id(iface["id"]), iface["id"], iface["zone"], iface["name"]]
+          [iface["id"].to_sym, iface["id"], iface["zone"], iface["name"]]
         end
       end
+
+      # @macro seeAbstractWidget
+      def handle(event)
+        return nil unless event["EventReason"] == "SelectionChanged"
+        UIState.instance.select_row(value)
+        change_zone_button.interface = selected_interface
+        nil
+      end
+
+      def selected_interface
+        interfaces.find { |i| i["id"] == value.to_s }
+      end
+
+    private
+
+      # @return [Y2Firewalld::Widgets::ChangeZoneButton] Button to change the assigned zone
+      attr_reader :change_zone_button
     end
   end
 end

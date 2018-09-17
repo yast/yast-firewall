@@ -27,11 +27,11 @@ require "y2firewall/widgets/pages/interfaces"
 describe Y2Firewall::Widgets::Pages::Interfaces do
   subject(:widget) { described_class.new(double("fake pager")) }
 
-  include_examples "CWM::Page" 
+  include_examples "CWM::Page"
 
   describe "#contents" do
     let(:interfaces) do
-      [{"id" => "eth0", "name" => "Intel Corporation"}]
+      [{ "id" => "eth0", "name" => "Intel Corporation" }]
     end
 
     before do
@@ -39,7 +39,8 @@ describe Y2Firewall::Widgets::Pages::Interfaces do
     end
 
     it "builds a interfaces table containing known interfaces" do
-      expect(Y2Firewall::Widgets::InterfacesTable).to receive(:new).with(interfaces)
+      expect(Y2Firewall::Widgets::InterfacesTable).to receive(:new)
+        .with(interfaces, Y2Firewall::Widgets::ChangeZoneButton)
       widget.contents
     end
   end
