@@ -95,15 +95,7 @@ module Y2Firewall
 
       # @return [CWM::PagerTreeItem]
       def interfaces_item
-        ifcs = known_interfaces
-        children = ifcs.map { |i| interface_item(i) }
         page = Pages::Interfaces.new(self)
-        CWM::PagerTreeItem.new(page, children: children)
-      end
-
-      # @return [CWM::PagerTreeItem]
-      def interface_item(i)
-        page = Pages::Interface.new(i, self)
         CWM::PagerTreeItem.new(page)
       end
 

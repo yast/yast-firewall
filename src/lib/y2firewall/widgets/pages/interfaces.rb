@@ -67,52 +67,6 @@ module Y2Firewall
           @change_zone_button ||= ChangeZoneButton.new(known_interfaces.first)
         end
       end
-
-      # A page for one network interface
-      class Interface < CWM::Page
-        # Constructor
-        #
-        # @param interface [Hash<String,String>] "id", "name" and "zone"
-        # @param pager [CWM::TreePager]
-        def initialize(interface, _pager)
-          textdomain "firewall"
-          @interface = interface
-          @sb = ZoneBox.new(interface)
-          self.widget_id = "ifc:" + label
-        end
-
-        # @macro seeAbstractWidget
-        def label
-          @interface["id"]
-        end
-
-        # @macro seeCustomWidget
-        def contents
-          VBox(@sb)
-        end
-
-        # Selecting a zone to which an interface belongs
-        class ZoneBox < CWM::SelectionBox
-          # @param interface [Hash<String,String>] "id", "name" and "zone"
-          def initialize(interface)
-            textdomain "firewall"
-            @interface = interface
-            @zones = Y2Firewall::Firewalld.instance.zones
-          end
-
-          def label
-            format(_("Zone for Interface %s"), @interface["id"])
-          end
-
-          def items
-            @zones.map { |z| [z.name, z.name] }
-          end
-
-          def init
-            self.value = @interface["zone"]
-          end
-        end
-      end
     end
   end
 end
