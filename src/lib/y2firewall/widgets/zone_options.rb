@@ -30,6 +30,7 @@ module Y2Firewall
 
       # @return interface [Hash] Interface to act on
       def initialize(interface)
+        textdomain "firewall"
         @interface = interface
       end
 
