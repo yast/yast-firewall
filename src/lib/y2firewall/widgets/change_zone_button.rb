@@ -49,7 +49,7 @@ module Y2Firewall
         return nil unless interface
         UIState.instance.select_row(interface["id"])
         result = Dialogs::ChangeZone.run(interface)
-        result == :next ? :redraw : nil
+        result == :ok ? :redraw : nil
       end
     end
   end

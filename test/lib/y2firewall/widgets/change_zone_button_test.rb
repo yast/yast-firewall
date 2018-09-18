@@ -34,7 +34,7 @@ describe Y2Firewall::Widgets::ChangeZoneButton do
     { "id" => "eth0", "zone" => "public", "name" => "Intel Ethernet Connection I217-LM" }
   end
 
-  let(:result) { :next }
+  let(:result) { :ok }
 
   before do
     allow(Y2Firewall::Dialogs::ChangeZone).to receive(:run).and_return(result)
@@ -52,7 +52,7 @@ describe Y2Firewall::Widgets::ChangeZoneButton do
     end
 
     context "when the dialog is accepted" do
-      let(:result) { :next }
+      let(:result) { :ok }
 
       it "returns :redraw in order to redraw the interface" do
         expect(widget.handle).to eq(:redraw)

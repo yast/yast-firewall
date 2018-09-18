@@ -28,6 +28,10 @@ module Y2Firewall
     class ZoneOptions < ::CWM::ComboBox
       DEFAULT_ZONE_OPTION = ["", "default"].freeze
 
+      #@!attribute [r] interface
+      #  @return [Hash] Interface to act on
+      attr_reader :interface
+
       # Constructor
       #
       # @param interface [Hash] Interface to act on
@@ -51,6 +55,17 @@ module Y2Firewall
         [DEFAULT_ZONE_OPTION] + zones.map { |z| [z.name, z.name] }
       end
 
+      # @macro seeCommonWidget
+      def store
+        new_zone = selected_zone
+        return if new_zone && new_zone.interfaces.include?(interface["id"])
+
+        zones.each do |zone|
+          zone.remove_interface(interface["id"])
+        end
+        new_zone.add_interface(interface["id"]) if new_zone
+      end
+
     private
 
       alias_method :orig_value, :value
@@ -62,6 +77,14 @@ module Y2Firewall
       # @return [Array<Y2Firewall::Firewalld::Zone>] List of zones.
       def zones
         @zones ||= Y2Firewall::Firewalld.instance.zones
+      end
+
+      # Returns the selected zone
+      #
+      # @return [Y2Firewall::Firewalld::Zone,nil] selected zone
+      def selected_zone
+        return nil if value.empty?
+        Y2Firewall::Firewalld.instance.find_zone(value)
       end
     end
   end

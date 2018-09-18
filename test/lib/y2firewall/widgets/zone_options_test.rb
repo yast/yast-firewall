@@ -34,6 +34,18 @@ describe Y2Firewall::Widgets::ZoneOptions do
     { "id" => "eth0", "zone" => "public", "name" => "Intel Ethernet Connection I217-LM" }
   end
 
+  let(:public_zone) do
+    instance_double(
+      Y2Firewall::Firewalld::Zone, name: "public", interfaces: [], remove_interface: nil
+    )
+  end
+
+  let(:dmz_zone) do
+    instance_double(
+      Y2Firewall::Firewalld::Zone, name: "dmz", interfaces: [eth0], remove_interface: nil
+    )
+  end
+
   describe "#init" do
     it "sets the current value to the zone for the given zone" do
       expect(widget).to receive(:value=).with(eth0["zone"])
@@ -42,9 +54,6 @@ describe Y2Firewall::Widgets::ZoneOptions do
   end
 
   describe "#items" do
-    let(:public_zone) { instance_double(Y2Firewall::Firewalld::Zone, name: "public") }
-    let(:dmz_zone) { instance_double(Y2Firewall::Firewalld::Zone, name: "dmz") }
-
     before do
       allow(Y2Firewall::Firewalld.instance).to receive(:zones).and_return([public_zone, dmz_zone])
     end
@@ -57,6 +66,42 @@ describe Y2Firewall::Widgets::ZoneOptions do
           ["dmz", "dmz"]
         ]
       )
+    end
+  end
+
+  describe "#store" do
+    before do
+      allow(Y2Firewall::Firewalld.instance).to receive(:zones).and_return([public_zone, dmz_zone])
+      #allow(widget).to receive(:selected_zone).and_return(public_zone)
+      allow(widget).to receive(:value).and_return(public_zone.name)
+    end
+
+    context "when the interface is assigned to a different zone" do
+      before do
+        allow(public_zone).to receive(:add_interface)
+      end
+
+      it "assigns the interface to the selected zone" do
+        expect(public_zone).to receive(:add_interface).with("eth0")
+        widget.store
+      end
+
+      it "removes the interface from any other zone" do
+        expect(dmz_zone).to receive(:remove_interface).with("eth0")
+        widget.store
+      end
+    end
+
+    context "when the interface already belongs to the selected zone" do
+      before do
+        allow(public_zone).to receive(:interfaces).and_return(["eth0"])
+      end
+
+      it "does not modify the zone" do
+        expect(dmz_zone).to_not receive(:remove_interface)
+        expect(public_zone).to_not receive(:add_interface)
+        widget.store
+      end
     end
   end
 end
