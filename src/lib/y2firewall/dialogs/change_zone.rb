@@ -19,13 +19,13 @@
 # To contact SUSE LLC about this file by physical or electronic mail, you may
 # find current contact information at www.suse.com.
 
-require "cwm/dialog"
+require "cwm/popup"
 require "y2firewall/widgets/zone_options"
 
 module Y2Firewall
   module Dialogs
     # This dialog allows the user to select which zone should be an interface assigned to.
-    class ChangeZone < ::CWM::Dialog
+    class ChangeZone < ::CWM::Popup
       # @!attribute [r] interface
       #   @return [Hash] Interface to change the zone
       attr_reader :interface
@@ -39,65 +39,13 @@ module Y2Firewall
       end
 
       # @macro seeAbstractWidget
-      def label
+      def title
         _("Change Zone")
       end
 
       # @macro seeCustomWidget
       def contents
         VBox(zone_options)
-      end
-
-      # Returns the selected zone
-      #
-      # @return [Y2Firewall::Firewalld::Zone,nil] selected zone
-      def selected_zone
-        return nil if zone_options.value.empty?
-        Y2Firewall::Firewalld.instance.find_zone(zone_options.value)
-      end
-
-      # Updates firewall configuration when the 'next' button is pressed
-      #
-      # @note This method assigns the interface to the selected zone.
-      def next_handler
-        new_zone = selected_zone
-        return true if new_zone && new_zone.interfaces.include?(interface["id"])
-
-        Y2Firewall::Firewalld.instance.zones.each do |zone|
-          zone.remove_interface(interface["id"])
-        end
-        new_zone.add_interface(interface["id"]) if new_zone
-
-        true
-      end
-
-      # Returns the 'next' button label
-      #
-      # @return [String] Button label
-      #
-      # @see CWM::Dialog#next_button
-      # @see Yast::Label
-      def next_button
-        Yast::Label.AcceptButton
-      end
-
-      # Returns the 'abort' button label
-      #
-      # @return [String] Button label
-      #
-      # @see CWM::Dialog#abort_button
-      # @see Yast::Label
-      def abort_button
-        Yast::Label.CancelButton
-      end
-
-      # Disables the 'back' button
-      #
-      # @return [nil]
-      #
-      # @see CWM::Dialog#back_button
-      def back_button
-        ""
       end
 
     private
@@ -109,13 +57,6 @@ module Y2Firewall
       # @return [Y2Firewall::Widgets::ZoneOptions]
       def zone_options
         @zone_options ||= Y2Firewall::Widgets::ZoneOptions.new(interface)
-      end
-
-      # Determines whether a dialog should be open
-      #
-      # @return [true]
-      def should_open_dialog?
-        true
       end
     end
   end
