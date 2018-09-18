@@ -46,6 +46,20 @@ module Y2Firewall
       def items
         zones.map { |z| [z.name.to_sym, z.name, z.interfaces.join(", ")] }
       end
+
+      def help
+        _("<p>A network zone defines the level of trust for network " \
+          "connections.</p>\n<p>Each zone can be used for many network " \
+          "connections although a connection can only be part of one zone. " \
+          "</p>\n<p>" \
+          "<p>The current firewall features supported by zones are:</p>\n" \
+          "<ul>" \
+          "<li><b>Services:</b> Define a set of ports and/or protocols, " \
+          "destination addresses and netfilter kernel helpers to be enabled.</li>" \
+          "<li><b>Ports:</b> Single or range of ports <b>(TCP, UDP, SCTP, " \
+          "DCCP)</b> to be enabled.</li>" \
+          "</ul>\n")
+      end
     end
   end
 end
