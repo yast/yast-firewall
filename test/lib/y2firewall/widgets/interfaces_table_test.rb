@@ -55,7 +55,30 @@ describe Y2Firewall::Widgets::InterfacesTable do
     end
   end
 
-  describe "#init"
+  describe "#init" do
+    before do
+      allow(Y2Firewall::UIState.instance).to receive(:row_id).and_return(row_id)
+      allow(widget).to receive(:value).and_return(nil)
+    end
+
+    context "when no row has been visited previously" do
+      let(:row_id) { nil }
+
+      it "does not select any specific row" do
+        expect(widget).to_not receive(:value=)
+        widget.init
+      end
+    end
+
+    context "when a row has been visited" do
+      let(:row_id) { :eth0 }
+
+      it "does selects the visited row" do
+        expect(widget).to receive(:value=).with(:eth0)
+        widget.init
+      end
+    end
+  end
 
   describe "#handle" do
     context "when the selection is changed" do

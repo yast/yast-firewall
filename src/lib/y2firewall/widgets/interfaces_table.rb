@@ -49,9 +49,9 @@ module Y2Firewall
       end
 
       def init
-        interface = UIState.instance.row_id
-        if interface && interfaces.include?(interface)
-          self.value = interface.to_sym
+        interface = Y2Firewall::UIState.instance.row_id
+        if interface && interfaces.map { |i| i["id"] }.include?(interface.to_s)
+          self.value = interface
         end
         change_zone_button.interface = selected_interface
       end
