@@ -25,7 +25,7 @@ require "y2firewall/ui_state"
 
 module Y2Firewall
   module Widgets
-    # A table with all {Y2Firewall::Firewalld::Zone}s.
+    # A table with all {Y2Firewall::Firewalld::Interface}s.
     class InterfacesTable < ::CWM::Table
       DEFAULT_ZONE_NAME = "default".freeze
 
