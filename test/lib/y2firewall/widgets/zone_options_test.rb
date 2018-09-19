@@ -75,7 +75,6 @@ describe Y2Firewall::Widgets::ZoneOptions do
   describe "#store" do
     before do
       allow(Y2Firewall::Firewalld.instance).to receive(:zones).and_return([public_zone, dmz_zone])
-      #allow(widget).to receive(:selected_zone).and_return(public_zone)
       allow(widget).to receive(:value).and_return(public_zone.name)
     end
 

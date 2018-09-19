@@ -28,7 +28,7 @@ module Y2Firewall
     class ZoneOptions < ::CWM::ComboBox
       DEFAULT_ZONE_OPTION = ["", "default"].freeze
 
-      #@!attribute [r] interface
+      # @!attribute [r] interface
       #  @return [Y2Firewall::Firewalld::Interface] Interface to act on
       attr_reader :interface
 
@@ -67,8 +67,6 @@ module Y2Firewall
       end
 
     private
-
-      alias_method :orig_value, :value
 
       # Returns the list of known zones
       #
