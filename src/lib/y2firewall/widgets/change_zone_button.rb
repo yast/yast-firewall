@@ -47,7 +47,6 @@ module Y2Firewall
       # @see seeAbstractWidget
       def handle
         return nil unless interface
-        UIState.instance.select_row(interface["id"])
         result = Dialogs::ChangeZone.run(interface)
         result == :ok ? :redraw : nil
       end

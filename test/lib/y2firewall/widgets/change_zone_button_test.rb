@@ -41,11 +41,6 @@ describe Y2Firewall::Widgets::ChangeZoneButton do
   end
 
   describe "#handle" do
-    it "selects the current row in the UI state" do
-      expect(Y2Firewall::UIState.instance).to receive(:select_row).with("eth0")
-      widget.handle
-    end
-
     it "opens a dialog to change the zone" do
       expect(Y2Firewall::Dialogs::ChangeZone).to receive(:run)
       widget.handle
