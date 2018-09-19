@@ -36,6 +36,7 @@ module Y2Firewall
         # @param zone [Y2Firewall::Firewalld::Zone]
         # @param pager [CWM::TreePager]
         def initialize(zone, pager)
+          Yast.import "Popup"
           textdomain "firewall"
           @zone = zone
           @pager = pager
@@ -100,35 +101,64 @@ module Y2Firewall
           end
 
           def contents
-            fields = PROTOCOLS.map do |sym, label|
-              InputField(Id(sym), Opt(:hstretch), _(label))
+            fields = PROTOCOLS.map do |proto_sym, label|
+              InputField(Id(proto_sym), Opt(:hstretch), _(label))
             end
             VBox(* fields)
           end
 
+          def valid_port_description
+            format(
+              _("Enter ports or port ranges, separated by spaces and/or commas.\n" \
+                "A port is an integer.\n" \
+                "A port range is port-dash-port (with no spaces).\n" \
+                "For example:\n" \
+                "%s"),
+              "16001-16009, 18080"
+            )
+          end
+
           def help
-            "FIXME: ports or port ranges, separated by spaces and/or commas <br>" \
-            "a port is an integer <br>" \
-            "a port range is port-dash-port (with no spaces)"
+            valid_port_description.gsub("\n", "<br>\n")
           end
 
           def init
             by_proto = ports_from_array(@zone.ports)
-            PROTOCOLS.each do |sym, _label|
-              Yast::UI.ChangeWidget(Id(sym), :Value, by_proto.fetch(sym, []).join(", "))
+            PROTOCOLS.each do |proto_sym, _label|
+              s = by_proto.fetch(proto_sym, []).join(", ")
+              Yast::UI.ChangeWidget(Id(proto_sym), :Value, s)
             end
           end
 
-          # FIXME: validation, cleanup, error reporting
           def store
-            by_proto = PROTOCOLS.map do |sym, _label|
-              line = Yast::UI.QueryWidget(Id(sym), :Value)
-              [sym, items_from_ui(line)]
+            @zone.ports = ports_to_array(values_by_proto.to_h)
+          end
+
+          def validate
+            values_by_proto.each do |proto_sym, ranges|
+              invalid_range = ranges.find { |r| !valid_range?(r) }
+              next unless invalid_range
+              Yast::UI.SetFocus(Id(proto_sym))
+              err_msg = format(_("Invalid port range: %s"), invalid_range)
+              Yast::Popup.Error(err_msg + "\n" + valid_port_description)
+              return false
             end
-            @zone.ports = ports_to_array(by_proto.to_h)
+            true
           end
 
         private
+
+          # @return [Hash{Symbol => Array<String>}]
+          def values_by_proto
+            PROTOCOLS.map do |proto_sym, _label|
+              line = Yast::UI.QueryWidget(Id(proto_sym), :Value)
+              [proto_sym, items_from_ui(line)]
+            end
+          end
+
+          def valid_range?(r)
+            r =~ /\d+/ || r =~ /\d+-\d+/
+          end
 
           def items_from_ui(s)
             # the separator is at least one comma or space, surrounded by optional spaces

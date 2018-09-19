@@ -50,6 +50,18 @@ describe Y2Firewall::Widgets::Pages::PortsTab::PortsForProtocols do
   subject(:widget) { described_class.new(fake_zone) }
   include_examples "CWM::CustomWidget"
 
+  let(:input) { ["", "", "", ""] }
+  before do
+    allow(Yast::UI).to receive(:QueryWidget)
+      .with(Id(:tcp), :Value).and_return(input[0])
+    allow(Yast::UI).to receive(:QueryWidget)
+      .with(Id(:udp), :Value).and_return(input[1])
+    allow(Yast::UI).to receive(:QueryWidget)
+      .with(Id(:sctp), :Value).and_return(input[2])
+    allow(Yast::UI).to receive(:QueryWidget)
+      .with(Id(:dccp), :Value).and_return(input[3])
+  end
+
   describe "#init" do
     it "initializes the widgets correctly" do
       expect(fake_zone).to receive(:ports).and_return(["22-80/tcp"])
@@ -61,32 +73,24 @@ describe Y2Firewall::Widgets::Pages::PortsTab::PortsForProtocols do
     end
   end
 
-  describe "#store" do
-    before do
-      expect(Yast::UI).to receive(:QueryWidget)
-        .with(Id(:udp), :Value).and_return("")
-      expect(Yast::UI).to receive(:QueryWidget)
-        .with(Id(:sctp), :Value).and_return("")
-      expect(Yast::UI).to receive(:QueryWidget)
-        .with(Id(:dccp), :Value).and_return("")
-    end
-
+  describe "#validate and #store" do
     context "input is clean" do
+      let(:input) { ["22-80", "", "", ""] }
+
       it "assigns the ports correctly" do
-        expect(Yast::UI).to receive(:QueryWidget)
-          .with(Id(:tcp), :Value).and_return("22-80")
         expect(fake_zone).to receive(:ports=).with(["22-80/tcp"])
+        expect(widget.validate).to eq(true)
         expect { widget.store }.to_not raise_error
       end
     end
 
     context "input is nonsense" do
-      xit "FIXME: fails validation" do
-        expect(Yast::UI).to receive(:QueryWidget)
-          .with(Id(:tcp), :Value).and_return("- - - - -")
+      let(:input) { ["- - - - -", "", "", ""] }
 
-        expect(fake_zone).to_not receive(:ports=)
-        expect { widget.store }.to_not raise_error
+      it "fails validation (with a popup)" do
+        expect(Yast::UI).to receive(:SetFocus)
+        expect(Yast::Popup).to receive(:Error)
+        expect(widget.validate).to eq(false)
       end
     end
   end
