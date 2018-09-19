@@ -33,13 +33,25 @@ describe Y2Firewall::Widgets::InterfacesTable do
 
   let(:eth0) do
     instance_double(
-      Y2Firewall::Firewalld::Interface, name: "eth0", device_name: DEVICE_NAME, zone: "public"
+      Y2Firewall::Firewalld::Interface, name: "eth0", device_name: DEVICE_NAME, zone: public_zone
     )
   end
 
   let(:eth1) do
     instance_double(
       Y2Firewall::Firewalld::Interface, name: "eth1", device_name: DEVICE_NAME, zone: nil
+    )
+  end
+
+  let(:public_zone) do
+    instance_double(
+      Y2Firewall::Firewalld::Zone, name: "public", interfaces: [], remove_interface: nil
+    )
+  end
+
+  let(:dmz_zone) do
+    instance_double(
+      Y2Firewall::Firewalld::Zone, name: "dmz", remove_interface: nil
     )
   end
 
@@ -50,6 +62,10 @@ describe Y2Firewall::Widgets::InterfacesTable do
   end
 
   include_examples "CWM::Table"
+
+  before do
+    allow(public_zone).to receive(:interfaces).and_return([eth0])
+  end
 
   describe "#items" do
     it "returns the list of interfaces" do
