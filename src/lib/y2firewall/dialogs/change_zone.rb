@@ -27,12 +27,12 @@ module Y2Firewall
     # This dialog allows the user to select which zone should be an interface assigned to.
     class ChangeZone < ::CWM::Popup
       # @!attribute [r] interface
-      #   @return [Hash] Interface to change the zone
+      #   @return [Y2Firewall::Firewalld::Interface] Interface to act on
       attr_reader :interface
 
       # Constructor
       #
-      # @param interface [Hash] Interface to act on
+      # @param interface [Y2Firewall::Firewalld::Interface] Interface to act on
       def initialize(interface)
         textdomain "firewall"
         @interface = interface

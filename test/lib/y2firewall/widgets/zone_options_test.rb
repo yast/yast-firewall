@@ -24,15 +24,14 @@ require_relative "../../../test_helper"
 
 require "cwm/rspec"
 require "y2firewall/widgets/zone_options"
+require "y2firewall/firewalld/interface"
 
 describe Y2Firewall::Widgets::ZoneOptions do
   include_examples "CWM::ComboBox"
 
   subject(:widget) { described_class.new(eth0) }
 
-  let(:eth0) do
-    { "id" => "eth0", "zone" => "public", "name" => "Intel Ethernet Connection I217-LM" }
-  end
+  let(:eth0) { Y2Firewall::Firewalld::Interface.new("eth0") }
 
   let(:public_zone) do
     instance_double(
@@ -46,9 +45,13 @@ describe Y2Firewall::Widgets::ZoneOptions do
     )
   end
 
+  before do
+    allow(eth0).to receive(:zone).and_return(dmz_zone)
+  end
+
   describe "#init" do
     it "sets the current value to the zone for the given zone" do
-      expect(widget).to receive(:value=).with(eth0["zone"])
+      expect(widget).to receive(:value=).with("dmz")
       widget.init
     end
   end

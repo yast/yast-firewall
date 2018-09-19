@@ -28,13 +28,13 @@ module Y2Firewall
     # This button opens a dialog to change the zone for a given interface
     class ChangeZoneButton < CWM::PushButton
       # @!attribute [r] interface
-      #   @return [Hash] Interface to act on
+      #   @return [Y2Firewall::Firewalld::Interface] Interface to act on
       attr_accessor :interface
 
       # Constructor
       #
-      # @param interface [Hash] Interface to act on
-      def initialize(interface = nil)
+      # @param interface [Y2Firewall::Firewalld::Interface] Interface to act on
+      def initialize(interface)
         textdomain "firewall"
         @interface = interface
       end

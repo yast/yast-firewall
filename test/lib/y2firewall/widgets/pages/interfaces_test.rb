@@ -23,6 +23,7 @@
 require_relative "../../../../test_helper.rb"
 require "cwm/rspec"
 require "y2firewall/widgets/pages/interfaces"
+require "y2firewall/firewalld/interface"
 
 describe Y2Firewall::Widgets::Pages::Interfaces do
   subject(:widget) { described_class.new(double("fake pager")) }
@@ -31,7 +32,7 @@ describe Y2Firewall::Widgets::Pages::Interfaces do
 
   describe "#contents" do
     let(:interfaces) do
-      [{ "id" => "eth0", "name" => "Intel Corporation" }]
+      [Y2Firewall::Firewalld::Interface.new("eth0")]
     end
 
     before do

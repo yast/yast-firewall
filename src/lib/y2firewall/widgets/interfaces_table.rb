@@ -30,12 +30,12 @@ module Y2Firewall
       DEFAULT_ZONE_NAME = "default".freeze
 
       # @!attribute [r] interfaces
-      #   @return [Array<Hash>] Interfaces
+      #   @return [Array<Y2Firewall::Firewalld::Interface>] Interfaces
       attr_reader :interfaces
 
       # Constructor
       #
-      # @param interfaces [Array<Hash>] Interfaces to include in the table
+      # @param interfaces [Array<Y2Firewall::Firewalld::Interfaces>] Interfaces to list
       # @param change_zone_button [Y2Firewall::Widgets::ChangeZoneButton] Button to change assigned
       #   zone
       def initialize(interfaces, change_zone_button)
@@ -44,13 +44,15 @@ module Y2Firewall
         @change_zone_button = change_zone_button
       end
 
+      # @macro seeAbstractWidget
       def opt
         [:notify, :immediate]
       end
 
+      # @macro seeAbstractWidget
       def init
         interface = Y2Firewall::UIState.instance.row_id
-        if interface && interfaces.map { |i| i["id"] }.include?(interface.to_s)
+        if interface && interfaces.map(&:name).include?(interface.to_s)
           self.value = interface
         end
         change_zone_button.interface = selected_interface
@@ -69,10 +71,10 @@ module Y2Firewall
       def items
         interfaces.map do |iface|
           [
-            iface["id"].to_sym,
-            iface["id"],
-            iface["zone"] || DEFAULT_ZONE_NAME,
-            iface["name"]
+            iface.name.to_sym,
+            iface.name,
+            iface.zone ? iface.zone.name : DEFAULT_ZONE_NAME,
+            iface.device_name
           ]
         end
       end
@@ -86,7 +88,7 @@ module Y2Firewall
       end
 
       def selected_interface
-        interfaces.find { |i| i["id"] == value.to_s }
+        interfaces.find { |i| i.name == value.to_s }
       end
 
     private

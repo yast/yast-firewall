@@ -24,13 +24,12 @@ require_relative "../../../test_helper"
 
 require "cwm/rspec"
 require "y2firewall/dialogs/change_zone"
+require "y2firewall/firewalld/interface"
 
 describe Y2Firewall::Dialogs::ChangeZone do
   include_examples "CWM::Dialog"
 
   subject(:widget) { described_class.new(eth0) }
 
-  let(:eth0) do
-    { "id" => "eth0", "zone" => "public", "name" => "Intel Ethernet Connection I217-LM" }
-  end
+  let(:eth0) { Y2Firewall::Firewalld::Interface.new("eth0") }
 end

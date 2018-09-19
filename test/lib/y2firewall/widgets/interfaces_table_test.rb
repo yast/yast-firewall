@@ -24,16 +24,23 @@ require_relative "../../../test_helper.rb"
 require "cwm/rspec"
 require "y2firewall/widgets/interfaces_table"
 require "y2firewall/widgets/change_zone_button"
+require "y2firewall/firewalld/interface"
 
 describe Y2Firewall::Widgets::InterfacesTable do
   subject(:widget) { described_class.new(interfaces, change_zone_button) }
 
+  DEVICE_NAME = "Intel Ethernet Connection I217-LM".freeze
+
   let(:eth0) do
-    { "id" => "eth0", "name" => "Intel Ethernet Connection I217-LM", "zone" => "public" }
+    instance_double(
+      Y2Firewall::Firewalld::Interface, name: "eth0", device_name: DEVICE_NAME, zone: "public"
+    )
   end
 
   let(:eth1) do
-    { "id" => "eth1", "name" => "Intel Ethernet Connection I217-LM", "zone" => nil }
+    instance_double(
+      Y2Firewall::Firewalld::Interface, name: "eth1", device_name: DEVICE_NAME, zone: nil
+    )
   end
 
   let(:interfaces) { [eth0, eth1] }
@@ -48,8 +55,8 @@ describe Y2Firewall::Widgets::InterfacesTable do
     it "returns the list of interfaces" do
       expect(widget.items).to eq(
         [
-          [:eth0, "eth0", "public", "Intel Ethernet Connection I217-LM"],
-          [:eth1, "eth1", "default", "Intel Ethernet Connection I217-LM"]
+          [:eth0, "eth0", "public", DEVICE_NAME],
+          [:eth1, "eth1", "default", DEVICE_NAME]
         ]
       )
     end

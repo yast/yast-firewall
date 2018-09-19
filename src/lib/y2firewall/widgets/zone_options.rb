@@ -29,12 +29,12 @@ module Y2Firewall
       DEFAULT_ZONE_OPTION = ["", "default"].freeze
 
       #@!attribute [r] interface
-      #  @return [Hash] Interface to act on
+      #  @return [Y2Firewall::Firewalld::Interface] Interface to act on
       attr_reader :interface
 
       # Constructor
       #
-      # @param interface [Hash] Interface to act on
+      # @param interface [Y2Firewall::Firewalld::Interface] Interface to act on
       def initialize(interface)
         textdomain "firewall"
         @interface = interface
@@ -42,7 +42,8 @@ module Y2Firewall
 
       # @macro seeAbstractWidget
       def init
-        self.value = @interface["zone"]
+        return unless @interface.zone
+        self.value = @interface.zone.name
       end
 
       # @macro seeAbstractWidget
@@ -58,12 +59,11 @@ module Y2Firewall
       # @macro seeCommonWidget
       def store
         new_zone = selected_zone
-        return if new_zone && new_zone.interfaces.include?(interface["id"])
+        return if new_zone && new_zone.interfaces.include?(interface.name)
 
-        zones.each do |zone|
-          zone.remove_interface(interface["id"])
-        end
-        new_zone.add_interface(interface["id"]) if new_zone
+        old_zone = interface.zone
+        old_zone.remove_interface(interface.name) if old_zone
+        new_zone.add_interface(interface.name) if new_zone
       end
 
     private
