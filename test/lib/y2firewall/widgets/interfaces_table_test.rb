@@ -33,13 +33,15 @@ describe Y2Firewall::Widgets::InterfacesTable do
 
   let(:eth0) do
     instance_double(
-      Y2Firewall::Firewalld::Interface, name: "eth0", device_name: DEVICE_NAME, zone: public_zone
+      Y2Firewall::Firewalld::Interface, id: :eth0, name: "eth0",
+      device_name: DEVICE_NAME, zone: public_zone
     )
   end
 
   let(:eth1) do
     instance_double(
-      Y2Firewall::Firewalld::Interface, name: "eth1", device_name: DEVICE_NAME, zone: nil
+      Y2Firewall::Firewalld::Interface, id: :eth1, name: "eth1",
+      device_name: DEVICE_NAME, zone: nil
     )
   end
 

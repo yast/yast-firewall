@@ -52,7 +52,7 @@ module Y2Firewall
       # @macro seeAbstractWidget
       def init
         interface = Y2Firewall::UIState.instance.row_id
-        if interface && interfaces.map(&:name).include?(interface.to_s)
+        if interface && interfaces.map(&:id).include?(interface)
           self.value = interface
         end
         change_zone_button.interface = selected_interface
@@ -71,7 +71,7 @@ module Y2Firewall
       def items
         interfaces.map do |iface|
           [
-            iface.name.to_sym,
+            iface.id,
             iface.name,
             iface.zone ? iface.zone.name : DEFAULT_ZONE_NAME,
             iface.device_name
@@ -88,7 +88,7 @@ module Y2Firewall
       end
 
       def selected_interface
-        interfaces.find { |i| i.name == value.to_s }
+        interfaces.find { |i| i.id == value }
       end
 
     private
