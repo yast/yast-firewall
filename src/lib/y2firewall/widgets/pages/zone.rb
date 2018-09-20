@@ -203,7 +203,7 @@ module Y2Firewall
         # Constructor
         #
         # @param zone [Y2Firewall::Firewalld::Zone]
-        # @param pager [CWM::TreePager]
+        # @param _pager [CWM::TreePager]
         def initialize(zone, _pager)
           textdomain "firewall"
           @zone = zone

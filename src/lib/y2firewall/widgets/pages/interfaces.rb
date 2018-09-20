@@ -30,7 +30,7 @@ require "y2firewall/widgets/change_zone_button"
 module Y2Firewall
   module Widgets
     module Pages
-      # A page for network interfaces, has {Interface} as subpages
+      # A page for network interfaces
       class Interfaces < CWM::Page
         include Y2Firewall::Helpers::Interfaces
 
