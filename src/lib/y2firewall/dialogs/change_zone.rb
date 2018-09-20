@@ -50,6 +50,11 @@ module Y2Firewall
 
     private
 
+      # @return [Array<Yast::Term>] List of buttons to display
+      def buttons
+        [ok_button, cancel_button]
+      end
+
       # Returns a combobox to select the zone
       #
       # @note The widget is 'memoized'.

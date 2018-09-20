@@ -39,12 +39,12 @@ module Y2Firewall
         @interface = interface
       end
 
-      # @see seeAbstractWidget
+      # @macro seeAbstractWidget
       def label
         _("Change Zone")
       end
 
-      # @see seeAbstractWidget
+      # @macro seeAbstractWidget
       def handle
         return nil unless interface
         result = Dialogs::ChangeZone.run(interface)
