@@ -88,6 +88,16 @@ module Y2Firewall
         zones.find { |z| z.name == value.to_s }
       end
 
+      # @macro seeAbstractWidget
+      def help
+        _(
+          "<p>This is the list of firewall zones. You can designate one of them\n" \
+          "as the <b>default</b> zone by clicking the <b>Set As Default</b> button</p>\n\n" \
+          "<p>If you want to assign a interface to a given zone, just visit the\n" \
+          "<b>Interfaces</b> section.</p>"
+         )
+      end
+
     private
 
       # @return [Y2Firewalld::Widgets::DefaultZoneButton] Button to set a zone as 'default'
