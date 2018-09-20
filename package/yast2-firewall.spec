@@ -28,15 +28,13 @@ License:        GPL-2.0
 BuildRequires:  perl-XML-Writer update-desktop-files yast2-testsuite
 BuildRequires:  yast2-devtools >= 3.1.10
 
-# Extended firewalld API
-# Y2Firewall::Firewalld.instance.current_service_names
-BuildRequires:  yast2 >= 4.0.91
+# Y2Firewall::Firewalld::Interface
+BuildRequires:  yast2 >= 4.0.96
 BuildRequires:  rubygem(%rb_default_ruby_abi:yast-rake)
 BuildRequires:  rubygem(%rb_default_ruby_abi:rspec)
 
-# Extended firewalld API
-# Y2Firewall::Firewalld.instance.current_service_names
-Requires:       yast2 >= 4.0.91
+# Y2Firewall::Firewalld::Interface
+Requires:       yast2 >= 4.0.96
 
 # ButtonBox widget
 Conflicts:	yast2-ycp-ui-bindings < 2.17.3
