@@ -1,50 +1,33 @@
 # encoding: utf-8
 
-# ------------------------------------------------------------------------------
-# Copyright (c) 2018 SUSE LLC
+# Copyright (c) [2018] SUSE LLC
 #
+# All Rights Reserved.
 #
-# This program is free software; you can redistribute it and/or modify it under
-# the terms of version 2 of the GNU General Public License as published by the
-# Free Software Foundation.
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of version 2 of the GNU General Public License as published
+# by the Free Software Foundation.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
 #
-# You should have received a copy of the GNU General Public License along with
-# this program; if not, contact SUSE.
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, contact SUSE LLC.
 #
-# To contact SUSE about this file by physical or electronic mail, you may find
-# current contact information at www.suse.com.
-# ------------------------------------------------------------------------------
+# To contact SUSE LLC about this file by physical or electronic mail, you may
+# find current contact information at www.suse.com.
 
 require "yast"
-require "cwm/widget"
-require "cwm/tree"
 require "cwm/tree_pager"
+require "y2firewall/firewalld"
+require "y2firewall/widgets/overview_tree"
 require "y2firewall/widgets/pages"
 require "y2firewall/helpers/interfaces"
-require "y2firewall/ui_state"
 
 module Y2Firewall
   module Widgets
-    # A tree that is told what its items are.
-    # We need a tree whose items include Pages that point to the OverviewTreePager.
-    class OverviewTree < CWM::Tree
-      def initialize(items)
-        textdomain "firewall"
-        @items = items
-      end
-
-      # @macro seeAbstractWidget
-      def label
-        _("System View")
-      end
-
-      attr_reader :items
-    end
-
     # Widget representing firewall overview pager with tree on left side and rest on right side.
     #
     # It has replace point where it displays more details about selected element in firewall.
@@ -74,6 +57,8 @@ module Y2Firewall
 
       # Overrides default behavior of TreePager to register the new state with
       # {UIState} before jumping to the tree node
+      #
+      # @param page [CWM::Page] Page to switch to
       def switch_page(page)
         UIState.instance.go_to_tree_node(page)
         super
