@@ -81,6 +81,17 @@ module Y2Firewall
         nil
       end
 
+      # @macro seeAbstractWidget
+      def help
+        # TRANSLATORS: %s is the zone label
+        format(
+          _("<p>Select which services you want to allow in the zone <b>%s</b>\n" \
+            "by adding them to the <b>Allowed</b> list (using <b>Add</b> or <b>Add All</b>\n" \
+            "buttons).</p>"),
+          zone.name
+        )
+      end
+
     private
 
       # @!attribute [r] known_svcs_table
