@@ -87,8 +87,22 @@ module Y2Firewall
         nil
       end
 
+      # Returns the selected interface
+      #
+      # @return [Y2Firewall::Firewall::Interface] Interface
       def selected_interface
         interfaces.find { |i| i.id == value }
+      end
+
+      # @macro seeAbstractMethod
+      def help
+        _(
+          "<p>Assign your network devices into firewall zones by selecting the device\n" \
+          "in the table and clicking <b>Change Zone</b>.</p>\n\n" \
+          "<p>If you assign an interface to the <b>default</b> zone, the device\n" \
+          "will be assigned to the firewall's default zone. Visit the <b>Zones</b>\n" \
+          "section to find out (and eventually change) which zone is the default one.</p>"
+        )
       end
 
     private
