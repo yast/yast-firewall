@@ -21,7 +21,7 @@
 
 require "yast"
 require "cwm/dialog"
-require "y2firewall/widgets/overview"
+require "y2firewall/widgets/overview_tree_pager"
 
 Yast.import "Label"
 

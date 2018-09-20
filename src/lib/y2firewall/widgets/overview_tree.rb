@@ -20,7 +20,6 @@
 # ------------------------------------------------------------------------------
 
 require "yast"
-require "cwm/widget"
 require "cwm/tree"
 
 module Y2Firewall
