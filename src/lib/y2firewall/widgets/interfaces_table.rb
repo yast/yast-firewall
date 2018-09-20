@@ -94,7 +94,7 @@ module Y2Firewall
         interfaces.find { |i| i.id == value }
       end
 
-      # @macro seeAbstractMethod
+      # @macro seeAbstractWidget
       def help
         _(
           "<p>Assign your network devices into firewall zones by selecting the device\n" \
