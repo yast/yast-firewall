@@ -89,7 +89,7 @@ module Y2Firewall
 
       # @return [CWM::PagerTreeItem]
       def startup_item
-        page = Pages::Startup.new
+        page = Pages::Startup.new(self)
         CWM::PagerTreeItem.new(page)
       end
 

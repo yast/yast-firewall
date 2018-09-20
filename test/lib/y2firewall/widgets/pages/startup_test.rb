@@ -25,13 +25,14 @@ require "y2firewall/widgets/pages/startup"
 
 describe Y2Firewall::Widgets::Pages::Startup do
   include_examples "CWM::Page"
+  subject(:widget) { described_class.new(double("fake pager")) }
 
   let(:firewalld) { Y2Firewall::Firewalld.instance }
   let(:system_service) { Yast2::SystemService.build(Y2Firewall::Firewalld::SERVICE) }
   let(:service_status) { ::UI::ServiceStatus.new(system_service.service) }
 
   before do
-    allow(subject).to receive(:status_widget).and_return(service_status)
+    allow(widget).to receive(:status_widget).and_return(service_status)
   end
 
   describe "#store" do
@@ -50,7 +51,7 @@ describe Y2Firewall::Widgets::Pages::Startup do
       it "marks the service to be enabled on boot" do
         expect(system_service).to receive(:start_mode=).with(:on_boot)
 
-        subject.store
+        widget.store
       end
     end
 
@@ -58,7 +59,7 @@ describe Y2Firewall::Widgets::Pages::Startup do
       it "marks the service to be enabled manually" do
         expect(system_service).to receive(:start_mode=).with(:manual)
 
-        subject.store
+        widget.store
       end
     end
 
@@ -68,7 +69,7 @@ describe Y2Firewall::Widgets::Pages::Startup do
       it "marks the service to be reloaded after write" do
         expect(system_service).to receive(:reload)
 
-        subject.store
+        widget.store
       end
     end
   end
