@@ -136,8 +136,7 @@ module Y2Firewall
       # A map with the packages that needs to be installed or removed for
       # configuring firewalld properly
       #
-      # @return packages [Hash{String => Array<String>} ] of packages to be
-      # installed or removed
+      # @return [Hash{String => Array<String>} ] of packages to be installed or removed
       def packages
         { "install" => ["firewalld"], "remove" => [] }
       end

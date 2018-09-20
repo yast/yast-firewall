@@ -85,7 +85,7 @@ module Y2Firewall
 
       # Constructor
       #
-      # @param [Hash] AutoYaST profile firewall's section
+      # @param profile [Hash] AutoYaST profile firewall's section
       def initialize(profile)
         textdomain "firewall"
         @profile = profile
@@ -209,7 +209,7 @@ module Y2Firewall
       # Obtain the protocols for the given SuSEFIrewall2 zone name from the
       # profile.
       #
-      # @param zone_name [String]
+      # @param zone [String]
       # @return [Array<String>, nil]
       def protocols(zone)
         protocols = profile["FW_SERVICES_#{zone}_IP"]
@@ -219,7 +219,7 @@ module Y2Firewall
       # Obtain the ports for the given SuSEFIrewall2 zone name from the
       # profile.
       #
-      # @param zone_name [String]
+      # @param zone [String]
       # @return [Array<String>, nil]
       def ports(zone)
         return nil unless rpc_ports(zone) || tcp_ports(zone) || udp_ports(zone)
@@ -230,8 +230,8 @@ module Y2Firewall
       # ones that are known have changed using the corresponding firewalld
       # service name.
       #
-      # @param [Array<String>] list of SuSEFirewall2 services names.
-      # @return [Array<String] list of given services converted to firewalld
+      # @param services [Array<String>] list of SuSEFirewall2 services names.
+      # @return [Array<String>] list of given services converted to firewalld
       # when known.
       def map_services(services)
         services.map do |service|
@@ -242,7 +242,7 @@ module Y2Firewall
       # Obtain the TCP ports for the given SuSEFIrewall2 zone name from the
       # profile.
       #
-      # @param zone_name [String]
+      # @param zone [String]
       # @return [Array<Strint>, nil] list of configured TCP ports; nil if no
       # configured
       def tcp_ports(zone)
@@ -253,7 +253,7 @@ module Y2Firewall
       # Obtain the UDP ports for the given SuSEFIrewall2 zone name from the
       # profile.
       #
-      # @param zone_name [String]
+      # @param zone [String]
       # @return [Array<Strint>, nil] list of configured UDP ports; nil if no
       # configured
       def udp_ports(zone)
@@ -264,9 +264,9 @@ module Y2Firewall
       # Obtain the RPC ports for the given SuSEFIrewall2 zone name from the
       # profile.
       #
-      # @param zone_name [String]
-      # @return [Array<Strint>, nil] list of configured RPC ports; nil if no
-      # configured
+      # @param zone [String]
+      # @return [Array<String>, nil] list of configured RPC ports; nil if no
+      #   configured
       def rpc_ports(zone)
         ports = profile["FW_SERVICES_#{zone}_RPC"]
         ports ? ports.split(" ").map { |p| ["#{p}/udp", "#{p}/tcp"] }.flatten : nil

@@ -496,10 +496,10 @@ module Yast
     # @return [Boolean] whether user accepts the port definition despite the warning.
     #
     # @example
-    #	// maximum port number is 65535, port range
-    #	boolean accepted = ReportWrongPortDefinition(99999, "5:99999");
-    #	// dtto., single port
-    #	boolean whattodo = ReportWrongPortDefinition(78910, "78910");
+    #	  // maximum port number is 65535, port range
+    #   boolean accepted = ReportWrongPortDefinition(99999, "5:99999");
+    #   // dtto., single port
+    #   boolean whattodo = ReportWrongPortDefinition(78910, "78910");
     def ReportWrongPortDefinition(port_nr, port_definition)
       port_err = ""
 
@@ -554,7 +554,7 @@ module Yast
     # Function checks list of ports if they exist (are known).
     #
     # @param [Object] ui_id for the setfocus
-    # @param list <string> of ports to be checked
+    # @param ports [Array<String>] of ports to be checked
     def CheckIfTheyAreAllKnownPorts(ui_id, ports)
       ui_id = deep_copy(ui_id)
       ports = deep_copy(ports)
@@ -978,7 +978,7 @@ module Yast
 
     # Function sets UI for Masquerade Table (and buttons) enabled or disabled
     #
-    # @param	boolean enable
+    # @param usable [Boolean] enable
     def SetMasqueradeTableUsable(usable)
       UI.ChangeWidget(Id("table_redirect_masq"), :Enabled, usable)
       UI.ChangeWidget(Id("add_redirect_to_masquerade"), :Enabled, usable)
@@ -1069,8 +1069,8 @@ module Yast
     # Validates existency of a value in a referenced UI entry
     # and reports error otherwise
     #
-    # @param any UI id
-    # @report boolean if value exists
+    # @param ui_id [String] any UI id
+    # @return [Boolean] true if value exists
     def ValidateExistency(ui_id)
       ui_id = deep_copy(ui_id)
       if UI.QueryWidget(Id(ui_id), :Value) == ""
@@ -1085,7 +1085,7 @@ module Yast
     # Checks whether the referenced UI entry contains a valid
     # port definition and reports an error otherwise
     #
-    # @param any UI id
+    # @param ui_id [String] any UI id
     # @return [Boolean] if entry is valid
     def ValidatePortEntry(ui_id)
       ui_id = deep_copy(ui_id)
@@ -1116,7 +1116,7 @@ module Yast
     # Function checks port number got as parameter.
     # If check fails SetFocus is called and an empty string is returned.
     #
-    # @param any UI id
+    # @param ui_id [String] any UI id
     # @return [Fixnum] port number (or nil)
     def GetPortNumber(ui_id)
       ui_id = deep_copy(ui_id)
@@ -1144,7 +1144,7 @@ module Yast
     # Checks whether the referenced UI entry contains a valid IPv4 or v6
     # and reports error otherwise.
     #
-    # @param any UI id
+    # @param ui_id [String] any UI id
     # @return [Boolean] whether it's valid IP
     def ValidateIPEntry(ui_id)
       ui_id = deep_copy(ui_id)

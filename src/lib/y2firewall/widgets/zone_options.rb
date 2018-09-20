@@ -56,7 +56,7 @@ module Y2Firewall
         [DEFAULT_ZONE_OPTION] + zones.map { |z| [z.name, z.name] }
       end
 
-      # @macro seeCommonWidget
+      # @macro seeAbstractWidget
       def store
         new_zone = selected_zone
         return if new_zone && new_zone.interfaces.include?(interface.name)
