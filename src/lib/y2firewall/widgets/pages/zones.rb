@@ -23,6 +23,7 @@ require "yast"
 require "cwm/page"
 require "y2firewall/firewalld"
 require "y2firewall/widgets/zones_table"
+require "y2firewall/widgets/default_zone_button"
 
 module Y2Firewall
   module Widgets
@@ -47,11 +48,16 @@ module Y2Firewall
           return @contents if @contents
           @contents = VBox(
             Left(Heading(_("Zones"))),
-            ZonesTable.new(firewall.zones)
+            ZonesTable.new(firewall.zones, default_zone_button),
+            firewall.zones.empty? ? Empty() : default_zone_button
           )
         end
 
       private
+
+        def default_zone_button
+          @default_zone_button ||= DefaultZoneButton.new(firewall.zones.first)
+        end
 
         def firewall
           Y2Firewall::Firewalld.instance

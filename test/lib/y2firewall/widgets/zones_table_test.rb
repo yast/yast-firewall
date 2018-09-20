@@ -22,10 +22,38 @@
 require_relative "../../../test_helper.rb"
 require "cwm/rspec"
 require "y2firewall/widgets/zones_table"
+require "y2firewall/widgets/default_zone_button"
+require "y2firewall/firewalld/interface"
 
 describe Y2Firewall::Widgets::ZonesTable do
-  let(:z1) { double("fake zone", name: "zoe", interfaces: []) }
-  subject { described_class.new([z1]) }
+  subject(:widget) { described_class.new([public_zone, dmz_zone], default_zone_button) }
+
+  let(:default_zone_button) do
+    instance_double(Y2Firewall::Widgets::DefaultZoneButton).as_null_object
+  end
+
+  let(:public_zone) do
+    instance_double(Y2Firewall::Firewalld::Zone, name: "public", interfaces: ["eth0", "eth1"])
+  end
+
+  let(:dmz_zone) do
+    instance_double(Y2Firewall::Firewalld::Zone, name: "dmz", interfaces: [])
+  end
+
+  before do
+    allow(Y2Firewall::Firewalld.instance).to receive(:default_zone).and_return(public_zone.name)
+  end
 
   include_examples "CWM::Table"
+
+  describe "#items" do
+    it "returns the list of zones" do
+      expect(widget.items).to eq(
+        [
+          [:public, "public", "eth0, eth1", Yast::UI.Glyph(:CheckMark)],
+          [:dmz, "dmz", "", ""]
+        ]
+      )
+    end
+  end
 end
