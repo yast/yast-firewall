@@ -42,8 +42,8 @@ module Y2Firewall
 
       # @macro seeAbstractWidget
       def init
-        return unless @interface.zone
-        self.value = @interface.zone.name
+        return unless interface.zone
+        self.value = interface.zone.name
       end
 
       # @macro seeAbstractWidget
