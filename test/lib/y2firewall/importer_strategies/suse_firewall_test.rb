@@ -53,7 +53,6 @@ describe Y2Firewall::ImporterStrategies::SuseFirewall do
         "FW_MASQUERADE"         => masquerade,
         "FW_LOG_DROP_CRIT"      => "yes",
         "FW_LOG_DROP_ALL"       => "no",
-        "FW_LOG_ACCEPT_CRIT"    => "no",
         "FW_PROTECT_FROM_INT"   => int_protected
       }
     end

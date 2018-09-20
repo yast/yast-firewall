@@ -25,6 +25,8 @@ require "yast2/popup"
 require "cwm/tree_pager"
 require "y2firewall/dialogs/main"
 
+Yast.import "PackageSystem"
+
 module Y2Firewall
   # YaST "clients" are the CLI entry points
   module Clients
@@ -33,12 +35,14 @@ module Y2Firewall
       include Yast::I18n
       include Yast::Logger
 
+      # Constructor
       def initialize
         textdomain "firewall"
       end
 
       # Runs the client
       def run
+        return :abort unless Yast::PackageSystem.CheckAndInstallPackages(["firewalld"])
         Dialogs::Main.new.run
       end
     end
