@@ -52,7 +52,7 @@ module Yast
 
     # Sets whether summary should be more detailed.
     #
-    # @param boolean show detailed summary
+    # @param set_show [Boolean] show detailed summary
     def SetShowSummaryDetails(set_show)
       @show_summary_details = set_show if set_show != nil
 

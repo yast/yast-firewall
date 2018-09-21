@@ -24,52 +24,44 @@ require "y2firewall/clients/firewall"
 
 describe Y2Firewall::Clients::Firewall do
   describe "#run" do
+    let(:installed) { true }
+    let(:args) { [] }
+    before do
+      allow(Yast::PackageSystem).to receive("CheckAndInstallPackages")
+        .with(["firewalld"]).and_return(installed)
+      allow(Yast::WFM).to receive("Args").and_return(args)
+      allow($stderr).to receive(:puts)
+    end
+
+    context "when the firewalld package is not installed" do
+      let(:installed) { false }
+      it "returns :abort" do
+        expect(subject.run).to eql(:abort)
+      end
+    end
+
     context "when the client is called with some argument" do
-      before do
-        allow(Yast::WFM).to receive("Args").and_return(["list"])
+      let(:args) { ["list"] }
+
+      it "recommends to use the firewalld cmdline clients" do
+        expect($stderr).to receive(:puts).with(Y2Firewall::Clients::Firewall::NOT_SUPPORTED)
+
+        subject.run
       end
 
       it "returns false" do
-
         expect(subject.run).to eql(false)
       end
     end
 
     context "when the client is called without arguments" do
-      before do
-        allow(Yast::WFM).to receive("Args").and_return([])
-        allow(Yast::UI).to receive("TextMode").and_return false
-      end
+      let(:main_dialog) { instance_double("Y2Firewall:::Dialogs::Main", run: true) }
 
-      context "and it is called in TextMode" do
-        before do
-          allow(Yast::UI).to receive("TextMode").and_return true
-        end
+      it "runs the Main dialog" do
+        expect(Y2Firewall::Dialogs::Main).to receive(:new).and_return(main_dialog)
+        expect(main_dialog).to receive(:run)
 
-        it "reports an error" do
-          expect(Yast::Popup).to receive("Error")
-
-          subject.run
-        end
-
-        it "returns false" do
-          allow(Yast::Popup).to receive("Error")
-
-          expect(subject.run).to eq(false)
-        end
-      end
-
-      context "and the firewall-config package is installed" do
-        before do
-          allow(Yast::PackageSystem).to receive("CheckAndInstallPackages")
-            .with(["firewall-config"]).and_return(true)
-        end
-
-        it "runs the firewall-config gui" do
-          expect(Yast::Execute).to receive("locally").with("/usr/bin/firewall-config")
-
-          subject.run
-        end
+        subject.run
       end
     end
   end

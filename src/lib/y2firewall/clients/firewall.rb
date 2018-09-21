@@ -20,6 +20,11 @@
 require "yast"
 require "yast2/execute"
 require "ui/text_helpers"
+require "y2firewall/dialogs/main"
+
+Yast.import "UI"
+Yast.import "Popup"
+Yast.import "PackageSystem"
 
 module Y2Firewall
   module Clients
@@ -34,31 +39,23 @@ module Y2Firewall
 
       # Constructor
       def initialize
-        Yast.import "UI"
-        Yast.import "Popup"
-        Yast.import "PackageSystem"
-
         textdomain "firewall"
       end
 
       # TRANSLATORS: firewall-config and firewall-cmd are the names of software utilities,
       # so they should not be translated.
-      NOT_SUPPORTED = N_("YaST currently does not have a module for configuring" \
-        " firewall. Please, either use \"firewall-config\" to configure your firewall" \
-        " via a user interface or \"firewall-cmd\" for the command line.").freeze
+      NOT_SUPPORTED = N_("YaST does not support the command line for " \
+        "configuring the firewall.\nInstead, please use the firewalld " \
+        "command line clients \"firewalld-cmd\" or \"firewall-offline-cmd\".")
 
       def run
         log_and_return do
+          return :abort unless Yast::PackageSystem.CheckAndInstallPackages(["firewalld"])
           if !Yast::WFM.Args.empty?
-            $stderr.puts wrap_text(_(NOT_SUPPORTED))
+            $stderr.puts _(NOT_SUPPORTED)
             false
-          elsif Yast::UI.TextMode()
-            Yast::Popup.Error(
-              wrap_text(_(NOT_SUPPORTED))
-            )
-            false
-          elsif Yast::PackageSystem.CheckAndInstallPackages(["firewall-config"])
-            Yast::Execute.locally("/usr/bin/firewall-config")
+          else
+            Dialogs::Main.new.run
           end
         end
       end

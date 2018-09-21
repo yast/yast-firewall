@@ -31,9 +31,9 @@ module Y2Firewall
     include Yast::Logger
     # Import the given configuration
     #
-    # @param [Hash] AutoYaST profile firewall's section
+    # @param profile [Hash] AutoYaST profile firewall's section
     # @return [true,nil] return true if success; return nil if the given
-    # profile is empty
+    #   profile is empty
     def import(profile)
       return if profile.empty?
 
@@ -61,9 +61,9 @@ module Y2Firewall
     #
     #   importer.strategy_for(profile)            #=> Y2Firewall::ImporterStrategies::Firewalld
     #
-    # @param [Hash] AutoYaST profile firewall's section
+    # @param profile [Hash] AutoYaST profile firewall's section
     # @return [ImporterStrategies::SuseFirewall,ImporterStrategies::Firewalld]
-    # the importer strategy to be used for importing.
+    #   the importer strategy to be used for importing.
     def strategy_for(profile)
       return ImporterStrategies::SuseFirewall if profile.any? { |k, _v| k.start_with?("FW_") }
 

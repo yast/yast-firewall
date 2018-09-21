@@ -34,7 +34,7 @@ module Y2Firewall
 
       # Constructor
       #
-      # @param [Hash] AutoYaST profile firewall's section
+      # @param profile [Hash] AutoYaST profile firewall's section
       def initialize(profile = {})
         @profile = profile
       end
@@ -65,7 +65,7 @@ module Y2Firewall
       # Configures Y2Firewall::Firewalld::Zone that correspond with the
       # profile's firewall zone definition
       #
-      # @param [Hash] AutoYaST profile firewall's section
+      # @param zone_definition [Hash] AutoYaST profile firewall's section
       # @return [Boolean] true if the zone exist; nil otherwise
       def process_zone(zone_definition)
         zone = firewalld.find_zone(zone_definition["name"])

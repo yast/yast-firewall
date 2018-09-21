@@ -6,6 +6,10 @@ require "y2firewall/clients/installation_finish"
 Yast.import "Service"
 
 describe Y2Firewall::Clients::InstallationFinish do
+  before do
+    allow_any_instance_of(Y2Firewall::Firewalld::Api).to receive(:running?).and_return(false)
+  end
+
   let(:proposal_settings) { Y2Firewall::ProposalSettings.instance }
   let(:firewalld) { Y2Firewall::Firewalld.instance }
 

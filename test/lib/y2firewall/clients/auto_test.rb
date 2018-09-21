@@ -27,6 +27,7 @@ describe Y2Firewall::Clients::Auto do
   let(:importer) { double("Y2Firewall::Importer", import: true) }
 
   before do
+    allow_any_instance_of(Y2Firewall::Firewalld::Api).to receive(:running?).and_return(false)
     subject.class.imported = false
     allow(firewalld).to receive(:read)
     allow(firewalld).to receive(:installed?).and_return(true)
