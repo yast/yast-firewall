@@ -34,8 +34,8 @@ module Y2Firewall
         textdomain "firewall"
         @zone = zone
         self.widget_id = "allowed_services"
-        @known_svcs_table = ServicesTable.new(widget_id: "known:#{zone.name}")
-        @allowed_svcs_table = ServicesTable.new(widget_id: "allowed:#{zone.name}")
+        @known_services_table = ServicesTable.new(widget_id: "known:#{zone.name}")
+        @allowed_services_table = ServicesTable.new(widget_id: "allowed:#{zone.name}")
         refresh_services
       end
 
@@ -52,12 +52,12 @@ module Y2Firewall
           HBox(
             VBox(
               Left(Label(_("Known"))),
-              known_svcs_table
+              known_services_table
             ),
             VBox(*add_remove_buttons),
             VBox(
               Left(Label(_("Allowed"))),
-              allowed_svcs_table
+              allowed_services_table
             )
           )
         )
@@ -94,19 +94,19 @@ module Y2Firewall
 
     private
 
-      # @!attribute [r] known_svcs_table
+      # @!attribute [r] known_services_table
       #   @return [ServicesTable]
       #
-      # @!attribute [r] allowed_svcs_table
+      # @!attribute [r] allowed_services_table
       #   @return [ServiceTable]
       #
       # @!attribute [r] zone
       #   @return [Y2Firewall::Firewalld::Zone]
-      attr_reader :known_svcs_table, :allowed_svcs_table, :zone
+      attr_reader :known_services_table, :allowed_services_table, :zone
 
       # Adds a service to the list of allowed ones
       def add_service
-        known_svcs_table.selected_services.each { |s| zone.add_service(s) }
+        known_services_table.selected_services.each { |s| zone.add_service(s) }
       end
 
       def add_all_services
@@ -115,7 +115,7 @@ module Y2Firewall
 
       # Removes a service from the list of allowed ones
       def remove_service
-        allowed_svcs_table.selected_services.each { |s| zone.remove_service(s) }
+        allowed_services_table.selected_services.each { |s| zone.remove_service(s) }
       end
 
       def remove_all_services
@@ -124,8 +124,8 @@ module Y2Firewall
 
       # Refresh the content of the services tables
       def refresh_services
-        known_svcs_table.services = (firewall.current_service_names - zone.services)
-        allowed_svcs_table.services = zone.services.clone
+        known_services_table.services = (firewall.current_service_names - zone.services)
+        allowed_services_table.services = zone.services.clone
       end
 
       # Return a list of buttons to add/remove elements

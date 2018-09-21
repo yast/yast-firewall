@@ -82,7 +82,7 @@ module Y2Firewall
 
       # @macro seeAbstractWidget
       def handle(event)
-        return nil unless my_event?(event) && event["EventReason"] == "SelectionChanged"
+        return nil unless event["EventReason"] == "SelectionChanged"
         UIState.instance.select_row(value)
         default_zone_button.zone = selected_zone
         nil

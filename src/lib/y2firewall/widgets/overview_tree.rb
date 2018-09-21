@@ -41,7 +41,7 @@ module Y2Firewall
 
       # @macro seeAbstractWidget
       def label
-        _("System View")
+        ""
       end
     end
   end
