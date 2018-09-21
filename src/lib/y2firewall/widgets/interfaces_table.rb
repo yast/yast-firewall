@@ -42,6 +42,7 @@ module Y2Firewall
         textdomain "firewall"
         @interfaces = interfaces
         @change_zone_button = change_zone_button
+        self.widget_id = "interfaces_table"
       end
 
       # @macro seeAbstractWidget
@@ -81,7 +82,7 @@ module Y2Firewall
 
       # @macro seeAbstractWidget
       def handle(event)
-        return nil unless event["EventReason"] == "SelectionChanged"
+        return nil unless my_event?(event) && event["EventReason"] == "SelectionChanged"
         UIState.instance.select_row(value)
         change_zone_button.interface = selected_interface
         nil
