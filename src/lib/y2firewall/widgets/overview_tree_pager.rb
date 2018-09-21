@@ -47,11 +47,7 @@ module Y2Firewall
         [
           startup_item,
           interfaces_item,
-          zones_item,
-          # masquerade_item,
-          # broadcast_item,
-          # logging_item,
-          # custom_rules_item
+          zones_item
         ]
       end
 

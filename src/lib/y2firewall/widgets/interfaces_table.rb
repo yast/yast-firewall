@@ -27,7 +27,9 @@ module Y2Firewall
   module Widgets
     # A table with all {Y2Firewall::Firewalld::Interface}s.
     class InterfacesTable < ::CWM::Table
-      DEFAULT_ZONE_NAME = "default".freeze
+      extend Yast::I18n
+
+      DEFAULT_ZONE_NAME = N_("default").freeze
 
       # @!attribute [r] interfaces
       #   @return [Array<Y2Firewall::Firewalld::Interface>] Interfaces
@@ -73,7 +75,7 @@ module Y2Firewall
           [
             iface.id,
             iface.name,
-            iface.zone ? iface.zone.name : DEFAULT_ZONE_NAME,
+            iface.zone ? iface.zone.name : _(DEFAULT_ZONE_NAME),
             iface.device_name
           ]
         end

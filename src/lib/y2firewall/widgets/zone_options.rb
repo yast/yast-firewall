@@ -26,7 +26,9 @@ module Y2Firewall
   module Widgets
     # ComboBox which allows to select a zone
     class ZoneOptions < ::CWM::ComboBox
-      DEFAULT_ZONE_OPTION = ["", "default"].freeze
+      extend Yast::I18n
+
+      DEFAULT_ZONE_NAME = N_("default").freeze
 
       # @!attribute [r] interface
       #  @return [Y2Firewall::Firewalld::Interface] Interface to act on
@@ -53,7 +55,7 @@ module Y2Firewall
 
       # @see CWM::ComboBox#items
       def items
-        [DEFAULT_ZONE_OPTION] + zones.map { |z| [z.name, z.name] }
+        [default_zone_option] + zones.map { |z| [z.name, z.name] }
       end
 
       # @macro seeAbstractWidget
@@ -83,6 +85,13 @@ module Y2Firewall
       def selected_zone
         return nil if value.empty?
         Y2Firewall::Firewalld.instance.find_zone(value)
+      end
+
+      # Returns the option for the default zone
+      #
+      # @return [Array<String>]
+      def default_zone_option
+        ["", _(DEFAULT_ZONE_NAME)]
       end
     end
   end
