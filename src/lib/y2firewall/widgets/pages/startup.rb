@@ -38,7 +38,7 @@ module Y2Firewall
 
         # @macro seeAbstractWidget
         def label
-          _("Startup")
+          _("Start-Up")
         end
 
         # @macro seeCustomWidget
