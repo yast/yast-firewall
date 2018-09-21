@@ -73,8 +73,6 @@ rm -f $RPM_BUILD_ROOT/%{yast_docdir}/COPYING
 %defattr(-,root,root)
 %{yast_dir}/clients/*.rb
 %{yast_dir}/lib
-%{yast_dir}/include
-%{yast_dir}/modules
 %{yast_desktopdir}/*.desktop
 %{yast_schemadir}/autoyast/rnc/firewall.rnc
 
