@@ -91,11 +91,17 @@ module Y2Firewall
       # @macro seeAbstractWidget
       def help
         _(
-          "<p>This is the list of firewall zones. You can designate one of them\n" \
-          "as the <b>default</b> zone by clicking the <b>Set As Default</b> button</p>\n\n" \
-          "<p>If you want to assign a interface to a given zone, just visit the\n" \
+          "<p>A network zone defines the level of trust for network connections.</p>\n" \
+          "<p>You can designate one of them as the <b>default</b> zone by clicking the\n" \
+          "<b>Set As Default</b> button.</p>\n\n" \
+          "<p>In the <b>Interfaces</b> column you see which interfaces are assigned\n" \
+          "to a given zone. Bear in mind that, for the zone which is set as the default\n" \
+          "one, you will see the interfaces that are implicitly assigned to it, i.e.,\n" \
+          "those interfaces that are not assigned explicitly to that zone but to the\n" \
+          "default one.</p>\n\n" \
+          "<p>If you want to assign an interface to a given zone, just visit the\n" \
           "<b>Interfaces</b> section.</p>"
-         )
+        )
       end
 
     private
