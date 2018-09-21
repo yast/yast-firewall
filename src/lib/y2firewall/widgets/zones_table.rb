@@ -108,7 +108,7 @@ module Y2Firewall
       def assigned_interfaces(zone)
         assigned = zone.interfaces.clone
         assigned += interfaces.reject(&:zone).map(&:name) if default_zone?(zone)
-        assigned
+        assigned.sort
       end
 
       # Returns the default zone
