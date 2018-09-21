@@ -31,6 +31,8 @@ module Y2Firewall
       # A page for firewall zones:
       #   contains {ZonesTable}, has {Zone} as subpages.
       class Zones < CWM::Page
+        include Y2Firewall::Helpers::Interfaces
+
         # Constructor
         #
         # @param _pager [CWM::TreePager]
@@ -48,7 +50,7 @@ module Y2Firewall
           return @contents if @contents
           @contents = VBox(
             Left(Heading(_("Zones"))),
-            ZonesTable.new(firewall.zones, default_zone_button),
+            ZonesTable.new(firewall.zones, known_interfaces, default_zone_button),
             firewall.zones.empty? ? Empty() : default_zone_button
           )
         end

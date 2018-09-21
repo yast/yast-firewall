@@ -26,18 +26,34 @@ require "y2firewall/widgets/default_zone_button"
 require "y2firewall/firewalld/interface"
 
 describe Y2Firewall::Widgets::ZonesTable do
-  subject(:widget) { described_class.new([public_zone, dmz_zone], default_zone_button) }
+  subject(:widget) do
+    described_class.new(
+      [public_zone, dmz_zone], [eth0, eth1, eth2], default_zone_button
+    )
+  end
 
   let(:default_zone_button) do
     instance_double(Y2Firewall::Widgets::DefaultZoneButton).as_null_object
   end
 
   let(:public_zone) do
-    instance_double(Y2Firewall::Firewalld::Zone, name: "public", interfaces: ["eth0", "eth1"])
+    instance_double(Y2Firewall::Firewalld::Zone, name: "public", interfaces: ["eth0"])
   end
 
   let(:dmz_zone) do
-    instance_double(Y2Firewall::Firewalld::Zone, name: "dmz", interfaces: [])
+    instance_double(Y2Firewall::Firewalld::Zone, name: "dmz", interfaces: ["eth1"])
+  end
+
+  let(:eth0) do
+    instance_double(Y2Firewall::Firewalld::Interface, name: "eth0", zone: double("zone"))
+  end
+
+  let(:eth1) do
+    instance_double(Y2Firewall::Firewalld::Interface, name: "eth1", zone: double("zone"))
+  end
+
+  let(:eth2) do
+    instance_double(Y2Firewall::Firewalld::Interface, name: "eth2", zone: nil)
   end
 
   before do
@@ -50,8 +66,8 @@ describe Y2Firewall::Widgets::ZonesTable do
     it "returns the list of zones" do
       expect(widget.items).to eq(
         [
-          [:public, "public", "eth0, eth1", Yast::UI.Glyph(:CheckMark)],
-          [:dmz, "dmz", "", ""]
+          [:public, "public", "eth0 eth2", Yast::UI.Glyph(:CheckMark)],
+          [:dmz, "dmz", "eth1", ""]
         ]
       )
     end
