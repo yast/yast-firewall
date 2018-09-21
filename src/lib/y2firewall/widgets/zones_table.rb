@@ -20,6 +20,7 @@
 # find current contact information at www.suse.com.
 
 require "cwm/table"
+require "y2firewall/ui_state"
 
 module Y2Firewall
   module Widgets
@@ -43,6 +44,7 @@ module Y2Firewall
         @zones = zones
         @interfaces = interfaces
         @default_zone_button = default_zone_button
+        self.widget_id = "zones_table"
       end
 
       # @macro seeAbstractWidget

@@ -107,7 +107,7 @@ describe Y2Firewall::Widgets::InterfacesTable do
 
   describe "#handle" do
     context "when the selection is changed" do
-      let(:event) { { "EventReason" => "SelectionChanged" } }
+      let(:event) { { "ID" => "interfaces_table", "EventReason" => "SelectionChanged" } }
 
       before do
         allow(widget).to receive(:value).and_return(:eth1)
@@ -125,7 +125,7 @@ describe Y2Firewall::Widgets::InterfacesTable do
     end
 
     context "when the selection is not changed" do
-      let(:event) { { "EventReason" => "Whatever" } }
+      let(:event) { { "ID" => "interfaces_table", "EventReason" => "Whatever" } }
 
       it "does not select the current row in the UI state" do
         expect(Y2Firewall::UIState.instance).to_not receive(:select_row)
@@ -133,6 +133,4 @@ describe Y2Firewall::Widgets::InterfacesTable do
       end
     end
   end
-
-  describe "#selected_interface"
 end

@@ -72,4 +72,58 @@ describe Y2Firewall::Widgets::ZonesTable do
       )
     end
   end
+
+  describe "#init" do
+    before do
+      allow(Y2Firewall::UIState.instance).to receive(:row_id).and_return(row_id)
+      allow(widget).to receive(:value).and_return(nil)
+    end
+
+    context "when no row has been visited previously" do
+      let(:row_id) { nil }
+
+      it "does not select any specific row" do
+        expect(widget).to_not receive(:value=)
+        widget.init
+      end
+    end
+
+    context "when a row has been visited" do
+      let(:row_id) { :dmz }
+
+      it "does selects the visited row" do
+        expect(widget).to receive(:value=).with(:dmz)
+        widget.init
+      end
+    end
+  end
+
+  describe "#handle" do
+    context "when the selection is changed" do
+      let(:event) { { "ID" => "zones_table", "EventReason" => "SelectionChanged" } }
+
+      before do
+        allow(widget).to receive(:value).and_return(:dmz)
+      end
+
+      it "selects the current row in the UI state" do
+        expect(Y2Firewall::UIState.instance).to receive(:select_row).with(:dmz)
+        widget.handle(event)
+      end
+
+      it "updates the button to set the default zone" do
+        expect(default_zone_button).to receive(:zone=).with(dmz_zone)
+        widget.handle(event)
+      end
+    end
+
+    context "when the selection is not changed" do
+      let(:event) { { "ID" => "zones_table", "EventReason" => "Whatever" } }
+
+      it "does not select the current row in the UI state" do
+        expect(Y2Firewall::UIState.instance).to_not receive(:select_row)
+        widget.handle(event)
+      end
+    end
+  end
 end
