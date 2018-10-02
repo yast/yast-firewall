@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Tue Oct  2 11:52:27 UTC 2018 - knut.anderssen@suse.com
+
+- AutoYast schema:
+  - Allowed the new 'description', 'short' and 'target' elements in
+    zone entries (bsc#1108199)
+- 4.0.28
+
+-------------------------------------------------------------------
 Fri Sep 21 13:26:02 UTC 2018 - igonzalezsosa@suse.com
 
 - Add a new user interface to manage firewalld configuration

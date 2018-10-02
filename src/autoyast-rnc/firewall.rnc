@@ -126,6 +126,9 @@ zones =
     LIST,
     element (zone | listentry) {
       zone_name &
+      zone_short? &
+      zone_description? &
+      zone_target? &
       fwd_interfaces? &
       fwd_services? &
       fwd_ports? &
@@ -166,6 +169,9 @@ fwd_sources =
   }
 
 zone_name = element name { text }
+zone_short = element short { text }
+zone_description = element description { text }
+zone_target = element target { text }
 default_zone = element default_zone { text }
 masquerade = element masquerade { BOOLEAN }
 log_denied_packets = element log_denied_packets { text }
