@@ -58,6 +58,7 @@ module Y2Firewall
       private
 
         def default_zone_button
+          return nil if firewall.zones.empty?
           @default_zone_button ||= DefaultZoneButton.new(firewall.zones.first)
         end
 

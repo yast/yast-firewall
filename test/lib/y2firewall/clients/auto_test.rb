@@ -34,26 +34,21 @@ describe Y2Firewall::Clients::Auto do
     allow(subject).to receive(:importer).and_return(importer)
   end
 
-  describe "#zone_summary" do
-    it "empty zone returns empty description" do
-      summary = subject.send(:zone_summary, Y2Firewall::Firewalld::Zone.new(name: "test_zone"))
-
-      expect(summary).to be_empty
-    end
-  end
-
   describe "#summary" do
-    context "when firewalld is not installed" do
-      before(:each) do
-        allow(firewalld).to receive(:installed?).and_return(false)
-      end
+    let(:installed) { false }
 
+    before do
+      allow(firewalld).to receive(:installed?).and_return(installed)
+    end
+
+    context "when firewalld is not installed" do
       it "reports when firewalld is not available" do
         expect(subject.summary).to match(/not available/)
       end
     end
 
     context "when firewalld is installed" do
+      let(:installed) { true }
       let(:relations_stub) do
         {
           interfaces: ["eth0", "eth1"],
@@ -63,50 +58,73 @@ describe Y2Firewall::Clients::Auto do
         }
       end
 
-      before(:each) do
-        zones = []
-        relations_stub.each_pair do |relation, values|
-          zone = Y2Firewall::Firewalld::Zone.new(name: "zone_#{relation}")
-          allow(zone).to receive(relation).and_return(values)
-          zones << zone
+      context "but no modified yet" do
+        it "reports a not configured summary" do
+          firewalld.reset
+          expect(subject.summary).to match(/Not configured/)
         end
-
-        allow(firewalld).to receive(:zones).and_return(zones)
       end
 
-      it "builds a summary when firewall is installed" do
-        allow(firewalld).to receive(:read).and_return(true)
+      context "and the configuration has been modified" do
+        before do
+          zones = []
+          relations_stub.each_pair do |relation, values|
+            zone = Y2Firewall::Firewalld::Zone.new(name: "zone_#{relation}")
+            allow(zone).to receive(relation).and_return(values)
+            zones << zone
+          end
+          firewalld.zones = zones
+          subject.modified
+        end
 
-        expect(firewalld).to receive(:installed?).and_return(true)
-        expect(firewalld).to receive(:default_zone).and_return("public")
+        it "builds a summary" do
+          summary = subject.summary
 
-        summary = subject.summary
+          # general stuff
+          expect(summary).to match(/Default zone/)
+          expect(summary).to match(/Defined zones/)
 
-        # general stuff
-        expect(summary).to match(/Running/)
-        expect(summary).to match(/Enabled/)
-        expect(summary).to match(/Default zone/)
-        expect(summary).to match(/Defined zones/)
-
-        # zone details
-        relations_stub.each_pair do |_relation, values|
-          values.each { |value| expect(summary).to match(/#{value}/) }
+          # zone details
+          relations_stub.each_pair do |_relation, values|
+            values.each { |value| expect(summary).to match(/#{value}/) }
+          end
         end
       end
     end
   end
 
   describe "#read" do
-    it "reads the current firewalld configuration if firewalld is installed" do
-      expect(firewalld).to receive(:installed?).and_return(true)
-      expect(firewalld).to receive(:read)
+    before do
+      allow(firewalld).to receive(:installed?).and_return(true)
+    end
 
-      subject.read
+    it "returns false if firewalld is not installed" do
+      allow(firewalld).to receive(:installed?).and_return(false)
+      expect(subject.read).to eql(false)
+    end
+
+    context "when a force read is required" do
+      it "always reads the current configuration" do
+        expect(firewalld).to receive(:read)
+
+        subject.read
+      end
+    end
+
+    context "when a read is not forced" do
+      it "only reads the current configuration if has not beenn read before" do
+        expect(firewalld).to receive(:read?).and_return(true, false)
+        expect(firewalld).to receive(:read)
+        subject.read(force: false)
+        expect(firewalld).to_not receive(:read)
+        subject.read(force: false)
+      end
     end
   end
 
   describe "#import" do
     let(:i_list) { double("IssuesList", add: nil) }
+    let(:read?) { false }
 
     let(:arguments) do
       { "FW_MASQUERADE"   => "yes",
@@ -114,30 +132,58 @@ describe Y2Firewall::Clients::Auto do
         "start_firewall"  => false }
     end
 
-    it "reads the current firewalld configuration" do
-      expect(firewalld).to receive(:read)
-
-      subject.import(arguments)
+    before do
+      allow(subject).to receive(:read).and_return(read?)
+      allow(Yast::AutoInstall).to receive(:issues_list).and_return(i_list)
     end
 
-    context "when the current configuration was read correctly" do
-      before do
-        allow(firewalld).to receive(:read).and_return(true)
-        allow(Yast::AutoInstall).to receive(:issues_list).and_return(i_list)
+    it "saves the profile being imported for reusing it if needed" do
+      subject.class.profile = nil
+      subject.import(arguments, true)
+      expect(subject.class.profile).to eq(arguments)
+    end
+
+    context "when a merge with the current configuration is requested" do
+      it "reads the current configuration if has not been read before" do
+        expect(subject).to receive(:read).and_return(read?)
+        subject.import(arguments, true)
       end
 
-      it "pass its arguments to the firewalld importer" do
+      context "and the read fails" do
+        it "returns false" do
+          expect(subject).to receive(:read).and_return(read?)
+          expect(subject.import(arguments, true)).to eql(false)
+        end
+
+        it "does not mark the importation as done or completed" do
+          expect(subject).to receive(:read).and_return(read?)
+          subject.import(arguments, true)
+          expect(subject.class.imported).to eq(false)
+        end
+      end
+    end
+
+    context "when a merge is not requested" do
+      it "does not read the current firewalld configuration" do
+        expect(subject).to_not receive(:read)
+
+        subject.import(arguments, false)
+      end
+    end
+
+    context "once the current configuration has been set" do
+      it "imports the given profile" do
         expect(importer).to receive(:import).with(arguments)
 
-        subject.import(arguments)
+        subject.import(arguments, false)
       end
 
       it "returns true if import success" do
-        expect(subject.import(arguments)).to eq(true)
+        expect(subject.import(arguments, false)).to eq(true)
       end
 
       it "marks the importation as done" do
-        subject.import(arguments)
+        subject.import(arguments, false)
         expect(subject.class.imported).to eq(true)
       end
 
@@ -149,20 +195,7 @@ describe Y2Firewall::Clients::Auto do
           .with(:invalid_value, "firewall", "interfaces",
             "eth0",
             "This interface has been defined for more than one zone.")
-        subject.import(arguments)
-      end
-    end
-
-    context "when the current configuration was not read" do
-      it "returns false" do
-        expect(firewalld).to receive(:read).and_return(false)
-        expect(subject.import(arguments)).to eq(false)
-      end
-
-      it "does not mark the importation as done or completed" do
-        expect(firewalld).to receive(:read).and_return(false)
-        subject.import(arguments)
-        expect(subject.class.imported).to eq(false)
+        subject.import(arguments, false)
       end
     end
   end
@@ -179,10 +212,20 @@ describe Y2Firewall::Clients::Auto do
   end
 
   describe "#reset" do
-    it "import empty hash to set defaults" do
-      expect(importer).to receive(:import).with({})
+    let(:arguments) do
+      {
+        "default_zone"       => "dmz",
+        "log_denied_packets" => "unicast",
+        "zones"              => [{ "name" => "external", "interfaces" => ["eth0", "eth2"] }]
+      }
+    end
 
+    it "resets the firewalld current configuration to the defaults" do
+      subject.import(arguments, false)
+      firewalld.default_zone = "dmz"
       subject.reset
+      expect(firewalld.default_zone).to eq("public")
+      expect(firewalld.zones).to be_empty
     end
   end
 
@@ -191,13 +234,42 @@ describe Y2Firewall::Clients::Auto do
       { "FW_MASQUERADE" => "yes", "enable_firewall" => false, "start_firewall" => false }
     end
 
+    let(:known_zones) { %w(dmz external) }
+    let(:known_services) { %w(http https samba ssh) }
+
+    let(:zones_definition) do
+      ["dmz",
+       "  target: default",
+       "  interfaces: ",
+       "  ports: ",
+       "  protocols:",
+       "  sources:",
+       "",
+       "external (active)",
+       "  target: default",
+       "  interfaces: eth0",
+       "  services: ssh samba",
+       "  ports: 5901/tcp 5901/udp",
+       "  protocols:",
+       "  sources:"]
+    end
+
+    let(:api) do
+      instance_double(Y2Firewall::Firewalld::Api,
+        log_denied_packets: "off",
+        default_zone:       "dmz",
+        list_all_zones:     zones_definition,
+        zones:              known_zones,
+        services:           known_services)
+    end
+
     it "returns false if firewalld is not installed" do
       expect(firewalld).to receive(:installed?).and_return(false)
 
       expect(subject.write).to eq(false)
     end
 
-    it "tries to import again the profile if it was not imported" do
+    it "tries to import again the profile if needed" do
       allow(subject.class).to receive(:profile).and_return(arguments)
       expect(subject).to receive(:import).with(arguments).and_return(false)
 
@@ -205,19 +277,43 @@ describe Y2Firewall::Clients::Auto do
     end
 
     it "writes the imported configuration" do
-      allow(subject.class).to receive(:imported).and_return(true)
+      firewalld.default_zone = "drop"
+      allow(subject).to receive(:imported?).and_return(true)
       allow(subject).to receive(:activate_service)
+      allow(subject).to receive(:import_if_needed)
       expect(firewalld).to receive(:write)
 
       subject.write
     end
 
-    it "activates or deactives the firewalld service based on the profile" do
-      allow(subject.class).to receive(:imported).and_return(true)
-      expect(firewalld).to receive(:write)
-      expect(subject).to receive(:activate_service)
+    context "when the write is called from the AutoYaST configuration" do
+      before do
+        allow(firewalld).to receive("api").and_return api
+        allow(firewalld).to receive(:write)
+        allow(firewalld).to receive(:running?)
+        allow(firewalld).to receive(:enabled?)
+      end
 
-      subject.write
+      it "maintains the same configuration than before the write" do
+        subject.class.ay_config = true
+        firewalld.default_zone = "dmz"
+        firewalld.zones = []
+        expect(subject).to receive(:read).and_call_original
+        subject.write
+        expect(firewalld.default_zone).to eql("dmz")
+        expect(firewalld.zones).to be_empty
+      end
+    end
+
+    context "when the writes is not called from the AutoYaST configuration" do
+      it "activates or deactives the firewalld service based on the profile" do
+        subject.class.ay_config = nil
+        allow(subject.class).to receive(:imported).and_return(true)
+        expect(firewalld).to receive(:write)
+        expect(subject).to receive(:activate_service)
+
+        subject.write
+      end
     end
   end
 end
