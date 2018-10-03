@@ -20,8 +20,9 @@
 # ------------------------------------------------------------------------------
 
 # Set the paths
-src_path = File.expand_path("../../src", __FILE__)
-ENV["Y2DIR"] = src_path
+srcdir = File.expand_path("../../src", __FILE__)
+y2dirs = ENV.fetch("Y2DIR", "").split(":")
+ENV["Y2DIR"] = y2dirs.unshift(srcdir).join(":")
 
 require "yast"
 require "yast/rspec"
@@ -35,19 +36,22 @@ end
 # stub classes from other modules to speed up a build
 stub_module("AutoInstall")
 
+# some tests have translatable messages
+ENV["LANG"] = "en_US.UTF-8"
+
 if ENV["COVERAGE"]
   require "simplecov"
   SimpleCov.start do
     add_filter "/test/"
   end
 
-  # for coverage we need to load all ruby files
-  Dir["#{src_path}/{modules,lib}/**/*.rb"].each { |f| require_relative f }
+  # track all ruby files under src
+  SimpleCov.track_files("#{srcdir}/**/*.rb")
 
   # use coveralls for on-line code coverage reporting at Travis CI
   if ENV["TRAVIS"]
     require "coveralls"
-    SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
+    SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new [
       SimpleCov::Formatter::HTMLFormatter,
       Coveralls::SimpleCov::Formatter
     ]

@@ -17,7 +17,7 @@
 
 
 Name:           yast2-firewall
-Version:        4.0.26
+Version:        4.0.28
 Release:        0
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
@@ -28,13 +28,13 @@ License:        GPL-2.0-only
 BuildRequires:  perl-XML-Writer update-desktop-files yast2-testsuite
 BuildRequires:  yast2-devtools >= 3.1.10
 
-# Firewalld read?
-BuildRequires:  yast2 >= 4.0.45
+# Y2Firewall::Firewalld::Interface
+BuildRequires:  yast2 >= 4.1.17
 BuildRequires:  rubygem(%rb_default_ruby_abi:yast-rake)
 BuildRequires:  rubygem(%rb_default_ruby_abi:rspec)
 
-# Firewalld - extended API
-Requires:       yast2 >= 4.0.49
+# Y2Firewall::Firewalld::Interface
+Requires:       yast2 >= 4.1.17
 
 # ButtonBox widget
 Conflicts:	yast2-ycp-ui-bindings < 2.17.3
