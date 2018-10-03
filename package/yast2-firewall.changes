@@ -1,4 +1,25 @@
 -------------------------------------------------------------------
+Tue Oct  2 11:52:27 UTC 2018 - knut.anderssen@suse.com
+
+- AutoYast schema:
+  - Allowed the new 'description', 'short' and 'target' elements in
+    zone entries (bsc#1108199)
+- 4.0.28
+
+-------------------------------------------------------------------
+Fri Sep 21 13:26:02 UTC 2018 - igonzalezsosa@suse.com
+
+- Add a new user interface to manage firewalld configuration
+  (fate#324662).
+- Supported featues:
+  - Manage the firewalld service.
+  - Browse interfaces and assign them to firewall zones.
+  - List zones and design one of them as the default.
+  - Assign services to zones.
+  - Open ports.
+- 4.0.27
+
+-------------------------------------------------------------------
 Mon Aug 20 16:21:38 CEST 2018 - schubi@suse.de
 
 - Switched license in spec file from SPDX2 to SPDX3 format.
