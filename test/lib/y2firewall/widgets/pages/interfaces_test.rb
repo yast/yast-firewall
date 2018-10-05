@@ -31,12 +31,18 @@ describe Y2Firewall::Widgets::Pages::Interfaces do
   include_examples "CWM::Page"
 
   describe "#contents" do
-    let(:interfaces) do
+    let(:known_interfaces) do
       [Y2Firewall::Firewalld::Interface.new("eth0")]
     end
 
+    let(:unknown_interfaces) do
+      [Y2Firewall::Firewalld::Interface.new("virbr0")]
+    end
+
+    let(:interfaces) { known_interfaces + unknown_interfaces }
+
     before do
-      allow(widget).to receive(:known_interfaces).and_return(interfaces)
+      allow(widget).to receive(:interfaces).and_return(interfaces)
     end
 
     it "builds a interfaces table containing known interfaces" do
