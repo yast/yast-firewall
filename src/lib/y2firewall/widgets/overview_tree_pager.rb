@@ -26,6 +26,8 @@ require "y2firewall/widgets/overview_tree"
 require "y2firewall/widgets/pages"
 require "y2firewall/helpers/interfaces"
 
+Yast.import "Mode"
+
 module Y2Firewall
   module Widgets
     # Widget representing firewall overview pager with tree on left side and rest on right side.
@@ -48,7 +50,7 @@ module Y2Firewall
           startup_item,
           interfaces_item,
           zones_item
-        ]
+        ].compact
       end
 
       # Overrides default behavior of TreePager to register the new state with
@@ -70,6 +72,7 @@ module Y2Firewall
 
       # @return [CWM::PagerTreeItem]
       def startup_item
+        return nil if Yast::Mode.config
         page = Pages::Startup.new(self)
         CWM::PagerTreeItem.new(page)
       end
