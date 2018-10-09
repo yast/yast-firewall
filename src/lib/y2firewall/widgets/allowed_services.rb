@@ -92,6 +92,15 @@ module Y2Firewall
         )
       end
 
+      def validate
+        return true if selected_services.empty?
+        # TRANSLATORS: popup question
+        msg = _("The selection of services will be lost if you leave without\n" \
+          "applying the changes.\n\nDo you really want to continue?\n")
+
+        Yast::Popup.YesNo(msg)
+      end
+
     private
 
       # @!attribute [r] known_services_table
@@ -126,6 +135,10 @@ module Y2Firewall
       def refresh_services
         known_services_table.services = (firewall.current_service_names - zone.services)
         allowed_services_table.services = zone.services.clone
+      end
+
+      def selected_services
+        known_services_table.selected_services + allowed_services_table.selected_services
       end
 
       # Return a list of buttons to add/remove elements

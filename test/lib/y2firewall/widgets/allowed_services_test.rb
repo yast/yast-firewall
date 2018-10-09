@@ -60,6 +60,32 @@ describe Y2Firewall::Widgets::AllowedServices do
       .with(widget_id: "allowed:#{zone.name}").and_return(allowed_svcs_table)
   end
 
+  describe "#validate" do
+    context "when no service has been selected" do
+      before do
+        allow(available_svcs_table).to receive(:selected_services).and_return([])
+        allow(allowed_svcs_table).to receive(:selected_services).and_return([])
+      end
+
+      it "returns true" do
+        expect(widget.validate).to eq(true)
+      end
+    end
+
+    context "when some service has been selected" do
+      it "warns the user about unsaved changed and ask for continuing" do
+        expect(Yast::Popup).to receive("YesNo").with(/Do you really want to continue/)
+        widget.validate
+      end
+
+      it "returns whether the user wanted to continue or not" do
+        expect(Yast::Popup).to receive("YesNo").and_return(false, true)
+        expect(widget.validate).to eq(false)
+        expect(widget.validate).to eq(true)
+      end
+    end
+  end
+
   describe "#handle" do
     context "when it receives an event to add a service" do
       let(:event) { { "ID" => :add } }
