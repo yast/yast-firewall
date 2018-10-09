@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Tue Oct  9 08:55:56 UTC 2018 - knut.anderssen@suse.com
+
+- Alert the user about unsaved changes when leaving the zone
+  services configuration without applying changes (fate#324662)
+- 4.0.30
+
+-------------------------------------------------------------------
 Fri Oct  5 06:49:03 UTC 2018 - knut.anderssen@suse.com
 
 - AutoYaST configuration: Added support to editing and reseting the
