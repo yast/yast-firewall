@@ -20,6 +20,7 @@
 # find current contact information at www.suse.com.
 
 require "cwm"
+require "y2firewall/firewalld"
 
 module Y2Firewall
   module Widgets
@@ -38,10 +39,13 @@ module Y2Firewall
         @interfaces_input = interfaces_input
       end
 
+      # @macro seeAbstractWidget
       def init
-        @interfaces_input.value = selected_zone.interfaces.join(", ")
+        self.value = Y2Firewall::Firewalld.instance.default_zone
+        interfaces_input.value = selected_zone ? selected_zone.interfaces.join(" ") : ""
       end
 
+      # @macro seeAbstractWidget
       def opt
         [:notify]
       end
@@ -57,16 +61,15 @@ module Y2Firewall
       end
 
       # @macro seeAbstractWidget
-      def handle(event)
-        return unless event["ID"] == widget_id
-        @interfaces_input.value = selected_zone.interfaces.join(" ")
+      def handle
+        interfaces_input.value = selected_zone ? selected_zone.interfaces.join(" ") : ""
         nil
       end
 
       # @macro seeAbstractWidget
       def store
-        return if interfaces_input.value.empty?
-        selected_zone.interfaces = interfaces_input.value.split
+        return unless selected_zone
+        selected_zone.interfaces = interfaces_input.items_from_ui
       end
 
     private
@@ -84,7 +87,7 @@ module Y2Firewall
       #
       # @return [Y2Firewall::Firewalld::Zone,nil] selected zone
       def selected_zone
-        return nil if value.empty?
+        return nil if !value || value.empty?
         Y2Firewall::Firewalld.instance.find_zone(value)
       end
     end
@@ -98,8 +101,18 @@ module Y2Firewall
         textdomain "firewall"
       end
 
+      # @macro seeAbstractWidget
       def label
         _("Interfaces:")
+      end
+
+      # Split the current input field value by any combination of commas
+      # and/or spaces.
+      #
+      # @return [Array<String>] the current value splitted by any combination
+      #   of commas and/or spaces
+      def items_from_ui
+        value.split(/ *[, ] */)
       end
     end
   end
