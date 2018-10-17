@@ -42,8 +42,8 @@ describe Y2Firewall::Widgets::ZoneInterfacesSelector do
   end
 
   before do
+    allow(Y2Firewall::Firewalld.instance).to receive(:zones).and_return([public_zone, dmz_zone])
     firewalld.default_zone = "public"
-    firewalld.zones = [public_zone, dmz_zone]
   end
 
   describe "#init" do
