@@ -46,6 +46,7 @@ describe Y2Firewall::Widgets::ZoneOptions do
   end
 
   before do
+    allow(Y2Firewall::Firewalld.instance).to receive(:zones).and_return([public_zone, dmz_zone])
     allow(eth0).to receive(:zone).and_return(dmz_zone)
   end
 
@@ -57,10 +58,6 @@ describe Y2Firewall::Widgets::ZoneOptions do
   end
 
   describe "#items" do
-    before do
-      allow(Y2Firewall::Firewalld.instance).to receive(:zones).and_return([public_zone, dmz_zone])
-    end
-
     it "returns a list of selectable items including all known zones" do
       expect(widget.items).to eq(
         [

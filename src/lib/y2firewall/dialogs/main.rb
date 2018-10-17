@@ -24,6 +24,7 @@ require "cwm/dialog"
 require "y2firewall/widgets/overview_tree_pager"
 
 Yast.import "Label"
+Yast.import "Mode"
 
 module Y2Firewall
   module Dialogs
@@ -34,8 +35,17 @@ module Y2Firewall
         Yast.import "NetworkInterfaces"
         textdomain "firewall"
 
-        Yast::NetworkInterfaces.Read
-        fw.read
+        if Yast::Mode.config
+          fw.read(minimal: true) unless fw.read?
+        else
+          Yast::NetworkInterfaces.Read
+          fw.read unless fw.read?
+        end
+      end
+
+      def should_open_dialog?
+        return true if Yast::Mode.config
+        super
       end
 
       def title
@@ -80,7 +90,7 @@ module Y2Firewall
       end
 
       def abort_button
-        Yast::Label.AbortButton
+        Yast::Mode.config ? Yast::Label.CancelButton : Yast::Label.AbortButton
       end
 
       # @return [Boolean] it aborts if returns true
@@ -118,6 +128,7 @@ module Y2Firewall
       # Writes down the firewall configuration and the systemd service
       # modifications
       def apply_changes
+        return false if Yast::Mode.config
         fw.write_only
         fw.system_service.save
       end
