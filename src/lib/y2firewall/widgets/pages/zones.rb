@@ -22,6 +22,7 @@
 require "yast"
 require "cwm/page"
 require "y2firewall/firewalld"
+require "y2firewall/helpers/interfaces"
 require "y2firewall/widgets/zones_table"
 require "y2firewall/widgets/default_zone_button"
 
