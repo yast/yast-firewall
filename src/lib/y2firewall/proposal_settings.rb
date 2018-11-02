@@ -48,9 +48,9 @@ module Y2Firewall
 
       load_features
       enable_firewall! if @enable_firewall
-      enable_sshd! if Yast::Linuxrc.usessh || only_public_key_auth || @enable_sshd
-      open_ssh! if Yast::Linuxrc.usessh || only_public_key_auth || @open_ssh
-      open_vnc! if Yast::Linuxrc.vnc
+      enable_sshd! if wanted_enable_sshd?
+      open_ssh! if wanted_open_ssh?
+      open_vnc! if wanted_open_vnc?
       # FIXME: obtain from Y2Firewall::Firewalld, control file or allow to
       # chose a different one in the proposal
       @default_zone = "public"
@@ -131,6 +131,18 @@ module Y2Firewall
 
     def global_section
       Yast::ProductFeatures.GetSection("globals")
+    end
+
+    def wanted_enable_sshd?
+      Yast::Linuxrc.usessh || only_public_key_auth || @enable_sshd
+    end
+
+    def wanted_open_ssh?
+      Yast::Linuxrc.usessh || only_public_key_auth || @open_ssh
+    end
+
+    def wanted_open_vnc?
+      Yast::Linuxrc.vnc
     end
 
     # Determines whether only public key authentication is supported
