@@ -32,9 +32,13 @@ BuildRequires:  yast2-devtools >= 3.1.10
 BuildRequires:  yast2 >= 4.0.98
 BuildRequires:  rubygem(%rb_default_ruby_abi:yast-rake)
 BuildRequires:  rubygem(%rb_default_ruby_abi:rspec)
+# Yast::UsersSimple.GetRootPassword
+BuildRequires:  yast2-users
 
 # Y2Firewall::Firewalld#reset
 Requires:       yast2 >= 4.0.98
+# Yast::UsersSimple.GetRootPassword
+Requires:       yast2-users
 
 # ButtonBox widget
 Conflicts:	yast2-ycp-ui-bindings < 2.17.3
