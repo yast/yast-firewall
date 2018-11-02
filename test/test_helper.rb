@@ -29,12 +29,14 @@ require "yast/rspec"
 
 # stub module to prevent its Import
 # Useful for modules from different yast packages, to avoid build dependencies
-def stub_module(name)
-  Yast.const_set name.to_sym, Class.new { def self.fake_method; end }
+def stub_module(name, fake_class = nil)
+  fake_class = Class.new { def self.fake_method; end } if fake_class.nil?
+  Yast.const_set name.to_sym, fake_class
 end
 
 # stub classes from other modules to speed up a build
 stub_module("AutoInstall")
+stub_module("UsersSimple", Class.new { def self.GetRootPassword; "secret"; end })
 
 # some tests have translatable messages
 ENV["LANG"] = "en_US.UTF-8"
