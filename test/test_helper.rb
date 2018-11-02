@@ -36,6 +36,8 @@ end
 
 # stub classes from other modules to speed up a build
 stub_module("AutoInstall")
+# rubocop:disable Style/SingleLineMethods
+# rubocop:disable Style/MethodName
 stub_module("UsersSimple", Class.new { def self.GetRootPassword; "secret"; end })
 
 # some tests have translatable messages
