@@ -31,6 +31,7 @@
 #
 # File includes helps for yast2-firewall dialogs.
 #
+require "network/firewall_chooser"
 require "network/susefirewalld"
 
 module Yast
@@ -57,7 +58,7 @@ module Yast
       # there are some arguments - starting commandline
       if Ops.greater_than(Builtins.size(WFM.Args), 0)
         Yast.import "SuSEFirewallCMDLine"
-        SuSEFirewallCMDLine.Run 
+        SuSEFirewallCMDLine.Run
         # GUI or TextUI
       else
         # If FirewallD then use it's UI
@@ -79,6 +80,7 @@ module Yast
           if Mode.installation
             @ret = FirewallInstallationSequence()
           else
+            return false unless PackageSystem.CheckAndInstallPackages(["SuSEfirewall2"])
             @ret = FirewallSequence()
           end
         end
@@ -89,7 +91,7 @@ module Yast
       Builtins.y2milestone("Firewall module finished")
       Builtins.y2milestone("----------------------------------------")
 
-      deep_copy(@ret) 
+      deep_copy(@ret)
 
       # EOF
     end
