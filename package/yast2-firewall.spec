@@ -17,7 +17,7 @@
 
 
 Name:           yast2-firewall
-Version:        4.0.34
+Version:        4.1.0
 Release:        0
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
@@ -73,8 +73,6 @@ rm -f $RPM_BUILD_ROOT/%{yast_docdir}/COPYING
 %defattr(-,root,root)
 %{yast_dir}/clients/*.rb
 %{yast_dir}/lib
-%{yast_dir}/include
-%{yast_dir}/modules
 %{yast_desktopdir}/*.desktop
 %{yast_schemadir}/autoyast/rnc/firewall.rnc
 
