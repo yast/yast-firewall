@@ -75,7 +75,7 @@ rm -f $RPM_BUILD_ROOT/%{yast_docdir}/COPYING
 %{yast_dir}/lib
 %{yast_desktopdir}/*.desktop
 %{yast_schemadir}/autoyast/rnc/firewall.rnc
-%{_datadir}/icons/*
+%{yast_icondir}
 
 %license COPYING
 %doc README.md
