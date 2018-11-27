@@ -19,7 +19,30 @@
 # current contact information at www.suse.com.
 # ------------------------------------------------------------------------------
 
-# FIXME: rename to plain "firewall"
-require "y2firewall/clients/firewall_new"
+require "yast"
+require "cwm/tree"
 
-Y2Firewall::Clients::FirewallNew.new.run
+module Y2Firewall
+  module Widgets
+    # A tree that is told what its items are.
+    # We need a tree whose items include Pages that point to the OverviewTreePager.
+    class OverviewTree < CWM::Tree
+      # @!attribute [r] items
+      #   @return [Array<CWM::PagerTreeItem>] List of tree items
+      attr_reader :items
+
+      # Constructor
+      #
+      # @param items [Array<CWM::PagerTreeItem>] List of tree items to be included
+      def initialize(items)
+        textdomain "firewall"
+        @items = items
+      end
+
+      # @macro seeAbstractWidget
+      def label
+        ""
+      end
+    end
+  end
+end

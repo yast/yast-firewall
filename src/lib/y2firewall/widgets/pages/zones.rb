@@ -27,14 +27,21 @@ require "y2firewall/dialogs/zone"
 require "y2firewall/widgets/zones_table"
 require "y2firewall/widgets/pages/zone"
 require "y2firewall/widgets/zone_button"
+require "y2firewall/helpers/interfaces"
+require "y2firewall/widgets/default_zone_button"
 
 module Y2Firewall
   module Widgets
     module Pages
+
+      # A page for firewall zones:
+      #   contains {ZonesTable}, has {Zone} as subpages.
       class Zones < CWM::Page
+        include Y2Firewall::Helpers::Interfaces
+
         # Constructor
         #
-        # @param pager [CWM::TreePager]
+        # @param _pager [CWM::TreePager]
         def initialize(_pager)
           textdomain "firewall"
         end
@@ -54,7 +61,8 @@ module Y2Firewall
               HBox(
                 AddButton.new(self, zones_table),
                 EditButton.new(self, zones_table),
-                RemoveButton.new(self, zones_table)
+                RemoveButton.new(self, zones_table),
+                firewall.zones.empty? ? Empty() : default_zone_button
               )
             )
           )
@@ -70,7 +78,7 @@ module Y2Firewall
             result = Dialogs::Zone.run(zone, true)
             if result == :ok
               zone.relations.map { |r| zone.send("#{r}=", []) }
-              fw.zones << zone
+              firewall.zones << zone
               UIState.instance.select_row(zone.name)
 
               return :redraw
@@ -86,7 +94,7 @@ module Y2Firewall
           end
 
           def handle
-            zone = fw.find_zone(@table.value.to_s)
+            zone = firewall.find_zone(@table.value.to_s)
             name = zone.name
             result = Dialogs::Zone.run(zone)
             UIState.instance.select_row(name) if result == :ok
@@ -101,8 +109,8 @@ module Y2Firewall
           end
 
           def handle
-            zone = fw.find_zone(@table.value.to_s)
-            fw.remove_zone(zone.name)
+            zone = firewall.find_zone(@table.value.to_s)
+            firewall.remove_zone(zone.name)
 
             :redraw
           end
@@ -110,12 +118,17 @@ module Y2Firewall
 
       private
 
-        def fw
-          Y2Firewall::Firewalld.instance
+        def zones_table
+          @zones_table ||= ZonesTable.new(firewall.zones, known_interfaces, default_zone_button)
         end
 
-        def zones_table
-          @zones_table ||= ZonesTable.new(fw.zones)
+        def default_zone_button
+          return nil if firewall.zones.empty?
+          @default_zone_button ||= DefaultZoneButton.new(firewall.zones.first)
+        end
+
+        def firewall
+          Y2Firewall::Firewalld.instance
         end
       end
     end

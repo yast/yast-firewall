@@ -31,67 +31,150 @@ module Y2Firewall
       #
       # @param zone [Y2Firewall::Firewalld::Zone] Zone
       def initialize(zone)
+        textdomain "firewall"
         @zone = zone
         self.widget_id = "allowed_services"
-        @available_svcs_table = ServicesTable.new
-        @allowed_svcs_table = ServicesTable.new
+        @known_services_table = ServicesTable.new(widget_id: "known:#{zone.name}")
+        @allowed_services_table = ServicesTable.new(widget_id: "allowed:#{zone.name}")
         refresh_services
       end
 
+      # @macro seeAbstractWidget
+      def label
+        _("Allowed Services")
+      end
+
+      # @macro seeCustomWidget
       def contents
         return @contents if @contents
 
-        VBox(
+        @contents = VBox(
           HBox(
-            available_svcs_table,
             VBox(
-              PushButton(Id(:add), _("Add")),
-              PushButton(Id(:remove), _("Remove"))
+              Left(Label(_("Known"))),
+              known_services_table
             ),
-            allowed_svcs_table
+            VBox(*add_remove_buttons),
+            VBox(
+              Left(Label(_("Allowed"))),
+              allowed_services_table
+            )
           )
         )
       end
 
+      # @macro seeAbstractWidget
       def handle(event)
+        return unless event["ID"]
+
         case event["ID"]
         when :add
           add_service
+        when :add_all
+          add_all_services
         when :remove
           remove_service
+        when :remove_all
+          remove_all_services
         end
         refresh_services
         nil
       end
 
+      # @macro seeAbstractWidget
+      def help
+        # TRANSLATORS: %s is the zone label
+        format(
+          _("<p>Select which services you want to allow in the zone <b>%s</b>\n" \
+            "by adding them to the <b>Allowed</b> list (using <b>Add</b> or <b>Add All</b>\n" \
+            "buttons).</p>"),
+          zone.name
+        )
+      end
+
+      def validate
+        return true if selected_services.empty?
+        # TRANSLATORS: popup question
+        msg = _("The selection of services will be lost if you leave without\n" \
+          "applying the changes.\n\nDo you really want to continue?\n")
+
+        Yast::Popup.YesNo(msg)
+      end
+
     private
 
-      # @!attribute [r] available_svcs_table
+      # @!attribute [r] known_services_table
       #   @return [ServicesTable]
       #
-      # @!attribute [r] allowed_svcs_table
+      # @!attribute [r] allowed_services_table
       #   @return [ServiceTable]
       #
       # @!attribute [r] zone
       #   @return [Y2Firewall::Firewalld::Zone]
-      attr_reader :available_svcs_table, :allowed_svcs_table, :zone
+      attr_reader :known_services_table, :allowed_services_table, :zone
 
       # Adds a service to the list of allowed ones
       def add_service
-        zone.add_service(available_svcs_table.selected_service)
+        known_services_table.selected_services.each { |s| zone.add_service(s) }
+      end
+
+      def add_all_services
+        firewall.current_service_names.each { |s| zone.add_service(s) }
       end
 
       # Removes a service from the list of allowed ones
       def remove_service
-        zone.remove_service(allowed_svcs_table.selected_service)
+        allowed_services_table.selected_services.each { |s| zone.remove_service(s) }
+      end
+
+      def remove_all_services
+        zone.services.clone.each { |s| zone.remove_service(s) }
       end
 
       # Refresh the content of the services tables
       def refresh_services
-        available_svcs_table.update(firewall.api.services - zone.services)
-        allowed_svcs_table.update(zone.services.clone)
+        known_services_table.services = (firewall.current_service_names - zone.services)
+        allowed_services_table.services = zone.services.clone
       end
 
+      def selected_services
+        known_services_table.selected_services + allowed_services_table.selected_services
+      end
+
+      # Return a list of buttons to add/remove elements
+      #
+      # @return [Array<Yast::Term>] Buttons set UI terms
+      def add_remove_buttons
+        [
+          PushButton(
+            Id(:add),
+            Opt(:hstretch),
+            _("Add") + " #{Yast::UI.Glyph(:ArrowRight)}"
+          ),
+          PushButton(
+            Id(:add_all),
+            Opt(:hstretch),
+            _("Add All") + " #{Yast::UI.Glyph(:ArrowRight)}"
+          ),
+          VSpacing(1),
+          PushButton(
+            Id(:remove),
+            Opt(:hstretch),
+            "#{Yast::UI.Glyph(:ArrowLeft)} " + _("Remove")
+          ),
+          PushButton(
+            Id(:remove_all),
+            Opt(:hstretch),
+            "#{Yast::UI.Glyph(:ArrowLeft)} " + _("Remove All")
+          )
+        ]
+      end
+
+      # Return the current `Y2Firewall::Firewalld` instance
+      #
+      # This is just a convenience method.
+      #
+      # @return [Y2Firewall::Firewalld]
       def firewall
         Y2Firewall::Firewalld.instance
       end

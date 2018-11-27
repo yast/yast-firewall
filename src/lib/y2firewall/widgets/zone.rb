@@ -19,8 +19,6 @@
 # To contact SUSE LLC about this file by physical or electronic mail, you may
 # find current contact information at www.suse.com.
 
-require "cwm/dialog"
-require "y2partitioner/dialogs/popup"
 require "y2firewall/widgets/zone"
 
 module Y2Firewall

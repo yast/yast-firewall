@@ -21,19 +21,31 @@
 
 require "yast"
 require "cwm/dialog"
-require "y2firewall/widgets/overview"
+require "y2firewall/widgets/overview_tree_pager"
 
 Yast.import "Label"
+Yast.import "Mode"
 
 module Y2Firewall
   module Dialogs
     # Main entry point to Firewall showing tree pager with all content
     class Main < CWM::Dialog
+      # Constructor
       def initialize
+        Yast.import "NetworkInterfaces"
         textdomain "firewall"
 
-        fw = Y2Firewall::Firewalld.instance
-        fw.read
+        if Yast::Mode.config
+          fw.read(minimal: true) unless fw.read?
+        else
+          Yast::NetworkInterfaces.Read
+          fw.read unless fw.read?
+        end
+      end
+
+      def should_open_dialog?
+        return true if Yast::Mode.config
+        super
       end
 
       def title
@@ -48,12 +60,20 @@ module Y2Firewall
         )
       end
 
+      # Runs the dialog
+      #
+      # @return [Symbol] result of the dialog
       def run
+        result = nil
+
         loop do
           result = super
-
-          break unless result == :redraw
+          swap_api if result == :swap_mode
+          break unless continue_running?(result)
         end
+
+        apply_changes if result == :next
+        result
       end
 
       def skip_store_for
@@ -70,7 +90,7 @@ module Y2Firewall
       end
 
       def abort_button
-        Yast::Label.AbortButton
+        Yast::Mode.config ? Yast::Label.CancelButton : Yast::Label.AbortButton
       end
 
       # @return [Boolean] it aborts if returns true
@@ -81,6 +101,36 @@ module Y2Firewall
       # @return [Boolean] it goes back if returns true
       def back_handler
         true
+      end
+
+    private
+
+      # Whether the dialog run loop should continue or not
+      #
+      # @return [Boolean] true in case of a dialog redraw or an api change
+      def continue_running?(result)
+        result == :redraw || result == :swap_mode
+      end
+
+      # Convenience method which return an instance of Y2Firewall::Firewalld
+      #
+      # @return [Y2Firewall::Firewalld] a firewalld instance
+      def fw
+        Y2Firewall::Firewalld.instance
+      end
+
+      # Modify the firewalld API instance in case the systemd service state has
+      # changed.
+      def swap_api
+        fw.api = Y2Firewall::Firewalld::Api.new
+      end
+
+      # Writes down the firewall configuration and the systemd service
+      # modifications
+      def apply_changes
+        return false if Yast::Mode.config
+        fw.write_only
+        fw.system_service.save
       end
     end
   end

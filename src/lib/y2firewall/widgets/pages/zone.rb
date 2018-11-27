@@ -20,7 +20,9 @@
 # ------------------------------------------------------------------------------
 
 require "yast"
+require "cwm/common_widgets"
 require "cwm/page"
+require "cwm/table"
 require "cwm/tabs"
 require "y2firewall/widgets/allowed_services"
 
@@ -34,6 +36,7 @@ module Y2Firewall
         # @param zone [Y2Firewall::Firewalld::Zone]
         # @param pager [CWM::TreePager]
         def initialize(zone, pager)
+          Yast.import "Popup"
           textdomain "firewall"
           @zone = zone
           @pager = pager
@@ -72,60 +75,125 @@ module Y2Firewall
 
         def contents
           VBox(
-            # TRANSLATORS: TCP is the Transmission Control Protocol
-            PortsForProtocol.new(@zone, _("TCP Ports"), :tcp),
-            # TRANSLATORS: UDP is the User Datagram Protocol
-            PortsForProtocol.new(@zone, _("UDP Ports"), :udp),
-            # TRANSLATORS: SCTP is the Stream Control Transmission Protocol
-            PortsForProtocol.new(@zone, _("SCTP Ports"), :sctp),
-            # TRANSLATORS: DCCP is the Datagram Congestion Control Protocol
-            PortsForProtocol.new(@zone, _("DCCP Ports"), :dccp),
+            PortsForProtocols.new(@zone),
             VStretch()
           )
         end
 
-        def help
-          "FIXME: ports or port ranges, separated by spaces and/or commas <br>" \
-          "a port is an integer <br>" \
-          "a port range is port-dash-port (with no spaces)"
-        end
+        # A group of InputFields to specify the open TCP, UDP, SCTP and DCCP ports.
+        class PortsForProtocols < CWM::CustomWidget
+          extend Yast::I18n
 
-        def init
-          log.info "INIT #{widget_id}"
-        end
+          PROTOCOLS = {
+            # TRANSLATORS: TCP is the Transmission Control Protocol
+            tcp:  N_("TCP Ports"),
+            # TRANSLATORS: UDP is the User Datagram Protocol
+            udp:  N_("UDP Ports"),
+            # TRANSLATORS: SCTP is the Stream Control Transmission Protocol
+            sctp: N_("SCTP Ports"),
+            # TRANSLATORS: DCCP is the Datagram Congestion Control Protocol
+            dccp: N_("DCCP Ports")
+          }.freeze
 
-        def store
-          log.info "STORE #{widget_id}"
-        end
-
-        # FIXME: separate objects like this do not work well with the
-        # single zone.ports attribute mixing all protos. Rather make a
-        # CustomWidget that handles it all
-        class PortsForProtocol < CWM::InputField
-          # @param proto [:tcp,:udp,:sctp,:dccp]
-          def initialize(zone, label, proto)
+          def initialize(zone)
+            textdomain "firewall"
             @zone = zone
-            @proto = proto
-            @label = label
-            self.widget_id = "#{proto}_ports"
           end
 
-          attr_reader :label
+          def contents
+            fields = PROTOCOLS.map do |proto_sym, label|
+              InputField(Id(proto_sym), Opt(:hstretch), _(label))
+            end
+            VBox(* fields)
+          end
+
+          def valid_port_description
+            format(
+              _("Enter ports or port ranges, separated by spaces and/or commas.\n" \
+                "A port is an integer.\n" \
+                "A port range is port-dash-port (with no spaces).\n" \
+                "For example:\n" \
+                "%s"),
+              "16001-16009, 18080"
+            )
+          end
+
+          def help
+            valid_port_description.gsub("\n", "<br>\n")
+          end
 
           def init
-            log.info "INIT #{widget_id}"
-            # FIXME: factor out and test
-            self.value = @zone.ports
-                              .map { |p| p.split("/") }
-                              .find_all { |_port, proto| proto == @proto.to_s }
-                              .map { |port, _proto| port }
-                              .join(", ")
+            by_proto = ports_from_array(@zone.ports)
+            PROTOCOLS.each do |proto_sym, _label|
+              s = by_proto.fetch(proto_sym, []).join(", ")
+              Yast::UI.ChangeWidget(Id(proto_sym), :Value, s)
+            end
           end
 
           def store
-            # FIXME: do modify immediately?
-            # DUH, clumsy
-            log.info "STORE #{widget_id}"
+            @zone.ports = ports_to_array(values_by_proto.to_h)
+          end
+
+          def validate
+            values_by_proto.each do |proto_sym, ranges|
+              invalid_range = ranges.find { |r| !valid_range?(r) }
+              next unless invalid_range
+              Yast::UI.SetFocus(Id(proto_sym))
+              err_msg = format(_("Invalid port range: %s"), invalid_range)
+              Yast::Popup.Error(err_msg + "\n" + valid_port_description)
+              return false
+            end
+            true
+          end
+
+        private
+
+          # @return [Hash{Symbol => Array<String>}]
+          def values_by_proto
+            PROTOCOLS.map do |proto_sym, _label|
+              line = Yast::UI.QueryWidget(Id(proto_sym), :Value)
+              [proto_sym, items_from_ui(line)]
+            end
+          end
+
+          def valid_range?(r)
+            r =~ /\d+/ || r =~ /\d+-\d+/
+          end
+
+          def items_from_ui(s)
+            # the separator is at least one comma or space, surrounded by optional spaces
+            s.split(/ *[, ] */)
+          end
+
+          # @param hash [Hash{Symbol => Array<String>}] ports specification
+          #   categorized by protocol
+          # @return [Array] ports specification
+          #   as array for {Y2Firewall::Firewalld::Zone#ports}
+          # @example
+          #   h = { tcp: ["55555-55666", "44444"], udp: ["33333"] }
+          #   a = ["55555-55666/tcp", "44444/tcp", "33333/udp"]
+          #   ports_to_array(h) # => a
+          def ports_to_array(hash)
+            hash.map { |sym, ports| ports.map { |p| "#{p}/#{sym}" } }.flatten
+          end
+
+          # @param a [Array] ports specification
+          #   as array from {Y2Firewall::Firewalld::Zone#ports}
+          # @return [Hash{Symbol => Array<String>}] ports specification
+          #   categorized by protocol
+          # @example
+          #   a = ["55555-55666/tcp", "44444/tcp", "33333/udp"]
+          #   h = { tcp: ["55555-55666", "44444"], udp: ["33333"] }
+          #   ports_from_array(a) # => h
+          def ports_from_array(a)
+            a
+              .map { |p| p.split("/") }
+              .each_with_object({}) do |i, acc|
+                ports, proto = *i
+                proto = proto.to_sym
+                acc[proto] ||= []
+                acc[proto] << ports
+              end
           end
         end
       end
@@ -135,7 +203,7 @@ module Y2Firewall
         # Constructor
         #
         # @param zone [Y2Firewall::Firewalld::Zone]
-        # @param pager [CWM::TreePager]
+        # @param _pager [CWM::TreePager]
         def initialize(zone, _pager)
           textdomain "firewall"
           @zone = zone
@@ -151,28 +219,6 @@ module Y2Firewall
         # @macro seeCustomWidget
         def contents
           VBox(@allowed_services_widget)
-        end
-
-        # A list of services in a firewall zone
-        class ServiceBox < CWM::MultiSelectionBox
-          # @param zone [Y2Firewall::Firewalld::Zone]
-          def initialize(zone)
-            @zone = zone
-          end
-
-          def label
-            # TRANSLATORS: %s is a zone name
-            format(_("Services for %s") % @zone.name)
-          end
-
-          def items
-            all_known_services = Y2Firewall::Firewalld.instance.api.services
-            all_known_services.map { |s| [s, s] }
-          end
-
-          def init
-            self.value = @zone.services
-          end
         end
       end
     end

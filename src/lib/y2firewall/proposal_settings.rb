@@ -21,6 +21,8 @@
 
 require "yast"
 
+Yast.import "UsersSimple"
+
 module Y2Firewall
   # Class that stores the proposal settings for firewalld during installation.
   class ProposalSettings
@@ -46,9 +48,9 @@ module Y2Firewall
 
       load_features
       enable_firewall! if @enable_firewall
-      enable_sshd! if Yast::Linuxrc.usessh || @enable_sshd
-      open_ssh! if Yast::Linuxrc.usessh || @open_ssh
-      open_vnc! if Yast::Linuxrc.vnc
+      enable_sshd! if wanted_enable_sshd?
+      open_ssh! if wanted_open_ssh?
+      open_vnc! if wanted_open_vnc?
       # FIXME: obtain from Y2Firewall::Firewalld, control file or allow to
       # chose a different one in the proposal
       @default_zone = "public"
@@ -129,6 +131,27 @@ module Y2Firewall
 
     def global_section
       Yast::ProductFeatures.GetSection("globals")
+    end
+
+    def wanted_enable_sshd?
+      Yast::Linuxrc.usessh || only_public_key_auth || @enable_sshd
+    end
+
+    def wanted_open_ssh?
+      Yast::Linuxrc.usessh || only_public_key_auth || @open_ssh
+    end
+
+    def wanted_open_vnc?
+      Yast::Linuxrc.vnc
+    end
+
+    # Determines whether only public key authentication is supported
+    #
+    # @note If the root user does not have a password, we assume that we will use a public
+    #   key in order to log into the system. In such a case, we need to enable the SSH
+    #   service (including opening the port).
+    def only_public_key_auth
+      Yast::UsersSimple.GetRootPassword.empty?
     end
 
     class << self

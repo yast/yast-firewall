@@ -23,7 +23,12 @@ require "yast"
 require "y2firewall/firewalld"
 require "y2firewall/importer"
 require "y2firewall/proposal_settings"
+require "y2firewall/summary_presenter"
+require "y2firewall/dialogs/main"
 require "installation/auto_client"
+
+Yast.import "Mode"
+Yast.import "AutoInstall"
 
 module Y2Firewall
   module Clients
@@ -32,9 +37,6 @@ module Y2Firewall
     # Does not do any changes to the configuration.
     class Auto < ::Installation::AutoClient
       include Yast::Logger
-
-      Yast.import "HTML"
-      Yast.import "AutoInstall"
 
       class << self
         # @return [Boolean] whether the AutoYaST configuration has been
@@ -51,6 +53,9 @@ module Y2Firewall
         attr_accessor :start
         # @return [Hash]
         attr_accessor :profile
+        # @return [Boolean] whether the AutoYaST configuration has been
+        # modified or not
+        attr_accessor :ay_config
       end
 
       # Constructor
@@ -62,28 +67,20 @@ module Y2Firewall
       #
       # @return [String]
       def summary
-        return Yast::HTML.Para(_("Firewalld is not available")) if !firewalld.installed?
+        presenter = Y2Firewall::SummaryPresenter.new(firewalld)
+        return presenter.not_installed if !firewalld.installed?
+        return presenter.not_configured if !modified?
 
-        firewalld.read if !firewalld.read?
-
-        # general overview
-        summary = general_summary
-
-        # per zone details
-        firewalld.zones.each do |zone|
-          summary << zone_summary(zone)
-        end
-
-        summary
+        presenter.create
       end
 
       # Import the firewall configuration
       #
       # @param profile [Hash] firewall profile section to be imported
       # @return [Boolean]
-      def import(profile)
+      def import(profile, merge = !Yast::Mode.config)
         self.class.profile = profile
-        return false unless read
+        return false if merge && !read(force: false)
 
         # Obtains the default from the control file (settings) if not present.
         enable if profile.fetch("enable_firewall", settings.enable_firewall)
@@ -104,13 +101,19 @@ module Y2Firewall
       #
       # @return [Boolean]
       def reset
-        importer.import({})
+        firewalld.reset
+        self.class.ay_config = false
+        self.class.changed = false
       end
 
       def change
-        log.info "#{self.class}#change not implemented yet, returning :next."
-
-        :next
+        self.class.imported = false
+        result = Dialogs::Main.new.run
+        case result
+        when :next, :finish, :ok, :accept
+          self.class.ay_config = true
+        end
+        result
       end
 
       # Write the imported configuration to firewalld. If for some reason the
@@ -118,26 +121,33 @@ module Y2Firewall
       # it again.
       def write
         return false if !firewalld.installed?
-        import(self.class.profile) unless imported?
+        import_if_needed
         return false unless imported?
 
-        firewalld.write
-        activate_service
+        firewalld.write if firewalld.modified?
+
+        if ay_config?
+          firewalld.reset
+          firewalld.read(minimal: true)
+          import(self.class.profile, false)
+        else
+          activate_service
+        end
       end
 
       # Read the currnet firewalld configuration
-      def read
+      def read(force: true)
         return false if !firewalld.installed?
-        return true if firewalld.read?
+        return true if firewalld.read? && !force
 
+        modified
         firewalld.read
       end
 
       # A map with the packages that needs to be installed or removed for
       # configuring firewalld properly
       #
-      # @return packages [Hash{String => Array<String>} ] of packages to be
-      # installed or removed
+      # @return [Hash{String => Array<String>} ] of packages to be installed or removed
       def packages
         { "install" => ["firewalld"], "remove" => [] }
       end
@@ -151,6 +161,19 @@ module Y2Firewall
       end
 
     private
+
+      def import_if_needed
+        if ay_config?
+          self.class.profile = firewalld.export
+          self.class.imported = false
+        end
+
+        import(self.class.profile) if self.class.profile && !imported?
+      end
+
+      def ay_config?
+        !!self.class.ay_config
+      end
 
       # Semantic AutoYaST profile check
       #
@@ -228,55 +251,6 @@ module Y2Firewall
       def imported?
         !!self.class.imported
       end
-
-      # Creates a piece for summary for zone detail
-      #
-      # See has_many (@see Y2Firewall::Firewalld::Relations#has_many) in
-      # Y2Firewall::Firewalld::Zone for known detail / relations
-      #
-      # @param [String] relation is name of relation (used as a caption for generated blob)
-      # @param [Array<String>] names details to be formated
-      # @return [<String>] A string formated using Yast::HTML methods
-      def zone_detail_summary(relation, names)
-        return "" if names.nil? || names.empty?
-
-        Yast::HTML.Bold("#{relation.capitalize}:") + Yast::HTML.List(names)
-      end
-
-      # Creates a summary for the given zone
-      #
-      # @param [Firewalld::Zone] zone object defining a zone
-      # @return [String] HTML formated zone description
-      def zone_summary(zone)
-        raise ArgumentError, "zone parameter has to be defined" if zone.nil?
-
-        desc = zone.relations.map do |relation|
-          zone_detail_summary(relation, zone.send(relation))
-        end.delete_if(&:empty?)
-        return "" if desc.empty?
-
-        summary = Yast::HTML.Heading(zone.name)
-        summary << Yast::HTML.List(desc)
-      end
-
-      # Creates a general summary for firewalld
-      #
-      # @return [String] HTML formated firewall description
-      # rubocop:disable Metrics/AbcSize
-      def general_summary
-        html = Yast::HTML
-        running = " " + (firewalld.running? ? _("yes") : _("no"))
-        enabled = " " + (firewalld.enabled? ? _("yes") : _("no"))
-
-        summary = html.Bold(_("Running:")) + running + html.Newline
-        summary << html.Bold(_("Enabled:")) + enabled + html.Newline
-        summary << html.Bold(_("Default zone:")) + " " + firewalld.default_zone + html.Newline
-        summary << html.Bold(_("Defined zones:"))
-        summary << html.List(firewalld.zones.map(&:name))
-
-        html.Para(summary)
-      end
-      # rubocop:enable Metrics/AbcSize
     end
   end
 end

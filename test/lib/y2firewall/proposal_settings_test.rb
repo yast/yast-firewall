@@ -36,10 +36,12 @@ describe Y2Firewall::ProposalSettings do
   end
   let(:use_vnc) { false }
   let(:use_ssh) { false }
+  let(:root_password) { "secret" }
 
   before do
     allow(Yast::Linuxrc).to receive(:vnc).and_return(use_vnc)
     allow(Yast::Linuxrc).to receive(:usessh).and_return(use_ssh)
+    allow(Yast::UsersSimple).to receive(:GetRootPassword).and_return(root_password)
 
     allow(Yast::ProductFeatures).to receive("GetSection")
       .with("globals").and_return(global_section)
@@ -83,6 +85,21 @@ describe Y2Firewall::ProposalSettings do
 
       it "sets the vnc port to be opened" do
         expect_any_instance_of(described_class).to receive(:open_vnc!)
+
+        described_class.create_instance
+      end
+    end
+
+    context "when no root password was set" do
+      before do
+        allow(Yast::Linuxrc).to receive(:usessh).and_return(false)
+        allow(Yast::UsersSimple).to receive(:GetRootPassword)
+          .and_return("")
+      end
+
+      it "opens SSH to allow public key authentication" do
+        expect_any_instance_of(described_class).to receive(:enable_sshd!)
+        expect_any_instance_of(described_class).to receive(:open_ssh!)
 
         described_class.create_instance
       end

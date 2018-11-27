@@ -20,75 +20,64 @@
 # ------------------------------------------------------------------------------
 
 require "yast"
+require "cwm/common_widgets"
 require "cwm/page"
 require "y2firewall/firewalld"
+require "y2firewall/helpers/interfaces"
+require "y2firewall/widgets/interfaces_table"
+require "y2firewall/widgets/change_zone_button"
+require "y2firewall/widgets/zone_interfaces_button"
 
 module Y2Firewall
   module Widgets
     module Pages
-      # A page for network interfaces, has {Interface} as subpages
+      # A page for network interfaces
       class Interfaces < CWM::Page
+        include Y2Firewall::Helpers::Interfaces
+
         # Constructor
         #
-        # @param pager [CWM::TreePager]
+        # @param _pager [CWM::TreePager]
         def initialize(_pager)
           textdomain "firewall"
-          @fw = Y2Firewall::Firewalld.instance
         end
 
         # @macro seeAbstractWidget
         def label
-          "Interfaces" # FIXME
+          _("Interfaces")
         end
 
         # @macro seeCustomWidget
         def contents
-          Label("TODO: List of interfaces here")
-        end
-      end
-
-      # A page for one network interface
-      class Interface < CWM::Page
-        # Constructor
-        #
-        # @param interface [Hash<String,String>] "id", "name" and "zone"
-        # @param pager [CWM::TreePager]
-        def initialize(interface, _pager)
-          textdomain "firewall"
-          @interface = interface
-          @sb = ZoneBox.new(interface)
-          self.widget_id = "ifc:" + label
+          return @contents if @contents
+          @contents = VBox(
+            Left(Heading(_("Interfaces"))),
+            interfaces_table,
+            HBox(
+              interfaces.empty? ? Empty() : change_zone_button,
+              zone_interfaces_button
+            )
+          )
         end
 
-        # @macro seeAbstractWidget
-        def label
-          @interface["id"]
+      private
+
+        # @return [Y2Firewall::Widgets::InterfacesTable] Table containing all interfaces
+        def interfaces_table
+          @interfaces_table ||= InterfacesTable.new(interfaces, change_zone_button)
         end
 
-        # @macro seeCustomWidget
-        def contents
-          VBox(@sb)
+        # @return [Y2Firewall::Widgets::ChangeZoneButton] Buttton to change the zone
+        def change_zone_button
+          @change_zone_button ||= ChangeZoneButton.new(interfaces.first)
         end
 
-        # Selecting a zone to which an interface belongs
-        class ZoneBox < CWM::SelectionBox
-          # @param interface [Hash<String,String>] "id", "name" and "zone"
-          def initialize(interface)
-            @interface = interface
-            @zones = Y2Firewall::Firewalld.instance.zones
-          end
+        def zone_interfaces_button
+          @zone_interfaces_button ||= ZoneInterfacesButton.new
+        end
 
-          def label
-            format(_("Zone for Interface %s"), @interface["id"])
-          end
-
-          def items
-            @zones.map { |z| [z.name, z.name] }
-          end
-
-          def init
-            self.value = @interface["zone"]
-          end
+        def interfaces
+          known_interfaces + unknown_interfaces
         end
       end
     end

@@ -22,3 +22,13 @@
 require "y2firewall/widgets/pages/interfaces"
 require "y2firewall/widgets/pages/startup"
 require "y2firewall/widgets/pages/zones"
+require "y2firewall/widgets/pages/zone"
+
+# Work around YARD inability to link across repos/gems:
+
+# @!macro [new] seeAbstractWidget
+#   @see http://www.rubydoc.info/github/yast/yast-yast2/CWM%2FAbstractWidget:${0}
+# @!macro [new] seeCustomWidget
+#   @see http://www.rubydoc.info/github/yast/yast-yast2/CWM%2FCustomWidget:${0}
+# @!macro [new] seeDialog
+#   @see http://www.rubydoc.info/github/yast/yast-yast2/CWM%2FDialog:${0}

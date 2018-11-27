@@ -31,7 +31,7 @@ module Y2Firewall
         @table = table
       end
 
-      def fw
+      def firewall
         Y2Firewall::Firewalld.instance
       end
     end

@@ -19,45 +19,36 @@
 # To contact SUSE LLC about this file by physical or electronic mail, you may
 # find current contact information at www.suse.com.
 
-require "cwm/popup"
-require "y2firewall/widgets/zone"
+require "cwm"
+require "y2firewall/dialogs/change_zone"
+require "y2firewall/ui_state"
 
 module Y2Firewall
-  module Dialogs
-    class Zone < CWM::Popup
-      def initialize(zone, new_zone = false)
+  module Widgets
+    # This button opens a dialog to change the zone for a given interface
+    class ChangeZoneButton < CWM::PushButton
+      # @!attribute [r] interface
+      #   @return [Y2Firewall::Firewalld::Interface] Interface to act on
+      attr_accessor :interface
+
+      # Constructor
+      #
+      # @param interface [Y2Firewall::Firewalld::Interface] Interface to act on
+      def initialize(interface)
         textdomain "firewall"
-        @zone = zone
-        @new_zone = new_zone
+        @interface = interface
       end
 
-      def title
-        @new_zone ? _("Adding new zone") : format(_("Editing zone '%s'") % @zone.name)
+      # @macro seeAbstractWidget
+      def label
+        _("Change Zone")
       end
 
-      def contents
-        MinWidth(70,
-          VBox(
-            Left(NameWidget.new(@zone)),
-            VSpacing(1),
-            Left(ShortWidget.new(@zone)),
-            VSpacing(1),
-            Left(DescriptionWidget.new(@zone)),
-            VSpacing(1),
-            Left(TargetWidget.new(@zone)),
-            VSpacing(1),
-            Left(MasqueradeWidget.new(@zone))
-          ))
-      end
-
-      def abort_button
-        Yast::Label.CancelButton
-      end
-
-    private
-
-      def min_height
-        10
+      # @macro seeAbstractWidget
+      def handle
+        return nil unless interface
+        result = Dialogs::ChangeZone.run(interface)
+        result == :ok ? :redraw : nil
       end
     end
   end

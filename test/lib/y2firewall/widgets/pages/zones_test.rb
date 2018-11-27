@@ -1,4 +1,4 @@
-# encoding: utf-8
+#!/usr/bin/env rspec
 
 # ------------------------------------------------------------------------------
 # Copyright (c) 2018 SUSE LLC
@@ -19,28 +19,16 @@
 # current contact information at www.suse.com.
 # ------------------------------------------------------------------------------
 
-require "yast"
-require "yast/i18n"
-require "yast2/popup"
-require "cwm/tree_pager"
-require "y2firewall/dialogs/main"
+require_relative "../../../../test_helper.rb"
+require "cwm/rspec"
+require "y2firewall/widgets/pages/zones"
 
-module Y2Firewall
-  # YaST "clients" are the CLI entry points
-  module Clients
-    # The entry point for starting the firewall UI.
-    class FirewallNew
-      include Yast::I18n
-      include Yast::Logger
-
-      def initialize
-        textdomain "firewall"
-      end
-
-      # Runs the client
-      def run
-        Dialogs::Main.new.run
-      end
-    end
+describe Y2Firewall::Widgets::Pages::Zones do
+  subject { described_class.new(double("fake pager")) }
+  before do
+    fw = double("fake firewall", zones: [])
+    allow(Y2Firewall::Firewalld).to receive(:instance).and_return(fw)
   end
+
+  include_examples "CWM::Page"
 end

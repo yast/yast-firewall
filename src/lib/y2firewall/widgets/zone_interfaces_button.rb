@@ -19,45 +19,32 @@
 # To contact SUSE LLC about this file by physical or electronic mail, you may
 # find current contact information at www.suse.com.
 
-require "cwm/popup"
-require "y2firewall/widgets/zone"
+require "cwm"
+require "y2firewall/dialogs/modify_zone_interfaces"
+require "y2firewall/ui_state"
 
 module Y2Firewall
-  module Dialogs
-    class Zone < CWM::Popup
-      def initialize(zone, new_zone = false)
+  module Widgets
+    # This button opens a dialog to change the interfaces of the selected zone
+    class ZoneInterfacesButton < CWM::PushButton
+      # Constructor
+      def initialize
         textdomain "firewall"
-        @zone = zone
-        @new_zone = new_zone
       end
 
-      def title
-        @new_zone ? _("Adding new zone") : format(_("Editing zone '%s'") % @zone.name)
+      def opt
+        [:key_F7]
       end
 
-      def contents
-        MinWidth(70,
-          VBox(
-            Left(NameWidget.new(@zone)),
-            VSpacing(1),
-            Left(ShortWidget.new(@zone)),
-            VSpacing(1),
-            Left(DescriptionWidget.new(@zone)),
-            VSpacing(1),
-            Left(TargetWidget.new(@zone)),
-            VSpacing(1),
-            Left(MasqueradeWidget.new(@zone))
-          ))
+      # @macro seeAbstractWidget
+      def label
+        _("C&ustom...")
       end
 
-      def abort_button
-        Yast::Label.CancelButton
-      end
-
-    private
-
-      def min_height
-        10
+      # @macro seeAbstractWidget
+      def handle
+        result = Dialogs::ModifyZoneInterfaces.run
+        result == :ok ? :redraw : nil
       end
     end
   end
