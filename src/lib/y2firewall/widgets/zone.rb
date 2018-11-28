@@ -68,13 +68,21 @@ module Y2Firewall
       end
 
       def validate
-        return false if value.to_s.empty?
+        return true unless value.to_s.empty?
 
-        true
+        Yast::Report.Error(_("Please, provide a short name for the zone"))
+        focus
+        false
       end
 
       def store
         @zone.short = value
+      end
+
+      # Sets the focus into this widget
+      # TODO: move to CWM itself
+      def focus
+        Yast::UI.SetFocus(Id(widget_id))
       end
     end
 
@@ -92,14 +100,21 @@ module Y2Firewall
       end
 
       def validate
-        return true if !value.to_s.empty?
+        return true unless value.to_s.empty?
 
-        Yast::Report.Error(_("The description of the zone cannot be empty"))
+        Yast::Report.Error(_("Please, provide a description for the zone"))
+        focus
         false
       end
 
       def store
         @zone.description = value
+      end
+
+      # Sets the focus into this widget
+      # TODO: move to CWM itself
+      def focus
+        Yast::UI.SetFocus(Id(widget_id))
       end
     end
 
