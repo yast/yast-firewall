@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Sat Nov 24 16:51:09 UTC 2018 - Stasiek Michalski <hellcp@mailbox.org>
+
+- Provide icon with module (boo#1109310)
+- 4.1.1
+
+-------------------------------------------------------------------
 Wed Nov 21 16:57:37 UTC 2018 - knut.anderssen@suse.com
 
 - Drop completely old SuSEFirewall2 dialogs and modules.
