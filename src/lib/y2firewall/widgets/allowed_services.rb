@@ -95,7 +95,7 @@ module Y2Firewall
       def validate
         # check for missed selection in ncurses only as in qt selected entries is basically
         # just highlight and after move it is still selected, so more confusing.
-        return true if Yast::UI.textmode
+        return true unless Yast::UI.TextMode
 
         return true if selected_services.empty?
         # TRANSLATORS: popup question
