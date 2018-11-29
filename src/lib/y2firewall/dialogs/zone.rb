@@ -24,6 +24,7 @@ require "y2firewall/widgets/zone"
 
 module Y2Firewall
   module Dialogs
+    # Dialog for add/modify zone
     class Zone < CWM::Popup
       def initialize(zone, new_zone = false)
         textdomain "firewall"

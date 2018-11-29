@@ -23,6 +23,7 @@ require "y2firewall/widgets/zone"
 
 module Y2Firewall
   module Dialogs
+    # Name of zone. Can be disabled for modification
     class NameWidget < CWM::InputField
       include Yast::I18n
 
@@ -59,6 +60,7 @@ module Y2Firewall
       end
     end
 
+    # short name of zone.
     class ShortWidget < CWM::InputField
       include Yast::I18n
 
@@ -94,6 +96,8 @@ module Y2Firewall
       end
     end
 
+    # textual description of widget
+    # TODO: does not show nicely for long description
     class DescriptionWidget < CWM::InputField
       include Yast::I18n
 
@@ -129,6 +133,7 @@ module Y2Firewall
       end
     end
 
+    # target of zone
     class TargetWidget < CWM::ComboBox
       def initialize(zone)
         @zone = zone
@@ -151,6 +156,7 @@ module Y2Firewall
       end
     end
 
+    # enabling masquerade for zone
     class MasqueradeWidget < CWM::CheckBox
       include Yast::I18n
 

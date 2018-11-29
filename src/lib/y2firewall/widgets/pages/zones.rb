@@ -33,7 +33,6 @@ require "y2firewall/widgets/default_zone_button"
 module Y2Firewall
   module Widgets
     module Pages
-
       # A page for firewall zones:
       #   contains {ZonesTable}, has {Zone} as subpages.
       class Zones < CWM::Page
@@ -68,6 +67,7 @@ module Y2Firewall
           )
         end
 
+        # Add zone button
         class AddButton < ZoneButton
           def label
             _("Add")
@@ -88,6 +88,7 @@ module Y2Firewall
           end
         end
 
+        # Edit zone button
         class EditButton < ZoneButton
           def label
             _("Edit")
@@ -103,6 +104,7 @@ module Y2Firewall
           end
         end
 
+        # Remove zone button
         class RemoveButton < ZoneButton
           def label
             _("Remove")
