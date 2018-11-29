@@ -38,7 +38,8 @@ module Y2Firewall
       def contents
         MinWidth(70,
           VBox(
-            Left(NameWidget.new(@zone)),
+            # do not allow to change name for already created zone
+            Left(NameWidget.new(@zone, disabled: !@new_zone)),
             VSpacing(1),
             Left(ShortWidget.new(@zone)),
             VSpacing(1),

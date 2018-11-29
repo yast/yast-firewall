@@ -24,12 +24,17 @@ require "y2firewall/widgets/zone"
 module Y2Firewall
   module Dialogs
     class NameWidget < CWM::InputField
-      def initialize(zone)
+      include Yast::I18n
+
+      def initialize(zone, disabled: false)
+        textdomain "textdomain"
         @zone = zone
+        @disabled = disabled
       end
 
       def init
         self.value = @zone.name
+        @disabled ? disable : enable
       end
 
       def label
@@ -55,7 +60,10 @@ module Y2Firewall
     end
 
     class ShortWidget < CWM::InputField
+      include Yast::I18n
+
       def initialize(zone)
+        textdomain "textdomain"
         @zone = zone
       end
 
@@ -87,7 +95,10 @@ module Y2Firewall
     end
 
     class DescriptionWidget < CWM::InputField
+      include Yast::I18n
+
       def initialize(zone)
+        textdomain "textdomain"
         @zone = zone
       end
 
@@ -141,7 +152,10 @@ module Y2Firewall
     end
 
     class MasqueradeWidget < CWM::CheckBox
+      include Yast::I18n
+
       def initialize(zone)
+        textdomain "textdomain"
         @zone = zone
       end
 
