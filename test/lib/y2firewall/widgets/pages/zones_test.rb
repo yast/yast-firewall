@@ -32,3 +32,68 @@ describe Y2Firewall::Widgets::Pages::Zones do
 
   include_examples "CWM::Page"
 end
+
+describe Y2Firewall::Widgets::Pages::Zones::AddButton do
+  subject { described_class.new(double("pager"), double("table", value: "dmz")) }
+  before do
+    allow(Y2Firewall::Dialogs::Zone).to receive(:run)
+  end
+
+  include_examples "CWM::PushButton"
+
+  describe "#handle" do
+    it "shows zone dialog" do
+      expect(Y2Firewall::Dialogs::Zone).to receive(:run)
+
+      subject.handle
+    end
+
+    context "zone dialog confirmed" do
+      before do
+        allow(Y2Firewall::Dialogs::Zone).to receive(:run).and_return(:ok)
+      end
+
+      it "returns :redraw" do
+        expect(subject.handle).to eq :redraw
+      end
+
+      it "adds zone to zones" do
+        expect { subject.handle }.to change(subject.firewall, :zones)
+      end
+    end
+
+    context "zone dialog canceled" do
+      before do
+        allow(Y2Firewall::Dialogs::Zone).to receive(:run).and_return(:cancel)
+      end
+
+      it "returns nil" do
+        expect(subject.handle).to eq nil
+      end
+    end
+  end
+end
+
+describe Y2Firewall::Widgets::Pages::Zones::EditButton do
+  subject { described_class.new(double("pager"), double("table", value: "dmz")) }
+
+  before do
+    allow(Y2Firewall::Dialogs::Zone).to receive(:run)
+
+    allow(subject.firewall).to receive(:find_zone).and_return(double(name: "dmz"))
+  end
+
+  include_examples "CWM::PushButton"
+end
+
+describe Y2Firewall::Widgets::Pages::Zones::RemoveButton do
+  subject { described_class.new(double("pager"), double("table", value: "my_zone")) }
+
+  before do
+    allow(Y2Firewall::Dialogs::Zone).to receive(:run)
+
+    allow(subject.firewall).to receive(:find_zone).and_return(double(name: "my_zone"))
+  end
+
+  include_examples "CWM::PushButton"
+end
