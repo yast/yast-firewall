@@ -20,6 +20,7 @@
 # ------------------------------------------------------------------------------
 
 require "yast"
+require "yast2/popup"
 require "cwm/page"
 require "y2firewall/firewalld"
 require "y2firewall/ui_state"
@@ -112,6 +113,11 @@ module Y2Firewall
 
           def handle
             zone = firewall.find_zone(@table.value.to_s)
+            if Y2Firewall::Firewalld::Zone.known_zones.key?(zone.name)
+              Yast2::Popup.show(_("Builtin zone cannot be removed."), headline: :error)
+              return nil
+            end
+
             firewall.remove_zone(zone.name)
 
             :redraw
