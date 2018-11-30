@@ -20,6 +20,7 @@
 # find current contact information at www.suse.com.
 
 require "y2firewall/widgets/zone"
+require "cwm/widget"
 
 module Y2Firewall
   module Dialogs

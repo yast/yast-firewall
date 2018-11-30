@@ -26,6 +26,9 @@ module Y2Firewall
   module Dialogs
     # Dialog for add/modify zone
     class Zone < CWM::Popup
+      # @param zone [Y2Firewall::Firewalld::Zone] holder for configuration or
+      #   existing zone
+      # @param new_zone [Boolean] if it creates new zone or edit existing
       def initialize(zone, new_zone = false)
         textdomain "firewall"
         @zone = zone
