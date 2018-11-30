@@ -1,4 +1,13 @@
 -------------------------------------------------------------------
+Fri Nov 30 15:13:02 UTC 2018 - jreidinger@suse.com
+
+- Add ability to add/edit/remove zone (fate#324662)
+- Show warning about lost selection only in ncurses and improve
+  text
+- add confirmation when aborting module
+- 4.1.2
+
+-------------------------------------------------------------------
 Sat Nov 24 16:51:09 UTC 2018 - Stasiek Michalski <hellcp@mailbox.org>
 
 - Provide icon with module (boo#1109310)

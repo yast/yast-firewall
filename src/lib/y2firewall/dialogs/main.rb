@@ -25,6 +25,7 @@ require "y2firewall/widgets/overview_tree_pager"
 
 Yast.import "Label"
 Yast.import "Mode"
+Yast.import "Popup"
 
 module Y2Firewall
   module Dialogs
@@ -95,7 +96,7 @@ module Y2Firewall
 
       # @return [Boolean] it aborts if returns true
       def abort_handler
-        true
+        Yast::Popup.ReallyAbort(fw.modified?)
       end
 
       # @return [Boolean] it goes back if returns true

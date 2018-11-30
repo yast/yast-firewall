@@ -61,6 +61,19 @@ describe Y2Firewall::Widgets::AllowedServices do
   end
 
   describe "#validate" do
+    before do
+      allow(Yast::UI).to receive(:TextMode).and_return(true)
+    end
+
+    context "in qt" do
+      before do
+        allow(Yast::UI).to receive(:TextMode).and_return(false)
+      end
+
+      it "always return true" do
+        expect(widget.validate).to eq(true)
+      end
+    end
     context "when no service has been selected" do
       before do
         allow(available_svcs_table).to receive(:selected_services).and_return([])

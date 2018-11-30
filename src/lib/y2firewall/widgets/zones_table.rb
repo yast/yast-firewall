@@ -56,7 +56,7 @@ module Y2Firewall
       def init
         zone = Y2Firewall::UIState.instance.row_id
         self.value = zone if zone && zones.map(&:name).include?(zone.to_s)
-        update_default_zone_button
+        update_default_zone_button if selected_zone
       end
 
       # @see CWM::Table#header
