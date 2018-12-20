@@ -21,6 +21,7 @@
 
 require_relative "../../../../test_helper.rb"
 require "cwm/rspec"
+require "cwm/service_widget"
 require "y2firewall/widgets/pages/startup"
 
 describe Y2Firewall::Widgets::Pages::Startup do
@@ -29,48 +30,15 @@ describe Y2Firewall::Widgets::Pages::Startup do
 
   let(:firewalld) { Y2Firewall::Firewalld.instance }
   let(:system_service) { Yast2::SystemService.build(Y2Firewall::Firewalld::SERVICE) }
-  let(:service_status) { ::UI::ServiceStatus.new(system_service.service) }
+  let(:service_widget) { ::CWM::ServiceWidget.new(system_service.service) }
 
   before do
-    allow(widget).to receive(:status_widget).and_return(service_status)
+    allow(widget).to receive(:status_widget).and_return(service_widget)
   end
 
-  describe "#store" do
-    let(:enabled) { false }
-    let(:reload) { true }
-
-    before do
-      allow(firewalld).to receive(:system_service).and_return(system_service)
-      allow(service_status).to receive(:enabled_flag?).and_return(enabled)
-      allow(service_status).to receive(:reload_flag?).and_return(reload)
-    end
-
-    context "when the service status enable flag is selected" do
-      let(:enabled) { true }
-
-      it "marks the service to be enabled on boot" do
-        expect(system_service).to receive(:start_mode=).with(:on_boot)
-
-        widget.store
-      end
-    end
-
-    context "when the service status enable flag is not selected" do
-      it "marks the service to be enabled manually" do
-        expect(system_service).to receive(:start_mode=).with(:manual)
-
-        widget.store
-      end
-    end
-
-    context "when the service status reload flag is choosen" do
-      let(:reload) { true }
-
-      it "marks the service to be reloaded after write" do
-        expect(system_service).to receive(:reload)
-
-        widget.store
-      end
+  describe "#contents" do
+    it "shows the CWM::ServiceWidget for the #{Y2Firewall::Firewalld::SERVICE} service" do
+      expect(widget.contents).to include(service_widget)
     end
   end
 end

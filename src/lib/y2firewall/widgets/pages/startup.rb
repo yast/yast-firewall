@@ -21,8 +21,8 @@
 
 require "yast"
 require "cwm/page"
+require "cwm/service_widget"
 require "y2firewall/firewalld"
-require "ui/service_status"
 
 module Y2Firewall
   module Widgets
@@ -44,27 +44,9 @@ module Y2Firewall
         # @macro seeCustomWidget
         def contents
           VBox(
-            status_widget.widget,
+            status_widget,
             VStretch()
           )
-        end
-
-        # @return [Symbol, nil] returns :swap_mode if the service is started
-        #   or stopped and returns nil othwerwise
-        def handle(input)
-          result = status_widget.handle_input(input["ID"])
-          return :swap_mode if result == :start || result == :stop
-
-          nil
-        end
-
-        def store
-          system_service.start_mode = status_widget.enabled_flag? ? :on_boot : :manual
-          system_service.reload if status_widget.reload_flag?
-        end
-
-        def help
-          status_widget.help
         end
 
       private
@@ -72,7 +54,7 @@ module Y2Firewall
         # This is a generic widget in SLE15; may not be appropriate.
         # For SLE15-SP1, use CWM::ServiceWidget
         def status_widget
-          @status_widget ||= ::UI::ServiceStatus.new(system_service.service)
+          @status_widget ||= ::CWM::ServiceWidget.new(system_service)
         end
 
         # Convenience method to obtain the firewall system service
