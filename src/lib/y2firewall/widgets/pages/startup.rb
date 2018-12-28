@@ -51,8 +51,6 @@ module Y2Firewall
 
       private
 
-        # This is a generic widget in SLE15; may not be appropriate.
-        # For SLE15-SP1, use CWM::ServiceWidget
         def status_widget
           @status_widget ||= ::CWM::ServiceWidget.new(system_service)
         end

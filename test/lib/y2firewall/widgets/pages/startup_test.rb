@@ -20,24 +20,27 @@
 # ------------------------------------------------------------------------------
 
 require_relative "../../../../test_helper.rb"
+
 require "cwm/rspec"
 require "cwm/service_widget"
 require "y2firewall/widgets/pages/startup"
 
 describe Y2Firewall::Widgets::Pages::Startup do
-  include_examples "CWM::Page"
   subject(:widget) { described_class.new(double("fake pager")) }
 
-  let(:firewalld) { Y2Firewall::Firewalld.instance }
-  let(:system_service) { Yast2::SystemService.build(Y2Firewall::Firewalld::SERVICE) }
-  let(:service_widget) { ::CWM::ServiceWidget.new(system_service.service) }
+  include_examples "CWM::Page"
+
+  let(:service) { double("firewalld") }
+  let(:service_widget) { double("ServiceWidget") }
+  let(:fw_instance) { double("fw_instance", system_service: service) }
 
   before do
-    allow(widget).to receive(:status_widget).and_return(service_widget)
+    allow(Y2Firewall::Firewalld).to receive(:instance).and_return(fw_instance)
+    allow(::CWM::ServiceWidget).to receive(:new).and_return(service_widget)
   end
 
   describe "#contents" do
-    it "shows the CWM::ServiceWidget for the #{Y2Firewall::Firewalld::SERVICE} service" do
+    it "includes the ::CWM::ServiceWidget content" do
       expect(widget.contents).to include(service_widget)
     end
   end
