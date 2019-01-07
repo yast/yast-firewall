@@ -28,10 +28,11 @@ module Y2Firewall
     class NameWidget < CWM::InputField
       include Yast::I18n
 
-      def initialize(zone, disabled: false)
+      def initialize(zone, disabled: false, existing_names: [])
         textdomain "textdomain"
         @zone = zone
         @disabled = disabled
+        @existing_names = existing_names
       end
 
       def init
@@ -44,11 +45,17 @@ module Y2Firewall
       end
 
       def validate
-        return true if value.to_s.match?(/^\w+$/)
-
-        Yast::Report.Error(_("Please, provide a valid alphanumeric name for the zone"))
-        focus
-        false
+        if !value.to_s.match?(/^\w+$/)
+          Yast::Report.Error(_("Please, provide a valid alphanumeric name for the zone"))
+          focus
+          false
+        elsif @existing_names.include?(value.to_s)
+          Yast::Report.Error(_("Name is already used. Please choose different name."))
+          focus
+          false
+        else
+          true
+        end
       end
 
       def store
