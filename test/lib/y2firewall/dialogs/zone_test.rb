@@ -30,5 +30,5 @@ describe Y2Firewall::Dialogs::Zone do
   include_examples "CWM::Dialog"
 
   let(:zone) { Y2Firewall::Firewalld::Zone.new(name: "test") }
-  subject { described_class.new(zone, false) }
+  subject { described_class.new(zone) }
 end

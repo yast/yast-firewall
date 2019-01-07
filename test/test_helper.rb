@@ -42,6 +42,7 @@ stub_module("UsersSimple", Class.new { def self.GetRootPassword; "secret"; end }
 
 # some tests have translatable messages
 ENV["LANG"] = "en_US.UTF-8"
+ENV["LC_ALL"] = "en_US.UTF-8"
 
 if ENV["COVERAGE"]
   require "simplecov"
