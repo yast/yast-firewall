@@ -36,7 +36,7 @@ module Y2Firewall
       end
 
       def init
-        self.value = @zone.name
+        self.value = @zone.name || ""
         @disabled ? disable : enable
       end
 
@@ -78,7 +78,7 @@ module Y2Firewall
       end
 
       def init
-        self.value = @zone.short
+        self.value = @zone.short || ""
       end
 
       def label
@@ -115,7 +115,7 @@ module Y2Firewall
       end
 
       def init
-        self.value = @zone.description
+        self.value = @zone.description || ""
       end
 
       def label
