@@ -54,11 +54,13 @@ describe Y2Firewall::Dialogs::Main do
 
   describe "#run" do
     let(:result) { :next }
+    let(:action) { nil }
     let(:firewall_service) do
       instance_double("Yast2::SystemService",
         save:     true,
         running?: true,
-        restart:  nil)
+        restart:  nil,
+        action:   action)
     end
 
     before do
@@ -80,10 +82,24 @@ describe Y2Firewall::Dialogs::Main do
         subject.run
       end
 
-      it "restart the running firewalld systemd service" do
-        expect(firewall.system_service).to receive(:restart)
+      context "user has not changed the service running state" do
+        let(:action) { nil }
 
-        subject.run
+        it "restart the running firewalld systemd service" do
+          expect(firewall.system_service).to receive(:restart)
+
+          subject.run
+        end
+      end
+
+      context "service has been stopped by the user" do
+        let(:action) { :stop }
+
+        it "do not restart the running firewalld systemd service" do
+          expect(firewall.system_service).to_not receive(:restart)
+
+          subject.run
+        end
       end
 
       it "returns :next" do
