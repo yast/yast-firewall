@@ -130,11 +130,11 @@ module Y2Firewall
       # modifications
       def apply_changes
         return false if Yast::Mode.config
-        # Firewall setting will be written in the permanent configuration only.
-        # So the running firewall service will not be changed. Even a reload does
-        # not help (see man pages). So the running firewall service has to be
+        # Firewall settings will be written into the permanent configurations only.
+        # So the running firewalld service will not be changed. Even a reload does
+        # not help (see man pages). So the running firewalld service has to be
         # restarted.
-        # Sets a flag only. Restarting will be done by system_service.save.
+        # Set a flag only. Restarting will be done by system_service.save.
         fw.system_service.restart if fw.system_service.running? && fw.modified?
 
         fw.write_only
