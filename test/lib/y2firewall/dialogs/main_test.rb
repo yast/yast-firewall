@@ -54,11 +54,17 @@ describe Y2Firewall::Dialogs::Main do
 
   describe "#run" do
     let(:result) { :next }
-    let(:firewall_service) { instance_double("Yast2::SystemService", save: true) }
+    let(:firewall_service) do
+      instance_double("Yast2::SystemService",
+        save:     true,
+        running?: true,
+        restart:  nil)
+    end
 
     before do
       allow_any_instance_of(CWM::Dialog).to receive(:run).and_return(result)
       allow(firewall).to receive(:system_service).and_return(firewall_service)
+      allow(firewall).to receive(:modified?).and_return(true)
     end
 
     context "when the user accepts the changes" do
@@ -70,6 +76,12 @@ describe Y2Firewall::Dialogs::Main do
 
       it "updates the firewalld systemd service status" do
         expect(firewall.system_service).to receive(:save)
+
+        subject.run
+      end
+
+      it "restart the running firewalld systemd service" do
+        expect(firewall.system_service).to receive(:restart)
 
         subject.run
       end
