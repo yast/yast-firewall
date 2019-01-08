@@ -54,11 +54,19 @@ describe Y2Firewall::Dialogs::Main do
 
   describe "#run" do
     let(:result) { :next }
-    let(:firewall_service) { instance_double("Yast2::SystemService", save: true) }
+    let(:action) { nil }
+    let(:firewall_service) do
+      instance_double("Yast2::SystemService",
+        save:     true,
+        running?: true,
+        restart:  nil,
+        action:   action)
+    end
 
     before do
       allow_any_instance_of(CWM::Dialog).to receive(:run).and_return(result)
       allow(firewall).to receive(:system_service).and_return(firewall_service)
+      allow(firewall).to receive(:modified?).and_return(true)
     end
 
     context "when the user accepts the changes" do
@@ -72,6 +80,26 @@ describe Y2Firewall::Dialogs::Main do
         expect(firewall.system_service).to receive(:save)
 
         subject.run
+      end
+
+      context "user has not changed the service running state" do
+        let(:action) { nil }
+
+        it "restart the running firewalld systemd service" do
+          expect(firewall.system_service).to receive(:restart)
+
+          subject.run
+        end
+      end
+
+      context "service has been stopped by the user" do
+        let(:action) { :stop }
+
+        it "do not restart the running firewalld systemd service" do
+          expect(firewall.system_service).to_not receive(:restart)
+
+          subject.run
+        end
       end
 
       it "returns :next" do
