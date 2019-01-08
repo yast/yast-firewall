@@ -135,7 +135,11 @@ module Y2Firewall
         # not help (see man pages). So the running firewalld service has to be
         # restarted.
         # Set a flag only. Restarting will be done by system_service.save.
-        fw.system_service.restart if fw.system_service.running? && fw.modified?
+        if fw.modified? && # Data has been changed by user
+            fw.system_service.running? &&      # The service is already running
+            fw.system_service.action != :stop  # and will not be stopped by the user
+          fw.system_service.restart
+        end
 
         fw.write_only
         fw.system_service.save
