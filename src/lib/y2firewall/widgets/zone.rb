@@ -193,7 +193,7 @@ module Y2Firewall
                  "a network without assigned IP addresses to communicate using server’s" \
                  "assigned IP address."
         ),
-          title)
+          label)
       end
     end
   end
