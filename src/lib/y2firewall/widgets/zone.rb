@@ -174,7 +174,7 @@ module Y2Firewall
       end
 
       def label
-        _("Masquerade")
+        _("IPv4 Masquerade")
       end
 
       def init
@@ -183,6 +183,17 @@ module Y2Firewall
 
       def store
         @zone.masquerade = value
+      end
+
+      def help
+        format(_(
+                 "<b>%s</b> sets masquerade for given zone. Option is for IPv4 only." \
+                 "For IPv6 command line tool firewall-cmd and rich rules needs to be used." \
+                 "IP Masquerade, also called IPMASQ or MASQ, allows one or more computers in " \
+                 "a network without assigned IP addresses to communicate using server’s" \
+                 "assigned IP address."
+        ),
+          title)
       end
     end
   end
