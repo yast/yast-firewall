@@ -28,14 +28,15 @@ module Y2Firewall
     class NameWidget < CWM::InputField
       include Yast::I18n
 
-      def initialize(zone, disabled: false)
+      def initialize(zone, disabled: false, existing_names: [])
         textdomain "textdomain"
         @zone = zone
         @disabled = disabled
+        @existing_names = existing_names
       end
 
       def init
-        self.value = @zone.name
+        self.value = @zone.name || ""
         @disabled ? disable : enable
       end
 
@@ -44,11 +45,17 @@ module Y2Firewall
       end
 
       def validate
-        return true if value.to_s.match?(/^\w+$/)
-
-        Yast::Report.Error(_("Please, provide a valid alphanumeric name for the zone"))
-        focus
-        false
+        if !value.to_s.match?(/^\w+$/)
+          Yast::Report.Error(_("Please, provide a valid alphanumeric name for the zone"))
+          focus
+          false
+        elsif @existing_names.include?(value.to_s)
+          Yast::Report.Error(_("Name is already used. Please choose different name."))
+          focus
+          false
+        else
+          true
+        end
       end
 
       def store
@@ -71,7 +78,7 @@ module Y2Firewall
       end
 
       def init
-        self.value = @zone.short
+        self.value = @zone.short || ""
       end
 
       def label
@@ -108,7 +115,7 @@ module Y2Firewall
       end
 
       def init
-        self.value = @zone.description
+        self.value = @zone.description || ""
       end
 
       def label
@@ -167,7 +174,7 @@ module Y2Firewall
       end
 
       def label
-        _("Masquerade")
+        _("IPv4 Masquerade")
       end
 
       def init
@@ -176,6 +183,17 @@ module Y2Firewall
 
       def store
         @zone.masquerade = value
+      end
+
+      def help
+        format(_(
+                 "<b>%s</b> sets masquerade for given zone. Option is for IPv4 only." \
+                 "For IPv6 command line tool firewall-cmd and rich rules needs to be used." \
+                 "IP Masquerade, also called IPMASQ or MASQ, allows one or more computers in " \
+                 "a network without assigned IP addresses to communicate using server’s" \
+                 "assigned IP address."
+        ),
+          label)
       end
     end
   end

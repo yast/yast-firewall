@@ -29,10 +29,13 @@ module Y2Firewall
       # @param zone [Y2Firewall::Firewalld::Zone] holder for configuration or
       #   existing zone
       # @param new_zone [Boolean] if it creates new zone or edit existing
-      def initialize(zone, new_zone = false)
+      # @param existing_names [Array<String>] names have to be unique, so pass existing ones
+      #   which cannot be used.
+      def initialize(zone, new_zone: false, existing_names: [])
         textdomain "firewall"
         @zone = zone
         @new_zone = new_zone
+        @existing_names = existing_names
       end
 
       def title
@@ -43,7 +46,7 @@ module Y2Firewall
         MinWidth(70,
           VBox(
             # do not allow to change name for already created zone
-            Left(NameWidget.new(@zone, disabled: !@new_zone)),
+            Left(NameWidget.new(@zone, disabled: !@new_zone, existing_names: @existing_names)),
             VSpacing(1),
             Left(ShortWidget.new(@zone)),
             VSpacing(1),

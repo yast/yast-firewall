@@ -23,12 +23,34 @@
 require_relative "../../../test_helper"
 
 require "cwm/rspec"
-require "y2firewall/dialogs/zone"
-require "y2firewall/firewalld/zone"
+require "y2firewall/widgets/zone"
 
-describe Y2Firewall::Dialogs::Zone do
-  include_examples "CWM::Dialog"
+describe Y2Firewall::Dialogs::NameWidget do
+  subject { described_class.new(double(name: "test")) }
 
-  let(:zone) { Y2Firewall::Firewalld::Zone.new(name: "test") }
-  subject { described_class.new(zone) }
+  include_examples "CWM::AbstractWidget"
+end
+
+describe Y2Firewall::Dialogs::ShortWidget do
+  subject { described_class.new(double(short: "test")) }
+
+  include_examples "CWM::AbstractWidget"
+end
+
+describe Y2Firewall::Dialogs::DescriptionWidget do
+  subject { described_class.new(double(description: "test")) }
+
+  include_examples "CWM::AbstractWidget"
+end
+
+describe Y2Firewall::Dialogs::TargetWidget do
+  subject { described_class.new(double(target: "default")) }
+
+  include_examples "CWM::ComboBox"
+end
+
+describe Y2Firewall::Dialogs::MasqueradeWidget do
+  subject { described_class.new(double(masquerade: false)) }
+
+  include_examples "CWM::CheckBox"
 end
