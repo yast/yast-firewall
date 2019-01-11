@@ -73,7 +73,6 @@ module Y2Firewall
 
         loop do
           result = super
-          swap_api if result == :swap_mode
           break unless continue_running?(result)
         end
 
@@ -114,7 +113,7 @@ module Y2Firewall
       #
       # @return [Boolean] true in case of a dialog redraw or an api change
       def continue_running?(result)
-        result == :redraw || result == :swap_mode
+        result == :redraw
       end
 
       # Convenience method which return an instance of Y2Firewall::Firewalld
@@ -122,12 +121,6 @@ module Y2Firewall
       # @return [Y2Firewall::Firewalld] a firewalld instance
       def fw
         Y2Firewall::Firewalld.instance
-      end
-
-      # Modify the firewalld API instance in case the systemd service state has
-      # changed.
-      def swap_api
-        fw.api = Y2Firewall::Firewalld::Api.new
       end
 
       # Writes down the firewall configuration and the systemd service
