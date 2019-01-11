@@ -29,7 +29,7 @@ module Y2Firewall
       include Yast::I18n
 
       def initialize(zone, disabled: false, existing_names: [])
-        textdomain "textdomain"
+        textdomain "firewall"
         @zone = zone
         @disabled = disabled
         @existing_names = existing_names
