@@ -54,7 +54,7 @@ module Y2Firewall
       def initialize
         Yast.import "UI"
         Yast.import "HTML"
-        textdomain "installation"
+        textdomain "firewall"
 
         @settings ||= ProposalSettings.instance
       end
