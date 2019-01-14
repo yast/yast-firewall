@@ -17,7 +17,7 @@
 
 
 Name:           yast2-firewall
-Version:        3.2.1
+Version:        3.4.0
 Release:        0
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
@@ -30,8 +30,8 @@ BuildRequires:  yast2-devtools >= 3.1.10
 # IP::CheckNetwork
 BuildRequires:	yast2 >= 2.23.25
 
-# FirewallD backend
-Requires:	yast2 >= 3.1.191
+# network/firewall_chooser needed
+Requires:       yast2 >= 3.2.49
 
 # ButtonBox widget
 Conflicts:	yast2-ycp-ui-bindings < 2.17.3
