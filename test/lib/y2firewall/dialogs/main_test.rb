@@ -28,6 +28,7 @@ describe Y2Firewall::Dialogs::Main do
   let(:firewall) { Y2Firewall::Firewalld.instance }
 
   before do
+    firewall.reset
     allow(firewall).to receive(:read)
     allow_any_instance_of(Y2Firewall::Widgets::OverviewTreePager)
       .to receive(:items).and_return([])
