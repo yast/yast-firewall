@@ -60,20 +60,30 @@ module Y2Firewall
 
     private
 
-      ZONE_ATTRIBUTES = ["services", "interfaces", "protocols", "ports", "masquerade"].freeze
+      IGNORED_ATTRIBUTES = ["name", "short", "description"].freeze
 
       # Configures Y2Firewall::Firewalld::Zone that correspond with the
       # profile's firewall zone definition
       #
       # @param zone_definition [Hash] AutoYaST profile firewall's section
-      # @return [Boolean] true if the zone exist; nil otherwise
       def process_zone(zone_definition)
-        zone = firewalld.find_zone(zone_definition["name"])
-        return unless zone
-        ZONE_ATTRIBUTES.each do |attr|
-          zone.public_send("#{attr}=", zone_definition[attr]) if zone_definition[attr]
+        name = zone_definition["name"]
+        zone = firewalld.find_zone(name)
+        zone = create_zone(zone_definition) if !zone
+        (zone.attributes + zone.relations).each do |key|
+          next if IGNORED_ATTRIBUTES.include?(key.to_s)
+          zone.public_send("#{key}=", zone_definition[key.to_s]) if zone_definition[key.to_s]
         end
-        true
+      end
+
+      def create_zone(definition)
+        name = definition["name"]
+        zone = Y2Firewall::Firewalld::Zone.new(name: name)
+        zone.short = definition["short"] || name
+        zone.description = definition["description"] || name
+        firewalld.zones << zone
+
+        zone
       end
 
       # Convenience method which return an instance of Y2Firewall::Firewalld

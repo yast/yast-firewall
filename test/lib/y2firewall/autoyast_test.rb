@@ -51,7 +51,9 @@ describe Y2Firewall::Autoyast do
   describe "#strategy_for" do
     context "when the given profile uses a SuSEFirewall2 schema" do
       it "returns Y2Firewall::ImporterStrategies::SuSEFirewall" do
-        expect(subject.send(:strategy_for, profile)).to eq(Y2Firewall::ImporterStrategies::SuseFirewall)
+        expect(subject.send(:strategy_for, profile)).to(
+          eq(Y2Firewall::ImporterStrategies::SuseFirewall)
+        )
       end
     end
 
@@ -59,7 +61,9 @@ describe Y2Firewall::Autoyast do
       let(:profile) { { "zones" => [{ "name" => "public", "interfaces" => "eth0" }] } }
 
       it "returns Y2Firewall::ImporterStrategies::Firewalld" do
-        expect(subject.send(:strategy_for, profile)).to eq(Y2Firewall::ImporterStrategies::Firewalld)
+        expect(subject.send(:strategy_for, profile)).to(
+          eq(Y2Firewall::ImporterStrategies::Firewalld)
+        )
       end
     end
   end
