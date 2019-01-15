@@ -25,9 +25,9 @@ require "y2firewall/importer_strategies/suse_firewall"
 require "y2firewall/importer_strategies/firewalld"
 
 module Y2Firewall
-  # This class is responsible for importing firewalld AutoYaST configuration
-  # supporting the new firewalld schema but also the SuSEFirewall one.
-  class Importer
+  # This class is responsible for exporting/importing firewalld AutoYaST configuration
+  # supporting the new firewalld schema but also the SuSEFirewall one (for import).
+  class Autoyast
     include Yast::Logger
     # Import the given configuration
     #
@@ -40,6 +40,37 @@ module Y2Firewall
       strategy_for(profile).new(profile).import
 
       true
+    end
+
+    # Return a map with current firewalld settings.
+    #
+    # @return [Hash] dump firewalld settings
+    def export
+      return {} unless firewalld.installed?
+
+      {
+        "enable_firewall"    => firewalld.enabled?,
+        "start_firewall"     => firewalld.running?,
+        "default_zone"       => firewalld.default_zone,
+        "log_denied_packets" => firewalld.log_denied_packets,
+        "zones"              => firewalld.zones.map { |z| export_zone(z) }
+      }
+    end
+
+  private
+
+    def export_zone(zone)
+      (zone.attributes + zone.relations)
+        .each_with_object({}) do |field, profile|
+        profile[field.to_s] = zone.public_send(field) unless zone.public_send(field).nil?
+      end
+    end
+
+    # Return an instance of Y2Firewall::Firewalld
+    #
+    # @return [Y2Firewall::Firewalld] a firewalld instance
+    def firewalld
+      Y2Firewall::Firewalld.instance
     end
 
     # Given a profile defines the importer stragegy to be used.
@@ -68,15 +99,6 @@ module Y2Firewall
       return ImporterStrategies::SuseFirewall if profile.any? { |k, _v| k.start_with?("FW_") }
 
       ImporterStrategies::Firewalld
-    end
-
-  private
-
-    # Return an instance of Y2Firewall::Firewalld
-    #
-    # @return [Y2Firewall::Firewalld] a firewalld instance
-    def firewalld
-      Y2Firewall::Firewalld.instance
     end
   end
 end

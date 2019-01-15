@@ -20,9 +20,9 @@
 # ------------------------------------------------------------------------------
 
 require_relative "../../test_helper.rb"
-require "y2firewall/importer"
+require "y2firewall/autoyast"
 
-describe Y2Firewall::Importer do
+describe Y2Firewall::Autoyast do
   let(:profile) { { "FW_DEV_EXT" => "eth0" } }
 
   describe "#import" do
@@ -51,7 +51,7 @@ describe Y2Firewall::Importer do
   describe "#strategy_for" do
     context "when the given profile uses a SuSEFirewall2 schema" do
       it "returns Y2Firewall::ImporterStrategies::SuSEFirewall" do
-        expect(subject.strategy_for(profile)).to eq(Y2Firewall::ImporterStrategies::SuseFirewall)
+        expect(subject.send(:strategy_for, profile)).to eq(Y2Firewall::ImporterStrategies::SuseFirewall)
       end
     end
 
@@ -59,7 +59,7 @@ describe Y2Firewall::Importer do
       let(:profile) { { "zones" => [{ "name" => "public", "interfaces" => "eth0" }] } }
 
       it "returns Y2Firewall::ImporterStrategies::Firewalld" do
-        expect(subject.strategy_for(profile)).to eq(Y2Firewall::ImporterStrategies::Firewalld)
+        expect(subject.send(:strategy_for, profile)).to eq(Y2Firewall::ImporterStrategies::Firewalld)
       end
     end
   end
