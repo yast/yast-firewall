@@ -104,6 +104,11 @@ describe Y2Firewall::Autoyast do
       expect(external["ports"]).to eq(["5901/tcp", "5901/udp"])
       expect(external["protocols"]).to eq(["esp"])
     end
+
+    it "returned hash is valid for later import" do
+      config = subject.export
+      expect{subject.import(config)}.to_not raise_error
+    end
   end
 
   describe "#strategy_for" do
