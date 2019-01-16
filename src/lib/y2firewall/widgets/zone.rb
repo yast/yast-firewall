@@ -61,11 +61,6 @@ module Y2Firewall
       def store
         @zone.name = value
       end
-
-      # Sets the focus into this widget
-      def focus
-        Yast::UI.SetFocus(Id(widget_id))
-      end
     end
 
     # short name of zone.
@@ -95,12 +90,6 @@ module Y2Firewall
 
       def store
         @zone.short = value
-      end
-
-      # Sets the focus into this widget
-      # TODO: move to CWM itself
-      def focus
-        Yast::UI.SetFocus(Id(widget_id))
       end
     end
 
@@ -132,12 +121,6 @@ module Y2Firewall
 
       def store
         @zone.description = value
-      end
-
-      # Sets the focus into this widget
-      # TODO: move to CWM itself
-      def focus
-        Yast::UI.SetFocus(Id(widget_id))
       end
     end
 

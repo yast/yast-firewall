@@ -24,14 +24,14 @@ require "y2firewall/clients/auto"
 
 describe Y2Firewall::Clients::Auto do
   let(:firewalld) { Y2Firewall::Firewalld.instance }
-  let(:importer) { double("Y2Firewall::Importer", import: true) }
+  let(:autoyast) { double("Y2Firewall::Autoyast", import: true, export: {}) }
 
   before do
     allow_any_instance_of(Y2Firewall::Firewalld::Api).to receive(:running?).and_return(false)
     subject.class.imported = false
     allow(firewalld).to receive(:read)
     allow(firewalld).to receive(:installed?).and_return(true)
-    allow(subject).to receive(:importer).and_return(importer)
+    allow(subject).to receive(:autoyast).and_return(autoyast)
   end
 
   describe "#summary" do
@@ -173,7 +173,7 @@ describe Y2Firewall::Clients::Auto do
 
     context "once the current configuration has been set" do
       it "imports the given profile" do
-        expect(importer).to receive(:import).with(arguments)
+        expect(autoyast).to receive(:import).with(arguments)
 
         subject.import(arguments, false)
       end
@@ -188,7 +188,7 @@ describe Y2Firewall::Clients::Auto do
       end
 
       it "reports that an interface has been defined twice in zones" do
-        expect(firewalld).to receive(:export)
+        expect(autoyast).to receive(:export)
           .and_return("zones" => [{ "interfaces" => ["eth0"], "name" => "public" },
                                   { "interfaces" => ["eth0", "eth0"], "name" => "trusted" }])
         expect(i_list).to receive(:add)
@@ -202,7 +202,7 @@ describe Y2Firewall::Clients::Auto do
 
   describe "#export" do
     before do
-      allow(firewalld).to receive(:export)
+      allow(autoyast).to receive(:export)
         .and_return("zones" => {}, "default_zone" => "public", "log_denied_packets" => "unicast")
     end
 

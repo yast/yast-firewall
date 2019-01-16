@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Wed Jan 16 12:02:14 UTC 2019 - jreidinger@suse.com
+
+- Autoyast: remove unused options, move export to own class,
+  add support for custom zones in autoyast profile (fate#324662)
+- 4.1.8
+
+-------------------------------------------------------------------
 Fri Jan 11 16:25:41 UTC 2019 - lslezak@suse.cz
 
 - Fixed text domain names (bsc#1121643)

@@ -129,14 +129,10 @@ zones =
       zone_short? &
       zone_description? &
       zone_target? &
-      fwd_forward_ports? &
       fwd_interfaces? &
       fwd_ports? &
       fwd_protocols? &
-      fwd_rich_rules? &
       fwd_services? &
-      fwd_source_ports? &
-      fwd_sources? &
       masquerade?
     }*
   }
@@ -163,30 +159,6 @@ fwd_protocols =
   element protocols {
     LIST,
     element (protocol | listentry) {text}*
-  }
-
-fwd_sources =
-  element sources {
-    LIST,
-    element (source | listentry) {text}*
-  }
-
-fwd_rich_rules =
-  element rich_rules {
-    LIST,
-    element (rich_rule | litentry) {text}*
-  }
-
-fwd_source_ports =
-  element source_ports {
-    LIST,
-    element (souce_port | litentry) {text}*
-  }
-
-fwd_forward_ports =
-  element forward_ports {
-    LIST,
-    element (forward_port | litentry) {text}*
   }
 
 zone_name = element name { text }

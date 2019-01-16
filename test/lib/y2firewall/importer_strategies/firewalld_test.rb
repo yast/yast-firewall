@@ -41,7 +41,10 @@ describe Y2Firewall::ImporterStrategies::Firewalld do
         "zones"        => [
           { "name" => "dmz", "interfaces" => ["eth0.12"], "services" => ["samba"] },
           { "name" => "external", "interfaces" => ["eth0"], "services" => ["dhcp"] },
-          { "name" => "internal", "interfaces" => ["eth1"], "protocols" => ["icmp"] }
+          { "name" => "internal", "interfaces" => ["eth1"], "protocols" => ["icmp"] },
+          { "name" => "newzone", "short" => "new zone",
+            "description" => "nice new zone with fance protection",
+            "interfaces" => ["eth666"], "protocols" => ["icmp"], "target" => "ACCEPT" }
         ]
       }
     end
@@ -61,6 +64,7 @@ describe Y2Firewall::ImporterStrategies::Firewalld do
         dmz      = firewalld.find_zone("dmz")
         external = firewalld.find_zone("external")
         internal = firewalld.find_zone("internal")
+        new_zone = firewalld.find_zone("newzone")
 
         expect(dmz.interfaces).to eq(["eth0.12"])
         expect(external.interfaces).to eq(["eth0"])
@@ -68,6 +72,7 @@ describe Y2Firewall::ImporterStrategies::Firewalld do
         expect(external.services).to eq(["dhcp"])
         expect(internal.protocols).to eq(["icmp"])
         expect(firewalld.default_zone).to eq("dmz")
+        expect(new_zone.target).to eq "ACCEPT"
       end
     end
   end

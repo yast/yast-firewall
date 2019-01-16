@@ -21,7 +21,7 @@
 
 require "yast"
 require "y2firewall/firewalld"
-require "y2firewall/importer"
+require "y2firewall/autoyast"
 require "y2firewall/proposal_settings"
 require "y2firewall/summary_presenter"
 require "y2firewall/dialogs/main"
@@ -85,7 +85,7 @@ module Y2Firewall
         # Obtains the default from the control file (settings) if not present.
         enable if profile.fetch("enable_firewall", settings.enable_firewall)
         start if profile.fetch("start_firewall", false)
-        importer.import(profile)
+        autoyast.import(profile)
         check_profile_for_errors
         imported
       end
@@ -94,7 +94,7 @@ module Y2Firewall
       #
       # @return [Hash] with the current firewalld configuration
       def export
-        firewalld.export
+        autoyast.export
       end
 
       # Reset the current firewalld configuration.
@@ -180,7 +180,7 @@ module Y2Firewall
       # Problems will be stored in AutoInstall.issues_list.
       def check_profile_for_errors
         # Checking if an interface has been defined for different zones
-        zones = firewalld.export["zones"] || []
+        zones = export["zones"] || []
         all_interfaces = zones.flat_map { |zone| zone["interfaces"] || [] }
         double_entries = all_interfaces.select { |i| all_interfaces.count(i) > 1 }.uniq
         unless double_entries.empty?
@@ -197,11 +197,11 @@ module Y2Firewall
         start? ? firewalld.start : firewalld.stop
       end
 
-      # Return a firewall importer
+      # Return a firewall autoyast object
       #
-      # @return [Y2Firewall::Importer]
-      def importer
-        @importer ||= Importer.new
+      # @return [Y2Firewall::Autoyast]
+      def autoyast
+        @autoyast ||= Autoyast.new
       end
 
       # Return a firewalld singleton instance
