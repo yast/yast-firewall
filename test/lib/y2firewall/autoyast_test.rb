@@ -107,7 +107,7 @@ describe Y2Firewall::Autoyast do
 
     it "returned hash is valid for later import" do
       config = subject.export
-      expect{subject.import(config)}.to_not raise_error
+      expect { subject.import(config) }.to_not raise_error
     end
   end
 
