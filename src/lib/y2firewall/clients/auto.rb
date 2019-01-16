@@ -164,7 +164,7 @@ module Y2Firewall
 
       def import_if_needed
         if ay_config?
-          self.class.profile = firewalld.export
+          self.class.profile = export
           self.class.imported = false
         end
 
