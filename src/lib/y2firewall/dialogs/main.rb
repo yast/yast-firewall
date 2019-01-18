@@ -42,6 +42,10 @@ module Y2Firewall
           Yast::NetworkInterfaces.Read
           fw.read unless fw.read?
         end
+        # For applying the changes to the running configuration a reload or
+        # restart need to be applied.
+        # Proposed a service reload by default (bsc#1114673, bsc#1121277)
+        fw.system_service.reload if fw.system_service && fw.system_service.running?
       end
 
       def should_open_dialog?
@@ -69,7 +73,6 @@ module Y2Firewall
 
         loop do
           result = super
-          swap_api if result == :swap_mode
           break unless continue_running?(result)
         end
 
@@ -110,7 +113,7 @@ module Y2Firewall
       #
       # @return [Boolean] true in case of a dialog redraw or an api change
       def continue_running?(result)
-        result == :redraw || result == :swap_mode
+        result == :redraw
       end
 
       # Convenience method which return an instance of Y2Firewall::Firewalld
@@ -120,27 +123,10 @@ module Y2Firewall
         Y2Firewall::Firewalld.instance
       end
 
-      # Modify the firewalld API instance in case the systemd service state has
-      # changed.
-      def swap_api
-        fw.api = Y2Firewall::Firewalld::Api.new
-      end
-
       # Writes down the firewall configuration and the systemd service
       # modifications
       def apply_changes
         return false if Yast::Mode.config
-        # Firewall settings will be written into the permanent configurations only.
-        # So the running firewalld service will not be changed. Even a reload does
-        # not help (see man pages). So the running firewalld service has to be
-        # restarted.
-        # Set a flag only. Restarting will be done by system_service.save.
-        if fw.modified? && # Data has been changed by user
-            fw.system_service.running? &&      # The service is already running
-            fw.system_service.action != :stop  # and will not be stopped by the user
-          fw.system_service.restart
-        end
-
         fw.write_only
         fw.system_service.save
       end

@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Thu Jan 17 12:53:20 UTC 2019 - knut.anderssen@suse.com
+
+- Propose to reload the firewalld service after writing instead of
+  restarting it as in other case it will unload kernel modules and
+  terminate existing connections (bsc#1114673, bsc#1121277)
+- 4.1.9
+
+-------------------------------------------------------------------
 Wed Jan 16 12:02:14 UTC 2019 - jreidinger@suse.com
 
 - Autoyast: remove unused options, move export to own class,
