@@ -20,26 +20,25 @@
 # ------------------------------------------------------------------------------
 
 require_relative "../../../test_helper"
+require "y2firewall/dialogs/main"
 require "y2firewall/clients/auto"
 
 describe Y2Firewall::Clients::Auto do
   let(:firewalld) { Y2Firewall::Firewalld.instance }
+  let(:installed) { true }
   let(:autoyast) { double("Y2Firewall::Autoyast", import: true, export: {}) }
 
   before do
-    allow_any_instance_of(Y2Firewall::Firewalld::Api).to receive(:running?).and_return(false)
     subject.class.imported = false
+
     allow(firewalld).to receive(:read)
-    allow(firewalld).to receive(:installed?).and_return(true)
+    allow(firewalld).to receive(:installed?).and_return(installed)
     allow(subject).to receive(:autoyast).and_return(autoyast)
+    allow_any_instance_of(Y2Firewall::Firewalld::Api).to receive(:running?).and_return(false)
   end
 
   describe "#summary" do
     let(:installed) { false }
-
-    before do
-      allow(firewalld).to receive(:installed?).and_return(installed)
-    end
 
     context "when firewalld is not installed" do
       it "reports when firewalld is not available" do
@@ -226,6 +225,90 @@ describe Y2Firewall::Clients::Auto do
       subject.reset
       expect(firewalld.default_zone).to eq("public")
       expect(firewalld.zones).to be_empty
+    end
+  end
+
+  describe "#change" do
+    let(:result) { :ok }
+    let(:already_read) { false }
+    let(:main_dialog) { instance_double("Dialog::Main", run: result) }
+
+    before do
+      allow(Y2Firewall::Dialogs::Main).to receive(:new).and_return(main_dialog)
+      allow(firewalld).to receive(:read?).and_return(already_read)
+    end
+
+    context "when the configuration is accepted" do
+      [:next, :finish, :ok, :accept].each do |dialog_result|
+        let(:result) { dialog_result }
+
+        it "sets autoyast config" do
+          expect(subject.class).to receive(:ay_config=).with(true)
+
+          subject.change
+        end
+      end
+    end
+
+    context "when the configuration is aborted" do
+      [:back, :abort, :cancel].each do |dialog_result|
+        let(:result) { dialog_result }
+
+        it "does not set autoyast config" do
+          expect(subject.class).to_not receive(:ay_config=)
+
+          subject.change
+        end
+      end
+    end
+
+    context "when firewalld is not installed yet" do
+      let(:installed) { false }
+
+      it "does not read its configuration" do
+        expect(firewalld).to_not receive(:read)
+
+        subject.change
+      end
+    end
+
+    context "when firewalld is installed" do
+      context "and its configuration was already read" do
+        let(:already_read) { true }
+
+        it "does not read it again" do
+          expect(firewalld).to_not receive(:read)
+
+          subject.change
+        end
+      end
+
+      context "but its configuration has not been read" do
+        let(:example_zone) do
+          { "name" => "example", "services" => ["http", "https", "ssh"] }
+        end
+
+        let(:imported_zones) do
+          { "zones" => [example_zone] }
+        end
+
+        before do
+          allow(subject).to receive(:autoyast).and_call_original
+          subject.import(imported_zones, false)
+        end
+
+        it "reads the minimal configuration" do
+          expect(firewalld).to receive(:read).with(minimal: true)
+
+          subject.change
+        end
+
+        it "keeps the configuration previously imported" do
+          subject.change
+
+          expect(subject.export["zones"]).to include(hash_including(example_zone))
+        end
+      end
     end
   end
 
