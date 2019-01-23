@@ -69,7 +69,7 @@ module Y2Firewall
       def summary
         presenter = Y2Firewall::SummaryPresenter.new(firewalld)
         return presenter.not_installed if !firewalld.installed?
-        return presenter.not_configured if !modified?
+        return presenter.not_configured if !firewalld.read? && !firewalld.modified?
 
         presenter.create
       end
@@ -107,7 +107,8 @@ module Y2Firewall
       end
 
       def change
-        self.class.imported = false
+        read_keeping_configuration
+
         result = Dialogs::Main.new.run
         case result
         when :next, :finish, :ok, :accept
@@ -161,6 +162,19 @@ module Y2Firewall
       end
 
     private
+
+      # Read the minimal configuration from firewalld, w/o dropping available configuration
+      #
+      # Useful to preserve the already imported, but not written yet, configuration (if any)
+      def read_keeping_configuration
+        return unless firewalld.installed?
+        return if firewalld.read?
+
+        self.class.profile = export
+        firewalld.reset
+        firewalld.read(minimal: true)
+        import(self.class.profile, false)
+      end
 
       def import_if_needed
         if ay_config?

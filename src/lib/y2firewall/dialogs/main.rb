@@ -36,9 +36,7 @@ module Y2Firewall
         Yast.import "NetworkInterfaces"
         textdomain "firewall"
 
-        if Yast::Mode.config
-          fw.read(minimal: true) unless fw.read?
-        else
+        unless Yast::Mode.config
           Yast::NetworkInterfaces.Read
           fw.read unless fw.read?
         end
