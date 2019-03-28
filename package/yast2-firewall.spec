@@ -17,7 +17,7 @@
 
 
 Name:           yast2-firewall
-Version:        4.1.10
+Version:        4.1.11
 Release:        0
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
@@ -28,13 +28,13 @@ License:        GPL-2.0-only
 BuildRequires:  perl-XML-Writer update-desktop-files yast2-testsuite
 BuildRequires:  yast2-devtools >= 3.1.10
 
-# reduced relations
-BuildRequires:  yast2 >= 4.1.51
+# Removed zone name from common attributes definition
+BuildRequires:  yast2 >= 4.1.67
 BuildRequires:  rubygem(%rb_default_ruby_abi:yast-rake)
 BuildRequires:  rubygem(%rb_default_ruby_abi:rspec)
 
-# reduced relations
-Requires:       yast2 >= 4.1.51
+# Removed zone name from common attributes definition
+Requires:       yast2 >= 4.1.67
 
 # ButtonBox widget
 Conflicts:	yast2-ycp-ui-bindings < 2.17.3
