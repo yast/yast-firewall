@@ -79,7 +79,6 @@ module Y2Firewall
             result = Dialogs::Zone.run(zone, new_zone:       true,
                                              existing_names: firewall.zones.map(&:name))
             if result == :ok
-              zone.relations.map { |r| zone.send("#{r}=", []) }
               firewall.zones << zone
               UIState.instance.select_row(zone.name)
 

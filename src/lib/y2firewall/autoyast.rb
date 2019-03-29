@@ -61,7 +61,7 @@ module Y2Firewall
 
     def export_zone(zone)
       (zone.attributes + zone.relations)
-        .each_with_object({}) do |field, profile|
+        .each_with_object("name" => zone.name) do |field, profile|
         profile[field.to_s] = zone.public_send(field) unless zone.public_send(field).nil?
       end
     end
