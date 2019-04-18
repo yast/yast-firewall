@@ -62,9 +62,9 @@ module Y2Firewall
       def description
         {
           # Proposal title
-          "rich_text_title" => _("Firewall and SSH"),
+          "rich_text_title" => Yast::Builtins.dgettext("security", "Security"), # TODO: temporary only to avoid new translation
           # Menu entry label
-          "menu_title"      => _("&Firewall and SSH"),
+          "menu_title"      => Yast::Builtins.dgettext("ncurses-pkg", "&Security"), # TODO: temporary only to avoid new translation
           "id"              => LINK_FIREWALL_DIALOG
         }
       end
@@ -113,8 +113,20 @@ module Y2Firewall
       #
       # @return [Array<String>] services and ports descriptions
       def proposals
-        # Filter proposals with content and sort them
-        [firewall_proposal, sshd_proposal, ssh_port_proposal, vnc_fw_proposal].compact
+        # Filter proposals with content
+        [cpu_mitigations_proposal, firewall_proposal, sshd_proposal,
+          ssh_port_proposal, vnc_fw_proposal].compact
+      end
+
+      # Returns the cpu mitigation part of the bootloader proposal description
+      # Returns nil if this part should be skipped
+      # @return [String] proposal html text
+      def cpu_mitigations_proposal
+        require "bootloader/bootloader_factory"
+        bl = Bootloader::BootloaderFactory.current
+        return nil if bl.name == "none"
+
+        
       end
 
       # Returns the VNC-port part of the firewall proposal description
