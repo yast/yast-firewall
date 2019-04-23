@@ -45,7 +45,8 @@ module Y2Firewall
         LINK_ENABLE_SSHD = "firewall--enable_sshd".freeze,
         LINK_DISABLE_SSHD = "firewall--disable_sshd".freeze,
         LINK_OPEN_VNC = "firewall--open_vnc".freeze,
-        LINK_CLOSE_VNC = "firewall--close_vnc".freeze
+        LINK_CLOSE_VNC = "firewall--close_vnc".freeze,
+        LINK_CPU_MITIGATIONS = "firewall--cpu_mitigations".freeze
       ].freeze
 
       LINK_FIREWALL_DIALOG = "firewall".freeze
@@ -106,7 +107,11 @@ module Y2Firewall
       # Obtain and call the corresponding method for the clicked link.
       def call_proposal_action_for(link)
         action = link.gsub("firewall--", "")
-        @settings.public_send("#{action}!")
+        if action == "cpu_mitigations"
+          bootloader_dialog
+        else
+          @settings.public_send("#{action}!")
+        end
       end
 
       # Array with the available proposal descriptions.
@@ -126,7 +131,17 @@ module Y2Firewall
         bl = Bootloader::BootloaderFactory.current
         return nil if bl.name == "none"
 
-        
+        mitigations = bl.cpu_mitigations
+
+        _("CPU Mitigations: ") + format("<a href=\"%s\">", LINK_CPU_MITIGATIONS)
+          + mitigations.to_human_string + "</a>"
+      end
+
+      def bootloader_dialog
+        require "bootloader/config_dialog"
+
+        dialog = ::Bootloader::ConfigDialog.new(initial_tab: :kernel)
+        dialog.run
       end
 
       # Returns the VNC-port part of the firewall proposal description
