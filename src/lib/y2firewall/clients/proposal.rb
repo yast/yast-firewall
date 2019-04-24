@@ -133,8 +133,10 @@ module Y2Firewall
 
         mitigations = bl.cpu_mitigations
 
-        _("CPU Mitigations: ") + format("<a href=\"%s\">", LINK_CPU_MITIGATIONS)
-          + mitigations.to_human_string + "</a>"
+        res = _("CPU Mitigations: ") + format("<a href=\"%s\">", LINK_CPU_MITIGATIONS) +
+          mitigations.to_human_string + "</a>"
+        log.info "mitigations output #{res.inspect}"
+        res
       end
 
       def bootloader_dialog
