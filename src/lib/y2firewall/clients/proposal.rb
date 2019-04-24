@@ -141,11 +141,18 @@ module Y2Firewall
 
       def bootloader_dialog
         require "bootloader/config_dialog"
+        Yast.import "Bootloader"
 
         # do it in own dialog window
         Yast::Wizard.CreateDialog
         dialog = ::Bootloader::ConfigDialog.new(initial_tab: :kernel)
-        dialog.run
+        settings = Yast::Bootloader.Export
+        result = dialog.run
+        if result != :next
+          Yast::Bootloader.Import(settings)
+        else
+          Yast::Bootloader.proposed_cfg_changed = true
+        end
       ensure
         Yast::Wizard.CloseDialog
       end
