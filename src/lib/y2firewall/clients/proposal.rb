@@ -128,7 +128,7 @@ module Y2Firewall
       # @return [String] proposal html text
       def cpu_mitigations_proposal
         require "bootloader/bootloader_factory"
-        bl = Bootloader::BootloaderFactory.current
+        bl = ::Bootloader::BootloaderFactory.current
         return nil if bl.name == "none"
 
         mitigations = bl.cpu_mitigations
