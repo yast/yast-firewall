@@ -142,8 +142,12 @@ module Y2Firewall
       def bootloader_dialog
         require "bootloader/config_dialog"
 
+        # do it in own dialog window
+        Yast::Wizard.CreateDialog
         dialog = ::Bootloader::ConfigDialog.new(initial_tab: :kernel)
         dialog.run
+      ensure
+        Yast::Wizard.CloseDialog
       end
 
       # Returns the VNC-port part of the firewall proposal description
