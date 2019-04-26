@@ -61,11 +61,12 @@ module Y2Firewall
       end
 
       def description
+        # TODO: temporary dgettext only to avoid new translation
         {
           # Proposal title
-          "rich_text_title" => Yast::Builtins.dgettext("security", "Security"), # TODO: temporary only to avoid new translation
+          "rich_text_title" => Yast::Builtins.dgettext("security", "Security"),
           # Menu entry label
-          "menu_title"      => Yast::Builtins.dgettext("ncurses-pkg", "&Security"), # TODO: temporary only to avoid new translation
+          "menu_title"      => Yast::Builtins.dgettext("ncurses-pkg", "&Security"),
           "id"              => LINK_FIREWALL_DIALOG
         }
       end
@@ -120,7 +121,7 @@ module Y2Firewall
       def proposals
         # Filter proposals with content
         [cpu_mitigations_proposal, firewall_proposal, sshd_proposal,
-          ssh_port_proposal, vnc_fw_proposal].compact
+         ssh_port_proposal, vnc_fw_proposal].compact
       end
 
       # Returns the cpu mitigation part of the bootloader proposal description
