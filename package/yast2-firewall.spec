@@ -17,7 +17,7 @@
 
 
 Name:           yast2-firewall
-Version:        4.1.12
+Version:        4.2.0
 Release:        0
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
@@ -39,7 +39,7 @@ Requires:       yast2 >= 4.1.67
 # ButtonBox widget
 Conflicts:	yast2-ycp-ui-bindings < 2.17.3
 # CpiMitigations
-Conflicts:	yast2-bootloader < 4.1.24
+Conflicts:	yast2-bootloader < 4.2.1
 
 Provides:	yast2-config-firewall
 Obsoletes:	yast2-config-firewall

@@ -3,7 +3,7 @@ Fri Apr 26 12:30:53 UTC 2019 - jreidinger <jreidinger@suse.com>
 
 - change proposal naming and add option to set cpu mitigations
   (bsc#1128707)
-- 4.1.12
+- 4.2.0
 
 -------------------------------------------------------------------
 Tue Mar 26 23:44:33 UTC 2019 - knut.anderssen@suse.com
