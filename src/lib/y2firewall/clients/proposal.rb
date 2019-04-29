@@ -22,6 +22,7 @@
 # find current contact information at www.suse.com.
 
 require "yast"
+require "erb"
 require "y2firewall/firewalld/api"
 require "y2firewall/proposal_settings"
 require "y2firewall/dialogs/proposal"
@@ -134,8 +135,8 @@ module Y2Firewall
 
         mitigations = bl.cpu_mitigations
 
-        res = _("CPU Mitigations: ") + format("<a href=\"%s\">", LINK_CPU_MITIGATIONS) +
-          mitigations.to_human_string + "</a>"
+        res = _("CPU Mitigations: ") + "<a href=\"#{LINK_CPU_MITIGATIONS}\">" +
+          ERB::Util.html_escape(mitigations.to_human_string) + "</a>"
         log.info "mitigations output #{res.inspect}"
         res
       end
@@ -144,18 +145,20 @@ module Y2Firewall
         require "bootloader/config_dialog"
         Yast.import "Bootloader"
 
-        # do it in own dialog window
-        Yast::Wizard.CreateDialog
-        dialog = ::Bootloader::ConfigDialog.new(initial_tab: :kernel)
-        settings = Yast::Bootloader.Export
-        result = dialog.run
-        if result != :next
-          Yast::Bootloader.Import(settings)
-        else
-          Yast::Bootloader.proposed_cfg_changed = true
+        begin
+          # do it in own dialog window
+          Yast::Wizard.CreateDialog
+          dialog = ::Bootloader::ConfigDialog.new(initial_tab: :kernel)
+          settings = Yast::Bootloader.Export
+          result = dialog.run
+          if result != :next
+            Yast::Bootloader.Import(settings)
+          else
+            Yast::Bootloader.proposed_cfg_changed = true
+          end
+        ensure
+          Yast::Wizard.CloseDialog
         end
-      ensure
-        Yast::Wizard.CloseDialog
       end
 
       # Returns the VNC-port part of the firewall proposal description
