@@ -22,6 +22,7 @@
 # find current contact information at www.suse.com.
 
 require "yast"
+require "erb"
 require "y2firewall/firewalld/api"
 require "y2firewall/proposal_settings"
 require "y2firewall/dialogs/proposal"
@@ -45,7 +46,8 @@ module Y2Firewall
         LINK_ENABLE_SSHD = "firewall--enable_sshd".freeze,
         LINK_DISABLE_SSHD = "firewall--disable_sshd".freeze,
         LINK_OPEN_VNC = "firewall--open_vnc".freeze,
-        LINK_CLOSE_VNC = "firewall--close_vnc".freeze
+        LINK_CLOSE_VNC = "firewall--close_vnc".freeze,
+        LINK_CPU_MITIGATIONS = "firewall--cpu_mitigations".freeze
       ].freeze
 
       LINK_FIREWALL_DIALOG = "firewall".freeze
@@ -60,11 +62,12 @@ module Y2Firewall
       end
 
       def description
+        # TODO: temporary dgettext only to avoid new translation
         {
           # Proposal title
-          "rich_text_title" => _("Firewall and SSH"),
+          "rich_text_title" => Yast::Builtins.dgettext("security", "Security"),
           # Menu entry label
-          "menu_title"      => _("&Firewall and SSH"),
+          "menu_title"      => Yast::Builtins.dgettext("ncurses-pkg", "&Security"),
           "id"              => LINK_FIREWALL_DIALOG
         }
       end
@@ -106,15 +109,56 @@ module Y2Firewall
       # Obtain and call the corresponding method for the clicked link.
       def call_proposal_action_for(link)
         action = link.gsub("firewall--", "")
-        @settings.public_send("#{action}!")
+        if action == "cpu_mitigations"
+          bootloader_dialog
+        else
+          @settings.public_send("#{action}!")
+        end
       end
 
       # Array with the available proposal descriptions.
       #
       # @return [Array<String>] services and ports descriptions
       def proposals
-        # Filter proposals with content and sort them
-        [firewall_proposal, sshd_proposal, ssh_port_proposal, vnc_fw_proposal].compact
+        # Filter proposals with content
+        [cpu_mitigations_proposal, firewall_proposal, sshd_proposal,
+         ssh_port_proposal, vnc_fw_proposal].compact
+      end
+
+      # Returns the cpu mitigation part of the bootloader proposal description
+      # Returns nil if this part should be skipped
+      # @return [String] proposal html text
+      def cpu_mitigations_proposal
+        require "bootloader/bootloader_factory"
+        bl = ::Bootloader::BootloaderFactory.current
+        return nil if bl.name == "none"
+
+        mitigations = bl.cpu_mitigations
+
+        res = _("CPU Mitigations: ") + "<a href=\"#{LINK_CPU_MITIGATIONS}\">" +
+          ERB::Util.html_escape(mitigations.to_human_string) + "</a>"
+        log.info "mitigations output #{res.inspect}"
+        res
+      end
+
+      def bootloader_dialog
+        require "bootloader/config_dialog"
+        Yast.import "Bootloader"
+
+        begin
+          # do it in own dialog window
+          Yast::Wizard.CreateDialog
+          dialog = ::Bootloader::ConfigDialog.new(initial_tab: :kernel)
+          settings = Yast::Bootloader.Export
+          result = dialog.run
+          if result != :next
+            Yast::Bootloader.Import(settings)
+          else
+            Yast::Bootloader.proposed_cfg_changed = true
+          end
+        ensure
+          Yast::Wizard.CloseDialog
+        end
       end
 
       # Returns the VNC-port part of the firewall proposal description

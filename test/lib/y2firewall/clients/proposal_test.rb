@@ -24,14 +24,19 @@ require_relative "../../../test_helper.rb"
 require "y2firewall/clients/proposal"
 
 describe Y2Firewall::Clients::Proposal do
-  let(:client) { described_class.new }
+  subject(:client) { described_class.new }
   let(:proposal_settings) { Y2Firewall::ProposalSettings.instance }
+
+  before do
+    # skip bootloader proposal to avoid build dependency on it
+    allow(subject).to receive(:cpu_mitigations_proposal)
+  end
 
   describe "#initialize" do
     it "instantiates a new proposal settings" do
       expect(Y2Firewall::ProposalSettings).to receive(:instance)
 
-      client
+      described_class.new
     end
   end
 
