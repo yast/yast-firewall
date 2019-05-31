@@ -12,22 +12,22 @@
 # license that conforms to the Open Source Definition (Version 1.9)
 # published by the Open Source Initiative.
 
-# Please submit bugfixes or comments via http://bugs.opensuse.org/
+# Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
 
 
 Name:           yast2-firewall
 Version:        4.2.0
 Release:        0
+Summary:        YaST2 - Firewall Configuration
+Group:          System/YaST
+License:        GPL-2.0-only
+Url:            https://github.com/yast/yast-firewall
 
-BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 Source0:        %{name}-%{version}.tar.bz2
 
-Group:	        System/YaST
-License:        GPL-2.0-only
 BuildRequires:  perl-XML-Writer update-desktop-files yast2-testsuite
 BuildRequires:  yast2-devtools >= 3.1.10
-
 # Removed zone name from common attributes definition
 BuildRequires:  yast2 >= 4.1.67
 BuildRequires:  rubygem(%rb_default_ruby_abi:yast-rake)
@@ -35,50 +35,43 @@ BuildRequires:  rubygem(%rb_default_ruby_abi:rspec)
 
 # Removed zone name from common attributes definition
 Requires:       yast2 >= 4.1.67
-
-# ButtonBox widget
-Conflicts:	yast2-ycp-ui-bindings < 2.17.3
-# CpiMitigations
-Conflicts:	yast2-bootloader < 4.2.1
-
-Provides:	yast2-config-firewall
-Obsoletes:	yast2-config-firewall
-Provides:	yast2-trans-firewall
-Obsoletes:	yast2-trans-firewall
-
-BuildArchitectures:	noarch
-
 Requires:       yast2-ruby-bindings >= 1.0.0
 
-Summary:	YaST2 - Firewall Configuration
+# ButtonBox widget
+Conflicts:      yast2-ycp-ui-bindings < 2.17.3
+# CpiMitigations
+Conflicts:      yast2-bootloader < 4.2.1
+
+Provides:       yast2-config-firewall
+Provides:       yast2-trans-firewall
+
+Obsoletes:      yast2-config-firewall
+Obsoletes:      yast2-trans-firewall
+
+BuildArch:      noarch
 
 %description
 A YaST2 module to be used for configuring a firewall.
 
 %prep
-%setup -n %{name}-%{version}
+%setup -q
 
 %check
-rake test:unit
+%yast_check
 
 %build
 
 %install
-rake install DESTDIR="%{buildroot}"
-
-# Remove the license from the /usr/share/doc/packages directory,
-# it is also included in the /usr/share/licenses directory by using
-# the %license tag.
-rm -f $RPM_BUILD_ROOT/%{yast_docdir}/COPYING
+%yast_install
+%yast_metainfo
 
 %files
-%defattr(-,root,root)
-%{yast_dir}/clients/*.rb
-%{yast_dir}/lib
-%{yast_desktopdir}/*.desktop
-%{yast_schemadir}/autoyast/rnc/firewall.rnc
+%{yast_clientdir}
+%{yast_libdir}
+%{yast_desktopdir}
+%{yast_metainfodir}
+%{yast_schemadir}
 %{yast_icondir}
-
 %license COPYING
 %doc README.md
 %doc CONTRIBUTING.md
