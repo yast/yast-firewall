@@ -20,6 +20,7 @@ X-SuSE-YaST-Keywords=security,network
 Icon=yast-firewall
 Exec=xdg-su -c "/sbin/yast2 firewall"
 
-Name=Firewall
-GenericName=Configure a firewall
+Name=YaST Firewall
+GenericName=Firewall
+Comment=Configure a firewall
 StartupNotify=true
