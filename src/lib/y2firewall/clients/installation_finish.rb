@@ -24,6 +24,8 @@ require "y2firewall/firewalld"
 require "y2firewall/proposal_settings"
 require "installation/finish_client"
 
+Yast.import "Mode"
+
 module Y2Firewall
   module Clients
     # This is a step of base installation finish and it is responsible of write
@@ -49,7 +51,7 @@ module Y2Firewall
       end
 
       def modes
-        [:installation]
+        [:installation, :autoinst]
       end
 
       def write
@@ -63,7 +65,9 @@ module Y2Firewall
       # Modifies the configuration of the firewall according to the current
       # settings
       def configure_firewall
-        @settings.enable_firewall ? @firewalld.enable! : @firewalld.disable!
+        if Yast::Mode.installation
+          @settings.enable_firewall ? @firewalld.enable! : @firewalld.disable!
+        end
 
         if @settings.open_ssh
           @firewalld.api.add_service(@settings.default_zone, "ssh")

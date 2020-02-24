@@ -21,7 +21,7 @@ describe Y2Firewall::Clients::InstallationFinish do
 
   describe "#modes" do
     it "runs on installation and autoinstallation" do
-      expect(subject.modes).to eq([:installation])
+      expect(subject.modes).to eq([:installation, :autoinst])
     end
   end
 
@@ -69,26 +69,30 @@ describe Y2Firewall::Clients::InstallationFinish do
     let(:api) do
       instance_double(Y2Firewall::Firewalld::Api, remove_service: true, add_service: true)
     end
+    let(:installation) { true }
 
     before do
       allow(proposal_settings).to receive("enable_firewall").and_return(enable_firewall)
       allow(firewalld).to receive("api").and_return(api)
       allow(firewalld).to receive("enable!")
       allow(firewalld).to receive("disable!")
+      allow(Yast::Mode).to receive(:installation).and_return(installation)
       allow(proposal_settings).to receive("open_ssh").and_return(false)
     end
 
-    it "enables the firewalld service if enabled in the proposal" do
-      allow(proposal_settings).to receive("enable_firewall").and_return(true)
-      expect(firewalld).to receive("enable!")
+    context "during an installation" do
+      it "enables the firewalld service if enabled in the proposal" do
+        allow(proposal_settings).to receive("enable_firewall").and_return(true)
+        expect(firewalld).to receive("enable!")
 
-      subject.send(:configure_firewall)
-    end
+        subject.send(:configure_firewall)
+      end
 
-    it "disables the firewalld service if disabled in the proposal" do
-      expect(firewalld).to receive("disable!")
+      it "disables the firewalld service if disabled in the proposal" do
+        expect(firewalld).to receive("disable!")
 
-      subject.send(:configure_firewall)
+        subject.send(:configure_firewall)
+      end
     end
 
     it "adds the ssh service to the default zone if opened in the proposal" do
