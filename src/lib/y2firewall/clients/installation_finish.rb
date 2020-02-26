@@ -65,16 +65,32 @@ module Y2Firewall
       # Modifies the configuration of the firewall according to the current
       # settings
       def configure_firewall
-        if Yast::Mode.installation
-          @settings.enable_firewall ? @firewalld.enable! : @firewalld.disable!
-        end
+        configure_service
+        configure_ssh
+        configure_vnc
+      end
 
+      # Convenience method to enable / disable the firewalld service depending
+      # on the proposal settings
+      def configure_service
+        return unless Yast::Mode.installation
+
+        @settings.enable_firewall ? @firewalld.enable! : @firewalld.disable!
+      end
+
+      # Convenience method to open the ssh ports in firewalld depending on the
+      # proposal settings
+      def configure_ssh
         if @settings.open_ssh
           @firewalld.api.add_service(@settings.default_zone, "ssh")
         else
           @firewalld.api.remove_service(@settings.default_zone, "ssh")
         end
+      end
 
+      # Convenience method to open the vnc ports in firewalld depending on the
+      # proposal settings
+      def configure_vnc
         if @settings.open_vnc
           if @firewalld.api.service_supported?("tigervnc")
             @firewalld.api.add_service(@settings.default_zone, "tigervnc")
