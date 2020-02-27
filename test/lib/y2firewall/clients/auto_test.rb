@@ -399,4 +399,10 @@ describe Y2Firewall::Clients::Auto do
       end
     end
   end
+
+  describe "#packages" do
+    it "returns a hash with firewalld as a package to be installed" do
+      expect(subject.packages).to eq("install" => ["firewalld"], "remove" => [])
+    end
+  end
 end
