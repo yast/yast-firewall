@@ -1,8 +1,8 @@
 -------------------------------------------------------------------
 Wed Feb 26 20:23:04 UTC 2020 - Knut Anderssen <kanderssen@suse.com>
 
-- Autoyast: Added back the installation finish client for opening
-  the vnc or ssh port during the first stage when used for remote
+- AutoYaST: Added back the installation finish client for opening
+  the VNC or SSH port during the first stage when used for remote
   installations (bsc#1161319)
 - 4.2.3
 
