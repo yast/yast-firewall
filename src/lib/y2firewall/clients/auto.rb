@@ -133,6 +133,8 @@ module Y2Firewall
           import(self.class.profile, false)
         else
           activate_service
+          # Force a reset of the API instance (bsc#1166698)
+          firewalld.api = nil
         end
       end
 
