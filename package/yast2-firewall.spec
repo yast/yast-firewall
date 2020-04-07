@@ -74,4 +74,3 @@ A YaST2 module to be used for configuring a firewall.
 %{yast_icondir}
 %license COPYING
 %doc README.md
-%doc CONTRIBUTING.md
