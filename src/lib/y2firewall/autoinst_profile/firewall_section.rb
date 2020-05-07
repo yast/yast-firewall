@@ -24,13 +24,12 @@ module Y2Firewall
     # This class represents an AutoYaST \<firewall> section
 
     class FirewallSection < ::Installation::AutoinstProfile::SectionWithAttributes
-      
       # Creates an instance based on the profile representation used by the AutoYaST modules
       # (hash with nested hashes and arrays).
       #
       # @param hash [Hash] Firewall section from an AutoYaST profile
       # @return [FirewallSection]
-      def self.new_from_hashes(hash)
+      def self.new_from_hashes(_hash)
         result = new
         result
       end

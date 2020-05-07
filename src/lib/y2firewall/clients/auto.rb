@@ -203,7 +203,8 @@ module Y2Firewall
         unless double_entries.empty?
           AutoInstall.issues_list.add(:ay_invalid_value,
             Y2Firewall::AutoinstProfile::FirewallSection.new_from_hashes(
-              self.class.profile),
+              self.class.profile
+            ),
             "interfaces",
             double_entries.join(","),
             _("This interface has been defined for more than one zone."))
