@@ -2,6 +2,8 @@ default namespace = "http://www.suse.com/1.0/yast2ns"
 namespace a = "http://relaxng.org/ns/compatibility/annotations/1.0"
 namespace config = "http://www.suse.com/1.0/configns"
 
+include "common.rnc"
+
 y2_firewall =
   fw_allow_fw_traceroute
   | fw_autoprotect_services
@@ -57,58 +59,58 @@ y2_firewall =
   | FW_STOP_KEEP_ROUTING_STATE
   | FW_BOOT_FULL_INIT
 
-YESNO = "yes" | "no"
-firewall = element firewall { y2_firewall* | y2_firewalld* }
-FW_CONFIGURATIONS_DMZ = element FW_CONFIGURATIONS_DMZ { text }
-FW_CONFIGURATIONS_EXT = element FW_CONFIGURATIONS_EXT { text }
-FW_CONFIGURATIONS_INT = element FW_CONFIGURATIONS_INT { text }
-FW_LOAD_MODULES = element FW_LOAD_MODULES { text }
-fw_allow_fw_traceroute = element fw_allow_fw_traceroute { text }
-FW_ALLOW_FW_TRACEROUTE = element FW_ALLOW_FW_TRACEROUTE { text }
-fw_autoprotect_services = element fw_autoprotect_services { text }
-FW_DEV_EXT = element FW_DEV_EXT { text }
-FW_DEV_INT = element FW_DEV_INT { text }
-FW_DEV_DMZ = element FW_DEV_DMZ { text }
+YESNO = STRING_ATTR, ("yes" | "no")
+firewall = element firewall { MAP, (y2_firewall* | y2_firewalld*) }
+FW_CONFIGURATIONS_DMZ = element FW_CONFIGURATIONS_DMZ { STRING }
+FW_CONFIGURATIONS_EXT = element FW_CONFIGURATIONS_EXT { STRING }
+FW_CONFIGURATIONS_INT = element FW_CONFIGURATIONS_INT { STRING }
+FW_LOAD_MODULES = element FW_LOAD_MODULES { STRING }
+fw_allow_fw_traceroute = element fw_allow_fw_traceroute { STRING }
+FW_ALLOW_FW_TRACEROUTE = element FW_ALLOW_FW_TRACEROUTE { STRING }
+fw_autoprotect_services = element fw_autoprotect_services { STRING }
+FW_DEV_EXT = element FW_DEV_EXT { STRING }
+FW_DEV_INT = element FW_DEV_INT { STRING }
+FW_DEV_DMZ = element FW_DEV_DMZ { STRING }
 FW_LOG_ACCEPT_ALL = element FW_LOG_ACCEPT_ALL { YESNO }
 FW_LOG_ACCEPT_CRIT = element FW_LOG_ACCEPT_CRIT { YESNO }
 FW_LOG_DROP_ALL = element FW_LOG_DROP_ALL { YESNO }
 FW_LOG_DROP_CRIT = element FW_LOG_DROP_CRIT { YESNO }
-fw_masq_nets = element fw_masq_nets { text }
+fw_masq_nets = element fw_masq_nets { STRING }
 FW_MASQUERADE = element FW_MASQUERADE { YESNO }
-fw_protect_from_internal = element fw_protect_from_internal { text }
+fw_protect_from_internal = element fw_protect_from_internal { STRING }
 FW_ROUTE = element FW_ROUTE { YESNO }
-fw_services_ext_tcp = element fw_services_ext_tcp { text }
-fw_ipsec_trust = element fw_ipsec_trust { text }
-FW_SERVICES_EXT_UDP = element FW_SERVICES_EXT_UDP { text }
-FW_SERVICES_EXT_TCP = element FW_SERVICES_EXT_TCP { text }
-FW_SERVICES_EXT_IP = element FW_SERVICES_EXT_IP { text }
+fw_services_ext_tcp = element fw_services_ext_tcp { STRING }
+fw_ipsec_trust = element fw_ipsec_trust { STRING }
+FW_SERVICES_EXT_UDP = element FW_SERVICES_EXT_UDP { STRING }
+FW_SERVICES_EXT_TCP = element FW_SERVICES_EXT_TCP { STRING }
+FW_SERVICES_EXT_IP = element FW_SERVICES_EXT_IP { STRING }
 start_firewall = element start_firewall { BOOLEAN }
 enable_firewall = element enable_firewall { BOOLEAN }
-FW_ALLOW_FW_BROADCAST_DMZ = element FW_ALLOW_FW_BROADCAST_DMZ { text }
-FW_ALLOW_FW_BROADCAST_EXT = element FW_ALLOW_FW_BROADCAST_EXT { text }
-FW_ALLOW_FW_BROADCAST_INT = element FW_ALLOW_FW_BROADCAST_INT { text }
-FW_IGNORE_FW_BROADCAST_DMZ = element FW_IGNORE_FW_BROADCAST_DMZ { text }
-FW_IGNORE_FW_BROADCAST_EXT = element FW_IGNORE_FW_BROADCAST_EXT { text }
-FW_IGNORE_FW_BROADCAST_INT = element FW_IGNORE_FW_BROADCAST_INT { text }
-FW_FORWARD_ALWAYS_INOUT_DEV = element FW_FORWARD_ALWAYS_INOUT_DEV { text }
-FW_FORWARD_MASQ = element FW_FORWARD_MASQ { text }
-FW_IPSEC_TRUST = element FW_IPSEC_TRUST { text }
-FW_PROTECT_FROM_INT = element FW_PROTECT_FROM_INT { text }
-FW_SERVICES_ACCEPT_DMZ = element FW_SERVICES_ACCEPT_DMZ { text }
-FW_SERVICES_ACCEPT_EXT = element FW_SERVICES_ACCEPT_EXT { text }
-FW_SERVICES_ACCEPT_INT = element FW_SERVICES_ACCEPT_INT { text }
-FW_SERVICES_ACCEPT_RELATED_DMZ = element FW_SERVICES_ACCEPT_RELATED_DMZ { text }
-FW_SERVICES_ACCEPT_RELATED_EXT = element FW_SERVICES_ACCEPT_RELATED_EXT { text }
-FW_SERVICES_ACCEPT_RELATED_INT = element FW_SERVICES_ACCEPT_RELATED_INT { text }
-FW_SERVICES_DMZ_IP = element FW_SERVICES_DMZ_IP { text }
-FW_SERVICES_DMZ_RPC = element FW_SERVICES_DMZ_RPC { text }
-FW_SERVICES_DMZ_TCP = element FW_SERVICES_DMZ_TCP { text }
-FW_SERVICES_DMZ_UDP = element FW_SERVICES_DMZ_UDP { text }
-FW_SERVICES_EXT_RPC = element FW_SERVICES_EXT_RPC { text }
-FW_SERVICES_INT_IP = element FW_SERVICES_INT_IP { text }
-FW_SERVICES_INT_RPC = element FW_SERVICES_INT_RPC { text }
-FW_SERVICES_INT_TCP = element FW_SERVICES_INT_TCP { text }
-FW_SERVICES_INT_UDP = element FW_SERVICES_INT_UDP { text }
+FW_ALLOW_FW_BROADCAST_DMZ = element FW_ALLOW_FW_BROADCAST_DMZ { STRING }
+FW_ALLOW_FW_BROADCAST_EXT = element FW_ALLOW_FW_BROADCAST_EXT { STRING }
+FW_ALLOW_FW_BROADCAST_INT = element FW_ALLOW_FW_BROADCAST_INT { STRING }
+FW_IGNORE_FW_BROADCAST_DMZ = element FW_IGNORE_FW_BROADCAST_DMZ { STRING }
+FW_IGNORE_FW_BROADCAST_EXT = element FW_IGNORE_FW_BROADCAST_EXT { STRING }
+FW_IGNORE_FW_BROADCAST_INT = element FW_IGNORE_FW_BROADCAST_INT { STRING }
+FW_FORWARD_ALWAYS_INOUT_DEV = element FW_FORWARD_ALWAYS_INOUT_DEV { STRING }
+FW_FORWARD_MASQ = element FW_FORWARD_MASQ { STRING }
+FW_IPSEC_TRUST = element FW_IPSEC_TRUST { STRING }
+FW_PROTECT_FROM_INT = element FW_PROTECT_FROM_INT { STRING }
+FW_SERVICES_ACCEPT_DMZ = element FW_SERVICES_ACCEPT_DMZ { STRING }
+FW_SERVICES_ACCEPT_EXT = element FW_SERVICES_ACCEPT_EXT { STRING }
+FW_SERVICES_ACCEPT_INT = element FW_SERVICES_ACCEPT_INT { STRING }
+FW_SERVICES_ACCEPT_RELATED_DMZ = element FW_SERVICES_ACCEPT_RELATED_DMZ { STRING }
+FW_SERVICES_ACCEPT_RELATED_EXT = element FW_SERVICES_ACCEPT_RELATED_EXT { STRING }
+FW_SERVICES_ACCEPT_RELATED_INT = element FW_SERVICES_ACCEPT_RELATED_INT { STRING }
+FW_SERVICES_DMZ_IP = element FW_SERVICES_DMZ_IP { STRING }
+FW_SERVICES_DMZ_RPC = element FW_SERVICES_DMZ_RPC { STRING }
+FW_SERVICES_DMZ_TCP = element FW_SERVICES_DMZ_TCP { STRING }
+FW_SERVICES_DMZ_UDP = element FW_SERVICES_DMZ_UDP { STRING }
+FW_SERVICES_EXT_RPC = element FW_SERVICES_EXT_RPC { STRING }
+FW_SERVICES_INT_IP = element FW_SERVICES_INT_IP { STRING }
+FW_SERVICES_INT_RPC = element FW_SERVICES_INT_RPC { STRING }
+FW_SERVICES_INT_TCP = element FW_SERVICES_INT_TCP { STRING }
+FW_SERVICES_INT_UDP = element FW_SERVICES_INT_UDP { STRING }
 FW_ALLOW_PING_FW = element FW_ALLOW_PING_FW { YESNO }
 FW_STOP_KEEP_ROUTING_STATE = element FW_STOP_KEEP_ROUTING_STATE { YESNO }
 FW_BOOT_FULL_INIT = element FW_BOOT_FULL_INIT { YESNO }
@@ -125,46 +127,49 @@ zones =
   element zones {
     LIST,
     element (zone | listentry) {
-      zone_name &
-      zone_short? &
-      zone_description? &
-      zone_target? &
-      fwd_interfaces? &
-      fwd_ports? &
-      fwd_protocols? &
-      fwd_services? &
-      masquerade?
+      MAP,
+      (
+        zone_name &
+        zone_short? &
+        zone_description? &
+        zone_target? &
+        fwd_interfaces? &
+        fwd_ports? &
+        fwd_protocols? &
+        fwd_services? &
+        masquerade?
+      )
     }*
   }
 
 fwd_services =
   element services {
     LIST,
-    element (service | listentry) {text}*
+    element (service | listentry) {STRING}*
   }
 
 fwd_interfaces =
   element interfaces {
     LIST,
-    element (interface | listentry) {text}*
+    element (interface | listentry) {STRING}*
   }
 
 fwd_ports =
   element ports {
     LIST,
-    element (port | listentry) {text}*
+    element (port | listentry) {STRING}*
   }
 
 fwd_protocols =
   element protocols {
     LIST,
-    element (protocol | listentry) {text}*
+    element (protocol | listentry) {STRING}*
   }
 
-zone_name = element name { text }
-zone_short = element short { text }
-zone_description = element description { text }
-zone_target = element target { text }
-default_zone = element default_zone { text }
+zone_name = element name { STRING }
+zone_short = element short { STRING }
+zone_description = element description { STRING }
+zone_target = element target { STRING }
+default_zone = element default_zone { STRING }
 masquerade = element masquerade { BOOLEAN }
-log_denied_packets = element log_denied_packets { text }
+log_denied_packets = element log_denied_packets { STRING }
