@@ -21,7 +21,7 @@ require "installation/autoinst_profile/section_with_attributes"
 
 module Y2Firewall
   module AutoinstProfile
-    # This class represents an AutoYaST \<firewall> section
+    # This class represents an AutoYaST <firewall> section
     #
     class FirewallSection < ::Installation::AutoinstProfile::SectionWithAttributes
       # Creates an instance based on the profile representation used by the AutoYaST modules
