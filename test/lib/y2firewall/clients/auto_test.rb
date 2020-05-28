@@ -191,7 +191,8 @@ describe Y2Firewall::Clients::Auto do
           .and_return("zones" => [{ "interfaces" => ["eth0"], "name" => "public" },
                                   { "interfaces" => ["eth0", "eth0"], "name" => "trusted" }])
         expect(i_list).to receive(:add)
-          .with(:ay_invalid_value, "firewall", "interfaces",
+          .with(::Installation::AutoinstIssues::AyInvalidValue,
+            "firewall", "interfaces",
             "eth0",
             "This interface has been defined for more than one zone.")
         subject.import(arguments, false)

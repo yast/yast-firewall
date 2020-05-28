@@ -29,12 +29,12 @@ Source0:        %{name}-%{version}.tar.bz2
 BuildRequires:  perl-XML-Writer update-desktop-files yast2-testsuite
 BuildRequires:  yast2-devtools >= 4.2.2
 # AutoYaST issue report
-BuildRequires:  yast2 >= 4.2.84
+BuildRequires:  yast2 >= 4.3.2
 BuildRequires:  rubygem(%rb_default_ruby_abi:yast-rake)
 BuildRequires:  rubygem(%rb_default_ruby_abi:rspec)
 
 # AutoYaST issue report
-Requires:       yast2 >= 4.2.84
+Requires:       yast2 >= 4.3.2
 Requires:       yast2-ruby-bindings >= 1.0.0
 
 # ButtonBox widget
