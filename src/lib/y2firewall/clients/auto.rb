@@ -202,7 +202,7 @@ module Y2Firewall
         double_entries = all_interfaces.select { |i| all_interfaces.count(i) > 1 }.uniq
         unless double_entries.empty?
           AutoInstall.issues_list.add(
-            ::Installation::AutoinstIssues::AyInvalidValue,
+            ::Installation::AutoinstIssues::InvalidValue,
             Y2Firewall::AutoinstProfile::FirewallSection.new_from_hashes(
               self.class.profile
             ),
