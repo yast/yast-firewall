@@ -22,6 +22,7 @@
 require_relative "../../../test_helper"
 require "y2firewall/dialogs/main"
 require "y2firewall/clients/auto"
+require "installation/autoinst_issues"
 
 describe Y2Firewall::Clients::Auto do
   let(:firewalld) { Y2Firewall::Firewalld.instance }
@@ -171,6 +172,14 @@ describe Y2Firewall::Clients::Auto do
     end
 
     context "once the current configuration has been set" do
+
+      let(:fw_section) { Y2Firewall::AutoinstProfile::FirewallSection.new }
+
+      before do
+        allow(Y2Firewall::AutoinstProfile::FirewallSection).to receive(:new_from_hashes)
+          .and_return(fw_section)
+      end
+
       it "imports the given profile" do
         expect(autoyast).to receive(:import).with(arguments)
 
@@ -192,7 +201,7 @@ describe Y2Firewall::Clients::Auto do
                                   { "interfaces" => ["eth0", "eth0"], "name" => "trusted" }])
         expect(i_list).to receive(:add)
           .with(::Installation::AutoinstIssues::InvalidValue,
-            "firewall", "interfaces",
+            fw_section, "interfaces",
             "eth0",
             "This interface has been defined for more than one zone.")
         subject.import(arguments, false)
