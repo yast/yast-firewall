@@ -33,6 +33,7 @@ module Y2Firewall
     # modes.
     class InstallationFinish < ::Installation::FinishClient
       include Yast::I18n
+      include Yast::Logger
 
       # Y2Firewall::ProposalSettings instance
       attr_accessor :settings
@@ -41,6 +42,8 @@ module Y2Firewall
 
       # Constuctor
       def initialize
+        Yast.import "Mode"
+
         textdomain "firewall"
         @settings = ProposalSettings.instance
         @firewalld = Firewalld.instance
@@ -55,12 +58,35 @@ module Y2Firewall
       end
 
       def write
+        if Mode.autoinst || Mode.autoupgrade
+          configure_by_profile
+        else
+          configure_by_proposals
+        end
+      end
+
+    private
+
+      # In common installation configures the target according to proposals
+      def configure_by_proposals
         Service.Enable("sshd") if @settings.enable_sshd
         configure_firewall if @firewalld.installed?
         true
       end
 
-    private
+      # In autoyast installation configures the target according to the profile
+      def configure_by_profile
+        if Mode.autoupgrade
+          # This is approach taken from networking. In general, networking and firewall configuration
+          # can be fine tuned for proper run (including access to installation media) to risk its
+          # modification.
+          log.info("Firewall: running in auto upgrade mode, do not touch firewall configuration")
+          return true
+        end
+
+        log.info("Firewall: running configuration according to the AY profile")
+        true
+      end
 
       # Modifies the configuration of the firewall according to the current
       # settings
