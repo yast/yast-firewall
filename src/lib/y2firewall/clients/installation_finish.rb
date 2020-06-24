@@ -22,6 +22,7 @@
 require "yast"
 require "y2firewall/firewalld"
 require "y2firewall/proposal_settings"
+require "y2firewall/clients/auto"
 require "installation/finish_client"
 
 Yast.import "Mode"
@@ -59,6 +60,7 @@ module Y2Firewall
 
       def write
         if Mode.autoinst || Mode.autoupgrade
+          log.info("Firewall: running configuration according to the AY profile")
           configure_by_profile
         else
           configure_by_proposals
@@ -76,6 +78,8 @@ module Y2Firewall
 
       # In autoyast installation configures the target according to the profile
       def configure_by_profile
+        Yast.import "Profile"
+
         if Mode.autoupgrade
           # This is approach taken from networking. In general, networking and firewall configuration
           # can be fine tuned for proper run (including access to installation media) to risk its
@@ -84,8 +88,13 @@ module Y2Firewall
           return true
         end
 
-        log.info("Firewall: running configuration according to the AY profile")
-        true
+        ay_profile = Profile.current
+        raise "Invalid / non-existing AutoYast profile" if ay_profile.nil? || ay_profile.empty?
+
+        # Lets reuse client we already have
+        ay_client = Clients::Auto.new
+        ay_client.import(ay_profile)
+        ay_client.write
       end
 
       # Modifies the configuration of the firewall according to the current
