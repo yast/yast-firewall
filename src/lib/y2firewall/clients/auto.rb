@@ -29,6 +29,7 @@ require "y2firewall/autoinst_profile/firewall_section"
 require "installation/auto_client"
 
 Yast.import "Mode"
+Yast.import "Stage"
 Yast.import "AutoInstall"
 
 module Y2Firewall
@@ -81,14 +82,17 @@ module Y2Firewall
       # @return [Boolean]
       def import(profile, merge = !Yast::Mode.config)
         self.class.profile = profile
+        # in fact, merge is currently not used elsewhere
         return false if merge && !read(force: false)
 
-        # Obtains the default from the control file (settings) if not present.
-        enable if profile.fetch("enable_firewall", settings.enable_firewall)
-        start if profile.fetch("start_firewall", false)
-        autoyast.import(profile)
-        check_profile_for_errors
-        imported
+        if Yast::Stage.cont
+          # Configuration was already done at the end of the first stage.
+          # However, we need special handling of firewall setup in case when second
+          # stage is enabled and installation runs over network (ssh / vnc)
+          import_second_stage
+        else
+          import_first_stage(profile, merge)
+        end
       end
 
       # Export the current firewalld configuration
@@ -165,6 +169,27 @@ module Y2Firewall
       end
 
     private
+
+      # Import method for the first stage.
+      #
+      # Except a few edge cases complete firewall configuration should be done in first
+      # stage. Exceptions are installation over network (ssh / vnc) with second stage
+      # enabled which requires more careful approach
+      def import_first_stage(profile, merge = !Yast::Mode.config)
+        # Obtains the default from the control file (settings) if not present.
+        enable if profile.fetch("enable_firewall", settings.enable_firewall)
+        start if profile.fetch("start_firewall", false)
+        autoyast.import(profile)
+        check_profile_for_errors
+        imported
+      end
+
+      # Import method for the second stage
+      #
+      # Intended for finishing setup of exceptional cases. @see import_first_stage
+      def import_second_stage
+        true
+      end
 
       # Read the minimal configuration from firewalld, w/o dropping available configuration
       #
