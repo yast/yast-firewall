@@ -262,9 +262,20 @@ module Y2Firewall
 
       # Depending on the profile it activates or deactivates the firewalld
       # service
+      #
+      # Note: it always activates the service on the target
       def activate_service
-        enable? ? firewalld.enable! : firewalld.disable!
-        start? ? firewalld.start : firewalld.stop
+        if !Yast::Stage.initial
+          enable? ? firewalld.enable! : firewalld.disable!
+          start? ? firewalld.start : firewalld.stop
+        else
+          Yast::Execute.on_target(
+            "/usr/bin/systemctl", enable? ? "enable": "disable", "firewalld"
+          )
+          Yast::Execute.on_target(
+            "/usr/bin/systemctl", start? ? "start": "stop", "firewalld"
+          )
+        end
       end
 
       # Return a firewall autoyast object
