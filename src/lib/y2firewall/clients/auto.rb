@@ -82,7 +82,6 @@ module Y2Firewall
       # @return [Boolean]
       def import(profile, merge = !Yast::Mode.config)
         self.class.profile = profile
-        # in fact, merge is currently not used elsewhere
         return false if merge && !read(force: false)
 
         if Yast::Stage.cont
@@ -176,6 +175,7 @@ module Y2Firewall
       # stage. Exceptions are installation over network (ssh / vnc) with second stage
       # enabled which requires more careful approach
       def import_first_stage(merge = !Yast::Mode.config)
+        log.info("Firewall: importing part of the profile which can be processed in first stage")
         # Obtains the default from the control file (settings) if not present.
         start_firewall_on_target if !need_second_stage_run?
 
@@ -189,6 +189,7 @@ module Y2Firewall
       #
       # Intended for finishing setup of exceptional cases. @see import_first_stage
       def import_second_stage
+        log.info("Firewall: second stage cleanup")
         true
       end
 
