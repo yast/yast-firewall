@@ -91,7 +91,7 @@ module Y2Firewall
           # stage is enabled and installation runs over network (ssh / vnc)
           import_second_stage
         else
-          import_first_stage(profile, merge)
+          import_first_stage(merge)
         end
       end
 
@@ -175,12 +175,13 @@ module Y2Firewall
       # Except a few edge cases complete firewall configuration should be done in first
       # stage. Exceptions are installation over network (ssh / vnc) with second stage
       # enabled which requires more careful approach
-      def import_first_stage(profile, merge = !Yast::Mode.config)
+      def import_first_stage(merge = !Yast::Mode.config)
         # Obtains the default from the control file (settings) if not present.
-        enable if profile.fetch("enable_firewall", settings.enable_firewall)
-        start if profile.fetch("start_firewall", false)
-        autoyast.import(profile)
+        start_firewall_on_target if !need_second_stage_run?
+
+        autoyast.import(self.class.profile)
         check_profile_for_errors
+
         imported
       end
 
@@ -189,6 +190,27 @@ module Y2Firewall
       # Intended for finishing setup of exceptional cases. @see import_first_stage
       def import_second_stage
         true
+      end
+
+      # Checks whether we need to run second stage handling
+      def need_second_stage_run?
+        Yast.import "Linuxrc"
+
+        # We have a problem when
+        # 1) running remote installation
+        # 2) second stage was requested
+        # 3) firewall was configured (somehow) and started via AY profile
+        remote_installer = Linuxrc.usessh || Linuxrc.vnc
+        second_stage_required = self.class.profile.fetch("second_stage", false)
+        firewall_started = self.class.profile.fetch("enable_firewall", settings.enable_firewall)
+
+        remote_installer && second_stage_required && firewall_started
+      end
+
+      # Configures firewall service to run on target according to AY profile and product defaults
+      def start_firewall_on_target
+        enable if self.class.profile.fetch("enable_firewall", settings.enable_firewall)
+        start if self.class.profile.fetch("start_firewall", false)
       end
 
       # Read the minimal configuration from firewalld, w/o dropping available configuration
