@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Jul  2 10:23:06 UTC 2020 - Michal Filka <mfilka@suse.com>
+
+- AutoYaST: moved the configuration into first stage
+- 4.3.2
+
+-------------------------------------------------------------------
 Thu May  7 15:22:56 CEST 2020 - schubi@suse.de
 
 - AutoYaST: Cleanup/improve issue handling (bsc#1171335).
