@@ -203,15 +203,15 @@ module Y2Firewall
         # 3) firewall was configured (somehow) and started via AY profile
         remote_installer = Linuxrc.usessh || Linuxrc.vnc
         second_stage_required = self.class.profile.fetch("second_stage", false)
-        firewall_started = self.class.profile.fetch("enable_firewall", settings.enable_firewall)
+        firewall_started = firewall_profile.fetch("enable_firewall", settings.enable_firewall)
 
         remote_installer && second_stage_required && firewall_started
       end
 
       # Configures firewall service to run on target according to AY profile and product defaults
       def start_firewall_on_target
-        enable if self.class.profile.fetch("enable_firewall", settings.enable_firewall)
-        start if self.class.profile.fetch("start_firewall", false)
+        enable if firewall_profile.fetch("enable_firewall", settings.enable_firewall)
+        start if firewall_profile.fetch("start_firewall", false)
       end
 
       # Read the minimal configuration from firewalld, w/o dropping available configuration
@@ -296,6 +296,12 @@ module Y2Firewall
       # @return [Y2Firewall::ProposalSettings]
       def settings
         ProposalSettings.instance
+      end
+
+      # @return [Hash<String, any>] firewall section of the profile
+      def firewall_profile
+        return {} if !self.class.profile
+        self.class.profile.fetch("firewall", {})
       end
 
       # Set that the firewall has to be enabled when writing
