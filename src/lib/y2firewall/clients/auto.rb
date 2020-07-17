@@ -189,8 +189,13 @@ module Y2Firewall
       #
       # Intended for finishing setup of exceptional cases. @see import_first_stage
       def import_second_stage
-        log.info("Firewall: second stage cleanup")
-        true
+        return if !need_second_stage_run?
+
+        log.info("Firewall: second stage finish script")
+
+        # enable/disable firewall according to the profile. In exceptional case it
+        # cannot be done in the first stage
+        start_firewall_on_target
       end
 
       # Checks whether we need to run second stage handling
@@ -200,12 +205,13 @@ module Y2Firewall
         # We have a problem when
         # 1) running remote installation
         # 2) second stage was requested
-        # 3) firewall was configured (somehow) and started via AY profile
+        # 3) firewall was configured (somehow) and started via AY profile we can expect that
+        # ssh / vnc port can be blocked.
         remote_installer = Linuxrc.usessh || Linuxrc.vnc
         second_stage_required = self.class.profile.fetch("second_stage", false)
-        firewall_started = firewall_profile.fetch("enable_firewall", settings.enable_firewall)
+        firewall_enabled = firewall_profile.fetch("enable_firewall", settings.enable_firewall)
 
-        remote_installer && second_stage_required && firewall_started
+        remote_installer && second_stage_required && firewall_enabled
       end
 
       # Configures firewall service to run on target according to AY profile and product defaults
