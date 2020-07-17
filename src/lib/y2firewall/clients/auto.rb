@@ -207,8 +207,8 @@ module Y2Firewall
         # 2) second stage was requested
         # 3) firewall was configured (somehow) and started via AY profile we can expect that
         # ssh / vnc port can be blocked.
-        remote_installer = Linuxrc.usessh || Linuxrc.vnc
-        second_stage_required = self.class.profile.fetch("second_stage", false)
+        remote_installer = Yast::Linuxrc.usessh || Yast::Linuxrc.vnc
+        second_stage_required = !!self.class.profile.dig("general", "mode", "second_stage")
         firewall_enabled = firewall_profile.fetch("enable_firewall", settings.enable_firewall)
 
         remote_installer && second_stage_required && firewall_enabled

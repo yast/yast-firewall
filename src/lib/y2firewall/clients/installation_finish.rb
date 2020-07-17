@@ -93,8 +93,7 @@ module Y2Firewall
 
         # Lets reuse client we already have
         ay_client = Clients::Auto.new
-        ay_client.import(ay_profile)
-        ay_client.write
+        ay_client.import(ay_profile) && ay_client.write
       end
 
       # Modifies the configuration of the firewall according to the current
