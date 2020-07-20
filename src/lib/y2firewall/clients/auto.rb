@@ -90,7 +90,7 @@ module Y2Firewall
           # stage is enabled and installation runs over network (ssh / vnc)
           import_second_stage
         else
-          import_first_stage(merge)
+          import_first_stage
         end
       end
 
@@ -174,7 +174,7 @@ module Y2Firewall
       # Except a few edge cases complete firewall configuration should be done in first
       # stage. Exceptions are installation over network (ssh / vnc) with second stage
       # enabled which requires more careful approach
-      def import_first_stage(merge = !Yast::Mode.config)
+      def import_first_stage
         log.info("Firewall: importing part of the profile which can be processed in first stage")
         # Obtains the default from the control file (settings) if not present.
         start_firewall_on_target if !need_second_stage_run?
@@ -277,10 +277,10 @@ module Y2Firewall
           start? ? firewalld.start : firewalld.stop
         else
           Yast::Execute.on_target(
-            "/usr/bin/systemctl", enable? ? "enable": "disable", "firewalld"
+            "/usr/bin/systemctl", enable? ? "enable" : "disable", "firewalld"
           )
           Yast::Execute.on_target(
-            "/usr/bin/systemctl", start? ? "start": "stop", "firewalld"
+            "/usr/bin/systemctl", start? ? "start" : "stop", "firewalld"
           )
         end
       end
