@@ -31,6 +31,7 @@ require "installation/auto_client"
 Yast.import "Mode"
 Yast.import "Stage"
 Yast.import "AutoInstall"
+Yast.import "AutoinstFunctions"
 
 module Y2Firewall
   module Clients
@@ -208,7 +209,7 @@ module Y2Firewall
         # 3) firewall was configured (somehow) and started via AY profile we can expect that
         # ssh / vnc port can be blocked.
         remote_installer = Yast::Linuxrc.usessh || Yast::Linuxrc.vnc
-        second_stage_required = !!self.class.profile.dig("general", "mode", "second_stage")
+        second_stage_required = Yast::AutoinstFunctions.second_stage_required?
         firewall_enabled = self.class.profile.fetch("enable_firewall", settings.enable_firewall)
 
         remote_installer && second_stage_required && firewall_enabled
