@@ -81,7 +81,7 @@ module Y2Firewall
       #
       # @param profile [Hash] firewall profile section to be imported
       # @return [Boolean]
-      def import(profile, merge = !Yast::Mode.config)
+      def import(profile, merge = !Yast::Mode.config || !Yast::Mode.auto)
         self.class.profile = profile
         return false if merge && !read(force: false)
 
