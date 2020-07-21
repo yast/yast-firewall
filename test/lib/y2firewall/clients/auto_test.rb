@@ -35,6 +35,7 @@ describe Y2Firewall::Clients::Auto do
     allow(firewalld).to receive(:read)
     allow(firewalld).to receive(:installed?).and_return(installed)
     allow(subject).to receive(:autoyast).and_return(autoyast)
+    allow(Yast::AutoinstFunctions).to receive(:second_stage_required?).and_return(false)
     allow_any_instance_of(Y2Firewall::Firewalld::Api).to receive(:running?).and_return(false)
   end
 

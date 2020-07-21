@@ -8,6 +8,7 @@ Yast.import "Service"
 describe Y2Firewall::Clients::InstallationFinish do
   before do
     allow_any_instance_of(Y2Firewall::Firewalld::Api).to receive(:running?).and_return(false)
+    allow(Yast::AutoinstFunctions).to receive(:second_stage_required?).and_return(false)
   end
 
   let(:proposal_settings) { Y2Firewall::ProposalSettings.instance }
