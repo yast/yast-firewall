@@ -29,12 +29,12 @@ Source0:        %{name}-%{version}.tar.bz2
 BuildRequires:  perl-XML-Writer update-desktop-files yast2-testsuite
 BuildRequires:  yast2-devtools >= 4.2.2
 # Y2Firewall::Firewalld#modified_from_default
-BuildRequires:  yast2 >= 4.3.16
+BuildRequires:  yast2 >= 4.3.17
 BuildRequires:  rubygem(%rb_default_ruby_abi:yast-rake)
 BuildRequires:  rubygem(%rb_default_ruby_abi:rspec)
 
 # Y2Firewall::Firewalld#modified_from_default
-Requires:       yast2 >= 4.3.16
+Requires:       yast2 >= 4.3.17
 Requires:       yast2-ruby-bindings >= 1.0.0
 
 # ButtonBox widget
