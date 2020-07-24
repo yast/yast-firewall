@@ -45,7 +45,7 @@ module Y2Firewall
     # Return a map with current firewalld settings.
     #
     # @return [Hash] dump firewalld settings
-    def export
+    def export(target: :default)
       return {} unless firewalld.installed?
 
       {
@@ -53,11 +53,23 @@ module Y2Firewall
         "start_firewall"     => firewalld.running?,
         "default_zone"       => firewalld.default_zone,
         "log_denied_packets" => firewalld.log_denied_packets,
-        "zones"              => firewalld.zones.map { |z| export_zone(z) }
+        "zones"              => export_zones(target.to_s)
       }
     end
 
   private
+
+    def zones_to_export(target)
+      return firewalld.modified_from_default("zones") if target == "compact"
+
+      firewalld.zones.map(&:name)
+    end
+
+    def export_zones(target)
+      zones = zones_to_export(target)
+
+      firewalld.zones.select { |z| zones.include?(z.name) }.map { |z| export_zone(z) }
+    end
 
     def export_zone(zone)
       (zone.attributes + zone.relations)

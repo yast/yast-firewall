@@ -93,9 +93,11 @@ module Y2Firewall
 
       # Export the current firewalld configuration
       #
+      # @param target [Symbol] Control how much information should be exported
+      #   (e.g., :default or :compact).
       # @return [Hash] with the current firewalld configuration
-      def export
-        autoyast.export
+      def export(target: :default)
+        autoyast.export(target: target)
       end
 
       # Reset the current firewalld configuration.
@@ -123,6 +125,7 @@ module Y2Firewall
       # it again.
       def write
         return false if !firewalld.installed?
+
         import_if_needed
         return false unless imported?
 

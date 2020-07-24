@@ -86,6 +86,7 @@ describe Y2Firewall::Autoyast do
       allow(firewalld).to receive("running?").and_return true
       allow(firewalld).to receive("enabled?").and_return false
       allow(firewalld).to receive("installed?").and_return true
+      allow(firewalld).to receive(:modified_from_default).with("zones").and_return(["dmz"])
       firewalld.read
     end
 
@@ -108,6 +109,15 @@ describe Y2Firewall::Autoyast do
     it "returned hash is valid for later import" do
       config = subject.export
       expect { subject.import(config) }.to_not raise_error
+    end
+
+    context "when 'compact' export is wanted" do
+      it "exports only modified zones" do
+        config = subject.export(target: "compact")
+
+        expect(config["zones"].size).to eq(1)
+        expect(config["zones"].first["name"]) == "dmz"
+      end
     end
   end
 
