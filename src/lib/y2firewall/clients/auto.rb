@@ -96,7 +96,7 @@ module Y2Firewall
       # @param target [Symbol] Control how much information should be exported
       #   (e.g., :default or :compact).
       # @return [Hash] with the current firewalld configuration
-      def export(target:)
+      def export(target: :default)
         autoyast.export(target: target)
       end
 

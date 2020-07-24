@@ -62,7 +62,7 @@ module Y2Firewall
     def zones_to_export(target)
       return firewalld.modified_from_default("zones") if target == "compact"
 
-      firewalld.current_zone_names
+      firewalld.zones.map(&:name)
     end
 
     def export_zones(target)
