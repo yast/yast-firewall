@@ -22,6 +22,7 @@
 require "yast"
 require "y2firewall/firewalld"
 require "y2firewall/proposal_settings"
+require "y2firewall/clients/auto"
 require "installation/finish_client"
 
 Yast.import "Mode"
@@ -33,6 +34,7 @@ module Y2Firewall
     # modes.
     class InstallationFinish < ::Installation::FinishClient
       include Yast::I18n
+      include Yast::Logger
 
       # Y2Firewall::ProposalSettings instance
       attr_accessor :settings
@@ -55,6 +57,16 @@ module Y2Firewall
       end
 
       def write
+        Yast.import "Mode"
+
+        # If the profile is missing then firewall section is not present at all.
+        # The firewall will be configured according to product proposals then.
+        if Yast::Mode.auto && Y2Firewall::Clients::Auto.profile
+          log.info("Firewall: running configuration according to the AY profile")
+
+          return Y2Firewall::Clients::Auto.new.write
+        end
+
         Service.Enable("sshd") if @settings.enable_sshd
         configure_firewall if @firewalld.installed?
         true
