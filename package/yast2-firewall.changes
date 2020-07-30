@@ -1,7 +1,7 @@
 -------------------------------------------------------------------
 Thu Aug 13 07:52:47 UTC 2020 - Michal Filka <mfilka@suse.com>
 
-- AutoYaST: moved the configuration into first stage
+- AutoYaST: moved the configuration into first stage (bsc#1173624)
 - 4.3.4
 
 -------------------------------------------------------------------
