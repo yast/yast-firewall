@@ -57,8 +57,6 @@ module Y2Firewall
       end
 
       def write
-        Yast.import "Mode"
-
         # If the profile is missing then firewall section is not present at all.
         # The firewall will be configured according to product proposals then.
         if Yast::Mode.auto && Y2Firewall::Clients::Auto.profile
