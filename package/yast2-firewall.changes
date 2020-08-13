@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Thu Aug 13 07:52:47 UTC 2020 - Michal Filka <mfilka@suse.com>
+
+- AutoYaST: moved the configuration into first stage (bsc#1173624)
+- 4.3.4
+
+-------------------------------------------------------------------
 Tue Aug 11 12:05:15 CEST 2020 - schubi@suse.de
 
 - AutoYaST: Added supplements: autoyast(firewall) into the spec file

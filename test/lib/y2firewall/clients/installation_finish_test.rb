@@ -62,6 +62,33 @@ describe Y2Firewall::Clients::InstallationFinish do
         expect(subject.write).to eq true
       end
     end
+
+    context "when running in AutoYaST" do
+      before(:each) do
+        allow(Y2Firewall::Clients::Auto).to receive(:profile).and_return(profile)
+        allow(Yast::Mode).to receive(:auto).and_return(true)
+      end
+
+      context "when firewall section is present" do
+        let(:profile) { { "enable_firewall" => true } }
+
+        it "calls AY client write" do
+          expect_any_instance_of(Y2Firewall::Clients::Auto).to receive(:write)
+
+          subject.write
+        end
+      end
+
+      context "when firewall section is not present" do
+        let(:profile) { nil }
+
+        it "configures firewall according to product settings" do
+          expect(subject).to receive(:configure_firewall)
+
+          subject.write
+        end
+      end
+    end
   end
 
   describe "#configure_firewall" do
