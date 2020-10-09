@@ -1,6 +1,4 @@
 #!/usr/bin/env rspec
-# encoding: utf-8
-
 # Copyright (c) [2017] SUSE LLC
 #
 # All Rights Reserved.
@@ -93,11 +91,12 @@ describe Y2Firewall::Clients::Proposal do
 
   describe "#make_proposal" do
     let(:firewall_enabled) { false }
+
     before do
       allow(proposal_settings).to receive("enable_firewall").and_return(firewall_enabled)
     end
 
-    it "returns a hash with 'preformatted_proposal', 'links' and 'warning_level'" do
+    it "returns a hash with 'preformatted_proposal', 'links', 'warning_level' and 'warning'" do
       allow(Yast::HTML).to receive("List").and_return("<ul><li>Proposal link</li></ul>")
 
       proposal = client.make_proposal({})
@@ -120,6 +119,43 @@ describe Y2Firewall::Clients::Proposal do
         proposal = client.make_proposal({})
 
         expect(proposal["preformatted_proposal"]).to include("port")
+      end
+    end
+
+    context "when the user uses only SSH key based authentication" do
+      let(:ssh_enabled) { true }
+      let(:ssh_open) { true }
+
+      before do
+        allow(proposal_settings).to receive(:only_public_key_auth).and_return(true)
+        proposal_settings.enable_sshd = ssh_enabled
+        proposal_settings.open_ssh = ssh_open
+      end
+
+      context "and the SSH service is enabled" do
+        context "and the SSH port is open" do
+          it "the 'proposal' does not contain a warning message" do
+            proposal = client.make_proposal({})
+            expect(proposal["warning"]).to be_nil
+          end
+        end
+        context "and the SSH port is close" do
+          let(:ssh_open) { false }
+
+          it "returns the proposal warning about the situation" do
+            proposal = client.make_proposal({})
+            expect(proposal["warning"]).to include("might not be allowed")
+          end
+        end
+      end
+
+      context "and the SSH is disabled" do
+        let(:ssh_enabled) { false }
+
+        it "returns the proposal warning about the situation" do
+          proposal = client.make_proposal({})
+          expect(proposal["warning"]).to include("might not be allowed")
+        end
       end
     end
   end

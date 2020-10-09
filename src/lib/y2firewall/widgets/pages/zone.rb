@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 # ------------------------------------------------------------------------------
 # Copyright (c) 2018 SUSE LLC
 #
@@ -138,6 +136,7 @@ module Y2Firewall
             values_by_proto.each do |proto_sym, ranges|
               invalid_range = ranges.find { |r| !valid_range?(r) }
               next unless invalid_range
+
               Yast::UI.SetFocus(Id(proto_sym))
               err_msg = format(_("Invalid port range: %s"), invalid_range)
               Yast::Popup.Error(err_msg + "\n" + valid_port_description)
@@ -156,13 +155,13 @@ module Y2Firewall
             end
           end
 
-          def valid_range?(r)
-            r =~ /\d+/ || r =~ /\d+-\d+/
+          def valid_range?(range)
+            range =~ /\d+/ || range =~ /\d+-\d+/
           end
 
-          def items_from_ui(s)
+          def items_from_ui(str)
             # the separator is at least one comma or space, surrounded by optional spaces
-            s.split(/ *[, ] */)
+            str.split(/ *[, ] */)
           end
 
           # @param hash [Hash{Symbol => Array<String>}] ports specification
@@ -177,7 +176,7 @@ module Y2Firewall
             hash.map { |sym, ports| ports.map { |p| "#{p}/#{sym}" } }.flatten
           end
 
-          # @param a [Array] ports specification
+          # @param ports_list [Array] ports specification
           #   as array from {Y2Firewall::Firewalld::Zone#ports}
           # @return [Hash{Symbol => Array<String>}] ports specification
           #   categorized by protocol
@@ -185,8 +184,8 @@ module Y2Firewall
           #   a = ["55555-55666/tcp", "44444/tcp", "33333/udp"]
           #   h = { tcp: ["55555-55666", "44444"], udp: ["33333"] }
           #   ports_from_array(a) # => h
-          def ports_from_array(a)
-            a
+          def ports_from_array(ports_list)
+            ports_list
               .map { |p| p.split("/") }
               .each_with_object({}) do |i, acc|
                 ports, proto = *i

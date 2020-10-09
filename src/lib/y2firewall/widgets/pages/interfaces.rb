@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 # ------------------------------------------------------------------------------
 # Copyright (c) 2018 SUSE LLC
 #
@@ -50,6 +48,7 @@ module Y2Firewall
         # @macro seeCustomWidget
         def contents
           return @contents if @contents
+
           @contents = VBox(
             Left(Heading(_("Interfaces"))),
             interfaces_table,

@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 # ------------------------------------------------------------------------------
 # Copyright (c) 2017 SUSE LLC
 #
@@ -203,17 +201,17 @@ module Y2Firewall
         zones = export["zones"] || []
         all_interfaces = zones.flat_map { |zone| zone["interfaces"] || [] }
         double_entries = all_interfaces.select { |i| all_interfaces.count(i) > 1 }.uniq
-        unless double_entries.empty?
-          AutoInstall.issues_list.add(
-            ::Installation::AutoinstIssues::InvalidValue,
-            Y2Firewall::AutoinstProfile::FirewallSection.new_from_hashes(
-              self.class.profile
-            ),
-            "interfaces",
-            double_entries.join(","),
-            _("This interface has been defined for more than one zone.")
-          )
-        end
+        return if double_entries.empty?
+
+        AutoInstall.issues_list.add(
+          ::Installation::AutoinstIssues::InvalidValue,
+          Y2Firewall::AutoinstProfile::FirewallSection.new_from_hashes(
+            self.class.profile
+          ),
+          "interfaces",
+          double_entries.join(","),
+          _("This interface has been defined for more than one zone.")
+        )
       end
 
       # Depending on the profile it activates or deactivates the firewalld

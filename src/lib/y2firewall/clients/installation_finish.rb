@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 # ------------------------------------------------------------------------------
 # Copyright (c) 2017 SUSE LLC
 #
@@ -101,13 +99,13 @@ module Y2Firewall
       # Convenience method to open the vnc ports in firewalld depending on the
       # proposal settings
       def configure_vnc
-        if @settings.open_vnc
-          if @firewalld.api.service_supported?("tigervnc")
-            @firewalld.api.add_service(@settings.default_zone, "tigervnc")
-            @firewalld.api.add_service(@settings.default_zone, "tigervnc-https")
-          else
-            log.error "tigervnc service definition is not available"
-          end
+        return unless @settings.open_vnc
+
+        if @firewalld.api.service_supported?("tigervnc")
+          @firewalld.api.add_service(@settings.default_zone, "tigervnc")
+          @firewalld.api.add_service(@settings.default_zone, "tigervnc-https")
+        else
+          log.error "tigervnc service definition is not available"
         end
       end
     end

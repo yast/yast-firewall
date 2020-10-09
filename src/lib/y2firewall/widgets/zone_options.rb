@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 # Copyright (c) [2018] SUSE LLC
 #
 # All Rights Reserved.
@@ -45,6 +43,7 @@ module Y2Firewall
       # @macro seeAbstractWidget
       def init
         return unless interface.zone
+
         self.value = interface.zone.name
       end
 
@@ -61,11 +60,11 @@ module Y2Firewall
       # @macro seeAbstractWidget
       def store
         new_zone = selected_zone
-        return if new_zone && new_zone.interfaces.include?(interface.name)
+        return if new_zone&.interfaces&.include?(interface.name)
 
         old_zone = interface.zone
-        old_zone.remove_interface(interface.name) if old_zone
-        new_zone.add_interface(interface.name) if new_zone
+        old_zone&.remove_interface(interface.name)
+        new_zone&.add_interface(interface.name)
       end
 
     private
@@ -84,6 +83,7 @@ module Y2Firewall
       # @return [Y2Firewall::Firewalld::Zone,nil] selected zone
       def selected_zone
         return nil if value.empty?
+
         Y2Firewall::Firewalld.instance.find_zone(value)
       end
 

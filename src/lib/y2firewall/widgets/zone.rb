@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 # Copyright (c) [2017] SUSE LLC
 #
 # All Rights Reserved.
@@ -176,7 +174,7 @@ module Y2Firewall
                  "IP Masquerade, also called IPMASQ or MASQ, allows one or more computers in " \
                  "a network without assigned IP addresses to communicate using server’s" \
                  "assigned IP address."
-        ),
+               ),
           label)
       end
     end

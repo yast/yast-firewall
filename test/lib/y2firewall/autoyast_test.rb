@@ -66,8 +66,8 @@ describe Y2Firewall::Autoyast do
        "  sources:"]
     end
 
-    let(:known_zones) { %w(dmz drop external home internal public trusted work) }
-    let(:known_services) { %w(http https samba ssh) }
+    let(:known_zones) { %w[dmz drop external home internal public trusted work] }
+    let(:known_services) { %w[http https samba ssh] }
 
     let(:api) do
       instance_double(Y2Firewall::Firewalld::Api,

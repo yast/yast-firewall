@@ -24,11 +24,6 @@ require "cwm/rspec"
 require "y2firewall/widgets/proposal"
 require "y2firewall/proposal_settings"
 
-RSpec.shared_examples "CWM::CheckBox" do
-  include_examples "CWM::AbstractWidget"
-  include_examples "CWM::ValueBasedWidget"
-end
-
 describe Y2Firewall::Widgets do
   let(:proposal_settings) do
     instance_double(

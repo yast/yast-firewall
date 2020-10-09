@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 # ------------------------------------------------------------------------------
 # Copyright (c) 2017 SUSE LLC
 #
@@ -120,6 +118,17 @@ module Y2Firewall
     def close_vnc!
       log.info "Close VNC port"
       self.open_vnc = false
+    end
+
+    # Return whether the current settings could be a problem for the user to
+    # login
+    #
+    # @return [Boolean] true if the root user uses only public key
+    #   authentication and the system is not accesible through ssh
+    def access_problem?
+      return false unless only_public_key_auth
+
+      !(@open_ssh && @enable_sshd)
     end
 
   private

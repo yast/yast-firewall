@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 # ------------------------------------------------------------------------------
 # Copyright (c) 2017 SUSE LLC
 #
@@ -20,7 +18,7 @@
 # ------------------------------------------------------------------------------
 
 # Set the paths
-srcdir = File.expand_path("../../src", __FILE__)
+srcdir = File.expand_path("../src", __dir__)
 y2dirs = ENV.fetch("Y2DIR", "").split(":")
 ENV["Y2DIR"] = y2dirs.unshift(srcdir).join(":")
 
@@ -39,6 +37,8 @@ stub_module("AutoInstall")
 # rubocop:disable Style/SingleLineMethods
 # rubocop:disable Style/MethodName
 stub_module("UsersSimple", Class.new { def self.GetRootPassword; "secret"; end })
+# rubocop:enable Style/SingleLineMethods
+# rubocop:enable Style/MethodName
 
 # some tests have translatable messages
 ENV["LANG"] = "en_US.UTF-8"

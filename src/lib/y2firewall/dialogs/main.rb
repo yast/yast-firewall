@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 # ------------------------------------------------------------------------------
 # Copyright (c) 2018 SUSE LLC
 #
@@ -43,11 +41,12 @@ module Y2Firewall
         # For applying the changes to the running configuration a reload or
         # restart need to be applied.
         # Proposed a service reload by default (bsc#1114673, bsc#1121277)
-        fw.system_service.reload if fw.system_service && fw.system_service.running?
+        fw.system_service.reload if fw.system_service&.running?
       end
 
       def should_open_dialog?
         return true if Yast::Mode.config
+
         super
       end
 
@@ -125,6 +124,7 @@ module Y2Firewall
       # modifications
       def apply_changes
         return false if Yast::Mode.config
+
         fw.write_only
         fw.system_service.save
       end

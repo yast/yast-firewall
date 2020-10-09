@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 # ------------------------------------------------------------------------------
 # Copyright (c) 2018 SUSE LLC
 #
@@ -54,6 +52,7 @@ module Y2Firewall
         # @macro seeCustomWidget
         def contents
           return @contents if @contents
+
           @contents = VBox(
             Left(Heading(_("Zones"))),
             zones_table,
@@ -101,7 +100,7 @@ module Y2Firewall
             result = Dialogs::Zone.run(zone)
             UIState.instance.select_row(name) if result == :ok
 
-            result == :ok ? :redraw : nil
+            (result == :ok) ? :redraw : nil
           end
         end
 
@@ -132,6 +131,7 @@ module Y2Firewall
 
         def default_zone_button
           return nil if firewall.zones.empty?
+
           @default_zone_button ||= DefaultZoneButton.new(firewall.zones.first)
         end
 

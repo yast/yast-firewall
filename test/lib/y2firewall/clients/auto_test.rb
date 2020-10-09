@@ -327,8 +327,8 @@ describe Y2Firewall::Clients::Auto do
       { "FW_MASQUERADE" => "yes", "enable_firewall" => false, "start_firewall" => false }
     end
 
-    let(:known_zones) { %w(dmz external) }
-    let(:known_services) { %w(http https samba ssh) }
+    let(:known_zones) { %w[dmz external] }
+    let(:known_services) { %w[http https samba ssh] }
 
     let(:zones_definition) do
       ["dmz",

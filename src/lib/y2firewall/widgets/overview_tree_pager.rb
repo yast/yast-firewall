@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 # Copyright (c) [2018] SUSE LLC
 #
 # All Rights Reserved.
@@ -73,6 +71,7 @@ module Y2Firewall
       # @return [CWM::PagerTreeItem]
       def startup_item
         return nil if Yast::Mode.config
+
         page = Pages::Startup.new(self)
         CWM::PagerTreeItem.new(page)
       end
@@ -92,8 +91,8 @@ module Y2Firewall
       end
 
       # @return [CWM::PagerTreeItem]
-      def zone_item(z)
-        page = Pages::Zone.new(z, self)
+      def zone_item(zone)
+        page = Pages::Zone.new(zone, self)
         CWM::PagerTreeItem.new(page)
       end
     end
