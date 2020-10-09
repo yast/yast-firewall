@@ -30,7 +30,7 @@ describe Y2Firewall::Clients::Firewall do
       allow(Yast::PackageSystem).to receive("CheckAndInstallPackages")
         .with(["firewalld"]).and_return(installed)
       allow(Yast::WFM).to receive("Args").and_return(args)
-      allow($stderr).to receive(:puts)
+      allow(subject).to receive(:warn)
     end
 
     context "when the firewalld package is not installed" do
@@ -44,7 +44,7 @@ describe Y2Firewall::Clients::Firewall do
       let(:args) { ["list"] }
 
       it "recommends to use the firewalld cmdline clients" do
-        expect($stderr).to receive(:puts).with(Y2Firewall::Clients::Firewall::NOT_SUPPORTED)
+        expect(subject).to receive(:warn).with(Y2Firewall::Clients::Firewall::NOT_SUPPORTED)
 
         subject.run
       end

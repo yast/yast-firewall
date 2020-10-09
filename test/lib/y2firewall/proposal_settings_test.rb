@@ -206,4 +206,50 @@ describe Y2Firewall::ProposalSettings do
       expect(subject.open_vnc).to be(false)
     end
   end
+
+  describe "#access_problem?" do
+    let(:ssh_enabled) { true }
+    let(:ssh_open) { true }
+    let(:only_ssh_key_auth) { true }
+
+    before do
+      subject.enable_sshd = ssh_enabled
+      subject.open_ssh = ssh_open
+      allow(subject).to receive(:only_public_key_auth).and_return(only_ssh_key_auth)
+    end
+
+    context "when the root user uses only SSH key based authentication" do
+      context "when sshd is enabled" do
+        context "and the SSH port is open" do
+          it "returns false" do
+            expect(subject.access_problem?).to eql(false)
+          end
+        end
+
+        context "and the SSH port is close" do
+          let(:ssh_open) { false }
+
+          it "returns true" do
+            expect(subject.access_problem?).to eql(true)
+          end
+        end
+      end
+
+      context "when sshd is disabled" do
+        let(:ssh_enabled) { false }
+
+        it "returns true" do
+          expect(subject.access_problem?).to eql(true)
+        end
+      end
+    end
+
+    context "when the root user uses password authentication" do
+      let(:only_ssh_key_auth) { false }
+
+      it "returns false" do
+        expect(subject.access_problem?).to eql(false)
+      end
+    end
+  end
 end
