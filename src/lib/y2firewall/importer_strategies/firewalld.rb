@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 # ------------------------------------------------------------------------------
 # Copyright (c) 2017 SUSE LLC
 #
@@ -46,6 +44,7 @@ module Y2Firewall
       # @return [Boolean] true if imported correctly
       def import
         return true if profile.empty?
+
         profile.fetch("zones", []).each do |zone|
           log.debug "Proccesing zone: #{zone.inspect}"
           process_zone(zone)
@@ -72,6 +71,7 @@ module Y2Firewall
         zone = create_zone(zone_definition) if !zone
         (zone.attributes + zone.relations).each do |key|
           next if IGNORED_ATTRIBUTES.include?(key.to_s)
+
           zone.public_send("#{key}=", zone_definition[key.to_s]) if zone_definition[key.to_s]
         end
       end

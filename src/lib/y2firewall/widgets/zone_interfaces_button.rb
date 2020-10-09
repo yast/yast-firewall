@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 # Copyright (c) [2018] SUSE LLC
 #
 # All Rights Reserved.
@@ -44,7 +42,7 @@ module Y2Firewall
       # @macro seeAbstractWidget
       def handle
         result = Dialogs::ModifyZoneInterfaces.run
-        result == :ok ? :redraw : nil
+        (result == :ok) ? :redraw : nil
       end
     end
   end

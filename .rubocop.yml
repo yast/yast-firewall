@@ -1,12 +1,16 @@
 # use the shared YaST defaults
 inherit_from:
-  /usr/share/YaST2/data/devtools/data/rubocop_yast_style.yml
+  /usr/share/YaST2/data/devtools/data/rubocop-0.71.0_yast_style.yml
 
 Metrics/CyclomaticComplexity:
   Max: 10
 
-AllCops:
+Metrics/BlockLength:
+  Max: 86
   Exclude:
-    - "src/modules/*.rb"
-    - "src/clients/firewall_auto.rb"
-    - "src/include/*/*.rb"
+    - "test/**/*"
+
+# this needs more testing if we can have frozen string literals
+Style/FrozenStringLiteralComment:
+  Enabled: false
+

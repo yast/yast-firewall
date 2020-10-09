@@ -51,8 +51,9 @@ module Y2Firewall
       def run
         log_and_return do
           return :abort unless Yast::PackageSystem.CheckAndInstallPackages(["firewalld"])
+
           if !Yast::WFM.Args.empty?
-            $stderr.puts _(NOT_SUPPORTED)
+            warn _(NOT_SUPPORTED)
             false
           else
             Dialogs::Main.new.run

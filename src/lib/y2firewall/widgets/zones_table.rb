@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 # Copyright (c) [2018] SUSE LLC
 #
 # All Rights Reserved.
@@ -83,6 +81,7 @@ module Y2Firewall
       # @macro seeAbstractWidget
       def handle(event)
         return nil unless event["EventReason"] == "SelectionChanged"
+
         UIState.instance.select_row(value)
         update_default_zone_button
         nil

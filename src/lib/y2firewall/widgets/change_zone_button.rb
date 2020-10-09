@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 # Copyright (c) [2018] SUSE LLC
 #
 # All Rights Reserved.
@@ -47,8 +45,9 @@ module Y2Firewall
       # @macro seeAbstractWidget
       def handle
         return nil unless interface
+
         result = Dialogs::ChangeZone.run(interface)
-        result == :ok ? :redraw : nil
+        (result == :ok) ? :redraw : nil
       end
     end
   end

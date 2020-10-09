@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 # Copyright (c) [2018] SUSE LLC
 #
 # All Rights Reserved.
@@ -55,9 +53,7 @@ module Y2Firewall
       # @macro seeAbstractWidget
       def init
         interface = Y2Firewall::UIState.instance.row_id
-        if interface && interfaces.map(&:id).include?(interface)
-          self.value = interface
-        end
+        self.value = interface if interface && interfaces.map(&:id).include?(interface)
         change_zone_button.interface = selected_interface
       end
 
@@ -85,6 +81,7 @@ module Y2Firewall
       # @macro seeAbstractWidget
       def handle(event)
         return nil unless my_event?(event) && event["EventReason"] == "SelectionChanged"
+
         UIState.instance.select_row(value)
         change_zone_button.interface = selected_interface
         nil

@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 # Copyright (c) [2018] SUSE LLC
 #
 # All Rights Reserved.
@@ -98,6 +96,7 @@ module Y2Firewall
         return true unless Yast::UI.TextMode
 
         return true if selected_services.empty?
+
         # TRANSLATORS: popup question
         msg = _("The selection of services will be lost if you leave the page\n" \
           "without moving them with Add/Remove.\n\nDo you really want to continue?\n")

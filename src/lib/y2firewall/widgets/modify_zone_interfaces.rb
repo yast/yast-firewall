@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 # Copyright (c) [2018] SUSE LLC
 #
 # All Rights Reserved.
@@ -69,6 +67,7 @@ module Y2Firewall
       # @macro seeAbstractWidget
       def store
         return unless selected_zone
+
         selected_zone.interfaces = interfaces_input.items_from_ui
       end
 
@@ -88,6 +87,7 @@ module Y2Firewall
       # @return [Y2Firewall::Firewalld::Zone,nil] selected zone
       def selected_zone
         return nil if !value || value.empty?
+
         Y2Firewall::Firewalld.instance.find_zone(value)
       end
     end

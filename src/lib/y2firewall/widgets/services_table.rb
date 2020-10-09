@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 # Copyright (c) [2018] SUSE LLC
 #
 # All Rights Reserved.
@@ -74,10 +72,11 @@ module Y2Firewall
         old_services = @services
         @services = services
         change_items(items)
-        unless Yast::UI.TextMode
-          new_services = services - old_services
-          self.value = new_services
-        end
+
+        return if Yast::UI.TextMode
+
+        new_services = services - old_services
+        self.value = new_services
       end
     end
   end

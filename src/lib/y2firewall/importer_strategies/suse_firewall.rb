@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 # ------------------------------------------------------------------------------
 # Copyright (c) 2017 SUSE LLC
 #
@@ -104,7 +102,7 @@ module Y2Firewall
       #
       # @return [Array<String>] not supported properties
       def unsupported_properties
-        @profile.keys.select { |k| !SUPPORTED_PROPERTIES.include?(k) }
+        @profile.keys.reject { |k| SUPPORTED_PROPERTIES.include?(k) }
       end
 
       # It processes the profile configuring the firewalld zones that match
@@ -223,6 +221,7 @@ module Y2Firewall
       # @return [Array<String>, nil]
       def ports(zone)
         return nil unless rpc_ports(zone) || tcp_ports(zone) || udp_ports(zone)
+
         [rpc_ports(zone), tcp_ports(zone), udp_ports(zone)].compact.flatten
       end
 
@@ -309,6 +308,7 @@ module Y2Firewall
         zone_name = profile.fetch("FW_IPSEC_TRUST", "no").downcase
         return if zone_name == "no"
         return "int" if zone_name == "yes"
+
         zone_name
       end
 

@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 # ------------------------------------------------------------------------------
 # Copyright (c) 2017 SUSE LLC
 #
@@ -92,6 +90,7 @@ module Y2Firewall
         case attr_value
         when Array
           return "" if attr_value.empty?
+
           attr_value.join(", ")
         when TrueClass, FalseClass
           attr_value ? _("Yes") : _("No")
@@ -111,6 +110,7 @@ module Y2Firewall
 
       zone_desc = attributes_summary(zone, zone.relations)
       return "" if zone_desc.empty?
+
       zone_desc = attributes_summary(zone, ZONE_ATTRS) + zone_desc
 
       zone_header(zone) + list(zone_desc)
@@ -118,6 +118,7 @@ module Y2Firewall
 
     def attributes_summary(zone, attributes)
       raise ArgumentError, "zone parameter has to be defined" if zone.nil?
+
       attributes.each_with_object([]) do |attribute, memo|
         text = zone_detail_summary(attribute, zone.public_send(attribute))
         (memo << text) unless text.empty?
