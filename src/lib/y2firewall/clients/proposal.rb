@@ -76,12 +76,20 @@ module Y2Firewall
         {
           "preformatted_proposal" => preformatted_proposal,
           "warning_level"         => :warning,
-          "links"                 => SERVICES_LINKS
+          "links"                 => SERVICES_LINKS,
+          "warning"               => warning
         }
       end
 
       def preformatted_proposal
         Yast::HTML.List(proposals)
+      end
+
+      def warning
+        return nil unless @settings.access_problem?
+
+        _("The 'root' user uses only SSH key based authentication. <br>" \
+          "With the current settings the user might not be allowed to login.")
       end
 
       def ask_user(param)
