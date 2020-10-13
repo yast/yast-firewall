@@ -88,7 +88,7 @@ module Y2Firewall
       def warning
         return nil unless @settings.access_problem?
 
-        _("The 'root' user uses only SSH key based authentication. <br>" \
+        _("The 'root' user uses only SSH key-based authentication. <br>" \
           "With the current settings the user might not be allowed to login.")
       end
 
