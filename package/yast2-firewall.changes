@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Oct 16 15:15:49 UTC 2020 - Josef Reidinger <jreidinger@suse.com>
+
+- Do not enable firewall during first stage of AutoYaST
+  (bsc#1177778) 
+- 4.2.5
+
+-------------------------------------------------------------------
 Sat Mar 21 12:02:05 UTC 2020 - Knut Anderssen <kanderssen@suse.com>
 
 - Force a reset of the firewalld API instance after modifying the
