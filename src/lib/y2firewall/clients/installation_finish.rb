@@ -73,6 +73,9 @@ module Y2Firewall
       # Convenience method to enable / disable the firewalld service depending
       # on the proposal settings
       def configure_firewall_service
+        # do not run in autoyast as it is done in second stage (bsc#1177778)
+        return if Yast::Mode.auto
+        # and also only installation, not upgrade one. NOTE: installation mode include auto
         return unless Yast::Mode.installation
 
         @settings.enable_firewall ? @firewalld.enable! : @firewalld.disable!
