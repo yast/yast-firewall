@@ -126,9 +126,14 @@ module Y2Firewall
     # @return [Boolean] true if the root user uses only public key
     #   authentication and the system is not accesible through ssh
     def access_problem?
+      # public key is not the only way
       return false unless only_public_key_auth
 
-      !(@open_ssh && @enable_sshd)
+      # without running sshd it is useless
+      return true unless @enable_sshd
+
+      # firewall is up and port for ssh is not open
+      @enable_firewall && !@open_ssh
     end
 
   private

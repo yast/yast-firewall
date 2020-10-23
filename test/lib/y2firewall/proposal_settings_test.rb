@@ -209,28 +209,40 @@ describe Y2Firewall::ProposalSettings do
 
   describe "#access_problem?" do
     let(:ssh_enabled) { true }
+    let(:firewall_enabled) { true }
     let(:ssh_open) { true }
     let(:only_ssh_key_auth) { true }
 
     before do
       subject.enable_sshd = ssh_enabled
+      subject.enable_firewall = firewall_enabled
       subject.open_ssh = ssh_open
       allow(subject).to receive(:only_public_key_auth).and_return(only_ssh_key_auth)
     end
 
     context "when the root user uses only SSH key based authentication" do
       context "when sshd is enabled" do
-        context "and the SSH port is open" do
-          it "returns false" do
-            expect(subject.access_problem?).to eql(false)
+        context "and firewall is enabled" do
+          context "and the SSH port is open" do
+            it "returns false" do
+              expect(subject.access_problem?).to eql(false)
+            end
+          end
+
+          context "and the SSH port is close" do
+            let(:ssh_open) { false }
+
+            it "returns true" do
+              expect(subject.access_problem?).to eql(true)
+            end
           end
         end
 
-        context "and the SSH port is close" do
-          let(:ssh_open) { false }
+        context "and firewall is disabled" do
+          let(:firewall_enabled) { false }
 
-          it "returns true" do
-            expect(subject.access_problem?).to eql(true)
+          it "returns false" do
+            expect(subject.access_problem?).to eql(false)
           end
         end
       end
