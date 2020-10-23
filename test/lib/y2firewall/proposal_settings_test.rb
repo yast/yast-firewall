@@ -241,8 +241,8 @@ describe Y2Firewall::ProposalSettings do
         context "and firewall is disabled" do
           let(:firewall_enabled) { false }
 
-          it "returns true" do
-            expect(subject.access_problem?).to eql(true)
+          it "returns false" do
+            expect(subject.access_problem?).to eql(false)
           end
         end
       end
