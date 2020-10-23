@@ -215,7 +215,7 @@ describe Y2Firewall::ProposalSettings do
 
     before do
       subject.enable_sshd = ssh_enabled
-      subject.firewall_enabled = firewall_enabled
+      subject.enable_firewall = firewall_enabled
       subject.open_ssh = ssh_open
       allow(subject).to receive(:only_public_key_auth).and_return(only_ssh_key_auth)
     end
