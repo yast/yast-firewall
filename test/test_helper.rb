@@ -33,9 +33,9 @@ def stub_module(name, fake_class = nil)
 end
 
 # stub classes from other modules to speed up a build
-stub_module("AutoInstall")
 # rubocop:disable Style/SingleLineMethods
 # rubocop:disable Style/MethodName
+stub_module("AutoInstall", Class.new { def self.issues_list; []; end })
 stub_module("UsersSimple", Class.new { def self.GetRootPassword; "secret"; end })
 # rubocop:enable Style/SingleLineMethods
 # rubocop:enable Style/MethodName
@@ -43,6 +43,14 @@ stub_module("UsersSimple", Class.new { def self.GetRootPassword; "secret"; end }
 # some tests have translatable messages
 ENV["LANG"] = "en_US.UTF-8"
 ENV["LC_ALL"] = "en_US.UTF-8"
+
+RSpec.configure do |config|
+  config.mock_with :rspec do |c|
+    # make sure we mock only the existing methods
+    # https://relishapp.com/rspec/rspec-mocks/v/3-0/docs/verifying-doubles/partial-doubles
+    c.verify_partial_doubles = true
+  end
+end
 
 if ENV["COVERAGE"]
   require "simplecov"
@@ -53,12 +61,20 @@ if ENV["COVERAGE"]
   # track all ruby files under src
   SimpleCov.track_files("#{srcdir}/**/*.rb")
 
-  # use coveralls for on-line code coverage reporting at Travis CI
-  if ENV["TRAVIS"]
-    require "coveralls"
-    SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new [
+  # additionally use the LCOV format for on-line code coverage reporting at CI
+  if ENV["CI"] || ENV["COVERAGE_LCOV"]
+    require "simplecov-lcov"
+
+    SimpleCov::Formatter::LcovFormatter.config do |c|
+      c.report_with_single_file = true
+      # this is the default Coveralls GitHub Action location
+      # https://github.com/marketplace/actions/coveralls-github-action
+      c.single_report_path = "coverage/lcov.info"
+    end
+
+    SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
       SimpleCov::Formatter::HTMLFormatter,
-      Coveralls::SimpleCov::Formatter
+      SimpleCov::Formatter::LcovFormatter
     ]
   end
 end
