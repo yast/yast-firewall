@@ -30,6 +30,7 @@ describe Y2Firewall::Dialogs::Main do
   before do
     firewall.reset
     allow(firewall).to receive(:read)
+    allow(firewall).to receive(:write_only).and_return(true)
     allow_any_instance_of(Y2Firewall::Widgets::OverviewTreePager)
       .to receive(:items).and_return([])
   end
