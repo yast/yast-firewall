@@ -225,7 +225,7 @@ module Y2Firewall
         return nil unless @settings.selinux_config.configurable?
 
         _(
-          "Selinux Default Policy %s"
+          "Selinux Default Policy is %s"
         ) % @settings.selinux_config.mode.to_human_string
       end
     end
