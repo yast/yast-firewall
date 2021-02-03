@@ -59,7 +59,6 @@ module Y2Firewall
       # chose a different one in the proposal
       @default_zone = "public"
       @selinux_config = Y2Security::SelinuxConfig.new
-      @selinux_config.save # lets write the proposal to sync the initial state
     end
 
     # Load the default values defined in the control file
