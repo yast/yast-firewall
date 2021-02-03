@@ -22,6 +22,7 @@
 require "yast"
 
 Yast.import "UsersSimple"
+require "y2security/selinux_config"
 
 module Y2Firewall
   # Class that stores the proposal settings for firewalld during installation.
@@ -39,6 +40,9 @@ module Y2Firewall
     attr_accessor :open_vnc
     # [String] Name of the default zone where perform the changes
     attr_accessor :default_zone
+    # [Y2Security::SelinuxConfig] selinux configuration. Only temporary for SLE15 SP2,
+    # for newer code streams it lives in security_setttings in yast2-installation.
+    attr_accessor :selinux_config
 
     # Constructor
     def initialize
@@ -54,6 +58,7 @@ module Y2Firewall
       # FIXME: obtain from Y2Firewall::Firewalld, control file or allow to
       # chose a different one in the proposal
       @default_zone = "public"
+      @selinux_config = Y2Security::SelinuxConfig.new
     end
 
     # Load the default values defined in the control file

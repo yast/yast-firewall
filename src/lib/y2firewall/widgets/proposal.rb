@@ -200,5 +200,29 @@ module Y2Firewall
         )
       end
     end
+
+    class SelinuxPolicy < CWM::ComboBox
+      def initialize(settings)
+        textdomain "firewall"
+
+        @settings = settings
+      end
+
+      def label
+        _("SELinux Policy")
+      end
+
+      def items
+        @settings.selinux_config.modes.map { |m| [m.id, m.to_human_string] }
+      end
+
+      def init
+        self.value = @settings.selinux_config.mode.id
+      end
+
+      def store
+        @settings.selinux_config.mode = value
+      end
+    end
   end
 end

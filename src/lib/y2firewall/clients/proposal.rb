@@ -122,7 +122,7 @@ module Y2Firewall
       def proposals
         # Filter proposals with content
         [cpu_mitigations_proposal, firewall_proposal, sshd_proposal,
-         ssh_port_proposal, vnc_fw_proposal].compact
+         ssh_port_proposal, vnc_fw_proposal, selinux_proposal].compact
       end
 
       # Returns the cpu mitigation part of the bootloader proposal description
@@ -217,6 +217,16 @@ module Y2Firewall
             "SSH service will be disabled (<a href=\"%s\">enable</a>)"
           ) % LINK_ENABLE_SSHD
         end
+      end
+
+      # Returns the Selinux config description
+      # @return [String, nil] proposal html text or nil if not configurable
+      def selinux_proposal
+        return nil unless @settings.selinux_config.configurable?
+
+        _(
+          "Selinux Default Policy %s"
+        ) % @settings.selinux_config.mode.to_human_string
       end
     end
   end

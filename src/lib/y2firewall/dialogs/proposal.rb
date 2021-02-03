@@ -41,7 +41,7 @@ module Y2Firewall
       end
 
       def contents
-        VBox(
+        res = VBox(
           Frame(
             _("Firewall and SSH service"),
             HSquash(
@@ -55,6 +55,17 @@ module Y2Firewall
             )
           )
         )
+        if @settings.selinux_config.configurable?
+          res.params << Frame(
+            _("SELinux"),
+            MarginBox(
+              0.5,
+              0.5,
+              VBox(
+                Widgets::SelinuxPolicy.new(@settings)
+              )
+            )
+          )
       end
 
       def abort_button
