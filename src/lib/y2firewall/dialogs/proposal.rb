@@ -66,6 +66,7 @@ module Y2Firewall
               )
             )
           )
+        end
       end
 
       def abort_button
