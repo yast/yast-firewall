@@ -55,6 +55,7 @@ module Y2Firewall
             )
           )
         )
+
         if @settings.selinux_config.configurable?
           res.params << Frame(
             _("SELinux"),
@@ -67,6 +68,8 @@ module Y2Firewall
             )
           )
         end
+
+        res
       end
 
       def abort_button
