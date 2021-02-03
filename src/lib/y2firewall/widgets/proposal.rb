@@ -222,6 +222,7 @@ module Y2Firewall
 
       def store
         @settings.selinux_config.mode = value
+        @settings.selinux_config.save
       end
     end
   end
