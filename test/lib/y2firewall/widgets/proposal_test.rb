@@ -330,4 +330,10 @@ describe Y2Firewall::Widgets do
       end
     end
   end
+
+  describe Y2Firewall::Widgets::SelinuxPolicy do
+    subject { described_class.new(proposal_settings) }
+
+    include_examples "CWM::ComboBox"
+  end
 end

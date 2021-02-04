@@ -42,6 +42,10 @@ describe Y2Firewall::Clients::InstallationFinish do
       subject.write
     end
 
+    it "saves selinux policy" do
+      expect(proposal_settings.selinux_config).to receive(:save)
+    end
+
     context "when firewalld is not installed" do
       let(:installed) { false }
 
