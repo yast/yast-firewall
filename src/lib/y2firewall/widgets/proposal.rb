@@ -201,6 +201,7 @@ module Y2Firewall
       end
     end
 
+    # widget to set selinux policy
     class SelinuxPolicy < CWM::ComboBox
       def initialize(settings)
         textdomain "firewall"
