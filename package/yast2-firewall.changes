@@ -1,8 +1,15 @@
 -------------------------------------------------------------------
+Thu Feb  4 09:14:13 UTC 2021 - Josef Reidinger <jreidinger@suse.com>
+
+- Add to firewall/security proposal option to setup selinux if
+  given product require it. (jsc#SLE-17427)
+- 4.2.6
+
+-------------------------------------------------------------------
 Fri Oct 16 15:15:49 UTC 2020 - Josef Reidinger <jreidinger@suse.com>
 
 - Do not enable firewall during first stage of AutoYaST
-  (bsc#1177778) 
+  (bsc#1177778)
 - 4.2.5
 
 -------------------------------------------------------------------
