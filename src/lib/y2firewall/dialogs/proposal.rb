@@ -41,34 +41,8 @@ module Y2Firewall
       end
 
       def contents
-        res = VBox(
-          Frame(
-            _("Firewall and SSH service"),
-            HSquash(
-              MarginBox(
-                0.5,
-                0.5,
-                VBox(
-                  Widgets::FirewallSSHProposal.new(@settings)
-                )
-              )
-            )
-          )
-        )
-
-        if @settings.selinux_config.configurable?
-          res.params << Frame(
-            _("SELinux"),
-            MarginBox(
-              0.5,
-              0.5,
-              VBox(
-                Widgets::SelinuxPolicy.new(@settings)
-              )
-            )
-          )
-        end
-
+        res = VBox(firewall_ssh_content)
+        res.params << selinux_content if selinux_configurable?
         res
       end
 
@@ -90,6 +64,38 @@ module Y2Firewall
       end
 
     protected
+
+      def selinux_configurable?
+        @settings.selinux_config.configurable?
+      end
+
+      def firewall_ssh_content
+        Frame(
+          _("Firewall and SSH service"),
+          HSquash(
+            MarginBox(
+              0.5,
+              0.5,
+              VBox(
+                Widgets::FirewallSSHProposal.new(@settings)
+              )
+            )
+          )
+        )
+      end
+
+      def selinux_content
+        Frame(
+          _("SELinux"),
+          MarginBox(
+            0.5,
+            0.5,
+            VBox(
+              Widgets::SelinuxPolicy.new(@settings)
+            )
+          )
+        )
+      end
 
       # Hostname of the current system.
       #

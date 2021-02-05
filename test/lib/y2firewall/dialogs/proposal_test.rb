@@ -29,5 +29,9 @@ describe Y2Firewall::Dialogs::Proposal do
 
   subject { described_class.new(settings) }
 
+  before do
+    allow(subject).to receive(:selinux_configurable?).and_return(false)
+  end
+
   include_examples "CWM::Dialog"
 end

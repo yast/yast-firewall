@@ -334,6 +334,12 @@ describe Y2Firewall::Widgets do
   describe Y2Firewall::Widgets::SelinuxPolicy do
     subject { described_class.new(proposal_settings) }
 
+    let(:selinux_config) { instance_double("Y2Security::SelinuxConfig", modes: []) }
+
+    before do
+      allow(proposal_settings).to receive(:selinux_config).and_return(selinux_config)
+    end
+
     include_examples "CWM::ComboBox"
   end
 end

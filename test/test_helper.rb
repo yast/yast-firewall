@@ -35,7 +35,7 @@ def stub_module(name, fake_class = nil)
 end
 
 # stub classes from other modules to speed up a build
-stub_module("AutoInstall")
+stub_module("AutoInstall", Class.new { def issues_list; []; end })
 # rubocop:disable Style/SingleLineMethods
 # rubocop:disable Style/MethodName
 stub_module("UsersSimple", Class.new { def self.GetRootPassword; "secret"; end })

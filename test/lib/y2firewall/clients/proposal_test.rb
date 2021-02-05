@@ -30,6 +30,7 @@ describe Y2Firewall::Clients::Proposal do
   before do
     # skip bootloader proposal to avoid build dependency on it
     allow(subject).to receive(:cpu_mitigations_proposal)
+    allow(subject).to receive(:selinux_proposal)
   end
 
   describe "#initialize" do

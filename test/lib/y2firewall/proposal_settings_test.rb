@@ -54,10 +54,6 @@ describe Y2Firewall::ProposalSettings do
       described_class.create_instance
     end
 
-    it "initializes selinux configuration" do
-      expect(subject.selinux_config).to be_a(Y2Security::SelinuxConfig)
-    end
-
     context "when firewall has been enabled in the control file" do
       let(:global_section) { { "enable_firewall" => true, "enable_sshd" => false } }
 
@@ -107,6 +103,18 @@ describe Y2Firewall::ProposalSettings do
 
         described_class.create_instance
       end
+    end
+  end
+
+  describe "#selinux_config" do
+    let(:selinux_config) { double("Y2Security::SelinuxConfig") }
+
+    before do
+      allow(Y2Security::SelinuxConfig).to receive(:new).and_return(selinux_config)
+    end
+
+    it "returns a SelinuxConfig object" do
+      expect(subject.selinux_config).to eq(selinux_config)
     end
   end
 
