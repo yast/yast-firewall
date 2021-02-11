@@ -41,9 +41,10 @@ module Y2Firewall
       end
 
       def contents
-        res = VBox(firewall_ssh_content)
-        res.params << selinux_content if selinux_configurable?
-        res
+        content = [firewall_ssh_content]
+        content << selinux_content if selinux_configurable?
+
+        VBox(*content)
       end
 
       def abort_button
