@@ -201,8 +201,8 @@ module Y2Firewall
       end
     end
 
-    # widget to set selinux policy
-    class SelinuxPolicy < CWM::ComboBox
+    # Widget to set SELinux mode
+    class SelinuxMode < CWM::ComboBox
       def initialize(settings)
         textdomain "firewall"
 
@@ -210,7 +210,7 @@ module Y2Firewall
       end
 
       def label
-        _("SELinux Policy")
+        _("SELinux Mode")
       end
 
       def items

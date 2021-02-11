@@ -22,7 +22,7 @@
 require "yast"
 
 Yast.import "UsersSimple"
-require "y2security/selinux_config"
+require "y2security/selinux"
 
 module Y2Firewall
   # Class that stores the proposal settings for firewalld during installation.
@@ -40,7 +40,6 @@ module Y2Firewall
     attr_accessor :open_vnc
     # [String] Name of the default zone where perform the changes
     attr_accessor :default_zone
-    attr_accessor :selinux_config
 
     # Constructor
     def initialize
@@ -124,10 +123,14 @@ module Y2Firewall
       self.open_vnc = false
     end
 
-    # @return [Y2Security::SelinuxConfig] selinux configuration. Only temporary for SLE15 SP2,
-    # for newer code streams it lives in security_setttings in yast2-installation.
+    # Returns a SELinux configuration handler
+    #
+    # @note this is here only for SLE-15-SP2 and derivated products. Newer code
+    #   streams will have it in the yast2-installation -> security settings
+    #
+    # @return [Y2Security::Selinux] the SELinux config handler
     def selinux_config
-      @selinux_config ||= Y2Security::SelinuxConfig.new
+      @selinux_config ||= Y2Security::Selinux.new
     end
 
   private
