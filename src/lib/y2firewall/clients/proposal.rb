@@ -224,6 +224,10 @@ module Y2Firewall
       def selinux_proposal
         return nil unless @settings.selinux_config.configurable?
 
+        # add required patterns
+        Yast.import "PackagesProposal"
+        Yast::PackagesProposal.SetResolvables("SELinux", :pattern, @settings.selinux_config.needed_patterns)
+
         _(
           "Selinux Default Mode is %s"
         ) % @settings.selinux_config.mode.to_human_string
