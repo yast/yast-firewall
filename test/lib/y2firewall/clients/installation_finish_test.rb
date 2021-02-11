@@ -8,12 +8,10 @@ Yast.import "Service"
 describe Y2Firewall::Clients::InstallationFinish do
   before do
     allow_any_instance_of(Y2Firewall::Firewalld::Api).to receive(:running?).and_return(false)
-    allow(Y2Security::SelinuxConfig).to receive(:new).and_return(selinux_config)
   end
 
   let(:proposal_settings) { Y2Firewall::ProposalSettings.instance }
   let(:firewalld) { Y2Firewall::Firewalld.instance }
-  let(:selinux_config) { double("SelinuxConfig", save: true, configurable?: true) }
 
   describe "#title" do
     it "returns translated string" do
@@ -35,7 +33,7 @@ describe Y2Firewall::Clients::InstallationFinish do
       allow(proposal_settings).to receive(:enable_sshd).and_return(enable_sshd)
       allow(firewalld).to receive(:installed?).and_return(installed)
       allow(proposal_settings).to receive(:open_ssh).and_return(false)
-      allow(proposal_settings).to receive(:selinux_config).and_return(selinux_config)
+      allow(proposal_settings.selinux_config).to receive(:save).and_return(true)
     end
 
     it "enables the sshd service if enabled in the proposal" do

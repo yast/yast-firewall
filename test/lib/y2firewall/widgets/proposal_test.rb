@@ -30,10 +30,12 @@ RSpec.shared_examples "CWM::CheckBox" do
 end
 
 describe Y2Firewall::Widgets do
+  let(:selinux_config) { instance_double(Y2Security::Selinux, modes: []) }
+
   let(:proposal_settings) do
     instance_double(
       Y2Firewall::ProposalSettings, enable_firewall: true, enable_sshd: true,
-        open_ssh: true, open_vnc: true
+        open_ssh: true, open_vnc: true, selinux_config: selinux_config
     )
   end
 
@@ -333,12 +335,6 @@ describe Y2Firewall::Widgets do
 
   describe Y2Firewall::Widgets::SelinuxPolicy do
     subject { described_class.new(proposal_settings) }
-
-    let(:selinux_config) { instance_double("Y2Security::SelinuxConfig", modes: []) }
-
-    before do
-      allow(proposal_settings).to receive(:selinux_config).and_return(selinux_config)
-    end
 
     include_examples "CWM::ComboBox"
   end

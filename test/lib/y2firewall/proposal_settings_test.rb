@@ -107,14 +107,8 @@ describe Y2Firewall::ProposalSettings do
   end
 
   describe "#selinux_config" do
-    let(:selinux_config) { double("Y2Security::SelinuxConfig") }
-
-    before do
-      allow(Y2Security::SelinuxConfig).to receive(:new).and_return(selinux_config)
-    end
-
-    it "returns a SelinuxConfig object" do
-      expect(subject.selinux_config).to eq(selinux_config)
+    it "returns a Y2Security::Selinux instance" do
+      expect(subject.selinux_config).to be_a(Y2Security::Selinux)
     end
   end
 
