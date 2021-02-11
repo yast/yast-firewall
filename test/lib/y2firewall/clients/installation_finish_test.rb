@@ -43,7 +43,7 @@ describe Y2Firewall::Clients::InstallationFinish do
       subject.write
     end
 
-    it "saves selinux policy" do
+    it "saves selinux config" do
       expect(proposal_settings.selinux_config).to receive(:save)
 
       subject.write

@@ -91,7 +91,7 @@ module Y2Firewall
             0.5,
             0.5,
             VBox(
-              Widgets::SelinuxPolicy.new(@settings)
+              Widgets::SelinuxMode.new(@settings)
             )
           )
         )
