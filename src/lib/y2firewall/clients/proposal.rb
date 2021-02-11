@@ -226,7 +226,8 @@ module Y2Firewall
 
         # add required patterns
         Yast.import "PackagesProposal"
-        Yast::PackagesProposal.SetResolvables("SELinux", :pattern, @settings.selinux_config.needed_patterns)
+        Yast::PackagesProposal.SetResolvables("SELinux", :pattern,
+          @settings.selinux_config.needed_patterns)
 
         _(
           "Selinux Default Mode is %s"
