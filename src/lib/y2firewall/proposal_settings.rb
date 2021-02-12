@@ -22,6 +22,7 @@
 require "yast"
 
 Yast.import "UsersSimple"
+require "y2security/selinux"
 
 module Y2Firewall
   # Class that stores the proposal settings for firewalld during installation.
@@ -120,6 +121,16 @@ module Y2Firewall
     def close_vnc!
       log.info "Close VNC port"
       self.open_vnc = false
+    end
+
+    # Returns a SELinux configuration handler
+    #
+    # @note this is here only for SLE-15-SP2 and derivated products. Newer code
+    #   streams will have it in the yast2-installation -> security settings
+    #
+    # @return [Y2Security::Selinux] the SELinux config handler
+    def selinux_config
+      @selinux_config ||= Y2Security::Selinux.new
     end
 
   private

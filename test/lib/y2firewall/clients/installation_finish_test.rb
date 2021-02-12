@@ -33,11 +33,18 @@ describe Y2Firewall::Clients::InstallationFinish do
       allow(proposal_settings).to receive(:enable_sshd).and_return(enable_sshd)
       allow(firewalld).to receive(:installed?).and_return(installed)
       allow(proposal_settings).to receive(:open_ssh).and_return(false)
+      allow(proposal_settings.selinux_config).to receive(:save).and_return(true)
     end
 
     it "enables the sshd service if enabled in the proposal" do
       allow(proposal_settings).to receive(:enable_sshd).and_return(true)
       expect(Yast::Service).to receive(:Enable).with("sshd")
+
+      subject.write
+    end
+
+    it "saves selinux config" do
+      expect(proposal_settings.selinux_config).to receive(:save)
 
       subject.write
     end

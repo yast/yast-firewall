@@ -106,6 +106,12 @@ describe Y2Firewall::ProposalSettings do
     end
   end
 
+  describe "#selinux_config" do
+    it "returns a Y2Security::Selinux instance" do
+      expect(subject.selinux_config).to be_a(Y2Security::Selinux)
+    end
+  end
+
   describe "#enable_firewall!" do
     it "sets firewalld service to be enabled" do
       allow(Yast::PackagesProposal).to receive("AddResolvables")

@@ -200,5 +200,43 @@ module Y2Firewall
         )
       end
     end
+
+    # Widget to set SELinux mode
+    class SelinuxMode < CWM::ComboBox
+      def initialize(settings)
+        textdomain "firewall"
+
+        @settings = settings
+      end
+
+      def label
+        # TRANSLATORS: SELinu Mode just SELinux is already content of frame.
+        _("Mode")
+      end
+
+      def items
+        @settings.selinux_config.modes.map { |m| [m.id, m.to_human_string] }
+      end
+
+      def init
+        self.value = @settings.selinux_config.mode.id
+      end
+
+      def store
+        @settings.selinux_config.mode = value
+      end
+
+      def help
+        _(
+          "<p>Sets default SELinux mode. Modes are: <ul>" \
+          "<li><b>Enforcing</b> the state that enforces SELinux security policy. "\
+          "Access is denied to users and programs unless permitted by " \
+          "SELinux security policy rules. All denial messages are logged.</li> "\
+          "<b>Permissive</b> is a diagnostic state. The security policy rules are " \
+          "not enforced, but SELinux sends denial messages to a log file.</li>" \
+          "<b>Disabled</b> SELinux does not enforce a security policy.</li></ul></p>"
+        )
+      end
+    end
   end
 end

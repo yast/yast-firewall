@@ -57,6 +57,7 @@ module Y2Firewall
       def write
         Service.Enable("sshd") if @settings.enable_sshd
         configure_firewall if @firewalld.installed?
+        @settings.selinux_config.save
         true
       end
 
