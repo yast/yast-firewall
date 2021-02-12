@@ -228,7 +228,7 @@ module Y2Firewall
 
       def help
         _(
-          "<p>Sets default selinux mode. Modes are: <ul>" \
+          "<p>Sets default SELinux mode. Modes are: <ul>" \
           "<li><b>Enforcing</b> the state that enforces SELinux security policy. "\
           "Access is denied to users and programs unless permitted by " \
           "SELinux security policy rules. All denial messages are logged.</li> "\
