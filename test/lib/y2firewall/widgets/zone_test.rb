@@ -24,18 +24,30 @@ require "cwm/rspec"
 require "y2firewall/widgets/zone"
 
 describe Y2Firewall::Dialogs::NameWidget do
+  before do
+    allow(Yast::Report).to receive(:Error).with(/provide a valid alphanumeric name/)
+  end
+
   subject { described_class.new(double(name: "test")) }
 
   include_examples "CWM::AbstractWidget"
 end
 
 describe Y2Firewall::Dialogs::ShortWidget do
+  before do
+    allow(Yast::Report).to receive(:Error).with(/provide a short name/)
+  end
+
   subject { described_class.new(double(short: "test")) }
 
   include_examples "CWM::AbstractWidget"
 end
 
 describe Y2Firewall::Dialogs::DescriptionWidget do
+  before do
+    allow(Yast::Report).to receive(:Error).with(/provide a description/)
+  end
+
   subject { described_class.new(double(description: "test")) }
 
   include_examples "CWM::AbstractWidget"
