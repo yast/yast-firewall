@@ -29,7 +29,7 @@ Source0:        %{name}-%{version}.tar.bz2
 BuildRequires:  update-desktop-files
 BuildRequires:  yast2-devtools >= 4.2.2
 # for proposing selinux
-BuildRequires:  yast2-security >= 4.2.16
+BuildRequires:  yast2-security >= 4.2.17
 # Removed zone name from common attributes definition
 BuildRequires:  yast2 >= 4.1.67
 BuildRequires:  rubygem(%rb_default_ruby_abi:yast-rake)

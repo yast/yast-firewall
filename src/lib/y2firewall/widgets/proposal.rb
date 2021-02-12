@@ -210,7 +210,8 @@ module Y2Firewall
       end
 
       def label
-        _("SELinux Mode")
+        # TRANSLATORS: SELinu Mode just SELinux is already content of frame.
+        _("Mode")
       end
 
       def items
@@ -223,6 +224,18 @@ module Y2Firewall
 
       def store
         @settings.selinux_config.mode = value
+      end
+
+      def help
+        _(
+          "<p>Sets default selinux mode. Modes are: <ul>" \
+          "<li><b>Enforcing</b> the state that enforces SELinux security policy. "\
+          "Access is denied to users and programs unless permitted by " \
+          "SELinux security policy rules. All denial messages are logged.</li> "\
+          "<b>Permissive</b> is a diagnostic state. The security policy rules are " \
+          "not enforced, but SELinux sends denial messages to a log file.</li>" \
+          "<b>Disabled</b> SELinux does not enforce a security policy.</li></ul></p>"
+        )
       end
     end
   end
