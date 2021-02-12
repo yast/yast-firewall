@@ -67,6 +67,7 @@ describe Y2Firewall::ImporterStrategies::SuseFirewall do
 
     context "when the profile is not empty" do
       before do
+        allow(Yast::Report).to receive(:Warning).with(/profile in use is based on SuSEFirewall2/)
         subject.import
       end
 

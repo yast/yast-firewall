@@ -33,6 +33,7 @@ describe Y2Firewall::Clients::InstallationFinish do
       allow(proposal_settings).to receive(:enable_sshd).and_return(enable_sshd)
       allow(firewalld).to receive(:installed?).and_return(installed)
       allow(proposal_settings).to receive(:open_ssh).and_return(false)
+      allow(subject).to receive(:configure_firewall)
     end
 
     it "enables the sshd service if enabled in the proposal" do
