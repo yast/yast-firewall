@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+Mon Mar  1 15:39:46 UTC 2021 - David Diaz <dgonzalez@suse.com>
+
+- Use the correct SELinux abbreviation (related to jsc#SLE-17427).
+- 4.2.7
+
+-------------------------------------------------------------------
 Thu Feb  4 09:14:13 UTC 2021 - Josef Reidinger <jreidinger@suse.com>
 
 - Add to firewall/security proposal option to setup selinux if

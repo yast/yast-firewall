@@ -30,7 +30,6 @@ describe Y2Firewall::Clients::Proposal do
   before do
     # skip bootloader proposal to avoid build dependency on it
     allow(subject).to receive(:cpu_mitigations_proposal)
-    allow(subject).to receive(:selinux_proposal)
   end
 
   describe "#initialize" do
@@ -94,8 +93,14 @@ describe Y2Firewall::Clients::Proposal do
 
   describe "#make_proposal" do
     let(:firewall_enabled) { false }
+    let(:selinux_configurable) { false }
+
     before do
-      allow(proposal_settings).to receive("enable_firewall").and_return(firewall_enabled)
+      allow(proposal_settings).to receive("enable_firewall")
+        .and_return(firewall_enabled)
+      allow(proposal_settings.selinux_config).to receive(:configurable?)
+        .and_return(selinux_configurable)
+      allow(Yast::Bootloader).to receive(:kernel_param).and_return(:missing)
     end
 
     it "returns a hash with 'preformatted_proposal', 'links' and 'warning_level'" do
@@ -104,6 +109,24 @@ describe Y2Firewall::Clients::Proposal do
       proposal = client.make_proposal({})
       expect(proposal).to be_a Hash
       expect(proposal).to include("preformatted_proposal", "links", "warning_level")
+    end
+
+    context "when SELinux is configurable" do
+      let(:selinux_configurable) { true }
+
+      it "contains the SELinux Default Mode in preformatted proposal" do
+        proposal = client.make_proposal({})
+
+        expect(proposal["preformatted_proposal"]).to include("SELinux Default Mode")
+      end
+    end
+
+    context "when SELinux is not configurable" do
+      it "does not contain references to it in preformatted proposal" do
+        proposal = client.make_proposal({})
+
+        expect(proposal["preformatted_proposal"]).to_not include("SELinux Default Mode")
+      end
     end
 
     context "when firewalld is disabled" do
