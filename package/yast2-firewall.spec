@@ -17,7 +17,7 @@
 
 
 Name:           yast2-firewall
-Version:        4.3.10
+Version:        4.3.11
 Release:        0
 Summary:        YaST2 - Firewall Configuration
 Group:          System/YaST
