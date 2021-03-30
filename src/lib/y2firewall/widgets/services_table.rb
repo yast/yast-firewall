@@ -71,7 +71,7 @@ module Y2Firewall
       def services=(services)
         old_services = @services
         @services = services
-        change_items(items)
+        change_items(items) if displayed?
 
         return if Yast::UI.TextMode
 
