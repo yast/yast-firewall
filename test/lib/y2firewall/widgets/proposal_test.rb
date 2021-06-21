@@ -22,12 +22,12 @@
 require_relative "../../../test_helper.rb"
 require "cwm/rspec"
 require "y2firewall/widgets/proposal"
-require "y2firewall/proposal_settings"
+require "installation/security_settings"
 
 describe Y2Firewall::Widgets do
   let(:proposal_settings) do
     instance_double(
-      Y2Firewall::ProposalSettings, enable_firewall: true, enable_sshd: true,
+      ::Installation::SecuritySettings, enable_firewall: true, enable_sshd: true,
         open_ssh: true, open_vnc: true
     )
   end
