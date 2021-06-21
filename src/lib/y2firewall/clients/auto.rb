@@ -20,7 +20,7 @@
 require "yast"
 require "y2firewall/firewalld"
 require "y2firewall/autoyast"
-require "y2firewall/proposal_settings"
+require "installation/security_settings"
 require "y2firewall/summary_presenter"
 require "y2firewall/dialogs/main"
 require "y2firewall/autoinst_profile/firewall_section"
@@ -235,9 +235,9 @@ module Y2Firewall
         Firewalld.instance
       end
 
-      # @return [Y2Firewall::ProposalSettings]
+      # @return [::Installation::SecuritySettings]
       def settings
-        ProposalSettings.instance
+        ::Installation::SecuritySettings.instance
       end
 
       # Set that the firewall has to be enabled when writing
