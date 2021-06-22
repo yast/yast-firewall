@@ -25,6 +25,21 @@ ENV["Y2DIR"] = y2dirs.unshift(srcdir).join(":")
 require "yast"
 require "yast/rspec"
 
+LIBS_TO_SKIP = ["installation/security_settings"].freeze
+
+# Hack to avoid to require some files
+#
+# This is here to avoid a cyclic dependency with yast-installation at build time.
+# The package yast-firewall does not include a BuildRequires for yast-installation, so the require
+# for files defined by that package must be avoided.
+module Kernel
+  alias_method :old_require, :require
+
+  def require(path)
+    old_require(path) unless LIBS_TO_SKIP.include?(path)
+  end
+end
+
 # stub module to prevent its Import
 # Useful for modules from different yast packages, to avoid build dependencies
 def stub_module(name, fake_class = nil)
