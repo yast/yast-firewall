@@ -40,18 +40,6 @@ module Kernel
   end
 end
 
-# stub module to prevent its Import
-# Useful for modules from different yast packages, to avoid build dependencies
-def stub_module(name, fake_class = nil)
-  fake_class = Class.new { def self.fake_method; end } if fake_class.nil?
-  Yast.const_set name.to_sym, fake_class
-end
-
-# stub classes from other modules to speed up a build
-# rubocop:disable Style/SingleLineMethods
-stub_module("AutoInstall", Class.new { def self.issues_list; []; end })
-# rubocop:enable Style/SingleLineMethods
-
 # some tests have translatable messages
 ENV["LANG"] = "en_US.UTF-8"
 ENV["LC_ALL"] = "en_US.UTF-8"
@@ -90,3 +78,6 @@ if ENV["COVERAGE"]
     ]
   end
 end
+
+# stub classes from other modules to avoid build dependencies
+Yast::RSpec::Helpers.define_yast_module("AutoInstall", methods: [:issues_list])
