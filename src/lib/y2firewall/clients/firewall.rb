@@ -24,7 +24,7 @@ require "y2firewall/dialogs/main"
 
 Yast.import "UI"
 Yast.import "Popup"
-Yast.import "PackageSystem"
+Yast.import "Package"
 
 module Y2Firewall
   module Clients
@@ -50,7 +50,7 @@ module Y2Firewall
 
       def run
         log_and_return do
-          return :abort unless Yast::PackageSystem.CheckAndInstallPackages(["firewalld"])
+          return :abort unless Yast::Package.CheckAndInstallPackages(["firewalld"])
 
           if !Yast::WFM.Args.empty?
             warn _(NOT_SUPPORTED)
