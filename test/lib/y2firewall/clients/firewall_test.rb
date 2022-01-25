@@ -27,7 +27,7 @@ describe Y2Firewall::Clients::Firewall do
     let(:installed) { true }
     let(:args) { [] }
     before do
-      allow(Yast::PackageSystem).to receive("CheckAndInstallPackages")
+      allow(Yast::Package).to receive("CheckAndInstallPackages")
         .with(["firewalld"]).and_return(installed)
       allow(Yast::WFM).to receive("Args").and_return(args)
       allow(subject).to receive(:warn)
