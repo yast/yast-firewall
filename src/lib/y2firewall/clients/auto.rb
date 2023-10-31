@@ -83,6 +83,7 @@ module Y2Firewall
         # by the AutoYaST confirm dialog.
         update_service_state(profile)
         return false if merge && !read(force: false)
+
         start if profile.fetch("start_firewall", false)
         autoyast.import(profile)
         check_profile_for_errors
@@ -250,7 +251,9 @@ module Y2Firewall
         state = profile.fetch("enable_firewall", settings.enable_firewall)
 
         log.info("Firewall should be enabled: #{state}")
-        state ? settings.enable_firewall! : settings.disable_firewall! if Yast::Mode.auto
+        if Yast::Mode.auto
+          state ? settings.enable_firewall! : settings.disable_firewall!
+        end
         state
       end
 
