@@ -99,7 +99,7 @@ module Y2Firewall
 
         # TRANSLATORS: popup question
         msg = _("The selection of services will be lost if you leave the page\n" \
-          "without moving them with Add/Remove.\n\nDo you really want to continue?\n")
+                "without moving them with Add/Remove.\n\nDo you really want to continue?\n")
 
         Yast::Popup.YesNo(msg)
       end

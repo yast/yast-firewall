@@ -30,8 +30,7 @@ module Y2Firewall
       # @param _hash [Hash] Firewall section from an AutoYaST profile
       # @return [FirewallSection]
       def self.new_from_hashes(_hash)
-        result = new
-        result
+        new
       end
     end
   end

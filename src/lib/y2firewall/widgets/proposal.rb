@@ -93,11 +93,11 @@ module Y2Firewall
       def help
         _(
           "<p><b><big>Firewall and SSH</big></b><br>\n" \
-            "Firewall is a defensive mechanism that protects " \
-            "your computer from network attacks.\n" \
-            "SSH is a service that allows logging into this " \
-            "computer remotely via dedicated\n" \
-            "SSH client</p>"
+          "Firewall is a defensive mechanism that protects " \
+          "your computer from network attacks.\n" \
+          "SSH is a service that allows logging into this " \
+          "computer remotely via dedicated\n" \
+          "SSH client</p>"
         ) +
           _(
             "<p>Here you can choose whether the firewall will be " \
@@ -193,8 +193,8 @@ module Y2Firewall
       def help
         _(
           "<p>You can also open VNC ports in firewall. It will not enable\n" \
-            "the remote administration service on a running system but it is\n" \
-            "started by the installer automatically if needed.</p>"
+          "the remote administration service on a running system but it is\n" \
+          "started by the installer automatically if needed.</p>"
         )
       end
     end
