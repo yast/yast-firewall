@@ -32,6 +32,7 @@ module Y2Firewall
       #
       # @param zone [Y2Firewall::Firewalld::Zone] Zone to set as 'default'
       def initialize(zone)
+        super()
         textdomain "firewall"
         @zone = zone
       end

@@ -37,6 +37,7 @@ module Y2Firewall
         #
         # @param _pager [CWM::TreePager]
         def initialize(_pager)
+          super()
           textdomain "firewall"
         end
 

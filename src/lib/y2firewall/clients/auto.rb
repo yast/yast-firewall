@@ -59,6 +59,7 @@ module Y2Firewall
 
       # Constructor
       def initialize
+        super()
         textdomain "firewall"
       end
 

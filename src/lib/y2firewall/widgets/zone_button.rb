@@ -25,6 +25,7 @@ module Y2Firewall
     # ancestor only class for all zone related buttons
     class ZoneButton < CWM::PushButton
       def initialize(pager, table)
+        super()
         textdomain "firewall"
         @pager = pager
         @table = table

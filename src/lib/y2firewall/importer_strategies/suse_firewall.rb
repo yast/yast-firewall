@@ -180,7 +180,7 @@ module Y2Firewall
       # @param zone_name [String]
       def services(zone_name)
         services = profile["FW_CONFIGURATIONS_#{zone_name}"]
-        services ? map_services(services.split(" ")) : nil
+        services ? map_services(services.split) : nil
       end
 
       # Obtain the interfaces for the given SuSEFIrewall2 zone name from the
@@ -192,7 +192,7 @@ module Y2Firewall
       # especial wildcards like 'any' or nil in case the key is not defined
       def interfaces(zone_name)
         interfaces = profile["FW_DEV_#{zone_name}"]
-        interfaces ? interfaces.split(" ").reject { |i| i == "any" } : nil
+        interfaces ? interfaces.split.reject { |i| i == "any" } : nil
       end
 
       # Return whether the given zone name is the default one.
@@ -211,7 +211,7 @@ module Y2Firewall
       # @return [Array<String>, nil]
       def protocols(zone)
         protocols = profile["FW_SERVICES_#{zone}_IP"]
-        protocols ? protocols.split(" ") : nil
+        protocols ? protocols.split : nil
       end
 
       # Obtain the ports for the given SuSEFIrewall2 zone name from the
@@ -246,7 +246,7 @@ module Y2Firewall
       # configured
       def tcp_ports(zone)
         ports = profile["FW_SERVICES_#{zone}_TCP"]
-        ports ? ports.split(" ").map { |p| "#{p.sub(":", "-")}/tcp" } : nil
+        ports ? ports.split.map { |p| "#{p.sub(":", "-")}/tcp" } : nil
       end
 
       # Obtain the UDP ports for the given SuSEFIrewall2 zone name from the
@@ -257,7 +257,7 @@ module Y2Firewall
       # configured
       def udp_ports(zone)
         ports = profile["FW_SERVICES_#{zone}_UDP"]
-        ports ? ports.split(" ").map { |p| "#{p.sub(":", "-")}/udp" } : nil
+        ports ? ports.split.map { |p| "#{p.sub(":", "-")}/udp" } : nil
       end
 
       # Obtain the RPC ports for the given SuSEFIrewall2 zone name from the
@@ -268,7 +268,7 @@ module Y2Firewall
       #   configured
       def rpc_ports(zone)
         ports = profile["FW_SERVICES_#{zone}_RPC"]
-        ports ? ports.split(" ").map { |p| ["#{p}/udp", "#{p}/tcp"] }.flatten : nil
+        ports ? ports.split.map { |p| ["#{p}/udp", "#{p}/tcp"] }.flatten : nil
       end
 
       # Given a SuSEFirewall2 zone name return the firewalld zone equivalent

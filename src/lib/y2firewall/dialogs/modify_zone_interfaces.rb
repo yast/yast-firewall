@@ -28,6 +28,7 @@ module Y2Firewall
     class ModifyZoneInterfaces < ::CWM::Popup
       # Constructor
       def initialize
+        super()
         textdomain "firewall"
       end
 

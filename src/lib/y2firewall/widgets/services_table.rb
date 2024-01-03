@@ -43,6 +43,7 @@ module Y2Firewall
       #
       # @param services [Array<String>] Services to be displayed
       def initialize(services: [], widget_id: nil)
+        super()
         textdomain "firewall"
         @services = services
         self.widget_id = widget_id || "services_table:#{object_id}"

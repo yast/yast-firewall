@@ -36,6 +36,7 @@ module Y2Firewall
 
       # Constructor
       def initialize
+        super()
         textdomain "firewall"
 
         @fw = Y2Firewall::Firewalld.instance

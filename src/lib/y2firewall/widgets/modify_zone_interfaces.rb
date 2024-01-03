@@ -33,6 +33,7 @@ module Y2Firewall
       # @param interfaces_input [CWM::InputField] input field for modifying the
       #   selected zone interfaces
       def initialize(interfaces_input)
+        super()
         textdomain "firewall"
         @interfaces_input = interfaces_input
       end
@@ -98,6 +99,7 @@ module Y2Firewall
     # @example input field widget child
     class ZoneInterfaces < CWM::InputField
       def initialize
+        super()
         textdomain "firewall"
       end
 
