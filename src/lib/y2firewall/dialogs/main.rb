@@ -31,6 +31,7 @@ module Y2Firewall
     class Main < CWM::Dialog
       # Constructor
       def initialize
+        super()
         Yast.import "NetworkInterfaces"
         textdomain "firewall"
 

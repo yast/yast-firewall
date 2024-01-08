@@ -34,6 +34,7 @@ module Y2Firewall
         # @param zone [Y2Firewall::Firewalld::Zone]
         # @param pager [CWM::TreePager]
         def initialize(zone, pager)
+          super()
           Yast.import "Popup"
           textdomain "firewall"
           @zone = zone
@@ -63,6 +64,7 @@ module Y2Firewall
         #
         # @param zone [Y2Firewall::Firewalld::Zone]
         def initialize(zone)
+          super()
           textdomain "firewall"
           @zone = zone
         end
@@ -94,6 +96,7 @@ module Y2Firewall
           }.freeze
 
           def initialize(zone)
+            super()
             textdomain "firewall"
             @zone = zone
           end
@@ -204,6 +207,7 @@ module Y2Firewall
         # @param zone [Y2Firewall::Firewalld::Zone]
         # @param _pager [CWM::TreePager]
         def initialize(zone, _pager)
+          super()
           textdomain "firewall"
           @zone = zone
 

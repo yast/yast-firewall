@@ -33,6 +33,7 @@ module Y2Firewall
       #
       # @param interface [Y2Firewall::Firewalld::Interface] Interface to act on
       def initialize(interface)
+        super()
         textdomain "firewall"
         @interface = interface
       end

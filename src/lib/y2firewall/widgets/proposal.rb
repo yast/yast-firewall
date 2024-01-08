@@ -28,6 +28,7 @@ module Y2Firewall
     # open/close checkbox widgets when the firewall is disable
     class FirewallSSHProposal < CWM::CustomWidget
       def initialize(settings)
+        super()
         @settings = settings
 
         @port_widgets = [Widgets::OpenSSHPort.new(@settings)]
@@ -61,6 +62,7 @@ module Y2Firewall
     # Enable firewall service checkbox
     class EnableFirewall < CWM::CheckBox
       def initialize(settings, widgets)
+        super()
         textdomain "firewall"
         @settings = settings
         @widgets = widgets
@@ -93,11 +95,11 @@ module Y2Firewall
       def help
         _(
           "<p><b><big>Firewall and SSH</big></b><br>\n" \
-            "Firewall is a defensive mechanism that protects " \
-            "your computer from network attacks.\n" \
-            "SSH is a service that allows logging into this " \
-            "computer remotely via dedicated\n" \
-            "SSH client</p>"
+          "Firewall is a defensive mechanism that protects " \
+          "your computer from network attacks.\n" \
+          "SSH is a service that allows logging into this " \
+          "computer remotely via dedicated\n" \
+          "SSH client</p>"
         ) +
           _(
             "<p>Here you can choose whether the firewall will be " \
@@ -110,6 +112,7 @@ module Y2Firewall
     # Enable sshd service checkbox
     class EnableSSHD < CWM::CheckBox
       def initialize(settings)
+        super()
         textdomain "firewall"
         @settings = settings
       end
@@ -143,6 +146,7 @@ module Y2Firewall
     # Open ssh port checkbox
     class OpenSSHPort < CWM::CheckBox
       def initialize(settings)
+        super()
         textdomain "firewall"
         @settings = settings
       end
@@ -168,6 +172,7 @@ module Y2Firewall
     # Open vnc port checkbox
     class OpenVNCPorts < CWM::CheckBox
       def initialize(settings)
+        super()
         textdomain "firewall"
         @settings = settings
       end
@@ -193,8 +198,8 @@ module Y2Firewall
       def help
         _(
           "<p>You can also open VNC ports in firewall. It will not enable\n" \
-            "the remote administration service on a running system but it is\n" \
-            "started by the installer automatically if needed.</p>"
+          "the remote administration service on a running system but it is\n" \
+          "started by the installer automatically if needed.</p>"
         )
       end
     end

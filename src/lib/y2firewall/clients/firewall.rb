@@ -45,18 +45,18 @@ module Y2Firewall
       # TRANSLATORS: firewall-config and firewall-cmd are the names of software utilities,
       # so they should not be translated.
       NOT_SUPPORTED = N_("YaST does not support the command line for " \
-        "configuring the firewall.\nInstead, please use the firewalld " \
-        "command line clients \"firewalld-cmd\" or \"firewall-offline-cmd\".")
+                         "configuring the firewall.\nInstead, please use the firewalld " \
+                         "command line clients \"firewalld-cmd\" or \"firewall-offline-cmd\".")
 
       def run
         log_and_return do
           return :abort unless Yast::Package.CheckAndInstallPackages(["firewalld"])
 
-          if !Yast::WFM.Args.empty?
+          if Yast::WFM.Args.empty?
+            Dialogs::Main.new.run
+          else
             warn _(NOT_SUPPORTED)
             false
-          else
-            Dialogs::Main.new.run
           end
         end
       end

@@ -27,6 +27,7 @@ module Y2Firewall
     class ZoneInterfacesButton < CWM::PushButton
       # Constructor
       def initialize
+        super()
         textdomain "firewall"
       end
 

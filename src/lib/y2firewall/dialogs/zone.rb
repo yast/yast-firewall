@@ -30,6 +30,7 @@ module Y2Firewall
       # @param existing_names [Array<String>] names have to be unique, so pass existing ones
       #   which cannot be used.
       def initialize(zone, new_zone: false, existing_names: [])
+        super()
         textdomain "firewall"
         @zone = zone
         @new_zone = new_zone

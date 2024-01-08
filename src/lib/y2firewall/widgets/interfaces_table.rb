@@ -39,6 +39,7 @@ module Y2Firewall
       # @param change_zone_button [Y2Firewall::Widgets::ChangeZoneButton] Button to change assigned
       #   zone
       def initialize(interfaces, change_zone_button)
+        super()
         textdomain "firewall"
         @interfaces = interfaces
         @change_zone_button = change_zone_button

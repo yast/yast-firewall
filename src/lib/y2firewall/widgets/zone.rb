@@ -27,6 +27,7 @@ module Y2Firewall
       include Yast::I18n
 
       def initialize(zone, disabled: false, existing_names: [])
+        super()
         textdomain "firewall"
         @zone = zone
         @disabled = disabled
@@ -66,6 +67,7 @@ module Y2Firewall
       include Yast::I18n
 
       def initialize(zone)
+        super()
         textdomain "firewall"
         @zone = zone
       end
@@ -97,6 +99,7 @@ module Y2Firewall
       include Yast::I18n
 
       def initialize(zone)
+        super()
         textdomain "firewall"
         @zone = zone
       end
@@ -125,6 +128,7 @@ module Y2Firewall
     # target of zone
     class TargetWidget < CWM::ComboBox
       def initialize(zone)
+        super()
         textdomain "firewall"
         @zone = zone
       end
@@ -151,6 +155,7 @@ module Y2Firewall
       include Yast::I18n
 
       def initialize(zone)
+        super()
         textdomain "firewall"
         @zone = zone
       end
