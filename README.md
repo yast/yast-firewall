@@ -2,8 +2,7 @@
 
 [![Workflow Status](https://github.com/yast/yast-firewall/workflows/CI/badge.svg?branch=master)](
 https://github.com/yast/yast-firewall/actions?query=branch%3Amaster)
-[![Jenkins Status](https://ci.opensuse.org/buildStatus/icon?job=yast-yast-firewall-master)](
-https://ci.opensuse.org/view/Yast/job/yast-yast-firewall-master/)
+[![OBS](https://github.com/yast/yast-firewall/actions/workflows/submit.yml/badge.svg)](https://github.com/yast/yast-firewall/actions/workflows/submit.yml)
 [![Coverage Status](https://coveralls.io/repos/github/yast/yast-firewall/badge.svg?branch=master)](
 https://coveralls.io/github/yast/yast-firewall?branch=master)
 
