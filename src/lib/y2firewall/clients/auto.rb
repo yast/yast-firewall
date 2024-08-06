@@ -80,10 +80,11 @@ module Y2Firewall
       # @return [Boolean]
       def import(profile, merge = !Yast::Mode.config)
         self.class.profile = profile
+        # It does not need to be merged with current config but could be modified
+        # by the AutoYaST confirm dialog.
+        update_service_state(profile)
         return false if merge && !read(force: false)
 
-        # Obtains the default from the control file (settings) if not present.
-        enable if profile.fetch("enable_firewall", settings.enable_firewall)
         start if profile.fetch("start_firewall", false)
         autoyast.import(profile)
         check_profile_for_errors
@@ -241,16 +242,27 @@ module Y2Firewall
         ::Installation::SecuritySettings.instance
       end
 
-      # Set that the firewall has to be enabled when writing
-      def enable
-        self.class.enable = true
+      # It sets which should be the firewalld service state according to the profile
+      # or to the product defaults settings
+      #
+      # @param profile [Hash] firewall profile section to be imported
+      def update_service_state(profile)
+        return unless self.class.enable.nil?
+
+        state = profile.fetch("enable_firewall", settings.enable_firewall)
+
+        log.info("Firewall should be enabled: #{state}")
+        if Yast::Mode.auto
+          state ? settings.enable_firewall! : settings.disable_firewall!
+        end
+        state
       end
 
       # Whether the firewalld service has to be enable or disable when writing
       #
       # @return [Boolean] true if has to be enabled; false otherwise
       def enable?
-        !!self.class.enable
+        !!(Yast::Mode.auto ? settings.enable_firewall : self.class.enable)
       end
 
       # Set that the firewall has to be started when writing
