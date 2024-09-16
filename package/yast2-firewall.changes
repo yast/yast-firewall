@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Mon Sep 16 14:21:01 UTC 2024 - Ladislav Slezák <lslezak@suse.com>
+
+- Branch package for SP7 (bsc#1230201)
+
+-------------------------------------------------------------------
 Tue Oct 31 16:42:54 UTC 2023 - Knut Anderssen <kanderssen@suse.com>
 
 - In case of autoinstallation keep the firewall service state in
