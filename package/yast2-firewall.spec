@@ -17,7 +17,7 @@
 
 
 Name:           yast2-firewall
-Version:        5.0.1
+Version:        5.0.2
 Release:        0
 Summary:        YaST2 - Firewall Configuration
 Group:          System/YaST
@@ -26,7 +26,6 @@ Url:            https://github.com/yast/yast-firewall
 
 Source0:        %{name}-%{version}.tar.bz2
 
-BuildRequires:  perl-XML-Writer update-desktop-files yast2-testsuite
 BuildRequires:  yast2-devtools >= 4.2.2
 # Replace PackageSystem with Package
 BuildRequires:  yast2 >= 4.4.38
